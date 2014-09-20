@@ -34,6 +34,7 @@ class CommandExecutor {
 	}
 	
 	public boolean updateProgress(int taskID, int progress){
+		//progress: 0-->incomplete; 1-->in progress; 2-->completed
 		return true;
 	}
 	
@@ -50,6 +51,14 @@ class CommandExecutor {
 	}
 	
 	public boolean updateType(int taskID, String startTime, String endTime){
+		return true;
+	}
+	
+	public boolean updateRecurrence(int taskID, String recurrence){
+		return true;
+	}
+	
+	public boolean updateImportance(int taskID, int importance){
 		return true;
 	}
 }
