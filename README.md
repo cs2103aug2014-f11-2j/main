@@ -8,6 +8,7 @@ Basic Command Line Interface Usage
 ------
 
  1. Add a task:
+ 
  `add [-N or --title <title>] ([-D or --description <description>] [-L or --location <location>] [-C or --category <category name>] [-T or --time {<date+time>| <<starting date+time> to <ending date+time>>}] [-R or --recurring <number h/d/w/m/y>] [-I or --importance <importance level>)`
  
  Note: date+time format: YYYY/MM/DD/hh:mm
@@ -40,19 +41,7 @@ Basic Command Line Interface Usage
  
  `undo <steps>`
  
- 9. List categories:
- 
- `listcategory`
- 
- 10. Add a category:
- 
- `addcategory <category name>`
- 
- 11. Delete a category:
- 
- `delcategory <category name>`
- 
- 12. Display Help:
+ 9. Display Help:
  
  `help`
 
