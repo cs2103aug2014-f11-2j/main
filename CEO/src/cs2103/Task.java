@@ -7,11 +7,11 @@ class Task {
 	private static enum Progress{
 		INCOMPLETE, IN_PROGRESS, COMPLETED
 	};
-	private static enum Type{
-		FLOATING, DEADLINE, PERIOD
-	};
-	private final static byte START=0;
-	private final static byte END=1;
+	private final static int START=0;
+	private final static int END=1;
+	private final static int FLOATING=0;
+	private final static int DEADLINE=1;
+	private final static int PERIODIC=2;
 	private String taskUID;
 	private String title;
 	private String description;
@@ -20,7 +20,6 @@ class Task {
 	private String recurrence;
 	private int importance;
 	private Progress progress;
-	private Type type;
 	private Date[] time;
 
 	
@@ -33,17 +32,15 @@ class Task {
 			this.recurrence=recurrence;
 			this.importance=importance;
 			this.progress=Progress.INCOMPLETE;
-			if (startTime==null && endTime==null){
-				this.type=Type.FLOATING;
-			}else if (endTime==null){
-				this.type=Type.DEADLINE;
-				time=new Date[1];
-				this.time[START]=startTime;
-			}else{
-				this.type=Type.PERIOD;
+			if (startTime!=null && endTime!=null){
 				time=new Date[2];
 				this.time[START]=startTime;
 				this.time[END]=endTime;
+			}else if (endTime==null){
+				time=new Date[1];
+				this.time[START]=startTime;
+			}else{
+				time=null;
 			}
 		}else{
 			throw new CEOException("No Title Error");
@@ -93,15 +90,12 @@ class Task {
 	}
 	
 	public int getType(){
-		switch(this.type){
-		case FLOATING:
-			return 0;
-		case DEADLINE:
-			return 1;
-		case PERIOD:
-			return 2;
-		default:
-			return -1;
+		if (time.length==2){
+			return PERIODIC;
+		}else if (time.length==1){
+			return DEADLINE;
+		}else{
+			return FLOATING;
 		}
 	}
 	
