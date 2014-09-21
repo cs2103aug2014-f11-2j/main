@@ -9,9 +9,11 @@ class Task {
 	};
 	private final static int START=0;
 	private final static int END=1;
-	private final static int FLOATING=0;
 	private final static int DEADLINE=1;
 	private final static int PERIODIC=2;
+	private final static int INCOMPLETE=0;
+	private final static int IN_PROGRESS=1;
+	private final static int COMPLETED=2;
 	private String taskUID;
 	private String title;
 	private String description;
@@ -33,11 +35,11 @@ class Task {
 			this.importance=importance;
 			this.progress=Progress.INCOMPLETE;
 			if (startTime!=null && endTime!=null){
-				time=new Date[2];
+				time=new Date[PERIODIC];
 				this.time[START]=startTime;
 				this.time[END]=endTime;
 			}else if (endTime==null){
-				time=new Date[1];
+				time=new Date[DEADLINE];
 				this.time[START]=startTime;
 			}else{
 				time=null;
@@ -79,29 +81,71 @@ class Task {
 	public int getProgress(){
 		switch(this.progress){
 		case INCOMPLETE:
-			return 0;
+			return INCOMPLETE;
 		case IN_PROGRESS:
-			return 1;
+			return IN_PROGRESS;
 		case COMPLETED:
-			return 2;
+			return COMPLETED;
 		default:
 			return -1;
 		}
 	}
-	
-	public int getType(){
-		if (time.length==2){
-			return PERIODIC;
-		}else if (time.length==1){
-			return DEADLINE;
-		}else{
-			return FLOATING;
-		}
-	}
-	
+
 	public Date[] getTime(){
 		return this.time;
 	}
 	
-	//To-do: Implement update functions
+	public void updateTitle(String title) throws CEOException{
+		if (title==null){
+			throw new CEOException("No Title Error");
+		}else{
+			this.title=title;
+		}
+	}
+	
+	public void updateDescription(String description){
+		this.description=description;
+	}
+	
+	public void updateLocation(String location){
+		this.location=location;
+	}
+	
+	public void updateCategory(String category){
+		this.category=category;
+	}
+	
+	public void updateRecurrence(String recurrence){
+		this.recurrence=recurrence;
+	}
+	
+	public void updateImportance(int importance){
+		this.importance=importance;
+	}
+	
+	public void updateProgress(int progress) throws CEOException{
+		if (progress == COMPLETED){
+			this.progress=Progress.COMPLETED;
+		}else if (progress == IN_PROGRESS){
+			this.progress=Progress.IN_PROGRESS;
+		}else if (progress == INCOMPLETE){
+			this.progress=Progress.INCOMPLETE;
+		}else{
+			throw new CEOException("Invalid Progress");
+		}
+	}
+	
+	public void updateTime(Date startTime, Date endTime){
+		if (startTime==null && endTime==null){
+			this.time=null;
+		}else if (endTime==null){
+			this.time=new Date[DEADLINE];
+			this.time[START]=startTime;
+		}else{
+			this.time=new Date[PERIODIC];
+			this.time[START]=startTime;
+			this.time[END]=endTime;
+		}
+	}
+	
 }
