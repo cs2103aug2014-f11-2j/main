@@ -1,7 +1,5 @@
 package cs2103;
-import java.text.DateFormat;  
 import java.util.Date;  
-import java.util.GregorianCalendar;
 
 class Task {
 	private static enum Progress{

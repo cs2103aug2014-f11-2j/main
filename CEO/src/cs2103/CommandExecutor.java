@@ -2,8 +2,11 @@ package cs2103;
 
 import java.util.ArrayList;
 import java.text.DateFormat;  
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;  
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 class CommandExecutor {
 	private ArrayList<Task> taskList;
@@ -50,7 +53,7 @@ class CommandExecutor {
 		return true;
 	}
 	
-	public boolean updateType(int taskID, String startTime, String endTime){
+	public boolean updateTime(int taskID, String startTime, String endTime){
 		return true;
 	}
 	
@@ -60,5 +63,12 @@ class CommandExecutor {
 	
 	public boolean updateImportance(int taskID, int importance){
 		return true;
+	}
+	
+	public Date stringToDate(String timeString) throws ParseException{
+		TimeZone tz=TimeZone.getDefault();
+		SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd/HH:mm");
+		dateFormat.setTimeZone(tz);
+		return dateFormat.parse(timeString);
 	}
 }
