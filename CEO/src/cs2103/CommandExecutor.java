@@ -13,6 +13,7 @@ class CommandExecutor {
 	
 	public CommandExecutor(String configFile){
 		this.storage = new StorageEngine(configFile);
+		this.taskList = storage.getTaskList();
 	}
 	
 	public boolean addTask(String title, String description, String location, String category, String recurrence,  int importance, String startTime, String endTime){
