@@ -16,7 +16,8 @@ class CommandExecutor {
 		this.taskList = storage.getTaskList();
 	}
 	
-	public boolean addTask(String title, String description, String location, String category, String recurrence,  int importance, String startTime, String endTime){
+	public boolean addTask(String title, String description, String location, 
+			String category, String recurrence,  int importance, String startTime, String endTime){
 		//You need to parse the time from String to Date
 		return true;
 	}
