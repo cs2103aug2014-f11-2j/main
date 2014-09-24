@@ -1,7 +1,6 @@
 package cs2103;
 
-import java.util.ArrayList;
-import java.text.DateFormat;  
+import java.util.ArrayList; 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;  
@@ -9,7 +8,12 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 class CommandExecutor {
+	private final StorageEngine storage;
 	private ArrayList<Task> taskList;
+	
+	public CommandExecutor(String configFile){
+		this.storage = new StorageEngine(configFile);
+	}
 	
 	public boolean addTask(String title, String description, String location, String category, String recurrence,  int importance, String startTime, String endTime){
 		//You need to parse the time from String to Date

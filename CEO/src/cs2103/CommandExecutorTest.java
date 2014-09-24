@@ -10,7 +10,7 @@ public class CommandExecutorTest {
 
 	@Test
 	public void testStringToDate() {
-		CommandExecutor test=new CommandExecutor();
+		CommandExecutor test=new CommandExecutor("");
 		try {
 			System.out.println(test.stringToDate("2000/10/01/22:33"));
 		} catch (ParseException e) {
