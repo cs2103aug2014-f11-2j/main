@@ -2,9 +2,6 @@ package cs2103;
 import java.util.Date;  
 
 class Task {
-	private static enum Progress{
-		INCOMPLETE, IN_PROGRESS, COMPLETED
-	};
 	private final static int START=0;
 	private final static int END=1;
 	private final static int DEADLINE=1;
@@ -19,7 +16,7 @@ class Task {
 	private String category;
 	private String recurrence;
 	private int importance;
-	private Progress progress;
+	private int progress;
 	private Date[] time;
 
 	
@@ -31,7 +28,7 @@ class Task {
 			this.category=category;
 			this.recurrence=recurrence;
 			this.importance=importance;
-			this.progress=Progress.INCOMPLETE;
+			this.progress=INCOMPLETE;
 			if (startTime!=null && endTime!=null){
 				time=new Date[PERIODIC];
 				this.time[START]=startTime;
@@ -77,16 +74,7 @@ class Task {
 	}
 	
 	public int getProgress(){
-		switch(this.progress){
-		case INCOMPLETE:
-			return INCOMPLETE;
-		case IN_PROGRESS:
-			return IN_PROGRESS;
-		case COMPLETED:
-			return COMPLETED;
-		default:
-			return -1;
-		}
+		return this.progress;
 	}
 
 	public Date[] getTime(){
@@ -122,14 +110,10 @@ class Task {
 	}
 	
 	public void updateProgress(int progress) throws CEOException{
-		if (progress == COMPLETED){
-			this.progress=Progress.COMPLETED;
-		}else if (progress == IN_PROGRESS){
-			this.progress=Progress.IN_PROGRESS;
-		}else if (progress == INCOMPLETE){
-			this.progress=Progress.INCOMPLETE;
-		}else{
+		if (progress > COMPLETED || progress < INCOMPLETE){
 			throw new CEOException("Invalid Progress");
+		}else{
+			this.progress=progress;
 		}
 	}
 	
