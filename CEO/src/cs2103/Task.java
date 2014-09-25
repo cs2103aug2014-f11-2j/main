@@ -3,13 +3,7 @@ import java.util.Date;
 
 import net.fortuna.ical4j.model.Recur;
 
-class Task {
-	private final static int START=0;
-	private final static int END=1;
-	@SuppressWarnings("unused")
-	private final static int FLOATING=0;
-	private final static int DEADLINE=1;
-	private final static int PERIODIC=2;
+class Task {;
 	private final static String TYPE_FLOATING="floating";
 	private final static String TYPE_DEADLINE="deadline";
 	private final static String TYPE_PERIODIC="periodic";
@@ -25,7 +19,8 @@ class Task {
 	private Recur recurrence;
 	private int importance;
 	private String progress;
-	private Date[] time;
+	private Date startTime;
+	private Date endTime;
 
 	
 	public Task(String taskUID, String title, String description, String location, String category, Recur recurrence,  int importance, Date startTime, Date endTime) throws CEOException{
@@ -80,8 +75,12 @@ class Task {
 		return this.progress;
 	}
 
-	public Date[] getTime(){
-		return this.time;
+	public Date getStartTime(){
+		return this.startTime;
+	}
+	
+	public Date getEndTime(){
+		return this.endTime;
 	}
 	
 	public void updateTitle(String title){
@@ -119,17 +118,13 @@ class Task {
 	}
 	
 	public void updateTime(Date startTime, Date endTime){
+		this.startTime=startTime;
+		this.endTime=endTime;
 		if (startTime==null && endTime==null){
-			this.time=null;
 			this.type=TYPE_FLOATING;
 		}else if (endTime==null){
-			this.time=new Date[DEADLINE];
-			this.time[START]=startTime;
 			this.type=TYPE_DEADLINE;
 		}else{
-			this.time=new Date[PERIODIC];
-			this.time[START]=startTime;
-			this.time[END]=endTime;
 			this.type=TYPE_PERIODIC;
 		}
 	}

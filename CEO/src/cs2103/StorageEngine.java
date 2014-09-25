@@ -14,7 +14,6 @@ import java.util.TimeZone;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
-import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.IndexedComponentList;
 import net.fortuna.ical4j.model.Property;
@@ -22,17 +21,11 @@ import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VToDo;
-import net.fortuna.ical4j.model.property.DateProperty;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.ValidationException;
 class StorageEngine {
 	private ArrayList<Task> taskList;
 	private net.fortuna.ical4j.model.Calendar calendar;
-	private final static String TODO="VTODO";
-	private final static String EVENT="VEVENT";
-	private final static String TYPE_FLOATING="floating";
-	private final static String TYPE_DEADLINE="deadline";
-	private final static String TYPE_PERIODIC="periodic";
 	private final static String INCOMPLETE="incomplete";
 	private final static String IN_PROCESS="in_process";
 	private final static String COMPLETED="completed";
@@ -55,12 +48,10 @@ class StorageEngine {
 			for (Iterator<VToDo> i= calendar.getComponents(Component.VTODO).iterator(); i.hasNext();){
 				VToDo component = i.next();
 				taskList.add(parseVToDo(component));
-
 			}
 			for (Iterator<VEvent> i= calendar.getComponents(Component.VEVENT).iterator(); i.hasNext();){
 				VEvent component = i.next();
-				Date date=component.getStartDate().getDate();
-				System.out.println(date);
+				taskList.add(parseVEvent(component));
 			}
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
