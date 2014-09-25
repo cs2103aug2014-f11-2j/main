@@ -4,9 +4,11 @@ import java.util.Date;
 class Task {
 	private final static int START=0;
 	private final static int END=1;
+	private final static int FLOATING=0;
 	private final static int DEADLINE=1;
 	private final static int PERIODIC=2;
 	private final static int INCOMPLETE=0;
+	@SuppressWarnings("unused")
 	private final static int IN_PROGRESS=1;
 	private final static int COMPLETED=2;
 	private String taskUID;
@@ -16,6 +18,7 @@ class Task {
 	private String category;
 	private String recurrence;
 	private int importance;
+	private int type;
 	private int progress;
 	private Date[] time;
 
@@ -29,16 +32,7 @@ class Task {
 			this.recurrence=recurrence;
 			this.importance=importance;
 			this.progress=INCOMPLETE;
-			if (startTime!=null && endTime!=null){
-				time=new Date[PERIODIC];
-				this.time[START]=startTime;
-				this.time[END]=endTime;
-			}else if (endTime==null){
-				time=new Date[DEADLINE];
-				this.time[START]=startTime;
-			}else{
-				time=null;
-			}
+			updateTime(startTime, endTime);
 		}else{
 			throw new CEOException("No Title Error");
 		}
@@ -67,6 +61,10 @@ class Task {
 	
 	public String getRecurrance(){
 		return this.recurrence;
+	}
+	
+	public int getType(){
+		return this.type;
 	}
 	
 	public int getImportance(){
@@ -120,13 +118,16 @@ class Task {
 	public void updateTime(Date startTime, Date endTime){
 		if (startTime==null && endTime==null){
 			this.time=null;
+			this.type=FLOATING;
 		}else if (endTime==null){
 			this.time=new Date[DEADLINE];
 			this.time[START]=startTime;
+			this.type=DEADLINE;
 		}else{
 			this.time=new Date[PERIODIC];
 			this.time[START]=startTime;
 			this.time[END]=endTime;
+			this.type=PERIODIC;
 		}
 	}
 	
