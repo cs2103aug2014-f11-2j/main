@@ -58,7 +58,7 @@ class CommandExecutor {
 	
 	public boolean updateTitle(int taskID, String title) throws CEOException{
 		this.getTaskList().clear();
-		//pull all existing tasks from storage engine into arrayList
+		//pull all existing tasks from storage engine into arrayList 
 		Task task = this.getTaskList().get(taskID);
 		task.updateTitle(title);
 		//push arrayList into storage
