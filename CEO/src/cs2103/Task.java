@@ -1,6 +1,8 @@
 package cs2103;
 import java.util.Date;  
 
+import net.fortuna.ical4j.model.Recur;
+
 class Task {
 	private final static int START=0;
 	private final static int END=1;
@@ -12,7 +14,7 @@ class Task {
 	private final static String TYPE_DEADLINE="deadline";
 	private final static String TYPE_PERIODIC="periodic";
 	private final static String INCOMPLETE="incomplete";
-	private final static String IN_PROGRESS="in_progress";
+	private final static String IN_PROCESS="in_process";
 	private final static String COMPLETED="completed";
 	private String taskUID;
 	private String type;
@@ -20,13 +22,13 @@ class Task {
 	private String description;
 	private String location;
 	private String category;
-	private String recurrence;
+	private Recur recurrence;
 	private int importance;
 	private String progress;
 	private Date[] time;
 
 	
-	public Task(String title, String description, String location, String category, String recurrence,  int importance, Date startTime, Date endTime) throws CEOException{
+	public Task(String taskUID, String title, String description, String location, String category, Recur recurrence,  int importance, Date startTime, Date endTime) throws CEOException{
 		if (title!=null){
 			this.title=title;
 			this.description=description;
@@ -62,7 +64,7 @@ class Task {
 		return this.category;
 	}
 	
-	public String getRecurrance(){
+	public Recur getRecurrance(){
 		return this.recurrence;
 	}
 	
@@ -100,7 +102,7 @@ class Task {
 		this.category=category;
 	}
 	
-	public void updateRecurrence(String recurrence){
+	public void updateRecurrence(Recur recurrence){
 		this.recurrence=recurrence;
 	}
 	
@@ -109,7 +111,7 @@ class Task {
 	}
 	
 	public void updateProgress(String progress) throws CEOException{
-		if (progress.equals(INCOMPLETE) || progress.equals(IN_PROGRESS) || progress.equals(COMPLETED)){
+		if (progress.equals(INCOMPLETE) || progress.equals(IN_PROCESS) || progress.equals(COMPLETED)){
 			this.progress=progress;
 		}else{
 			throw new CEOException("Invalid Progress");

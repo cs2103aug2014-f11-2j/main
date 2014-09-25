@@ -19,7 +19,11 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.IndexedComponentList;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.DateProperty;
+import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.ValidationException;
 class StorageEngine {
 	private ArrayList<Task> taskList;
@@ -29,6 +33,9 @@ class StorageEngine {
 	private final static String TYPE_FLOATING="floating";
 	private final static String TYPE_DEADLINE="deadline";
 	private final static String TYPE_PERIODIC="periodic";
+	private final static String INCOMPLETE="incomplete";
+	private final static String IN_PROCESS="in_process";
+	private final static String COMPLETED="completed";
 	private final File file;
 	public StorageEngine(String configFile){
 		String fileName="default.ics";
@@ -44,27 +51,16 @@ class StorageEngine {
 			CalendarBuilder builder = new CalendarBuilder();
 			this.calendar = builder.build(fin);
 			//IndexedComponentList indexedList= new IndexedComponentList(this.calendar.getComponents(), Property.UID);
-			for (Iterator<Component> i= calendar.getComponents().iterator(); i.hasNext();){
-				Component component = i.next();
-				String componentType = determineComponentType(component);
-				String componentTitle = readTitle(component);
-				String componentDescription = readProperty(component, Property.DESCRIPTION);
-				String componentLocation = readProperty(component,Property.LOCATION);
-				String componentCategory = readProperty(component,Property.CATEGORIES);
-				String componentReccurence = readProperty(component,Property.RRULE);
-				int componentImportance = parseImportance(readProperty(component,Property.PRIORITY));
-				if (componentType.equals(TYPE_PERIODIC)){
-					Date componentStartTime = stringToDate(readProperty(component, Property.DTSTART));
-					Date componentEndTime = stringToDate(readProperty(component, Property.DTEND));
-				}else if (componentType.equals(TYPE_DEADLINE)){
-					Date componentDeadline = stringToDate(readProperty(component, Property.DUE));
-				}else{
-					
-				}
-			    for (Iterator<Property> j = component.getProperties().iterator(); j.hasNext();) {
-			        Property property = (Property) j.next();
-			        System.out.println("Property [" + property.getName() + ", " + property.getValue() + "]");
-			    }
+			taskList = new ArrayList<Task>();
+			for (Iterator<VToDo> i= calendar.getComponents(Component.VTODO).iterator(); i.hasNext();){
+				VToDo component = i.next();
+				taskList.add(parseVToDo(component));
+
+			}
+			for (Iterator<VEvent> i= calendar.getComponents(Component.VEVENT).iterator(); i.hasNext();){
+				VEvent component = i.next();
+				Date date=component.getStartDate().getDate();
+				System.out.println(date);
 			}
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -80,13 +76,6 @@ class StorageEngine {
 			e.printStackTrace();
 		}
 	}
-	public String readProperty(Component component, String propertyType){
-		if (component.getProperty(propertyType)!=null){
-			return component.getProperty(propertyType).getValue();
-		}else{
-			return "";
-		}
-	}
 	public String readTitle(Component component) throws CEOException{
 		if (component.getProperty(Property.SUMMARY)!=null){
 			return component.getProperty(Property.SUMMARY).getValue();
@@ -94,20 +83,7 @@ class StorageEngine {
 			throw new CEOException("No title error");
 		}
 	}
-	public String determineComponentType(Component component) throws CEOException{
-		String componentName = component.getName();
-		if (componentName.equals(EVENT)){
-			return TYPE_PERIODIC;
-		}else if (componentName.equals(TODO)){
-			if (component.getProperty(Property.DUE)==null){
-				return TYPE_DEADLINE;
-			}else{
-				return TYPE_FLOATING;
-			}
-		}else{
-			throw new CEOException("Invalid type error");
-		}
-	}
+
 	public void write(){
 		try {
 			FileOutputStream fout = new FileOutputStream(file);
@@ -126,7 +102,7 @@ class StorageEngine {
 		
 	}
 	
-	private Date stringToDate(String timeString) throws ParseException{
+	/*private Date stringToDate(String timeString) throws ParseException{
 		TimeZone tz;
 		if (timeString.endsWith("Z")){
 			tz=TimeZone.getTimeZone("UTC");
@@ -142,13 +118,73 @@ class StorageEngine {
 		}
 		dateFormat.setTimeZone(tz);
 		return dateFormat.parse(timeString);
-	}
+	}*/
 	
+	private Task parseVEvent(VEvent component) throws CEOException, ParseException{
+		String componentUID = component.getUid().getValue();
+		String componentTitle = readTitle(component);
+		String componentDescription = component.getDescription()==null?"":component.getDescription().getValue();
+		String componentLocation = component.getLocation()==null?"":component.getLocation().getValue();
+		String componentCategory = component.getProperty(Property.CATEGORIES)==null?"":component.getProperty(Property.CATEGORIES).getValue();
+		Recur componentReccurence = getRecur(component);
+		int componentImportance = parseImportance(component.getPriority()==null?"":component.getPriority().getValue());
+		Date componentStartTime;
+		Date componentEndTime;
+		if (component.getStartDate()==null||component.getEndDate()==null){
+			throw new CEOException("Period error");
+		}else{
+			componentStartTime=component.getStartDate().getDate();
+			componentEndTime=component.getEndDate().getDate();
+		}
+		Task task = new Task(componentUID, componentTitle, componentDescription, componentLocation, componentCategory, componentReccurence, componentImportance, componentStartTime, componentEndTime);
+		task.updateProgress(COMPLETED);
+		return task;
+	}
+	private Task parseVToDo(VToDo component) throws CEOException, ParseException{
+		String componentUID = component.getUid().getValue();
+		String componentTitle = readTitle(component);
+		String componentDescription = component.getDescription()==null?"":component.getDescription().getValue();
+		String componentLocation = component.getLocation()==null?"":component.getLocation().getValue();
+		String componentCategory = component.getProperty(Property.CATEGORIES)==null?"":component.getProperty(Property.CATEGORIES).getValue();
+		Recur componentReccurence = getRecur(component);
+		int componentImportance = parseImportance(component.getPriority()==null?"0":component.getPriority().getValue());
+		Date componentStartTime=null;
+		String componentProgress;
+		if (component.getStartDate()==null){
+			componentProgress=parseProgress(component.getStatus()==null?"NEEDS-ACTION":component.getStatus().getValue());
+		}else{
+			componentStartTime=component.getStartDate().getDate();
+			componentProgress=COMPLETED;
+		}
+		Task task = new Task(componentUID, componentTitle, componentDescription, componentLocation, componentCategory, componentReccurence, componentImportance, componentStartTime, null);
+		task.updateProgress(componentProgress);
+		return task;
+	}
+	private Recur getRecur(Component component){
+		if (component.getProperty(Property.RRULE)==null){
+			return null;
+		}else{
+			RRule rule = (RRule) component.getProperty(Property.RRULE);
+			return rule.getRecur();
+		}
+	}
 	private int parseImportance(String componentImportance){
 		if (componentImportance.matches("[0-9]+")){
 			return Integer.parseInt(componentImportance);
 		}else{
 			return 0;
+		}
+	}
+	
+	private String parseProgress(String componentProgress) throws CEOException{
+		if (componentProgress.equals("NEEDS-ACTION")){
+			return INCOMPLETE;
+		}else if (componentProgress.equals("IN-PROCESS")){
+			return IN_PROCESS;
+		}else if (componentProgress.equals("COMPLETED")){
+			return COMPLETED;
+		}else{
+			throw new CEOException("Invalid Progress");
 		}
 	}
 }
