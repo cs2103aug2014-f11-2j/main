@@ -27,6 +27,11 @@ class CommandExecutor {
 		return this.taskList;
 	}
 	
+	public ArrayList<Task> listTask(){
+		//Return all tasks
+		return this.taskList;
+	}
+	
 	public Task showTaskDetail(int taskID){
 		//
 		return this.taskList.get(taskID);
