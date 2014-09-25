@@ -11,19 +11,18 @@ class Task {
 	private final static String TYPE_FLOATING="floating";
 	private final static String TYPE_DEADLINE="deadline";
 	private final static String TYPE_PERIODIC="periodic";
-	private final static int INCOMPLETE=0;
-	@SuppressWarnings("unused")
-	private final static int IN_PROGRESS=1;
-	private final static int COMPLETED=2;
+	private final static String INCOMPLETE="incomplete";
+	private final static String IN_PROGRESS="in_progress";
+	private final static String COMPLETED="completed";
 	private String taskUID;
+	private String type;
 	private String title;
 	private String description;
 	private String location;
 	private String category;
 	private String recurrence;
 	private int importance;
-	private String type;
-	private int progress;
+	private String progress;
 	private Date[] time;
 
 	
@@ -75,7 +74,7 @@ class Task {
 		return this.importance;
 	}
 	
-	public int getProgress(){
+	public String getProgress(){
 		return this.progress;
 	}
 
@@ -109,11 +108,11 @@ class Task {
 		this.importance=importance;
 	}
 	
-	public void updateProgress(int progress) throws CEOException{
-		if (progress > COMPLETED || progress < INCOMPLETE){
-			throw new CEOException("Invalid Progress");
-		}else{
+	public void updateProgress(String progress) throws CEOException{
+		if (progress.equals(INCOMPLETE) || progress.equals(IN_PROGRESS) || progress.equals(COMPLETED)){
 			this.progress=progress;
+		}else{
+			throw new CEOException("Invalid Progress");
 		}
 	}
 	
