@@ -18,6 +18,11 @@ import net.fortuna.ical4j.model.ValidationException;
 class StorageEngine {
 	private ArrayList<Task> taskList;
 	private net.fortuna.ical4j.model.Calendar calendar;
+	private final static String TODO="VTODO";
+	private final static String EVENT="VEVENT";
+	private final static String TYPE_FLOATING="floating";
+	private final static String TYPE_DEADLINE="deadline";
+	private final static String TYPE_PERIODIC="periodic";
 	private final File file;
 	public StorageEngine(String configFile){
 		String fileName="default.ics";
@@ -35,7 +40,7 @@ class StorageEngine {
 			//IndexedComponentList indexedList= new IndexedComponentList(this.calendar.getComponents(), Property.UID);
 			for (Iterator<Component> i= calendar.getComponents().iterator(); i.hasNext();){
 				Component component = i.next();
-				System.out.println("Component [" + component.getName() + "]");
+				System.out.println(determineComponentType(component));
 			    for (Iterator<Property> j = component.getProperties().iterator(); j.hasNext();) {
 			        Property property = (Property) j.next();
 			        System.out.println("Property [" + property.getName() + ", " + property.getValue() + "]");
@@ -50,6 +55,22 @@ class StorageEngine {
 		} catch (ParserException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	public String determineComponentType(Component component){
+		String componentName = component.getName();
+		if (componentName.equals(TODO)){
+			return TYPE_FLOATING;
+		}else if (componentName.equals(EVENT)){
+			String startTime=component.getProperty(Property.DTSTART).getValue();
+			String endTime=component.getProperty(Property.DTEND).getValue();
+			if (startTime.equals(endTime)){
+				return TYPE_DEADLINE;
+			}else{
+				return TYPE_PERIODIC;
+			}
+		}else{
+			return null;
 		}
 	}
 	public void write(){

@@ -42,37 +42,9 @@ class CommandExecutor {
 		taskList.remove(taskID);
 		return true;
 	}
-	
-	public boolean updateTitle(int taskID, String title){
-		return true;
-	}
-	
-	public boolean updateProgress(int taskID, int progress){
-		//progress: 0-->incomplete; 1-->in progress; 2-->completed
-		return true;
-	}
-	
-	public boolean updateDescription(int taskID, String description){
-		return true;
-	}
-	
-	public boolean updateLocation(int taskID, String location){
-		return true;
-	}
-	
-	public boolean updateCategory(int taskID, String category){
-		return true;
-	}
-	
-	public boolean updateTime(int taskID, String startTime, String endTime){
-		return true;
-	}
-	
-	public boolean updateRecurrence(int taskID, String recurrence){
-		return true;
-	}
-	
-	public boolean updateImportance(int taskID, int importance){
+	public boolean updateTask(int taskID, String title, String description, String location, 
+			String category, String recurrence,  int importance, String startTime, String endTime, boolean updateTimeFlag){
+		
 		return true;
 	}
 	
