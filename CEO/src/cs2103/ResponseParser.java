@@ -10,8 +10,6 @@ public class ResponseParser {
 	//Taking in various response type and convert to Strings and to be displayed in CommandLineUI
 	
 	private static final String MESSAGE_ADD = "You have added a new task.";
-	private static final String MESSAGE_DELETE_FORMAT = "You have deleted task %1$d.";
-	private static final String MESSAGE_DELETE_FAIL_FORMAT = "Deleting task %1$d was unsuccessful.";
 	private static final String MESSAGE_SHOWDETAIL_FORMAT = "The details for Task %1$d:\n";
 	private static final String MESSAGE_UPDATE = "%1$s has been updated.";
 	private static final String MESSAGE_EMPTY_LIST = "The task list is empty";
@@ -44,19 +42,6 @@ public class ResponseParser {
 				return null;
 			}
 		}
-	}
-	
-	public static String parseDeleteResponse(boolean success, int taskID){
-		if (success){
-			return String.format(MESSAGE_DELETE_FORMAT, taskID);
-		}else{
-			return String.format(MESSAGE_DELETE_FAIL_FORMAT, taskID);
-		}
-	}
-	
-	public static String parseUpdateResponse(boolean success){
-		return null;
-		
 	}
 	
 	public static String parseShowDetailResponse(Task task, int taskID){

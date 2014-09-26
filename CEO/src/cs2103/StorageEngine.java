@@ -1,6 +1,7 @@
 package cs2103;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
@@ -50,7 +51,7 @@ class StorageEngine {
 			}
 			ug = new UidGenerator("test");
 			read();
-		} catch (CEOException | ParseException | IOException | ParserException | ValidationException e) {
+		} catch (CEOException | IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -59,7 +60,7 @@ class StorageEngine {
 		return taskList;
 	}
 	
-	private void createNewFile() throws IOException, ValidationException{
+	private void createNewFile() throws CEOException{
 		this.calendar = new net.fortuna.ical4j.model.Calendar();
 		this.calendar.getProperties().add(new ProdId("-//cs2103-f11-2j//CEO 0.0//EN"));
 		this.calendar.getProperties().add(Version.VERSION_2_0);
@@ -68,10 +69,12 @@ class StorageEngine {
 		TimeZone timeZone = registry.getTimeZone(TimeZone.getDefault().getID());
 		this.calendar.getComponents().add(timeZone.getVTimeZone());
 		write();
+		
 	}
 	
 	@SuppressWarnings("unchecked") 
-	private void read() throws CEOException, ParseException, IOException, ParserException{
+	private void read() throws CEOException{
+		try{	
 			FileInputStream fin = new FileInputStream(file);
 			CalendarBuilder builder = new CalendarBuilder();
 			this.calendar = builder.build(fin);
@@ -91,16 +94,24 @@ class StorageEngine {
 				count++;
 				task.updateTaskID(count);
 			}
+		}catch(IOException | ParserException | ParseException e){
+			throw new CEOException("Read Error");
+		}
 	}
 
-	private void write() throws IOException, ValidationException{
-		calendar.validate();
-		FileOutputStream fout = new FileOutputStream(file);
-		CalendarOutputter outputter = new CalendarOutputter();
-		outputter.output(this.calendar, fout);
+	private void write() throws CEOException{
+		try {
+			calendar.validate();
+			FileOutputStream fout;
+			fout = new FileOutputStream(file);
+			CalendarOutputter outputter = new CalendarOutputter();
+			outputter.output(this.calendar, fout);
+		} catch (IOException | ValidationException e) {
+			throw new CEOException("Write Error");
+		}
 	}
 	
-	public boolean updateTask(Task task) throws CEOException{
+	public void updateTask(Task task) throws CEOException{
 		Component updating = taskToComponent(task);
 		Component existing = this.indexedComponents.getComponent(updating.getProperty(Property.UID).getValue());
 		if (existing == null){
@@ -109,31 +120,19 @@ class StorageEngine {
 			calendar.getComponents().remove(existing);
 			calendar.getComponents().add(updating);
 		}
-		try {
-			write();
-			read();
-		} catch (IOException | ValidationException | ParseException | ParserException e) {
-			e.printStackTrace();
-			return false;
-		}
-		return true;
+		write();
+		read();
 	}
 	
-	public boolean deleteTask(Task task) throws CEOException{
+	public void deleteTask(Task task) throws CEOException{
 		Component existing = this.indexedComponents.getComponent(task.getTaskUID());
 		if (existing == null){
-			throw new CEOException("Non-existed task");
+			throw new CEOException("Task not exist");
 		}else{
 			calendar.getComponents().remove(existing);
 		}
-		try {
-			write();
-			read();
-		} catch (IOException | ValidationException | ParseException | ParserException e) {
-			e.printStackTrace();
-			return false;
-		}
-		return true;
+		write();
+		read();
 	}
 	
 	private Component taskToComponent(Task task) throws CEOException{

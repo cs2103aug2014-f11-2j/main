@@ -87,14 +87,14 @@ class CommandExecutor {
 		return this.taskList.get(taskID-1);
 	}
 	
-	public boolean deleteTask(int taskID) throws CEOException{
+	public void deleteTask(int taskID) throws CEOException{
 		if (taskID>=this.taskList.size() || taskID < 1){
 			throw new CEOException("Invalid TaskID");
 		}
-		return storage.deleteTask(taskList.get(taskID-1));
+		storage.deleteTask(taskList.get(taskID-1));
 	}
 	
-	public boolean updateTask(int taskID, String title, String description, String location, String progress, String startTime, String endTime) throws CEOException, ParseException{
+	public void updateTask(int taskID, String title, String description, String location, String progress, String startTime, String endTime) throws CEOException, ParseException{
 		if (taskID>=this.taskList.size() || taskID < 1){
 			throw new CEOException("Invalid TaskID");
 		}
@@ -150,7 +150,7 @@ class CommandExecutor {
 				task = newTask;
 			}
 		}
-		return storage.updateTask(task);
+		storage.updateTask(task);
 	}
 	
 	public Date stringToDate(String timeString) throws ParseException{

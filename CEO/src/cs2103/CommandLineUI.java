@@ -9,8 +9,10 @@ public class CommandLineUI {
 	private static final String MESSAGE_USER_PROMPT = "Command me please: ";
 	private static final String MESSAGE_COMMAND_ERROR = "Your input command is invalid, please check your command and try again";
 	private static final String MESSAGE_INVALID_TASKID = "Your input taskID is invalid, please check your command and try again";
-	private static final String MESSAGE_INVALID_TASKTYPE = "Your input TaskType is invalid, default to ALL";
+	private static final String MESSAGE_INVALID_TASKTYPE = "Your input TaskType is invalid, corrected to ALL";
 	private static final String MESSAGE_UNKNOWN_ERROR = "An Unknown Error occurred";
+	private static final String MESSAGE_DELETE_FORMAT = "You have deleted task %1$d.";
+	
 	public enum CommandType {
 		ADD, LIST, SHOWDETAIL, DELETE, UPDATE, EXIT, INVALID;
 	}
@@ -108,7 +110,8 @@ public class CommandLineUI {
 		int taskID=CommandParser.parseIntegerParameter(parameter);
 		String response;
 		try {
-			response=ResponseParser.parseDeleteResponse(commandExecutor.deleteTask(taskID),taskID);
+			commandExecutor.deleteTask(taskID);
+			response = String.format(MESSAGE_DELETE_FORMAT, taskID);
 		} catch (CEOException e) {
 			if(e.getMessage().equals("Invalid TaskID")){
 				response=MESSAGE_INVALID_TASKID;
@@ -145,7 +148,8 @@ public class CommandLineUI {
 	private String add(Queue<String> parameterList){
 		return null;
 	}
+	
 	private static void printFeedback(String feedback) {
-		
+		System.out.println(feedback);
 	}
 }
