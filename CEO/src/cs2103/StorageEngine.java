@@ -153,7 +153,7 @@ class StorageEngine {
 		if (task.getTaskUID()==null){
 			component.getProperties().add(ug.generateUid());
 		}else{
-			component.getUid().setValue(task.getTaskUID());
+			component.getProperties().add(new Uid(task.getTaskUID()));
 		}
 		component.getProperties().add(new Description(task.getDescription()));
 		component.getProperties().add(new Location(task.getLocation()));
@@ -162,7 +162,7 @@ class StorageEngine {
 	}
 	
 	private Component deadlineToComponent(DeadlineTask task) {
-		VToDo component = new VToDo(new net.fortuna.ical4j.model.DateTime(new Date()), new net.fortuna.ical4j.model.DateTime(task.getDueTime()),task.getTitle());
+		VToDo component = new VToDo(new net.fortuna.ical4j.model.DateTime(task.getDueTime()), new net.fortuna.ical4j.model.DateTime(task.getDueTime()),task.getTitle());
 		if (task.getTaskUID()==null){
 			component.getProperties().add(ug.generateUid());
 		}else{
@@ -178,7 +178,7 @@ class StorageEngine {
 		if (task.getTaskUID()==null){
 			component.getProperties().add(ug.generateUid());
 		}else{
-			component.getUid().setValue(task.getTaskUID());
+			component.getProperties().add(new Uid(task.getTaskUID()));
 		}
 		component.getProperties().add(new Description(task.getDescription()));
 		component.getProperties().add(new Location(task.getLocation()));

@@ -34,6 +34,48 @@ class CommandExecutor {
 		return true;
 	}
 	
+	public ArrayList<Task> listTask(String type){
+		if (type.equalsIgnoreCase("PERIODIC")){
+			return getPeriodicList();
+		}else if (type.equalsIgnoreCase("DEADLINE")){
+			return getDeadlineList();
+		}else if (type.equalsIgnoreCase("FLOATING")){
+			return getFloatingList();
+		}else{
+			return null;
+		}
+	}
+	
+	private ArrayList<Task> getPeriodicList(){
+		ArrayList<Task> returnList = new ArrayList<Task>();
+		for (Task task:this.taskList){
+			if (task instanceof PeriodicTask){
+				returnList.add(task);
+			}
+		}
+		return returnList;
+	}
+	
+	private ArrayList<Task> getDeadlineList(){
+		ArrayList<Task> returnList = new ArrayList<Task>();
+		for (Task task:this.taskList){
+			if (task instanceof DeadlineTask){
+				returnList.add(task);
+			}
+		}
+		return returnList;
+	}
+	
+	private ArrayList<Task> getFloatingList(){
+		ArrayList<Task> returnList = new ArrayList<Task>();
+		for (Task task:this.taskList){
+			if (task instanceof FloatingTask){
+				returnList.add(task);
+			}
+		}
+		return returnList;
+	}
+	
 	public ArrayList<Task> listTask(){
 		return this.taskList;
 	}
@@ -67,16 +109,7 @@ class CommandExecutor {
 					((FloatingTask) task).updateProgress(progress);
 				}
 			}
-		}else if (endTime==null || endTime.equals("")){
-			if (task instanceof DeadlineTask){
-				((DeadlineTask) task).updateDueTime(stringToDate(startTime));
-			}else{
-				Task newTask = new DeadlineTask(task.getTaskUID(),task.getTitle(),stringToDate(startTime));
-				newTask.updateDescription(task.getDescription());
-				newTask.updateLocation(task.getLocation());
-				task = newTask;
-			}
-		}else if (startTime.equals("")){
+		}else if (startTime.equals("") && endTime.equals("")){
 			if (task instanceof FloatingTask){
 				if (progress!=null){
 					((FloatingTask) task).updateProgress(progress);
@@ -87,6 +120,17 @@ class CommandExecutor {
 				newTask.updateLocation(task.getLocation());
 				task = newTask;
 			}
+		}else if (endTime==null || endTime.equals("")){
+			if (task instanceof DeadlineTask){
+				((DeadlineTask) task).updateDueTime(stringToDate(startTime));
+			}else{
+				Task newTask = new DeadlineTask(task.getTaskUID(),task.getTitle(),stringToDate(startTime));
+				newTask.updateDescription(task.getDescription());
+				newTask.updateLocation(task.getLocation());
+				task = newTask;
+			}
+		}else if (startTime.equals("") || startTime==null){
+			throw new CEOException("Invalid Time");
 		}else{
 			if (task instanceof PeriodicTask){
 				((PeriodicTask) task).updateTime(stringToDate(startTime), stringToDate(endTime));
