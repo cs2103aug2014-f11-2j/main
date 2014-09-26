@@ -37,16 +37,20 @@ public class ResponseParser {
 	
 	private static String parserResponse(ResponseTypeDummy type, ArrayList<Task> tasks) {
 		if (type == ResponseTypeDummy.LIST) {
-			String toDisplay = "";
-			int lineNum = 1;
-			for (Task t : tasks) {
-				toDisplay += String.format(FORMAT_LINE_DISPLAY, lineNum, t.getTitle());
-				lineNum++;
-			}
-			return toDisplay;
+			return formatTasksFromTaskList(tasks);
 		} else {
 			return null;
 		}
+	}
+
+	private static String formatTasksFromTaskList(ArrayList<Task> tasks) {
+		String toDisplay = "";
+		int lineNum = 1;
+		for (Task t : tasks) {
+			toDisplay += String.format(FORMAT_LINE_DISPLAY, lineNum, t.getTitle());
+			lineNum++;
+		}
+		return toDisplay;
 	}
 	
 }
