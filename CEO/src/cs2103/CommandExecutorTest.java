@@ -13,11 +13,8 @@ public class CommandExecutorTest {
 		CommandExecutor test=new CommandExecutor("");
 		try {
 			System.out.println(test.stringToDate("2000/10/01/22:33"));
-			test.stringToRecur("1d");
+			
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CEOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

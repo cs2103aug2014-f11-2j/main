@@ -3,13 +3,12 @@ package cs2103;
 import java.util.ArrayList; 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;  
-import java.util.GregorianCalendar;
+import java.util.Date;
 import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+//import java.util.regex.Matcher;
+//import java.util.regex.Pattern;
 
-import net.fortuna.ical4j.model.Recur;
+//import net.fortuna.ical4j.model.Recur;
 
 class CommandExecutor {
 	private final StorageEngine storage;
@@ -20,36 +19,85 @@ class CommandExecutor {
 		this.taskList = storage.getTaskList();
 	}
 	
-	public boolean addTask(String title, String description, String location, 
-			String category, String recurrence,  int importance, String startTime, String endTime){
-		//You need to parse the time from String to Date
+	public boolean addTask(String title, String description, String location, String startTime, String endTime) throws CEOException, ParseException{
+		Task task;
+		if (startTime == null && endTime == null){
+			task = new FloatingTask(null, title, "NEEDS-ACTION");
+		}else if (endTime==null){
+			task = new DeadlineTask(null, title, stringToDate(startTime));
+		}else{
+			task = new PeriodicTask(null, title, stringToDate(startTime), stringToDate(endTime));
+		}
+		task.updateDescription(description);
+		task.updateLocation(location);
+		storage.updateTask(task);
 		return true;
 	}
 	
-	public ArrayList<Task> listTask(int type){
-		//type: 0-->floating; 1-->deadline; 2-->periodic
-		return this.taskList;
-	}
-	
 	public ArrayList<Task> listTask(){
-		//Return all tasks
 		return this.taskList;
 	}
 	
 	public Task showTaskDetail(int taskID){
-		//
 		return this.taskList.get(taskID);
 	}
 	
-	public boolean deleteTask(int taskID){
-		//
-		taskList.remove(taskID);
-		return true;
+	public boolean deleteTask(int taskID) throws CEOException{
+		return storage.deleteTask(taskList.get(taskID));
 	}
-	public boolean updateTask(int taskID, String title, String description, String location, 
-			String category, String recurrence,  int importance, String startTime, String endTime, boolean updateTimeFlag){
-		
-		return true;
+	
+	public boolean updateTask(int taskID, String title, String description, String location, String progress, String startTime, String endTime) throws CEOException, ParseException{
+		Task task = taskList.get(taskID);
+		if (title!=null){
+			if (title!=""){
+				task.updateTitle(title);
+			}else{
+				throw new CEOException("No Title Error");
+			}
+		}
+		if (description!=null){
+			task.updateDescription(description);
+		}
+		if (location!=null){
+			task.updateLocation(location);
+		}
+		if (startTime==null && endTime==null){
+			if (task instanceof FloatingTask){
+				if (progress!=null){
+					((FloatingTask) task).updateProgress(progress);
+				}
+			}
+		}else if (endTime==null || endTime.equals("")){
+			if (task instanceof DeadlineTask){
+				((DeadlineTask) task).updateDueTime(stringToDate(startTime));
+			}else{
+				Task newTask = new DeadlineTask(task.getTaskUID(),task.getTitle(),stringToDate(startTime));
+				newTask.updateDescription(task.getDescription());
+				newTask.updateLocation(task.getLocation());
+				task = newTask;
+			}
+		}else if (startTime.equals("")){
+			if (task instanceof FloatingTask){
+				if (progress!=null){
+					((FloatingTask) task).updateProgress(progress);
+				}
+			}else{
+				Task newTask = new FloatingTask(task.getTaskUID(),task.getTitle(),"NEEDS-ACTION");
+				newTask.updateDescription(task.getDescription());
+				newTask.updateLocation(task.getLocation());
+				task = newTask;
+			}
+		}else{
+			if (task instanceof PeriodicTask){
+				((PeriodicTask) task).updateTime(stringToDate(startTime), stringToDate(endTime));
+			}else{
+				Task newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),stringToDate(startTime), stringToDate(endTime));
+				newTask.updateDescription(task.getDescription());
+				newTask.updateLocation(task.getLocation());
+				task = newTask;
+			}
+		}
+		return storage.updateTask(task);
 	}
 	
 	public Date stringToDate(String timeString) throws ParseException{
@@ -59,6 +107,7 @@ class CommandExecutor {
 		return dateFormat.parse(timeString);
 	}
 	
+	/*
 	public Recur stringToRecur(String recurrence) throws CEOException{
 		Pattern p = Pattern.compile("([0-9]+)([hdwmy])([0-9]+)");
 		Matcher m = p.matcher(recurrence);
@@ -89,4 +138,5 @@ class CommandExecutor {
 			throw new CEOException("Invalid Recurrence");
 		}
 	}
+	*/
 }

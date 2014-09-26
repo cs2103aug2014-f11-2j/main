@@ -3,7 +3,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.SocketException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,30 +19,32 @@ import net.fortuna.ical4j.model.TimeZoneRegistry;
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 //import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Status;
+import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 //import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.util.CompatibilityHints;
 import net.fortuna.ical4j.util.UidGenerator;
+
 class StorageEngine {
 	private ArrayList<Task> taskList;
 	private net.fortuna.ical4j.model.Calendar calendar;
 	private IndexedComponentList indexedComponents;
 	private final File file;
 	UidGenerator ug;
+	
 	public StorageEngine(String configFile){
 		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION,true);
 		String fileName="default.ics";
 		this.file = new File(fileName);
 		try {
-			if (!file.exists()){
+			if (!file.exists() || file.length()==0){
 				createNewFile();
 			}
 			ug = new UidGenerator("test");
@@ -52,9 +53,11 @@ class StorageEngine {
 			e.printStackTrace();
 		}
 	}
+	
 	public ArrayList<Task> getTaskList(){
 		return taskList;
 	}
+	
 	private void createNewFile() throws IOException, ValidationException{
 		this.calendar = new net.fortuna.ical4j.model.Calendar();
 		this.calendar.getProperties().add(new ProdId("-//cs2103-f11-2j//CEO 0.0//EN"));
@@ -65,8 +68,9 @@ class StorageEngine {
 		this.calendar.getComponents().add(timeZone.getVTimeZone());
 		write();
 	}
+	
 	@SuppressWarnings("unchecked") 
-	public void read() throws CEOException, ParseException, IOException, ParserException{
+	private void read() throws CEOException, ParseException, IOException, ParserException{
 			FileInputStream fin = new FileInputStream(file);
 			CalendarBuilder builder = new CalendarBuilder();
 			this.calendar = builder.build(fin);
@@ -149,17 +153,19 @@ class StorageEngine {
 		component.getProperties().add(new Status(task.getProgress()));
 		return component;
 	}
+	
 	private Component deadlineToComponent(DeadlineTask task) {
 		VToDo component = new VToDo(new net.fortuna.ical4j.model.DateTime(new Date()), new net.fortuna.ical4j.model.DateTime(task.getDueTime()),task.getTitle());
 		if (task.getTaskUID()==null){
 			component.getProperties().add(ug.generateUid());
 		}else{
-			component.getUid().setValue(task.getTaskUID());
+			component.getProperties().add(new Uid(task.getTaskUID()));
 		}
 		component.getProperties().add(new Description(task.getDescription()));
 		component.getProperties().add(new Location(task.getLocation()));
 		return component;
 	}
+	
 	private Component periodicToComponent(PeriodicTask task) {
 		VEvent component = new VEvent(new net.fortuna.ical4j.model.DateTime(task.getStartTime()), new net.fortuna.ical4j.model.DateTime(task.getEndTime()),task.getTitle());
 		if (task.getTaskUID()==null){
@@ -189,6 +195,7 @@ class StorageEngine {
 		//Recur componentReccurence = getRecur(component);
 		return task;
 	}
+	
 	private Task parseVToDo(VToDo component) throws CEOException, ParseException{
 		String componentUID = component.getUid().getValue();
 		String componentTitle = readTitle(component);
@@ -201,6 +208,14 @@ class StorageEngine {
 		task.updateDescription(component.getDescription()==null?"":component.getDescription().getValue());
 		task.updateLocation(component.getLocation()==null?"":component.getLocation().getValue());
 		return task;
+	}
+	
+	public String readTitle(Component component) throws CEOException{
+		if (component.getProperty(Property.SUMMARY)!=null){
+			return component.getProperty(Property.SUMMARY).getValue();
+		}else{
+			throw new CEOException("No title error");
+		}
 	}
 	/*private Recur getRecur(Component component){
 		if (component.getProperty(Property.RRULE)==null){
@@ -237,11 +252,4 @@ class StorageEngine {
 	return dateFormat.parse(timeString);
 	}*/
 	
-	public String readTitle(Component component) throws CEOException{
-		if (component.getProperty(Property.SUMMARY)!=null){
-			return component.getProperty(Property.SUMMARY).getValue();
-		}else{
-			throw new CEOException("No title error");
-		}
-	}
 }

@@ -10,7 +10,6 @@ class Task {;
 	private String description;
 	private String location;
 
-
 	public Task(String taskUID, String title) throws CEOException{
 		if (title!=null){
 			this.taskUID=taskUID;

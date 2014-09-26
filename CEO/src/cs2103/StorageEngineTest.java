@@ -16,9 +16,9 @@ public class StorageEngineTest {
 		StorageEngine test=new StorageEngine("test");
 		try {
 			ArrayList<Task> taskList=test.getTaskList();
-			Task task = new PeriodicTask(null, "test", new Date(), new Date());
-			task.updateDescription("");
-			task.updateLocation("");
+			Task task = taskList.get(0);
+			task.updateDescription("Fuck");
+			task.updateLocation("Fuck");
 			test.updateTask(task);
 			//test.deleteTask(taskList.get(0));
 		} catch (CEOException e) {
