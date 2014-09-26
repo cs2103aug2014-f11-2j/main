@@ -46,6 +46,8 @@ public class CommandLineUI {
 	
 	private static void takeUserInput() {
 		String userInput = scanner.nextLine();
+		//pass userInput into commandExecutor 
+		
 	}	
 	
 	private static void printUserOutput() {
