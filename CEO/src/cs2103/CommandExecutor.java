@@ -80,19 +80,25 @@ class CommandExecutor {
 		return this.taskList;
 	}
 	
-	public Task showTaskDetail(int taskID){
-		return this.taskList.get(taskID);
+	public Task showTaskDetail(int taskID) throws CEOException{
+		if (taskID>this.taskList.size() || taskID < 1){
+			throw new CEOException("Invalid TaskID");
+		}
+		return this.taskList.get(taskID-1);
 	}
 	
 	public boolean deleteTask(int taskID) throws CEOException{
-		if (taskID>=this.taskList.size()){
+		if (taskID>=this.taskList.size() || taskID < 1){
 			throw new CEOException("Invalid TaskID");
 		}
-		return storage.deleteTask(taskList.get(taskID));
+		return storage.deleteTask(taskList.get(taskID-1));
 	}
 	
 	public boolean updateTask(int taskID, String title, String description, String location, String progress, String startTime, String endTime) throws CEOException, ParseException{
-		Task task = taskList.get(taskID);
+		if (taskID>=this.taskList.size() || taskID < 1){
+			throw new CEOException("Invalid TaskID");
+		}
+		Task task = taskList.get(taskID-1);
 		if (title!=null){
 			if (title!=""){
 				task.updateTitle(title);

@@ -1,52 +1,118 @@
 package cs2103;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class ResponseParser {
 	//All the methods here should be static
 	//Taking in various response type and convert to Strings and to be displayed in CommandLineUI
 	
-	private static final String MESSAGE_ADD = "You have added %1$s.";
-	private static final String MESSAGE_DELETE = "You have deleted %1$s.";
-	private static final String MESSAGE_SHOWDETAIL = "The details for %1$s - %2$s.";
+	private static final String MESSAGE_ADD = "You have added a new task.";
+	private static final String MESSAGE_DELETE_FORMAT = "You have deleted task %1$d.";
+	private static final String MESSAGE_DELETE_FAIL_FORMAT = "Deleting task %1$d was unsuccessful.";
+	private static final String MESSAGE_SHOWDETAIL_FORMAT = "The details for Task %1$d:\n";
 	private static final String MESSAGE_UPDATE = "%1$s has been updated.";
+	private static final String MESSAGE_EMPTY_LIST = "The task list is empty";
+	private static final String MESSAGE_SHOWDETAIL_ERROR_FOMRAT = "Unable to show detail for task %1$d";
+	private static final String STRING_TYPE_FLOATING = "Floating";
+	private static final String STRING_TYPE_DEADLINE = "Deadline";
+	private static final String STRING_TYPE_PERIODIC = "Periodic";
+	private static final String STRING_TYPE = "Type: ";
+	private static final String STRING_LOCATION = "Location: ";
+	private static final String STRING_DESCRIPTION = "Description: ";
 	
-	private static final String FORMAT_LINE_DISPLAY = "%1$s. %2$s\n";
-	
-	private static String parseAddResponse(boolean success) {
+	public static String parseAddResponse(boolean success) {
 		return null;
 	}
 	
-	private static String parserResponse(ResponseTypeDummy type, Task task) {
-		if (type == ResponseTypeDummy.ADD) {
-			return String.format(MESSAGE_ADD, task.getTitle());
-		} else if (type == ResponseTypeDummy.DELETE) {
-			return String.format(MESSAGE_DELETE, task.getTitle());
-		} else if (type == ResponseTypeDummy.SHOWDETAIL) {
-			return String.format(MESSAGE_SHOWDETAIL, task.getTitle(), task.getDescription());
-		} else if (type == ResponseTypeDummy.UPDATE) {
-			return String.format(MESSAGE_UPDATE, task.getTitle());
-		} else {
-			return null; 
+	public static String parseListResponse(ArrayList<Task> taskList){
+		if (taskList==null || taskList.size()==0){
+			return MESSAGE_EMPTY_LIST;
 		}
-	}
-	
-	private static String parserResponse(ResponseTypeDummy type, ArrayList<Task> tasks) {
-		if (type == ResponseTypeDummy.LIST) {
-			return formatTasksFromTaskList(tasks);
-		} else {
+		StringBuffer sb = new StringBuffer();
+		for (Task task:taskList){
+			sb.append(taskToString(task));
+		}
+		if (sb.length()>0){
+			sb.deleteCharAt(sb.length()-1);
+			return sb.toString();
+		}else{
 			return null;
 		}
 	}
-
-	private static String formatTasksFromTaskList(ArrayList<Task> tasks) {
-		String toDisplay = "";
-		int lineNum = 1;
-		for (Task t : tasks) {
-			toDisplay += String.format(FORMAT_LINE_DISPLAY, lineNum, t.getTitle());
-			lineNum++;
+	
+	public static String parseDeleteResponse(boolean success, int taskID){
+		if (success){
+			return String.format(MESSAGE_DELETE_FORMAT, taskID);
+		}else{
+			return String.format(MESSAGE_DELETE_FAIL_FORMAT, taskID);
 		}
-		return toDisplay;
 	}
 	
+	public static String parseUpdateResponse(boolean success){
+		return null;
+		
+	}
+	
+	public static String parseShowDetailResponse(Task task, int taskID){
+		if (task==null){
+			return String.format(MESSAGE_SHOWDETAIL_ERROR_FOMRAT,taskID);
+		}else{
+			StringBuffer sb = new StringBuffer();
+			sb.append(String.format(MESSAGE_SHOWDETAIL_FORMAT, taskID));
+			sb.append(taskDetailToString(task));
+			sb.deleteCharAt(sb.length()-1);
+			return sb.toString();
+		}
+	}
+	
+	private static String taskToString(Task task){
+		if (task==null){
+			return null;
+		}
+		StringBuffer sb = new StringBuffer();
+		sb.append(task.getTaskID()).append(". ").append(task.getTitle()).append("\n");
+		sb.append(STRING_TYPE);
+		if (task instanceof FloatingTask){
+			sb.append(STRING_TYPE_FLOATING);
+			sb.append("\t\t\t\t\t\t");
+			sb.append(((FloatingTask) task).getProgress());
+		}else if (task instanceof DeadlineTask){
+			sb.append(STRING_TYPE_DEADLINE);
+			sb.append("\t\t\t\tAt: ");
+			sb.append(dateToString(((DeadlineTask) task).getDueTime()));
+		}else if (task instanceof PeriodicTask){
+			sb.append(STRING_TYPE_PERIODIC);
+			sb.append("\tFrom: ");
+			sb.append(dateToString(((PeriodicTask) task).getStartTime()));
+			sb.append(" To ");
+			sb.append(dateToString(((PeriodicTask) task).getEndTime()));
+		}else{
+			return null;
+		}
+		return sb.append("\n").toString();
+	}
+	private static String taskDetailToString(Task task){
+		if (task==null){
+			return null;
+		}
+		String taskSummary = taskToString(task);
+		if (taskSummary==null){
+			return null;
+		}
+		StringBuffer sb = new StringBuffer();
+		sb.append(taskSummary);
+		sb.append(STRING_LOCATION);
+		sb.append(task.getLocation()).append("\n");
+		sb.append(STRING_DESCRIPTION);
+		sb.append(task.getDescription()).append("\n");
+		return sb.toString();
+	}
+	private static String dateToString(Date date){
+		DateFormat dateFormat;
+		dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.US);
+		return dateFormat.format(date);
+	}
 }

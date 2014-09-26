@@ -88,8 +88,8 @@ class StorageEngine {
 			Collections.sort(taskList);
 			int count=0;
 			for (Task task:taskList){
-				task.updateTaskID(count);
 				count++;
+				task.updateTaskID(count);
 			}
 	}
 
