@@ -16,6 +16,7 @@ public class ResponseParser {
 	private static final String MESSAGE_UPDATE = "%1$s has been updated.";
 	private static final String MESSAGE_EMPTY_LIST = "The task list is empty";
 	private static final String MESSAGE_SHOWDETAIL_ERROR_FOMRAT = "Unable to show detail for task %1$d";
+	private static final String MESSAGE_LIST_FORMAT = "Here shows task list for type %1$s\n";
 	private static final String STRING_TYPE_FLOATING = "Floating";
 	private static final String STRING_TYPE_DEADLINE = "Deadline";
 	private static final String STRING_TYPE_PERIODIC = "Periodic";
@@ -27,19 +28,21 @@ public class ResponseParser {
 		return null;
 	}
 	
-	public static String parseListResponse(ArrayList<Task> taskList){
+	public static String parseListResponse(ArrayList<Task> taskList, String taskType){
 		if (taskList==null || taskList.size()==0){
 			return MESSAGE_EMPTY_LIST;
-		}
-		StringBuffer sb = new StringBuffer();
-		for (Task task:taskList){
-			sb.append(taskToString(task));
-		}
-		if (sb.length()>0){
-			sb.deleteCharAt(sb.length()-1);
-			return sb.toString();
 		}else{
-			return null;
+			StringBuffer sb = new StringBuffer();
+			sb.append(String.format(MESSAGE_LIST_FORMAT, taskType));
+			for (Task task:taskList){
+				sb.append(taskToString(task));
+			}
+			if (sb.length()>0){
+				sb.deleteCharAt(sb.length()-1);
+				return sb.toString();
+			}else{
+				return null;
+			}
 		}
 	}
 	

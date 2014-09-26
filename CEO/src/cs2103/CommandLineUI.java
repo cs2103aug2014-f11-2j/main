@@ -1,5 +1,6 @@
 package cs2103;
 
+import java.util.Queue;
 import java.util.Scanner;
 
 public class CommandLineUI {
@@ -8,9 +9,13 @@ public class CommandLineUI {
 	private static final String MESSAGE_USER_PROMPT = "Command me please: ";
 	private static final String MESSAGE_COMMAND_ERROR = "Your input command is invalid, please check your command and try again";
 	private static final String MESSAGE_INVALID_TASKID = "Your input taskID is invalid, please check your command and try again";
+	private static final String MESSAGE_INVALID_TASKTYPE = "Your input TaskType is invalid, default to ALL";
 	private static final String MESSAGE_UNKNOWN_ERROR = "An Unknown Error occurred";
 	public enum CommandType {
 		ADD, LIST, SHOWDETAIL, DELETE, UPDATE, EXIT, INVALID;
+	}
+	public enum TaskType {
+		ALL, FLOATING, DEADLINE, PERIODIC, INVALID;
 	}
 	private final CommandExecutor commandExecutor;
 	private Scanner scanner = new Scanner(System.in);
@@ -58,30 +63,32 @@ public class CommandLineUI {
 	
 	private String takeUserInput() {
 		String userInput = scanner.nextLine();
-		String[] seperateResult=CommandParser.seperateCommand(userInput); 
-		if (seperateResult[0]==null || seperateResult[0].equals("")){
+		Queue<String> seperateResult=CommandParser.seperateCommand(userInput);
+		String commandTypeString = seperateResult.poll();
+		if (commandTypeString==null || commandTypeString.equals("")){
 			return MESSAGE_COMMAND_ERROR;
 		}else{
-			CommandType commandType = CommandParser.determineCommandType(seperateResult[0]);
+			CommandType commandType = CommandParser.determineCommandType(commandTypeString);
 			switch (commandType){
 			case LIST:
-				return list(seperateResult[1]);
+				return list(seperateResult.poll());
 			case UPDATE:
-				return update(seperateResult[1]);
+				return update(seperateResult);
 			case EXIT:
 				return "EXIT";
 			case ADD:
-				return add(seperateResult[1]);
+				return add(seperateResult);
 			case DELETE:
-				return delete(seperateResult[1]);
+				return delete(seperateResult.poll());
 			case SHOWDETAIL:
-				return show(seperateResult[1]);
+				return show(seperateResult.poll());
 			case INVALID:
 			default:
 				return MESSAGE_COMMAND_ERROR;
 			}
 		}
 	}	
+	
 	private String show(String parameters) {
 		int taskID=CommandParser.parseIntegerParameter(parameters);
 		String response;
@@ -97,8 +104,8 @@ public class CommandLineUI {
 		return response;
 	}
 
-	private String delete(String parameters) {
-		int taskID=CommandParser.parseIntegerParameter(parameters);
+	private String delete(String parameter) {
+		int taskID=CommandParser.parseIntegerParameter(parameter);
 		String response;
 		try {
 			response=ResponseParser.parseDeleteResponse(commandExecutor.deleteTask(taskID),taskID);
@@ -112,17 +119,30 @@ public class CommandLineUI {
 		return response;
 	}
 
-	private String update(String string) {
+	private String update(Queue<String> parameterList) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	private String list(String string) {
-		// TODO Auto-generated method stub
-		return null;
+	private String list(String parameter) {
+		TaskType taskType = CommandParser.determineTaskType(parameter);
+		switch (taskType){
+		case ALL:
+			return ResponseParser.parseListResponse(commandExecutor.listTask(), "ALL");
+		case FLOATING:
+			return ResponseParser.parseListResponse(commandExecutor.listTask("FLOATING"), "FLOATING");
+		case DEADLINE:
+			return ResponseParser.parseListResponse(commandExecutor.listTask("DEADLINE"), "DEADLINE");
+		case PERIODIC:
+			return ResponseParser.parseListResponse(commandExecutor.listTask("PERIODIC"), "PERIODIC");
+		case INVALID:
+		default:
+			printFeedback(MESSAGE_INVALID_TASKTYPE);
+			return ResponseParser.parseListResponse(commandExecutor.listTask(), "ALL");
+		}
 	}
 
-	private String add(String parameters){
+	private String add(Queue<String> parameterList){
 		return null;
 	}
 	private static void printFeedback(String feedback) {

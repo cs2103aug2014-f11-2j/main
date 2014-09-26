@@ -1,34 +1,50 @@
 package cs2103;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
+
 class CommandParser {
 
-	public static String[] seperateCommand(String userInput) {
-		String[] commandStr = new String[2];
-		int splitterIndex = userInput.indexOf(' ');
-		if (splitterIndex==-1){
-			commandStr[0]=userInput;
-		}else{
-			commandStr[0] = userInput.substring(0, splitterIndex);
-			commandStr[1] = userInput.substring(splitterIndex).trim();
+	public static Queue<String> seperateCommand(String userInput) {
+		String[] parameters = userInput.trim().split("\\s+");
+		Queue<String> result = new LinkedList<String>();
+		for (String s:parameters){
+			result.add(s);
 		}
-		return commandStr;
+		return result;
 	}
 	
 	public static CommandLineUI.CommandType determineCommandType(String command) {
 		if (command.equalsIgnoreCase("list")){
 			return CommandLineUI.CommandType.LIST;
-		}else if (command.equals("update")){
+		}else if (command.equalsIgnoreCase("update")){
 			return CommandLineUI.CommandType.UPDATE;
-		}else if (command.equals("exit")){
+		}else if (command.equalsIgnoreCase("exit")){
 			return CommandLineUI.CommandType.EXIT;
-		}else if (command.equals("add")){
+		}else if (command.equalsIgnoreCase("add")){
 			return CommandLineUI.CommandType.ADD;
-		}else if (command.equals("delete")){
+		}else if (command.equalsIgnoreCase("delete")){
 			return CommandLineUI.CommandType.DELETE;
-		}else if (command.equals("show")){
+		}else if (command.equalsIgnoreCase("show")){
 			return CommandLineUI.CommandType.SHOWDETAIL;
 		}else{
 			return CommandLineUI.CommandType.INVALID;
+		}
+	}
+	
+	public static CommandLineUI.TaskType determineTaskType(String parameter){
+		if (parameter.equalsIgnoreCase("all")){
+			return CommandLineUI.TaskType.ALL;
+		}else if (parameter.equalsIgnoreCase("floating")){
+			return CommandLineUI.TaskType.FLOATING;
+		}else if (parameter.equalsIgnoreCase("deadline")){
+			return CommandLineUI.TaskType.DEADLINE;
+		}else if (parameter.equalsIgnoreCase("periodic")){
+			return CommandLineUI.TaskType.PERIODIC;
+		}else{
+			return CommandLineUI.TaskType.INVALID;
 		}
 	}
 	
@@ -36,12 +52,39 @@ class CommandParser {
 		if (parameters==null || parameters.equals("")){
 			return -1;
 		}else{
+			parameters=parameters.trim();
 			if (parameters.matches("[0-9]+")){
 				return Integer.parseInt(parameters);
 			}else{
 				return -1;
 			}
 		}
+	}
+	
+	public static Map<String,String> parseParameters(Queue<String> parameterList) throws CEOException{
+		Map<String,String> parameterMap = new HashMap<String, String>();
+		if (!parameterList.peek().matches("-\\S+")){
+			throw new CEOException("Invalid Parameter");
+		}
+		String parameterType=null;
+		StringBuffer parameter = new StringBuffer();
+		while(!parameterList.isEmpty()){
+			String parameterString = parameterList.poll();
+			if (parameterString.matches("--\\w+|-[A-Z]")){
+				if (parameterType!=null){
+					parameterMap.put(parameterType, parameter.toString().trim());
+					parameter=new StringBuffer();
+				}
+				if (parameterString.matches("--\\w+")){
+					parameterType=parameterString.substring(2);
+				}else if (parameterString.matches("-[A-Z]")){
+					parameterType=parameterString.substring(1);
+				}
+			}else{
+				parameter.append(parameterString).append(' ');
+			}
+		}
+		return parameterMap;
 	}
 	//Write all methods static
 }
