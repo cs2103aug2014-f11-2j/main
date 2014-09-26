@@ -4,6 +4,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.SocketException;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,29 +22,43 @@ import net.fortuna.ical4j.model.DateTime;
 //import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VToDo;
+import net.fortuna.ical4j.model.property.Description;
+import net.fortuna.ical4j.model.property.Location;
+import net.fortuna.ical4j.model.property.Status;
+import net.fortuna.ical4j.model.property.Uid;
 //import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.ValidationException;
+import net.fortuna.ical4j.util.CompatibilityHints;
+import net.fortuna.ical4j.util.UidGenerator;
 class StorageEngine {
 	private ArrayList<Task> taskList;
 	private net.fortuna.ical4j.model.Calendar calendar;
-	private final static String INCOMPLETE="incomplete";
-	private final static String IN_PROCESS="in_process";
-	private final static String COMPLETED="completed";
+	private IndexedComponentList indexedComponents;
 	private final File file;
+	UidGenerator ug;
 	public StorageEngine(String configFile){
 		String fileName="default.ics";
-		this.file=new File(fileName);
+		this.file = new File(fileName);
+		try {
+			ug = new UidGenerator("test");
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
+		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION,true);
+		try {
+			read();
+		} catch (CEOException | ParseException | IOException | ParserException e) {
+			e.printStackTrace();
+		}
 	}
 	public ArrayList<Task> getTaskList(){
 		return taskList;
 	}
-	@SuppressWarnings("unchecked")
-	public void read() throws CEOException{
-		try {
+	@SuppressWarnings("unchecked") 
+	public void read() throws CEOException, ParseException, IOException, ParserException{
 			FileInputStream fin = new FileInputStream(file);
 			CalendarBuilder builder = new CalendarBuilder();
 			this.calendar = builder.build(fin);
-			//IndexedComponentList indexedList= new IndexedComponentList(this.calendar.getComponents(), Property.UID);
 			taskList = new ArrayList<Task>();
 			for (Iterator<VToDo> i= calendar.getComponents(Component.VTODO).iterator(); i.hasNext();){
 				VToDo component = i.next();
@@ -52,46 +68,52 @@ class StorageEngine {
 				VEvent component = i.next();
 				taskList.add(parseVEvent(component));
 			}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			indexedComponents = new IndexedComponentList(calendar.getComponents(), Property.UID);
 	}
 
-	public void write(){
-		try {
-			FileOutputStream fout = new FileOutputStream(file);
-			CalendarOutputter outputter = new CalendarOutputter();
-			outputter.output(this.calendar, fout);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ValidationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+	private void write() throws IOException, ValidationException{
+		calendar.validate();
+		FileOutputStream fout = new FileOutputStream(file);
+		CalendarOutputter outputter = new CalendarOutputter();
+		outputter.output(this.calendar, fout);
 	}
 	
-	@SuppressWarnings("unchecked")
-	private void updateTask(Task task){
-		IndexedComponentList indexedComponents = new IndexedComponentList(calendar.getComponents(), Property.UID);
-		if (task.getTaskUID()==null){
-			
+	public boolean updateTask(Task task) throws CEOException{
+		Component updating = taskToComponent(task);
+		Component existing = this.indexedComponents.getComponent(updating.getProperty(Property.UID).getValue());
+		if (existing == null){
+			calendar.getComponents().add(updating);
+		}else{
+			calendar.getComponents().remove(existing);
+			calendar.getComponents().add(updating);
 		}
+		try {
+			write();
+			read();
+		} catch (IOException | ValidationException | ParseException | ParserException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
+	
+	public boolean deleteTask(Task task) throws CEOException{
+		Component existing = this.indexedComponents.getComponent(task.getTaskUID());
+		if (existing == null){
+			throw new CEOException("Non-existed task");
+		}else{
+			calendar.getComponents().remove(existing);
+		}
+		try {
+			write();
+			read();
+		} catch (IOException | ValidationException | ParseException | ParserException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
 	private Component taskToComponent(Task task) throws CEOException{
 		if (task instanceof PeriodicTask){
 			return periodicToComponent((PeriodicTask)task);
@@ -105,16 +127,38 @@ class StorageEngine {
 	}
 	
 	private Component floatingToComponent(FloatingTask task) {
-		// TODO Auto-generated method stub
-		return null;
+		VToDo component = new VToDo(new net.fortuna.ical4j.model.Date(new Date()), task.getTitle());
+		if (task.getTaskUID()==null){
+			component.getProperties().add(ug.generateUid());
+		}else{
+			component.getUid().setValue(task.getTaskUID());
+		}
+		component.getProperties().add(new Description(task.getDescription()));
+		component.getProperties().add(new Location(task.getLocation()));
+		component.getProperties().add(new Status(task.getProgress()));
+		return component;
 	}
 	private Component deadlineToComponent(DeadlineTask task) {
-		// TODO Auto-generated method stub
-		return null;
+		VToDo component = new VToDo(new net.fortuna.ical4j.model.Date(new Date()), new net.fortuna.ical4j.model.Date(task.getDueTime()),task.getTitle());
+		if (task.getTaskUID()==null){
+			component.getProperties().add(ug.generateUid());
+		}else{
+			component.getUid().setValue(task.getTaskUID());
+		}
+		component.getProperties().add(new Description(task.getDescription()));
+		component.getProperties().add(new Location(task.getLocation()));
+		return component;
 	}
 	private Component periodicToComponent(PeriodicTask task) {
-		// TODO Auto-generated method stub
-		return null;
+		VEvent component = new VEvent(new net.fortuna.ical4j.model.Date(task.getStartTime()), new net.fortuna.ical4j.model.Date(task.getEndTime()),task.getTitle());
+		if (task.getTaskUID()==null){
+			component.getProperties().add(ug.generateUid());
+		}else{
+			component.getUid().setValue(task.getTaskUID());
+		}
+		component.getProperties().add(new Description(task.getDescription()));
+		component.getProperties().add(new Location(task.getLocation()));
+		return component;
 	}
 	
 	private Task parseVEvent(VEvent component) throws CEOException, ParseException{
@@ -139,7 +183,7 @@ class StorageEngine {
 		String componentTitle = readTitle(component);
 		Task task;
 		if (component.getDue()==null){
-			task = new FloatingTask(componentUID, componentTitle, parseProgress(component.getStatus()==null?"NEEDS-ACTION":component.getStatus().getValue()));
+			task = new FloatingTask(componentUID, componentTitle, component.getStatus()==null?"NEEDS-ACTION":component.getStatus().getValue());
 		}else{
 			task = new DeadlineTask(componentUID, componentTitle, component.getDue().getDate());
 		}
@@ -187,18 +231,6 @@ class StorageEngine {
 			return component.getProperty(Property.SUMMARY).getValue();
 		}else{
 			throw new CEOException("No title error");
-		}
-	}
-	
-	private String parseProgress(String componentProgress) throws CEOException{
-		if (componentProgress.equals("NEEDS-ACTION")){
-			return INCOMPLETE;
-		}else if (componentProgress.equals("IN-PROCESS")){
-			return IN_PROCESS;
-		}else if (componentProgress.equals("COMPLETED")){
-			return COMPLETED;
-		}else{
-			throw new CEOException("Invalid Progress");
 		}
 	}
 }

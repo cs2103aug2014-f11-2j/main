@@ -2,9 +2,9 @@ package cs2103;
 
 class FloatingTask extends Task {
 	private String progress;
-	private final static String INCOMPLETE="incomplete";
-	private final static String IN_PROCESS="in_process";
-	private final static String COMPLETED="completed";
+	private final static String INCOMPLETE="NEEDS-ACTION";
+	private final static String IN_PROCESS="IN-PROCESS";
+	private final static String COMPLETED="COMPLETED";
 	
 	public FloatingTask(String taskUID, String title, String progress) throws CEOException {
 		super(taskUID, title);

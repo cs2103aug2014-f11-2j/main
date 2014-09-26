@@ -13,9 +13,8 @@ class Task {;
 
 	public Task(String taskUID, String title) throws CEOException{
 		if (title!=null){
+			this.taskUID=taskUID;
 			this.title=title;
-			this.updateDescription(description);
-			this.updateLocation(location);
 		}else{
 			throw new CEOException("No Title Error");
 		}
