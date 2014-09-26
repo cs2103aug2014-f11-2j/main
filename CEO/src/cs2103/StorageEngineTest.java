@@ -16,7 +16,7 @@ public class StorageEngineTest {
 		StorageEngine test=new StorageEngine("test");
 		try {
 			ArrayList<Task> taskList=test.getTaskList();
-			Task task = new DeadlineTask(null, "test", new Date());
+			Task task = new PeriodicTask(null, "test", new Date(), new Date());
 			task.updateDescription("");
 			task.updateLocation("");
 			test.updateTask(task);

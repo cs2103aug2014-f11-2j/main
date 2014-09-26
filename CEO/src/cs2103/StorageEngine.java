@@ -1,16 +1,13 @@
 package cs2103;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.SocketException;
-import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.TimeZone;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
@@ -18,14 +15,19 @@ import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.IndexedComponentList;
 import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.TimeZone;
+import net.fortuna.ical4j.model.TimeZoneRegistry;
+import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 //import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.component.VToDo;
+import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.Location;
+import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Status;
-import net.fortuna.ical4j.model.property.Uid;
+import net.fortuna.ical4j.model.property.Version;
 //import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.util.CompatibilityHints;
@@ -37,22 +39,31 @@ class StorageEngine {
 	private final File file;
 	UidGenerator ug;
 	public StorageEngine(String configFile){
+		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION,true);
 		String fileName="default.ics";
 		this.file = new File(fileName);
 		try {
+			if (!file.exists()){
+				createNewFile();
+			}
 			ug = new UidGenerator("test");
-		} catch (SocketException e) {
-			e.printStackTrace();
-		}
-		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION,true);
-		try {
 			read();
-		} catch (CEOException | ParseException | IOException | ParserException e) {
+		} catch (CEOException | ParseException | IOException | ParserException | ValidationException e) {
 			e.printStackTrace();
 		}
 	}
 	public ArrayList<Task> getTaskList(){
 		return taskList;
+	}
+	private void createNewFile() throws IOException, ValidationException{
+		this.calendar = new net.fortuna.ical4j.model.Calendar();
+		this.calendar.getProperties().add(new ProdId("-//cs2103-f11-2j//CEO 0.0//EN"));
+		this.calendar.getProperties().add(Version.VERSION_2_0);
+		this.calendar.getProperties().add(CalScale.GREGORIAN);
+		TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
+		TimeZone timeZone = registry.getTimeZone(TimeZone.getDefault().getID());
+		this.calendar.getComponents().add(timeZone.getVTimeZone());
+		write();
 	}
 	@SuppressWarnings("unchecked") 
 	public void read() throws CEOException, ParseException, IOException, ParserException{
@@ -127,7 +138,7 @@ class StorageEngine {
 	}
 	
 	private Component floatingToComponent(FloatingTask task) {
-		VToDo component = new VToDo(new net.fortuna.ical4j.model.Date(new Date()), task.getTitle());
+		VToDo component = new VToDo(new net.fortuna.ical4j.model.DateTime(new Date()), task.getTitle());
 		if (task.getTaskUID()==null){
 			component.getProperties().add(ug.generateUid());
 		}else{
@@ -139,7 +150,7 @@ class StorageEngine {
 		return component;
 	}
 	private Component deadlineToComponent(DeadlineTask task) {
-		VToDo component = new VToDo(new net.fortuna.ical4j.model.Date(new Date()), new net.fortuna.ical4j.model.Date(task.getDueTime()),task.getTitle());
+		VToDo component = new VToDo(new net.fortuna.ical4j.model.DateTime(new Date()), new net.fortuna.ical4j.model.DateTime(task.getDueTime()),task.getTitle());
 		if (task.getTaskUID()==null){
 			component.getProperties().add(ug.generateUid());
 		}else{
@@ -150,7 +161,7 @@ class StorageEngine {
 		return component;
 	}
 	private Component periodicToComponent(PeriodicTask task) {
-		VEvent component = new VEvent(new net.fortuna.ical4j.model.Date(task.getStartTime()), new net.fortuna.ical4j.model.Date(task.getEndTime()),task.getTitle());
+		VEvent component = new VEvent(new net.fortuna.ical4j.model.DateTime(task.getStartTime()), new net.fortuna.ical4j.model.DateTime(task.getEndTime()),task.getTitle());
 		if (task.getTaskUID()==null){
 			component.getProperties().add(ug.generateUid());
 		}else{
