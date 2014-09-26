@@ -7,11 +7,11 @@ public class CommandLineUI {
 	private static final String MESSAGE_EXIT = "You have exited CEO. Hope to see you again.";
 	private static final String MESSAGE_USER_PROMPT = "What would you like to do today?";
 	
-	private final CommandParser commandParser;
+	private final CommandExecutor commandExecutor;
 	private static Scanner scanner = new Scanner(System.in);
 	
 	public CommandLineUI(String configFile){
-		this.commandParser=new CommandParser(configFile);
+		this.commandExecutor = new CommandExecutor(configFile);
 		printWelcomeMessage();
 		userLoop();
 	}

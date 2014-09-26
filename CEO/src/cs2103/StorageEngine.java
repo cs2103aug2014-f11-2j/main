@@ -85,23 +85,37 @@ class StorageEngine {
 		
 	}
 	
-	/*private Date stringToDate(String timeString) throws ParseException{
-		TimeZone tz;
-		if (timeString.endsWith("Z")){
-			tz=TimeZone.getTimeZone("UTC");
-		}else{
-			tz=TimeZone.getDefault();
+	@SuppressWarnings("unchecked")
+	private void updateTask(Task task){
+		IndexedComponentList indexedComponents = new IndexedComponentList(calendar.getComponents(), Property.UID);
+		if (task.getTaskUID()==null){
+			
 		}
-		timeString=timeString.replaceAll("\\D+","");
-		SimpleDateFormat dateFormat;
-		if (timeString.length()==14){
-			dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+	}
+	private Component taskToComponent(Task task) throws CEOException{
+		if (task instanceof PeriodicTask){
+			return periodicToComponent((PeriodicTask)task);
+		}else if (task instanceof DeadlineTask){
+			return deadlineToComponent((DeadlineTask)task);
+		}else if (task instanceof FloatingTask){
+			return floatingToComponent((FloatingTask)task);
 		}else{
-			dateFormat = new SimpleDateFormat("yyyyMMdd");
+			throw new CEOException("Invalid task");
 		}
-		dateFormat.setTimeZone(tz);
-		return dateFormat.parse(timeString);
-	}*/
+	}
+	
+	private Component floatingToComponent(FloatingTask task) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	private Component deadlineToComponent(DeadlineTask task) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	private Component periodicToComponent(PeriodicTask task) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	private Task parseVEvent(VEvent component) throws CEOException, ParseException{
 		String componentUID = component.getUid().getValue();
@@ -148,6 +162,24 @@ class StorageEngine {
 		}else{
 			return 0;
 		}
+	}*/
+	
+	/*private Date stringToDate(String timeString) throws ParseException{
+	TimeZone tz;
+	if (timeString.endsWith("Z")){
+		tz=TimeZone.getTimeZone("UTC");
+	}else{
+		tz=TimeZone.getDefault();
+	}
+	timeString=timeString.replaceAll("\\D+","");
+	SimpleDateFormat dateFormat;
+	if (timeString.length()==14){
+		dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+	}else{
+		dateFormat = new SimpleDateFormat("yyyyMMdd");
+	}
+	dateFormat.setTimeZone(tz);
+	return dateFormat.parse(timeString);
 	}*/
 	
 	public String readTitle(Component component) throws CEOException{
