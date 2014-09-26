@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -18,10 +17,10 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.IndexedComponentList;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.Recur;
+//import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VToDo;
-import net.fortuna.ical4j.model.property.RRule;
+//import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.ValidationException;
 class StorageEngine {
 	private ArrayList<Task> taskList;
@@ -67,13 +66,6 @@ class StorageEngine {
 			e.printStackTrace();
 		}
 	}
-	public String readTitle(Component component) throws CEOException{
-		if (component.getProperty(Property.SUMMARY)!=null){
-			return component.getProperty(Property.SUMMARY).getValue();
-		}else{
-			throw new CEOException("No title error");
-		}
-	}
 
 	public void write(){
 		try {
@@ -114,11 +106,6 @@ class StorageEngine {
 	private Task parseVEvent(VEvent component) throws CEOException, ParseException{
 		String componentUID = component.getUid().getValue();
 		String componentTitle = readTitle(component);
-		String componentDescription = component.getDescription()==null?"":component.getDescription().getValue();
-		String componentLocation = component.getLocation()==null?"":component.getLocation().getValue();
-		String componentCategory = component.getProperty(Property.CATEGORIES)==null?"":component.getProperty(Property.CATEGORIES).getValue();
-		Recur componentReccurence = getRecur(component);
-		int componentImportance = parseImportance(component.getPriority()==null?"":component.getPriority().getValue());
 		Date componentStartTime;
 		Date componentEndTime;
 		if (component.getStartDate()==null||component.getEndDate()==null){
@@ -127,43 +114,47 @@ class StorageEngine {
 			componentStartTime=component.getStartDate().getDate();
 			componentEndTime=component.getEndDate().getDate();
 		}
-		Task task = new Task(componentUID, componentTitle, componentDescription, componentLocation, componentCategory, componentReccurence, componentImportance, componentStartTime, componentEndTime);
-		task.updateProgress(COMPLETED);
+		Task task = new PeriodicTask(componentUID, componentTitle, componentStartTime, componentEndTime);
+		task.updateDescription(component.getDescription()==null?"":component.getDescription().getValue());
+		task.updateLocation(component.getLocation()==null?"":component.getLocation().getValue());
+		//Recur componentReccurence = getRecur(component);
 		return task;
 	}
 	private Task parseVToDo(VToDo component) throws CEOException, ParseException{
 		String componentUID = component.getUid().getValue();
 		String componentTitle = readTitle(component);
-		String componentDescription = component.getDescription()==null?"":component.getDescription().getValue();
-		String componentLocation = component.getLocation()==null?"":component.getLocation().getValue();
-		String componentCategory = component.getProperty(Property.CATEGORIES)==null?"":component.getProperty(Property.CATEGORIES).getValue();
-		Recur componentReccurence = getRecur(component);
-		int componentImportance = parseImportance(component.getPriority()==null?"0":component.getPriority().getValue());
-		Date componentStartTime=null;
-		String componentProgress;
-		if (component.getStartDate()==null){
-			componentProgress=parseProgress(component.getStatus()==null?"NEEDS-ACTION":component.getStatus().getValue());
+		Task task;
+		if (component.getDue()==null){
+			task = new FloatingTask(componentUID, componentTitle, parseProgress(component.getStatus()==null?"NEEDS-ACTION":component.getStatus().getValue()));
 		}else{
-			componentStartTime=component.getStartDate().getDate();
-			componentProgress=COMPLETED;
+			task = new DeadlineTask(componentUID, componentTitle, component.getDue().getDate());
 		}
-		Task task = new Task(componentUID, componentTitle, componentDescription, componentLocation, componentCategory, componentReccurence, componentImportance, componentStartTime, null);
-		task.updateProgress(componentProgress);
+		task.updateDescription(component.getDescription()==null?"":component.getDescription().getValue());
+		task.updateLocation(component.getLocation()==null?"":component.getLocation().getValue());
 		return task;
 	}
-	private Recur getRecur(Component component){
+	/*private Recur getRecur(Component component){
 		if (component.getProperty(Property.RRULE)==null){
 			return null;
 		}else{
 			RRule rule = (RRule) component.getProperty(Property.RRULE);
 			return rule.getRecur();
 		}
-	}
-	private int parseImportance(String componentImportance){
+	}*/
+	
+	/*private int parseImportance(String componentImportance){
 		if (componentImportance.matches("[0-9]+")){
 			return Integer.parseInt(componentImportance);
 		}else{
 			return 0;
+		}
+	}*/
+	
+	public String readTitle(Component component) throws CEOException{
+		if (component.getProperty(Property.SUMMARY)!=null){
+			return component.getProperty(Property.SUMMARY).getValue();
+		}else{
+			throw new CEOException("No title error");
 		}
 	}
 	

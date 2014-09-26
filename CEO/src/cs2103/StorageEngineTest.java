@@ -14,7 +14,6 @@ public class StorageEngineTest {
 		try {
 			test.read();
 			ArrayList<Task> taskList=test.getTaskList();
-			System.out.println(taskList.get(0).getStartTime().getTime());
 		} catch (CEOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
