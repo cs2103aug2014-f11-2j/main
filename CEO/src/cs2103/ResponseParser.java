@@ -13,11 +13,7 @@ public class ResponseParser {
 	
 	private static final String FORMAT_LINE_DISPLAY = "%1$s. %2$s\n";
 	
-	private enum ResponseTypeDummy {
-		ADD, LIST, SHOWDETAIL, DELETE, UPDATE
-	}
-	
-	private static String parseResponse(ResponseTypeDummy type) {
+	private static String parseAddResponse(boolean success) {
 		return null;
 	}
 	

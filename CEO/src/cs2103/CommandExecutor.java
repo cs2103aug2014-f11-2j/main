@@ -85,6 +85,9 @@ class CommandExecutor {
 	}
 	
 	public boolean deleteTask(int taskID) throws CEOException{
+		if (taskID>=this.taskList.size()){
+			throw new CEOException("Invalid TaskID");
+		}
 		return storage.deleteTask(taskList.get(taskID));
 	}
 	
