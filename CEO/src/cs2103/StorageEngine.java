@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
+import edu.emory.mathcs.backport.java.util.Collections;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
@@ -84,6 +85,12 @@ class StorageEngine {
 				taskList.add(parseVEvent(component));
 			}
 			indexedComponents = new IndexedComponentList(calendar.getComponents(), Property.UID);
+			Collections.sort(taskList);
+			int count=0;
+			for (Task task:taskList){
+				task.updateTaskID(count);
+				count++;
+			}
 	}
 
 	private void write() throws IOException, ValidationException{

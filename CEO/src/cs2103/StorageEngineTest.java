@@ -14,17 +14,13 @@ public class StorageEngineTest {
 	@Test
 	public void test() {
 		StorageEngine test=new StorageEngine("test");
-		try {
-			ArrayList<Task> taskList=test.getTaskList();
-			Task task = taskList.get(0);
-			task.updateDescription("Fuck");
-			task.updateLocation("Fuck");
-			test.updateTask(task);
-			//test.deleteTask(taskList.get(0));
-		} catch (CEOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		ArrayList<Task> taskList=test.getTaskList();
+		Task task = taskList.get(1);
+		System.out.println(task.getTaskID());
+		//task.updateDescription("Fuck");
+		//task.updateLocation("Fuck");
+		//test.updateTask(task);
+		//test.deleteTask(taskList.get(0));
 		
 	}
 

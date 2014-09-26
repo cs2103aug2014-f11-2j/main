@@ -1,9 +1,10 @@
 package cs2103; 
 
-class Task {;
+class Task implements Comparable<Task>{;
 	/*private final static String TYPE_FLOATING="floating";
 	private final static String TYPE_DEADLINE="deadline";
 	private final static String TYPE_PERIODIC="periodic";*/
+	private int taskID;
 	private String taskUID;
 	//private String type;
 	private String title;
@@ -18,7 +19,9 @@ class Task {;
 			throw new CEOException("No Title Error");
 		}
 	}
-	
+	public int getTaskID(){
+		return this.taskID;
+	}
 	public String getTaskUID(){
 		return this.taskUID;
 	}
@@ -35,6 +38,10 @@ class Task {;
 		return this.location;
 	}
 	
+	public void updateTaskID(int id){
+		this.taskID=id;
+	}
+	
 	public void updateTaskUID(String taskUID) throws CEOException{
 		if (taskUID==null){
 			throw new CEOException("Invalid UID");
@@ -42,7 +49,7 @@ class Task {;
 			this.taskUID=taskUID;
 		}
 	}
-
+	
 	public void updateTitle(String title){
 		this.title=title;
 	}
@@ -55,6 +62,15 @@ class Task {;
 	
 	public void updateLocation(String location){
 		this.location=location;
+	}
+
+	@Override
+	public int compareTo(Task o) {
+		if (this.taskUID==null){
+			return -1;
+		}else{
+			return this.taskUID.compareTo(o.taskUID);
+		}
 	}
 	
 
