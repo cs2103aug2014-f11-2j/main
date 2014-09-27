@@ -35,7 +35,7 @@ public class CommandLineUI {
 	public static void main(String[] args){
 		CommandLineUI main;
 		if (args.length > 1){
-			System.err.println("Incorrect Arguement");
+			System.err.println("Incorrect Argument");
 			main = new CommandLineUI(args[0]);
 		}else if (args.length == 1){
 			main = new CommandLineUI(args[0]);
