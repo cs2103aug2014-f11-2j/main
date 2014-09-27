@@ -12,7 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class CommandParser {
-
 	public static Queue<String> seperateCommand(String userInput) {
 		String[] parameters = userInput.trim().split("\\s+");
 		Queue<String> result = new LinkedList<String>();
@@ -76,7 +75,7 @@ class CommandParser {
 	public static Map<String,String> seperateParameters(Queue<String> parameterList) throws CEOException{
 		Map<String,String> parameterMap = new HashMap<String, String>();
 		if (!parameterList.peek().matches("-\\S+")){
-			throw new CEOException("Invalid Parameter");
+			throw new CEOException(CEOException.INVALID_PARA);
 		}
 		String parameterType=null;
 		StringBuffer parameter = new StringBuffer();
@@ -198,7 +197,7 @@ class CommandParser {
 		}else if (complete.equalsIgnoreCase("false")){
 			return false;
 		}else{
-			throw new CEOException("Invalid complete type");
+			throw new CEOException(CEOException.INVALID_COMPLETE);
 		}
 	}
 	

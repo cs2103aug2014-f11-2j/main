@@ -23,9 +23,9 @@ public class PeriodicTask extends Task {
 	
 	public void updateTime(Date startTime, Date endTime) throws CEOException{
 		if (startTime==null || endTime==null){
-			throw new CEOException("Invalid Period");
+			throw new CEOException(CEOException.INVALID_TIME);
 		}else if (startTime.after(endTime)){
-			throw new CEOException("Invalid Period");
+			throw new CEOException(CEOException.INVALID_TIME);
 		}else{
 			this.startTime=startTime;
 			this.endTime=endTime;

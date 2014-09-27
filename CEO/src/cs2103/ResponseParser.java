@@ -80,6 +80,7 @@ public class ResponseParser {
 		}
 		return sb.append("\n").toString();
 	}
+	
 	private static String taskDetailToString(Task task){
 		if (task==null){
 			return null;
@@ -96,6 +97,7 @@ public class ResponseParser {
 		sb.append(task.getDescription()).append("\n");
 		return sb.toString();
 	}
+	
 	private static String dateToString(Date date){
 		DateFormat dateFormat;
 		dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.US);

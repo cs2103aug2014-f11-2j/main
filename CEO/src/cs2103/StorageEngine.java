@@ -92,8 +92,10 @@ class StorageEngine {
 				count++;
 				task.updateTaskID(count);
 			}
-		}catch(IOException | ParserException | ParseException e){
-			throw new CEOException("Read Error");
+		}catch(IOException e){
+			throw new CEOException(CEOException.READ_ERROR);
+		} catch (ParseException | ParserException e) {
+			throw new CEOException(CEOException.ILLEGAL_FILE);
 		}
 	}
 
@@ -105,7 +107,7 @@ class StorageEngine {
 			CalendarOutputter outputter = new CalendarOutputter();
 			outputter.output(this.calendar, fout);
 		} catch (IOException | ValidationException e) {
-			throw new CEOException("Write Error");
+			throw new CEOException(CEOException.WRITE_ERROR);
 		}
 	}
 	
@@ -125,7 +127,7 @@ class StorageEngine {
 	public void deleteTask(Task task) throws CEOException{
 		Component existing = this.indexedComponents.getComponent(task.getTaskUID());
 		if (existing == null){
-			throw new CEOException("Task not exist");
+			throw new CEOException(CEOException.TASK_NOT_EXIST);
 		}else{
 			calendar.getComponents().remove(existing);
 		}
@@ -141,7 +143,7 @@ class StorageEngine {
 		}else if (task instanceof FloatingTask){
 			return floatingToComponent((FloatingTask)task);
 		}else{
-			throw new CEOException("Invalid task");
+			throw new CEOException(CEOException.INVALID_TASK_OBJ);
 		}
 	}
 	
@@ -189,7 +191,7 @@ class StorageEngine {
 		Date componentStartTime;
 		Date componentEndTime;
 		if (component.getStartDate()==null||component.getEndDate()==null){
-			throw new CEOException("Period error");
+			throw new CEOException(CEOException.ILLEGAL_FILE);
 		}else{
 			componentStartTime=component.getStartDate().getDate();
 			componentEndTime=component.getEndDate().getDate();
@@ -219,7 +221,7 @@ class StorageEngine {
 		if (component.getProperty(Property.SUMMARY)!=null){
 			return component.getProperty(Property.SUMMARY).getValue();
 		}else{
-			throw new CEOException("No title error");
+			throw new CEOException(CEOException.ILLEGAL_FILE);
 		}
 	}
 	

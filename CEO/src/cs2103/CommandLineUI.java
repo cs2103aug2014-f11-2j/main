@@ -9,14 +9,14 @@ public class CommandLineUI {
 	private static final String MESSAGE_EXIT = "You have exited CEO. Hope to see you again.";
 	private static final String MESSAGE_USER_PROMPT = "Command me please: ";
 	private static final String MESSAGE_COMMAND_ERROR = "Your input command is invalid, please check your command and try again";
-	private static final String MESSAGE_INVALID_TASKID = "Your input taskID is invalid, please check your command and try again";
 	private static final String MESSAGE_INVALID_TASKTYPE = "Your input TaskType is invalid, corrected to ALL";
-	private static final String MESSAGE_UNKNOWN_ERROR = "An Unknown Error occurred";
 	private static final String MESSAGE_DELETE_FORMAT = "You have deleted task %1$d";
 	private static final String MESSAGE_ADD = "You have added a new task.";
 	private static final String MESSAGE_ADD_ERROR = "Failed to add new task";
 	private static final String MESSAGE_UPDATE_FORMAT = "You have updated task %1$d";
 	private static final String MESSAGE_UPDATE_ERROR_FORMAT = "Failed to update task %1$d";
+	private static final String MESSAGE_SHOW_ERROR_FORMAT = "Failed to show task %1$d";
+	private static final String MESSAGE_DELETE_ERROR_FORMAT = "Failed to delete task %1$d";
 	
 	public enum CommandType {
 		ADD, LIST, SHOWDETAIL, DELETE, UPDATE, EXIT, INVALID;
@@ -43,7 +43,6 @@ public class CommandLineUI {
 			main = new CommandLineUI("default.xml");
 		}
 		main.userLoop();
-		//TODO call the function prompting user interface
 	}
 	
 	private static void printWelcomeMessage() {
@@ -102,11 +101,7 @@ public class CommandLineUI {
 		try {
 			response=ResponseParser.parseShowDetailResponse(commandExecutor.showTaskDetail(taskID),taskID);
 		} catch (CEOException e) {
-			if(e.getMessage().equals("Invalid TaskID")){
-				response=MESSAGE_INVALID_TASKID;
-			}else{
-				response=MESSAGE_UNKNOWN_ERROR;
-			}
+			response = String.format(MESSAGE_SHOW_ERROR_FORMAT, taskID);
 		}
 		return response;
 	}
@@ -118,11 +113,7 @@ public class CommandLineUI {
 			commandExecutor.deleteTask(taskID);
 			response = String.format(MESSAGE_DELETE_FORMAT, taskID);
 		} catch (CEOException e) {
-			if(e.getMessage().equals("Invalid TaskID")){
-				response=MESSAGE_INVALID_TASKID;
-			}else{
-				response=MESSAGE_UNKNOWN_ERROR;
-			}
+			response = String.format(MESSAGE_DELETE_ERROR_FORMAT, taskID);
 		}
 		return response;
 	}
@@ -150,10 +141,12 @@ public class CommandLineUI {
 					commandExecutor.updateTask(taskID, title, description, location, complete, time[0], time[1]);
 				}
 			}
+			if (title==null && description==null && location==null && complete==null && timeString==null){
+				throw new CEOException(CEOException.LESS_THAN_ONE_PARA);
+			}
 			result = String.format(MESSAGE_UPDATE_FORMAT, taskID);
 		}catch (CEOException e){
 			result = String.format(MESSAGE_UPDATE_ERROR_FORMAT, taskID);
-			//e.printStackTrace();
 		}
 		return result;
 	}
@@ -182,7 +175,7 @@ public class CommandLineUI {
 			Map<String, String> parameterMap = CommandParser.seperateParameters(parameterList);
 			String title = CommandParser.getTitle(parameterMap);
 			if (title==null || title.equals("")){
-				throw new CEOException("No title error");
+				throw new CEOException(CEOException.NO_TITLE);
 			}
 			String description = CommandParser.getDescription(parameterMap);
 			String location = CommandParser.getLocation(parameterMap);

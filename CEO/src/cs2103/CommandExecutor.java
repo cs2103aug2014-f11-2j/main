@@ -28,7 +28,7 @@ class CommandExecutor {
 			task.updateLocation(location);
 			storage.updateTask(task);
 		}catch(ParseException e){
-			throw new CEOException("Invalid time");
+			throw new CEOException(CEOException.INVALID_TIME);
 		}
 		
 	}
@@ -81,21 +81,21 @@ class CommandExecutor {
 	
 	public Task showTaskDetail(int taskID) throws CEOException{
 		if (taskID>storage.taskList.size() || taskID < 1){
-			throw new CEOException("Invalid TaskID");
+			throw new CEOException(CEOException.INVALID_TASKID);
 		}
 		return storage.taskList.get(taskID-1);
 	}
 	
 	public void deleteTask(int taskID) throws CEOException{
 		if (taskID>storage.taskList.size() || taskID < 1){
-			throw new CEOException("Invalid TaskID");
+			throw new CEOException(CEOException.INVALID_TASKID);
 		}
 		storage.deleteTask(storage.taskList.get(taskID-1));
 	}
 	
 	public void updateTask(int taskID, String title, String description, String location, String complete, String startTime, String endTime) throws CEOException{
 		if (taskID>this.storage.taskList.size() || taskID < 1){
-			throw new CEOException("Invalid TaskID");
+			throw new CEOException(CEOException.INVALID_TASKID);
 		}
 		Task task = storage.taskList.get(taskID-1);
 		Task newTask;
@@ -108,7 +108,7 @@ class CommandExecutor {
 				}else if (task instanceof PeriodicTask){
 					newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),((PeriodicTask)task).getStartTime(), ((PeriodicTask)task).getEndTime());
 				}else{
-					throw new CEOException("Invalid Task object");
+					throw new CEOException(CEOException.INVALID_TASK_OBJ);
 				}
 			}else if (startTime.equals("") && endTime.equals("")){
 				if (task instanceof FloatingTask){
@@ -121,7 +121,7 @@ class CommandExecutor {
 			}else if ((!startTime.equals("")) && (!endTime.equals(""))){
 				newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),CommandParser.stringToDate(startTime), CommandParser.stringToDate(endTime));
 			}else{
-				throw new CEOException("Invalid Time");
+				throw new CEOException(CEOException.INVALID_TIME);
 			}
 			newTask.updateLocation(task.getLocation());
 			newTask.updateDescription(task.getDescription());
@@ -129,7 +129,7 @@ class CommandExecutor {
 				if (title.equals("")){
 					newTask.updateTitle(title);
 				}else{
-					throw new CEOException("No Title Error");
+					throw new CEOException(CEOException.NO_TITLE);
 				}
 			}
 			if (description!=null){
@@ -147,7 +147,7 @@ class CommandExecutor {
 			}
 			storage.updateTask(newTask);
 		}catch (ParseException e){
-			throw new CEOException("Invalid time");
+			throw new CEOException(CEOException.INVALID_TIME);
 		}
 	}
 	
