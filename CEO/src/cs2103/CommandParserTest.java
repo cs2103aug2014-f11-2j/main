@@ -2,7 +2,9 @@ package cs2103;
 
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 
 import org.junit.Test;
@@ -82,6 +84,13 @@ public class CommandParserTest {
 		assertEquals(-1, CommandParser.parseIntegerParameter("-1"));
 		assertEquals(15, CommandParser.parseIntegerParameter("15"));
 		assertEquals(999, CommandParser.parseIntegerParameter("999")); // should there be a limit?
+	}
+	
+	@Test 
+	public void testSeparateParameters() {
+		Map<String,String> expected = new HashMap<String, String>();
+		Map<String,String> actual = new HashMap<String, String>();
+		
 	}
 	
 }
