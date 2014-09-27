@@ -4,18 +4,30 @@ import java.util.Date;
 
 class DeadlineTask extends Task {
 	private Date dueTime;
-	public DeadlineTask(String taskUID, String title, Date dueTime) throws CEOException {
+	private boolean complete;
+	public DeadlineTask(String taskUID, String title, Date dueTime, boolean complete) throws CEOException {
 		super(taskUID, title);
 		this.updateDueTime(dueTime);;
+		this.updateComplete(complete);
 	}
+	
 	public Date getDueTime(){
 		return this.dueTime;
 	}
+	
 	public void updateDueTime(Date dueTime) throws CEOException{
 		if (dueTime==null){
 			throw new CEOException("Invalid deadline");
 		}else{
 			this.dueTime=dueTime;
 		}
+	}
+	
+	public boolean getComplete(){
+		return this.complete;
+	}
+	
+	public void updateComplete(boolean complete){
+		this.complete=complete;
 	}
 }

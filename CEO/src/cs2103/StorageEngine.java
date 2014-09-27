@@ -167,6 +167,7 @@ class StorageEngine {
 		}
 		component.getProperties().add(new Description(task.getDescription()));
 		component.getProperties().add(new Location(task.getLocation()));
+		component.getProperties().add(new Status(completeToStatus(task.getComplete())));
 		return component;
 	}
 	
@@ -207,7 +208,7 @@ class StorageEngine {
 		if (component.getDue()==null){
 			task = new FloatingTask(componentUID, componentTitle, component.getStatus()==null?false:statusToComplete(component.getStatus().getValue()));
 		}else{
-			task = new DeadlineTask(componentUID, componentTitle, component.getDue().getDate());
+			task = new DeadlineTask(componentUID, componentTitle, component.getDue().getDate(),component.getStatus()==null?false:statusToComplete(component.getStatus().getValue()));
 		}
 		task.updateDescription(component.getDescription()==null?"":component.getDescription().getValue());
 		task.updateLocation(component.getLocation()==null?"":component.getLocation().getValue());

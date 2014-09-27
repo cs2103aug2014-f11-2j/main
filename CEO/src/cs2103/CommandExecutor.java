@@ -20,7 +20,7 @@ class CommandExecutor {
 			if (startTime == null && endTime == null){
 				task = new FloatingTask(null, title, false);
 			}else if (endTime==null){
-				task = new DeadlineTask(null, title, CommandParser.stringToDate(startTime));
+				task = new DeadlineTask(null, title, CommandParser.stringToDate(startTime), false);
 			}else{
 				task = new PeriodicTask(null, title, CommandParser.stringToDate(startTime), CommandParser.stringToDate(endTime));
 			}
@@ -104,7 +104,7 @@ class CommandExecutor {
 				if (task instanceof FloatingTask){
 					newTask = new FloatingTask(task.getTaskUID(),task.getTitle(),((FloatingTask)task).getComplete());
 				}else if (task instanceof DeadlineTask){
-					newTask = new DeadlineTask(task.getTaskUID(),task.getTitle(),((DeadlineTask)task).getDueTime());
+					newTask = new DeadlineTask(task.getTaskUID(),task.getTitle(),((DeadlineTask)task).getDueTime(), ((DeadlineTask)task).getComplete());
 				}else if (task instanceof PeriodicTask){
 					newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),((PeriodicTask)task).getStartTime(), ((PeriodicTask)task).getEndTime());
 				}else{
@@ -117,7 +117,7 @@ class CommandExecutor {
 					newTask = new FloatingTask(task.getTaskUID(),task.getTitle(),false);
 				}
 			}else if ((!startTime.equals("")) && endTime.equals("")){
-				newTask = new DeadlineTask(task.getTaskUID(),task.getTitle(),CommandParser.stringToDate(startTime));
+				newTask = new DeadlineTask(task.getTaskUID(),task.getTitle(),CommandParser.stringToDate(startTime),false);
 			}else if ((!startTime.equals("")) && (!endTime.equals(""))){
 				newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),CommandParser.stringToDate(startTime), CommandParser.stringToDate(endTime));
 			}else{
