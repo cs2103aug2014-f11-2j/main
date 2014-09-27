@@ -72,7 +72,7 @@ class CommandParser {
 		}
 	}
 	
-	public static Map<String,String> seperateParameters(Queue<String> parameterList) throws CEOException{
+	public static Map<String,String> separateParameters(Queue<String> parameterList) throws CEOException{
 		Map<String,String> parameterMap = new HashMap<String, String>();
 		if (!parameterList.peek().matches("-\\S+")){
 			throw new CEOException(CEOException.INVALID_PARA);
