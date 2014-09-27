@@ -117,7 +117,7 @@ class CommandExecutor {
 					newTask = new FloatingTask(task.getTaskUID(),task.getTitle(),false);
 				}
 			}else if ((!startTime.equals("")) && endTime.equals("")){
-				newTask = new DeadlineTask(task.getTaskUID(),task.getTitle(),CommandParser.stringToDate(startTime),false);
+				newTask = new DeadlineTask(task.getTaskUID(),task.getTitle(),CommandParser.stringToDate(startTime), false);
 			}else if ((!startTime.equals("")) && (!endTime.equals(""))){
 				newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),CommandParser.stringToDate(startTime), CommandParser.stringToDate(endTime));
 			}else{
@@ -126,7 +126,7 @@ class CommandExecutor {
 			newTask.updateLocation(task.getLocation());
 			newTask.updateDescription(task.getDescription());
 			if (title!=null){
-				if (title!=""){
+				if (title.equals("")){
 					newTask.updateTitle(title);
 				}else{
 					throw new CEOException("No Title Error");
@@ -138,8 +138,12 @@ class CommandExecutor {
 			if (location!=null){
 				newTask.updateLocation(location);
 			}
-			if (complete!=null && newTask instanceof FloatingTask){
-				CommandParser.parseComplete(complete);
+			if (complete!=null){
+				if(newTask instanceof FloatingTask){
+					((FloatingTask) newTask).updateComplete(CommandParser.parseComplete(complete));
+				}else if (newTask instanceof DeadlineTask){
+					((DeadlineTask) newTask).updateComplete(CommandParser.parseComplete(complete));
+				}
 			}
 			storage.updateTask(newTask);
 		}catch (ParseException e){
