@@ -69,25 +69,25 @@ public class CommandLineUI {
 	
 	private String takeUserInput() {
 		String userInput = scanner.nextLine();
-		Queue<String> seperateResult=CommandParser.seperateCommand(userInput);
-		String commandTypeString = seperateResult.poll();
+		Queue<String> separateResult=CommandParser.separateCommand(userInput);
+		String commandTypeString = separateResult.poll();
 		if (commandTypeString==null || commandTypeString.equals("")){
 			return MESSAGE_COMMAND_ERROR;
 		}else{
 			CommandType commandType = CommandParser.determineCommandType(commandTypeString);
 			switch (commandType){
 			case LIST:
-				return list(seperateResult.poll());
+				return list(separateResult.poll());
 			case UPDATE:
-				return update(seperateResult);
+				return update(separateResult);
 			case EXIT:
 				return "EXIT";
 			case ADD:
-				return add(seperateResult);
+				return add(separateResult);
 			case DELETE:
-				return delete(seperateResult.poll());
+				return delete(separateResult.poll());
 			case SHOWDETAIL:
-				return show(seperateResult.poll());
+				return show(separateResult.poll());
 			case INVALID:
 			default:
 				return MESSAGE_COMMAND_ERROR;
@@ -123,7 +123,7 @@ public class CommandLineUI {
 		int taskID=0;
 		try{
 			taskID = CommandParser.parseIntegerParameter(parameterList.poll());
-			Map<String, String> parameterMap = CommandParser.seperateParameters(parameterList);
+			Map<String, String> parameterMap = CommandParser.separateParameters(parameterList);
 			String title = CommandParser.getTitle(parameterMap);
 			String description = CommandParser.getDescription(parameterMap);
 			String location = CommandParser.getLocation(parameterMap);
@@ -172,7 +172,7 @@ public class CommandLineUI {
 	private String add(Queue<String> parameterList){
 		String result;
 		try{
-			Map<String, String> parameterMap = CommandParser.seperateParameters(parameterList);
+			Map<String, String> parameterMap = CommandParser.separateParameters(parameterList);
 			String title = CommandParser.getTitle(parameterMap);
 			if (title==null || title.equals("")){
 				throw new CEOException(CEOException.NO_TITLE);
