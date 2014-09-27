@@ -65,7 +65,9 @@ public class ResponseParser {
 			sb.append(completeToString(((FloatingTask) task).getComplete()));
 		}else if (task instanceof DeadlineTask){
 			sb.append(STRING_TYPE_DEADLINE);
-			sb.append("\t\t\t\tAt: ");
+			sb.append("\tStatus: ");
+			sb.append(completeToString(((DeadlineTask) task).getComplete()));
+			sb.append("\tDue At: ");
 			sb.append(dateToString(((DeadlineTask) task).getDueTime()));
 		}else if (task instanceof PeriodicTask){
 			sb.append(STRING_TYPE_PERIODIC);
