@@ -1,7 +1,6 @@
 package cs2103;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
@@ -156,7 +155,7 @@ class StorageEngine {
 		}
 		component.getProperties().add(new Description(task.getDescription()));
 		component.getProperties().add(new Location(task.getLocation()));
-		component.getProperties().add(new Status(task.getProgress()));
+		component.getProperties().add(new Status(completeToStatus(task.getComplete())));
 		return component;
 	}
 	
@@ -207,7 +206,7 @@ class StorageEngine {
 		String componentTitle = readTitle(component);
 		Task task;
 		if (component.getDue()==null){
-			task = new FloatingTask(componentUID, componentTitle, component.getStatus()==null?"NEEDS-ACTION":component.getStatus().getValue());
+			task = new FloatingTask(componentUID, componentTitle, component.getStatus()==null?false:statusToComplete(component.getStatus().getValue()));
 		}else{
 			task = new DeadlineTask(componentUID, componentTitle, component.getDue().getDate());
 		}
@@ -221,6 +220,18 @@ class StorageEngine {
 			return component.getProperty(Property.SUMMARY).getValue();
 		}else{
 			throw new CEOException("No title error");
+		}
+	}
+	
+	public String completeToStatus(boolean complete){
+		return complete?"COMPLETED":"NEEDS-ACTION";
+	}
+	
+	public boolean statusToComplete(String status){
+		if (status.equals("COMPLETED")){
+			return true;
+		}else{
+			return false;
 		}
 	}
 	/*private Recur getRecur(Component component){
@@ -238,24 +249,6 @@ class StorageEngine {
 		}else{
 			return 0;
 		}
-	}*/
-	
-	/*private Date stringToDate(String timeString) throws ParseException{
-	TimeZone tz;
-	if (timeString.endsWith("Z")){
-		tz=TimeZone.getTimeZone("UTC");
-	}else{
-		tz=TimeZone.getDefault();
-	}
-	timeString=timeString.replaceAll("\\D+","");
-	SimpleDateFormat dateFormat;
-	if (timeString.length()==14){
-		dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-	}else{
-		dateFormat = new SimpleDateFormat("yyyyMMdd");
-	}
-	dateFormat.setTimeZone(tz);
-	return dateFormat.parse(timeString);
 	}*/
 	
 }

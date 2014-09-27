@@ -1,25 +1,18 @@
 package cs2103;
 
 class FloatingTask extends Task {
-	private String progress;
-	private final static String INCOMPLETE="NEEDS-ACTION";
-	private final static String IN_PROCESS="IN-PROCESS";
-	private final static String COMPLETED="COMPLETED";
+	private boolean complete;
 	
-	public FloatingTask(String taskUID, String title, String progress) throws CEOException {
+	public FloatingTask(String taskUID, String title, boolean complete) throws CEOException{
 		super(taskUID, title);
-		this.updateProgress(progress);
+		this.updateComplete(complete);
 	}
 	
-	public String getProgress(){
-		return this.progress;
+	public boolean getComplete(){
+		return this.complete;
 	}
 	
-	public void updateProgress(String progress) throws CEOException{
-		if (progress.equals(INCOMPLETE) || progress.equals(IN_PROCESS) || progress.equals(COMPLETED)){
-			this.progress=progress;
-		}else{
-			throw new CEOException("Invalid Progress");
-		}
+	public void updateComplete(boolean complete){
+		this.complete=complete;
 	}
 }

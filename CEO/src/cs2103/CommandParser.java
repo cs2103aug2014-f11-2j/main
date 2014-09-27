@@ -17,6 +17,9 @@ class CommandParser {
 	}
 	
 	public static CommandLineUI.CommandType determineCommandType(String command) {
+		if (command==null){
+			return CommandLineUI.CommandType.INVALID;
+		}
 		if (command.equalsIgnoreCase("list")){
 			return CommandLineUI.CommandType.LIST;
 		}else if (command.equalsIgnoreCase("update")){
@@ -35,6 +38,9 @@ class CommandParser {
 	}
 	
 	public static CommandLineUI.TaskType determineTaskType(String parameter){
+		if (parameter==null){
+			return CommandLineUI.TaskType.INVALID;
+		}
 		if (parameter.equalsIgnoreCase("all")){
 			return CommandLineUI.TaskType.ALL;
 		}else if (parameter.equalsIgnoreCase("floating")){
