@@ -202,5 +202,36 @@ class CommandParser {
 		}
 	}
 	
-	//Write all methods static
+	/*
+	public Recur stringToRecur(String recurrence) throws CEOException{
+		Pattern p = Pattern.compile("([0-9]+)([hdwmy])([0-9]+)");
+		Matcher m = p.matcher(recurrence);
+		if(m.find()){
+			int interval=Integer.parseInt(m.group(1));
+			int count=Integer.parseInt(m.group(3));
+			String frequency;
+			String found=m.group(2);
+			if (found.equals("h")){
+				frequency=Recur.HOURLY;
+			}else if (found.equals("d")){
+				frequency=Recur.DAILY;
+			}else if (found.equals("w")){
+				frequency=Recur.WEEKLY;
+			}else if (found.equals("m")){
+				frequency=Recur.MONTHLY;
+			}else if (found.equals("y")){
+				frequency=Recur.YEARLY;
+			}else{
+				throw new CEOException("Invalid Recurrence");
+			}
+			Recur recur=new Recur(frequency, count);
+			recur.setInterval(interval);
+			return recur;
+		}else if (recurrence.equals("0")){
+			return null;
+		}else{
+			throw new CEOException("Invalid Recurrence");
+		}
+	}
+	*/
 }
