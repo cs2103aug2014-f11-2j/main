@@ -1,5 +1,6 @@
 package cs2103;
 
+import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
 
@@ -11,7 +12,11 @@ public class CommandLineUI {
 	private static final String MESSAGE_INVALID_TASKID = "Your input taskID is invalid, please check your command and try again";
 	private static final String MESSAGE_INVALID_TASKTYPE = "Your input TaskType is invalid, corrected to ALL";
 	private static final String MESSAGE_UNKNOWN_ERROR = "An Unknown Error occurred";
-	private static final String MESSAGE_DELETE_FORMAT = "You have deleted task %1$d.";
+	private static final String MESSAGE_DELETE_FORMAT = "You have deleted task %1$d";
+	private static final String MESSAGE_ADD = "You have added a new task.";
+	private static final String MESSAGE_ADD_ERROR = "Failed to add new task";
+	private static final String MESSAGE_UPDATE_FORMAT = "You have updated task %1$d";
+	private static final String MESSAGE_UPDATE_ERROR_FORMAT = "Failed to update task %1$d";
 	
 	public enum CommandType {
 		ADD, LIST, SHOWDETAIL, DELETE, UPDATE, EXIT, INVALID;
@@ -123,8 +128,34 @@ public class CommandLineUI {
 	}
 
 	private String update(Queue<String> parameterList) {
-		// TODO Auto-generated method stub
-		return null;
+		String result;
+		int taskID=0;
+		try{
+			taskID = CommandParser.parseIntegerParameter(parameterList.poll());
+			Map<String, String> parameterMap = CommandParser.seperateParameters(parameterList);
+			String title = CommandParser.getTitle(parameterMap);
+			String description = CommandParser.getDescription(parameterMap);
+			String location = CommandParser.getLocation(parameterMap);
+			String complete = CommandParser.getComplete(parameterMap);
+			String timeString = CommandParser.getTimeString(parameterMap);
+			if (timeString==null){
+				commandExecutor.updateTask(taskID, title, description, location, complete, null, null);
+			}else{
+				String[] time = CommandParser.getTime(timeString);
+				if (time[0]==null && time[1]==null){
+					commandExecutor.updateTask(taskID, title, description, location, complete, "", "");
+				}else if(time[1]==null){
+					commandExecutor.updateTask(taskID, title, description, location, complete, time[0], "");
+				}else{
+					commandExecutor.updateTask(taskID, title, description, location, complete, time[0], time[1]);
+				}
+			}
+			result = String.format(MESSAGE_UPDATE_FORMAT, taskID);
+		}catch (CEOException e){
+			result = String.format(MESSAGE_UPDATE_ERROR_FORMAT, taskID);
+			//e.printStackTrace();
+		}
+		return result;
 	}
 
 	private String list(String parameter) {
@@ -146,7 +177,22 @@ public class CommandLineUI {
 	}
 
 	private String add(Queue<String> parameterList){
-		return null;
+		String result;
+		try{
+			Map<String, String> parameterMap = CommandParser.seperateParameters(parameterList);
+			String title = CommandParser.getTitle(parameterMap);
+			if (title==null || title.equals("")){
+				throw new CEOException("No title error");
+			}
+			String description = CommandParser.getDescription(parameterMap);
+			String location = CommandParser.getLocation(parameterMap);
+			String[] time = CommandParser.getTime(CommandParser.getTimeString(parameterMap));
+			commandExecutor.addTask(title, description, location, time[0], time[1]);
+			result = MESSAGE_ADD;
+		}catch (CEOException e){
+			result = MESSAGE_ADD_ERROR;
+		}
+		return result;
 	}
 	
 	private static void printFeedback(String feedback) {

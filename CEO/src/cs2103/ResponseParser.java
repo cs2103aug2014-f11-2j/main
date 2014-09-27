@@ -9,7 +9,7 @@ public class ResponseParser {
 	//All the methods here should be static
 	//Taking in various response type and convert to Strings and to be displayed in CommandLineUI
 	
-	private static final String MESSAGE_ADD = "You have added a new task.";
+
 	private static final String MESSAGE_SHOWDETAIL_FORMAT = "The details for Task %1$d:\n";
 	private static final String MESSAGE_UPDATE = "%1$s has been updated.";
 	private static final String MESSAGE_EMPTY_LIST = "The task list is empty";
@@ -65,7 +65,7 @@ public class ResponseParser {
 		sb.append(STRING_TYPE);
 		if (task instanceof FloatingTask){
 			sb.append(STRING_TYPE_FLOATING);
-			sb.append("\t\t\t\t\t\t");
+			sb.append("\t\t\t\t\tStatus: ");
 			sb.append(completeToString(((FloatingTask) task).getComplete()));
 		}else if (task instanceof DeadlineTask){
 			sb.append(STRING_TYPE_DEADLINE);

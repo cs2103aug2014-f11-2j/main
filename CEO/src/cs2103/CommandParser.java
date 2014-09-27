@@ -8,6 +8,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class CommandParser {
 
@@ -71,7 +73,7 @@ class CommandParser {
 		}
 	}
 	
-	public static Map<String,String> parseParameters(Queue<String> parameterList) throws CEOException{
+	public static Map<String,String> seperateParameters(Queue<String> parameterList) throws CEOException{
 		Map<String,String> parameterMap = new HashMap<String, String>();
 		if (!parameterList.peek().matches("-\\S+")){
 			throw new CEOException("Invalid Parameter");
@@ -94,7 +96,91 @@ class CommandParser {
 				parameter.append(parameterString).append(' ');
 			}
 		}
+		if (parameterType!=null){
+			parameterMap.put(parameterType, parameter.toString().trim());
+		}
 		return parameterMap;
+	}
+	
+	public static String getParameter(String parameterType, Map<String, String> parameterMap){
+		if (parameterMap.containsKey(parameterType)){
+			String value=parameterMap.get(parameterType);
+			if (value==null){
+				return "";
+			}else{
+				return value;
+			}
+		}else{
+			return null;
+		}
+	}
+	
+	public static String getTitle(Map<String, String> parameterMap){
+		Queue<String> keywordQueue = new LinkedList<String>();
+		keywordQueue.add("N");
+		keywordQueue.add("title");
+		String result = null;
+		while(result == null && !keywordQueue.isEmpty()){
+			result = getParameter(keywordQueue.poll(), parameterMap);
+		}
+		return result;
+	}
+	
+	public static String getDescription(Map<String, String> parameterMap){
+		Queue<String> keywordQueue = new LinkedList<String>();
+		keywordQueue.add("D");
+		keywordQueue.add("description");
+		String result = null;
+		while(result == null && !keywordQueue.isEmpty()){
+			result = getParameter(keywordQueue.poll(), parameterMap);
+		}
+		return result;
+	}
+	
+	public static String getLocation(Map<String, String> parameterMap){
+		Queue<String> keywordQueue = new LinkedList<String>();
+		keywordQueue.add("L");
+		keywordQueue.add("location");
+		String result = null;
+		while(result == null && !keywordQueue.isEmpty()){
+			result = getParameter(keywordQueue.poll(), parameterMap);
+		}
+		return result;
+	}
+	
+	public static String getComplete(Map<String, String> parameterMap){
+		Queue<String> keywordQueue = new LinkedList<String>();
+		keywordQueue.add("C");
+		keywordQueue.add("complete");
+		String result = null;
+		while(result == null && !keywordQueue.isEmpty()){
+			result = getParameter(keywordQueue.poll(), parameterMap);
+		}
+		return result;
+	}
+	public static String getTimeString(Map<String, String> parameterMap){
+		Queue<String> keywordQueue = new LinkedList<String>();
+		keywordQueue.add("T");
+		keywordQueue.add("time");
+		String result = null;
+		while(result == null && !keywordQueue.isEmpty()){
+			result = getParameter(keywordQueue.poll(), parameterMap);
+		}
+		return result;
+	}
+	public static String[] getTime(String timeString){
+		String[] time = new String[2];
+		time[0]=null; time[1]=null;
+		if (timeString!=null){
+			Pattern p = Pattern.compile("\\d{4}/\\d{2}/\\d{2}/\\d{2}:\\d{2}");
+			Matcher m = p.matcher(timeString);
+			int i = 0;
+			while(m.find() && i < 2){
+				time[i] = m.group();
+				i++;
+			}
+		}
+		return time;
 	}
 	
 	public static Date stringToDate(String timeString) throws ParseException{
@@ -115,5 +201,6 @@ class CommandParser {
 			throw new CEOException("Invalid complete type");
 		}
 	}
+	
 	//Write all methods static
 }

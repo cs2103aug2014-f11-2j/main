@@ -34,7 +34,7 @@ import net.fortuna.ical4j.util.CompatibilityHints;
 import net.fortuna.ical4j.util.UidGenerator;
 
 class StorageEngine {
-	private ArrayList<Task> taskList;
+	public ArrayList<Task> taskList;
 	private net.fortuna.ical4j.model.Calendar calendar;
 	private IndexedComponentList indexedComponents;
 	private final File file;
@@ -76,19 +76,19 @@ class StorageEngine {
 			FileInputStream fin = new FileInputStream(file);
 			CalendarBuilder builder = new CalendarBuilder();
 			this.calendar = builder.build(fin);
-			taskList = new ArrayList<Task>();
-			for (Iterator<VToDo> i= calendar.getComponents(Component.VTODO).iterator(); i.hasNext();){
+			this.taskList = new ArrayList<Task>();
+			for (Iterator<VToDo> i = this.calendar.getComponents(Component.VTODO).iterator(); i.hasNext();){
 				VToDo component = i.next();
-				taskList.add(parseVToDo(component));
+				this.taskList.add(parseVToDo(component));
 			}
-			for (Iterator<VEvent> i= calendar.getComponents(Component.VEVENT).iterator(); i.hasNext();){
+			for (Iterator<VEvent> i = this.calendar.getComponents(Component.VEVENT).iterator(); i.hasNext();){
 				VEvent component = i.next();
-				taskList.add(parseVEvent(component));
+				this.taskList.add(parseVEvent(component));
 			}
 			indexedComponents = new IndexedComponentList(calendar.getComponents(), Property.UID);
-			Collections.sort(taskList);
+			Collections.sort(this.taskList);
 			int count=0;
-			for (Task task:taskList){
+			for (Task task:this.taskList){
 				count++;
 				task.updateTaskID(count);
 			}
