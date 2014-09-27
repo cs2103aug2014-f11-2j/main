@@ -10,8 +10,8 @@ import java.text.ParseException;
 class CommandExecutor {
 	private final StorageEngine storage;
 	
-	public CommandExecutor(String configFile){
-		this.storage = new StorageEngine(configFile);
+	public CommandExecutor(String dataFile){
+		this.storage = new StorageEngine(dataFile);
 	}
 	
 	public void addTask(String title, String description, String location, String startTime, String endTime) throws CEOException{

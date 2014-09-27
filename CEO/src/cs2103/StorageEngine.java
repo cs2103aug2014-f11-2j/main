@@ -40,10 +40,12 @@ class StorageEngine {
 	private final File file;
 	UidGenerator ug;
 	
-	public StorageEngine(String configFile){
+	public StorageEngine(String dataFile){
 		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION,true);
-		String fileName="default.ics";
-		this.file = new File(fileName);
+		if (dataFile==null){
+			dataFile="default.ics";
+		}
+		this.file = new File(dataFile);
 		try {
 			if (!file.exists() || file.length()==0){
 				createNewFile();

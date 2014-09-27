@@ -27,8 +27,8 @@ public class CommandLineUI {
 	private final CommandExecutor commandExecutor;
 	private Scanner scanner = new Scanner(System.in);
 	
-	public CommandLineUI(String configFile){
-		this.commandExecutor = new CommandExecutor(configFile);
+	public CommandLineUI(String dataFile){
+		this.commandExecutor = new CommandExecutor(dataFile);
 		
 	}
 	
@@ -40,7 +40,7 @@ public class CommandLineUI {
 		}else if (args.length == 1){
 			main = new CommandLineUI(args[0]);
 		}else{
-			main = new CommandLineUI("default.xml");
+			main = new CommandLineUI("default.ics");
 		}
 		main.userLoop();
 	}
