@@ -18,7 +18,7 @@ public class CommandParserTest {
 		Queue<String> expected = new LinkedList<String>();
 		Queue<String> actual = new LinkedList<String>();
 		expected.add("");
-		actual = CommandParser.seperateCommand("");
+		actual = CommandParser.separateCommand("");
 		assertEquals(expected, actual);
 	}
 	
@@ -27,7 +27,7 @@ public class CommandParserTest {
 		Queue<String> expected = new LinkedList<String>();
 		Queue<String> actual = new LinkedList<String>();
 		expected.add("add");
-		actual = CommandParser.seperateCommand("add");
+		actual = CommandParser.separateCommand("add");
 		assertEquals(expected, actual);
 	}
 	
@@ -37,7 +37,7 @@ public class CommandParserTest {
 		Queue<String> actual = new LinkedList<String>();
 		expected.add("add");
 		expected.add("two");
-		actual = CommandParser.seperateCommand("add two");
+		actual = CommandParser.separateCommand("add two");
 		assertEquals(expected, actual);
 	}
 	
@@ -47,7 +47,7 @@ public class CommandParserTest {
 		Queue<String> actual = new LinkedList<String>();
 		expected.add("add");
 		expected.add("two");
-		actual = CommandParser.seperateCommand("add      two  ");
+		actual = CommandParser.separateCommand("add      two  ");
 		assertEquals(expected, actual);
 	}
 

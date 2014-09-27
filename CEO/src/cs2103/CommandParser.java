@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class CommandParser {
-	public static Queue<String> seperateCommand(String userInput) {
+	public static Queue<String> separateCommand(String userInput) {
 		String[] parameters = userInput.trim().split("\\s+");
 		Queue<String> result = new LinkedList<String>();
 		for (String s:parameters){
