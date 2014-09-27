@@ -248,12 +248,4 @@ class StorageEngine {
 		}
 	}*/
 	
-	/*private int parseImportance(String componentImportance){
-		if (componentImportance.matches("[0-9]+")){
-			return Integer.parseInt(componentImportance);
-		}else{
-			return 0;
-		}
-	}*/
-	
 }
