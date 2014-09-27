@@ -29,7 +29,7 @@ class CommandParser {
 			return CommandLineUI.CommandType.LIST;
 		}else if (command.equalsIgnoreCase("update")){
 			return CommandLineUI.CommandType.UPDATE;
-		}else if (command.equalsIgnoreCase("exit")){
+		}else if (command.equalsIgnoreCase("ex2 it")){
 			return CommandLineUI.CommandType.EXIT;
 		}else if (command.equalsIgnoreCase("add")){
 			return CommandLineUI.CommandType.ADD;
