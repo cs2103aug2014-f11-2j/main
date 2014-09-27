@@ -9,7 +9,7 @@ Basic Command Line Interface Usage
 
  1. Add a task:
  
- `add [-N or --title <title>] ([-D or --description <description>] [-L or --location <location>] [-C or --category <category name>] [-T or --time {<date+time>| <<starting date+time> to <ending date+time>>}] [-R or --recurring <number h/d/w/m/y>] [-I or --importance <importance level>)`
+ `add [-N or --title <title>] ([-D or --description <description>] [-L or --location <location>] [-T or --time {<date+time>| <<starting date+time> to <ending date+time>>}] [-R or --recurring <number h/d/w/m/y>])`
  
  Note: date+time format: YYYY/MM/DD/hh:mm
  
@@ -23,7 +23,7 @@ Basic Command Line Interface Usage
  
  4. Update a task:
  
- `update <task ID> ([-N or --title <title>] [-P or --progress {n(incomplete)| p(in progress)| c(completed)}] [-D or --description <description>] [-L or --location <location>] [-C or --category <category name>] [-T or --time {<date+time>| <<starting date+time>,<ending date+time>>}] [-R or --recurring <number h/d/w/m/y>] [-I or --importance <importance level>)`
+ `update <task ID> ([-N or --title <title>] [-C or --complete {true|false}] [-D or --description <description>] [-L or --location <location>] [-T or --time {<date+time>| <<starting date+time>,<ending date+time>>}] [-R or --recurring <number h/d/w/m/y>])`
  
  5. Delete a task:
  
@@ -31,7 +31,7 @@ Basic Command Line Interface Usage
  
  6. Search for a task:
  
- `search {[-N or --title <title keyword>]|[-P or --progress {n(incomplete)| p(in progress)| c(complete)}]|[-D or --description <description keyword>]|[-L or --location <location>]|[-C or --category <category name>]|[-T or --time {<date+time>| <<starting date+time> to <ending date+time>>}]|[-R or --recurring <number h/d/w/m/y>]| [-I or --importance <importance level>]}`
+ `search {[-N or --title <title keyword>]|[-C or --complete {true|false}]|[-D or --description <description keyword>]|[-L or --location <location>]|[-T or --time {<date+time>| <<starting date+time> to <ending date+time>>}]|[-R or --recurring <number h/d/w/m/y>]}`
  
  7. Search for an empty slot:
 
