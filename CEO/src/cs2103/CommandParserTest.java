@@ -5,31 +5,11 @@ import static org.junit.Assert.*;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 
 
 public class CommandParserTest {
-
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
-
-	@Before
-	public void setUp() throws Exception {
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
 
 	@Test
 	public void testSeperateCommandNoParameters() {
@@ -69,7 +49,28 @@ public class CommandParserTest {
 		assertEquals(expected, actual);
 	}
 
+	@Test
+	public void testDetermineCommandType() {
+		assertEquals(CommandLineUI.CommandType.INVALID, CommandParser.determineCommandType(null));
+		assertEquals(CommandLineUI.CommandType.LIST, CommandParser.determineCommandType("list"));
+		assertEquals(CommandLineUI.CommandType.UPDATE, CommandParser.determineCommandType("update"));
+		assertEquals(CommandLineUI.CommandType.EXIT, CommandParser.determineCommandType("exit"));
+		assertEquals(CommandLineUI.CommandType.ADD, CommandParser.determineCommandType("add"));
+		assertEquals(CommandLineUI.CommandType.DELETE, CommandParser.determineCommandType("delete"));
+		assertEquals(CommandLineUI.CommandType.SHOWDETAIL, CommandParser.determineCommandType("show"));
+		assertEquals(CommandLineUI.CommandType.INVALID, CommandParser.determineCommandType(""));
+		assertEquals(CommandLineUI.CommandType.INVALID, CommandParser.determineCommandType("hello"));
+	}
 	
+	@Test
+	public void testParseIntegerParameter() {
+		assertEquals(-1, CommandParser.parseIntegerParameter(""));
+		assertEquals(-1, CommandParser.parseIntegerParameter(null));
+		assertEquals(9, CommandParser.parseIntegerParameter("9"));
+		assertEquals(0, CommandParser.parseIntegerParameter("0"));
+		assertEquals(5, CommandParser.parseIntegerParameter("5"));
+		assertEquals(-1, CommandParser.parseIntegerParameter("-1"));
+		assertEquals(-1, CommandParser.parseIntegerParameter("15"));
+	}
 	
-
 }
