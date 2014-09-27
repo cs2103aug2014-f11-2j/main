@@ -6,12 +6,8 @@ import java.util.Date;
 import java.util.Locale;
 
 public class ResponseParser {
-	//All the methods here should be static
-	//Taking in various response type and convert to Strings and to be displayed in CommandLineUI
-	
 
 	private static final String MESSAGE_SHOWDETAIL_FORMAT = "The details for Task %1$d:\n";
-	private static final String MESSAGE_UPDATE = "%1$s has been updated.";
 	private static final String MESSAGE_EMPTY_LIST = "The task list is empty";
 	private static final String MESSAGE_SHOWDETAIL_ERROR_FOMRAT = "Unable to show detail for task %1$d";
 	private static final String MESSAGE_LIST_FORMAT = "Here shows task list for type %1$s\n";
