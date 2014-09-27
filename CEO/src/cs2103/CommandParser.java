@@ -1,9 +1,13 @@
 package cs2103;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.TimeZone;
 
 class CommandParser {
 
@@ -91,6 +95,25 @@ class CommandParser {
 			}
 		}
 		return parameterMap;
+	}
+	
+	public static Date stringToDate(String timeString) throws ParseException{
+		TimeZone tz=TimeZone.getDefault();
+		SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd/HH:mm");
+		dateFormat.setTimeZone(tz);
+		return dateFormat.parse(timeString);
+	}
+	
+	public static boolean parseComplete(String complete) throws CEOException{
+		if (complete==null){
+			return false;
+		}else if (complete.equalsIgnoreCase("true")){
+			return true;
+		}else if (complete.equalsIgnoreCase("false")){
+			return false;
+		}else{
+			throw new CEOException("Invalid complete type");
+		}
 	}
 	//Write all methods static
 }

@@ -66,7 +66,7 @@ public class ResponseParser {
 		if (task instanceof FloatingTask){
 			sb.append(STRING_TYPE_FLOATING);
 			sb.append("\t\t\t\t\t\t");
-			sb.append(((FloatingTask) task).getProgress());
+			sb.append(completeToString(((FloatingTask) task).getComplete()));
 		}else if (task instanceof DeadlineTask){
 			sb.append(STRING_TYPE_DEADLINE);
 			sb.append("\t\t\t\tAt: ");
@@ -102,5 +102,9 @@ public class ResponseParser {
 		DateFormat dateFormat;
 		dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.US);
 		return dateFormat.format(date);
+	}
+	
+	public static String completeToString(boolean complete){
+		return complete?"Completed":"Needs Action";
 	}
 }

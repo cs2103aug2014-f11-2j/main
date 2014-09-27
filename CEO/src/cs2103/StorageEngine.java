@@ -68,7 +68,6 @@ class StorageEngine {
 		TimeZone timeZone = registry.getTimeZone(TimeZone.getDefault().getID());
 		this.calendar.getComponents().add(timeZone.getVTimeZone());
 		write();
-		
 	}
 	
 	@SuppressWarnings("unchecked") 
@@ -234,6 +233,7 @@ class StorageEngine {
 			return false;
 		}
 	}
+	
 	/*private Recur getRecur(Component component){
 		if (component.getProperty(Property.RRULE)==null){
 			return null;
