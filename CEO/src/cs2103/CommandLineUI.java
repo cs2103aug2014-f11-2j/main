@@ -179,8 +179,13 @@ public class CommandLineUI {
 			}
 			String description = CommandParser.getDescription(parameterMap);
 			String location = CommandParser.getLocation(parameterMap);
-			String[] time = CommandParser.getTime(CommandParser.getTimeString(parameterMap));
-			commandExecutor.addTask(title, description, location, time[0], time[1]);
+			String timeString = CommandParser.getTimeString(parameterMap);
+			if (timeString==null){
+				commandExecutor.addTask(title, description, location, null, null);
+			}else{
+				String[] time = CommandParser.getTime(timeString);
+				commandExecutor.addTask(title, description, location, time[0], time[1]);
+			}
 			result = MESSAGE_ADD;
 		}catch (CEOException e){
 			result = MESSAGE_ADD_ERROR;

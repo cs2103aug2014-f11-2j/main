@@ -169,7 +169,7 @@ class CommandParser {
 		return result;
 	}
 	
-	public static String[] getTime(String timeString){
+	public static String[] getTime(String timeString) throws CEOException{
 		String[] time = new String[2];
 		time[0]=null; time[1]=null;
 		if (timeString!=null){
