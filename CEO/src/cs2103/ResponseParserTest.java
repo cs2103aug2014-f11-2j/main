@@ -114,13 +114,27 @@ public class ResponseParserTest {
 				"Unable to show detail for task 1");
 	}
 	
+	@Test 
+	public void testParseShowDetailResponseTaskWithNoDetails() throws CEOException {
+		Task task = new FloatingTask(null, "Eating", false);
+		int taskID = 1;
+		assertEquals("The details for Task 1:\n"
+				+ "0. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action\n\n"
+				+ "Location: null\n"
+				+ "Description: null",
+				ResponseParser.parseShowDetailResponse(task, taskID));		
+	}
 	
 	@Test 
-	public void testParseShowDetailResponseTask() {
-		Task task = null;
+	public void testParseShowDetailResponseTaskWithDetails() throws CEOException {
+		Task task = new FloatingTask(null, "Eating", false);
+		task.updateDescription("Eating Chicken Rice");
+		task.updateLocation("Hawker Center");
 		int taskID = 1;
-		assertEquals(ResponseParser.parseShowDetailResponse(task, taskID), 
-				"Unable to show detail for task 1");
+		assertEquals("The details for Task 1:\n"
+				+ "0. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action\n\n"
+				+ "Location: Hawker Center\n"
+				+ "Description: Eating Chicken Rice",
+				ResponseParser.parseShowDetailResponse(task, taskID));		
 	}
-
 }

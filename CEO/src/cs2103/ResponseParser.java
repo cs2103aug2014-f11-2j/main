@@ -9,7 +9,7 @@ public class ResponseParser {
 
 	private static final String MESSAGE_SHOWDETAIL_FORMAT = "The details for Task %1$d:\n";
 	private static final String MESSAGE_EMPTY_LIST = "The task list is empty";
-	private static final String MESSAGE_SHOWDETAIL_ERROR_FOMRAT = "Unable to show detail for task %1$d";
+	private static final String MESSAGE_SHOWDETAIL_ERROR_FORMAT = "Unable to show detail for task %1$d";
 	private static final String MESSAGE_LIST_FORMAT = "Here shows task list for type %1$s\n";
 	private static final String LIST_TYPE_FLOATING = "Floating";
 	private static final String LIST_TYPE_DEADLINE = "Deadline";
@@ -43,9 +43,17 @@ public class ResponseParser {
 					}
 				}
 			} else if (taskType.equalsIgnoreCase(LIST_TYPE_DEADLINE)) {
-				
+				for (Task task:taskList){
+					if (task instanceof DeadlineTask) {
+						sb.append(taskToString(task));
+					}
+				}
 			} else if (taskType.equalsIgnoreCase(LIST_TYPE_PERIODIC)) {
-				
+				for (Task task:taskList){
+					if (task instanceof PeriodicTask) {
+						sb.append(taskToString(task));
+					}
+				}
 			}
 			if (sb.length() > 0){
 				sb.delete(sb.length() - 2, sb.length());
@@ -57,8 +65,8 @@ public class ResponseParser {
 	}
 	
 	public static String parseShowDetailResponse(Task task, int taskID){
-		if (task==null){
-			return String.format(MESSAGE_SHOWDETAIL_ERROR_FOMRAT,taskID);
+		if (task == null){
+			return String.format(MESSAGE_SHOWDETAIL_ERROR_FORMAT,taskID);
 		}else{
 			StringBuffer sb = new StringBuffer();
 			sb.append(String.format(MESSAGE_SHOWDETAIL_FORMAT, taskID));

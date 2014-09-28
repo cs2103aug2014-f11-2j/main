@@ -72,11 +72,4 @@ class Task implements Comparable<Task>{;
 			return this.taskUID.compareTo(o.taskUID);
 		}
 	}
-	
-
-	
-	
-	
-	
-	
 }
