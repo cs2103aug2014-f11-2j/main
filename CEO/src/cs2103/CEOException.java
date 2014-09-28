@@ -14,6 +14,10 @@ class CEOException extends Exception {
 	public static final String INVALID_COMPLETE = "INVALID_COMPLETE";
 	public static final String LESS_THAN_ONE_PARA = "LESS_THAN_ONE_PARAMETER";
 	public CEOException(String errorMSG){
-		//TO DO
+		if (errorMSG.equals(ILLEGAL_FILE)||errorMSG.equals(READ_ERROR)){
+			System.exit(-1);
+		}else if (errorMSG.equals(WRITE_ERROR)){
+			System.exit(-1);
+		}
 	}
 }

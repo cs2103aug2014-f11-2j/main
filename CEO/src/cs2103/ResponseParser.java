@@ -9,7 +9,7 @@ public class ResponseParser {
 
 	private static final String MESSAGE_SHOWDETAIL_FORMAT = "The details for Task %1$d:\n";
 	private static final String MESSAGE_EMPTY_LIST = "The task list is empty";
-	private static final String MESSAGE_SHOWDETAIL_ERROR_FORMAT = "Unable to show detail for task %1$d";
+	private static final String MESSAGE_SHOWDETAIL_ERROR_FOMRAT = "Unable to show detail for task %1$d";
 	private static final String MESSAGE_LIST_FORMAT = "Here shows task list for type %1$s\n";
 	private static final String LIST_TYPE_FLOATING = "Floating";
 	private static final String LIST_TYPE_DEADLINE = "Deadline";
@@ -66,7 +66,7 @@ public class ResponseParser {
 	
 	public static String parseShowDetailResponse(Task task, int taskID){
 		if (task == null){
-			return String.format(MESSAGE_SHOWDETAIL_ERROR_FORMAT,taskID);
+			return String.format(MESSAGE_SHOWDETAIL_ERROR_FOMRAT,taskID);
 		}else{
 			StringBuffer sb = new StringBuffer();
 			sb.append(String.format(MESSAGE_SHOWDETAIL_FORMAT, taskID));
