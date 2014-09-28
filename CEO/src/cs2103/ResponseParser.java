@@ -11,6 +11,10 @@ public class ResponseParser {
 	private static final String MESSAGE_EMPTY_LIST = "The task list is empty";
 	private static final String MESSAGE_SHOWDETAIL_ERROR_FOMRAT = "Unable to show detail for task %1$d";
 	private static final String MESSAGE_LIST_FORMAT = "Here shows task list for type %1$s\n";
+	private static final String LIST_TYPE_FLOATING = "Floating";
+	private static final String LIST_TYPE_DEADLINE = "Deadline";
+	private static final String LIST_TYPE_PERIODIC = "Periodic";
+	private static final String LIST_TYPE_ALL = "ALL";
 	private static final String STRING_TYPE_FLOATING = "Floating";
 	private static final String STRING_TYPE_DEADLINE = "Deadline";
 	private static final String STRING_TYPE_PERIODIC = "Periodic";
@@ -25,16 +29,28 @@ public class ResponseParser {
 	public static String parseListResponse(ArrayList<Task> taskList, String taskType){
 		if (taskList==null || taskList.size()==0){
 			return MESSAGE_EMPTY_LIST;
-		}else{
+		} else{
 			StringBuffer sb = new StringBuffer();
 			sb.append(String.format(MESSAGE_LIST_FORMAT, taskType));
-			for (Task task:taskList){
-				sb.append(taskToString(task));
+			if (taskType.equals(LIST_TYPE_ALL)) {
+				for (Task task:taskList){
+					sb.append(taskToString(task));
+				}
+			} else if (taskType.equals(LIST_TYPE_FLOATING)) {
+				for (Task task:taskList){
+					if (task instanceof FloatingTask) {
+						sb.append(taskToString(task));
+					}
+				}
+			} else if (taskType.equals(LIST_TYPE_DEADLINE)) {
+				
+			} else if (taskType.equals(LIST_TYPE_PERIODIC)) {
+				
 			}
-			if (sb.length()>0){
-				sb.delete(sb.length()-2, sb.length());
+			if (sb.length() > 0){
+				sb.delete(sb.length() - 2, sb.length());
 				return sb.toString();
-			}else{
+			} else{
 				return null;
 			}
 		}
@@ -71,7 +87,7 @@ public class ResponseParser {
 			sb.append(dateToString(((DeadlineTask) task).getDueTime()));
 		}else if (task instanceof PeriodicTask){
 			sb.append(STRING_TYPE_PERIODIC);
-			sb.append("\tFrom: ");
+			sb.append("\t\t\t\t\tFrom: ");
 			sb.append(dateToString(((PeriodicTask) task).getStartTime()));
 			sb.append(" To ");
 			sb.append(dateToString(((PeriodicTask) task).getEndTime()));
