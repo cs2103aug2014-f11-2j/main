@@ -2,6 +2,8 @@ package cs2103;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -20,15 +22,26 @@ public class ResponseParserTest {
 
 	@Before
 	public void setUp() throws Exception {
+		ArrayList<Task> taskList = new ArrayList<Task>();
 	}
 
 	@After
 	public void tearDown() throws Exception {
+		
 	}
 
 	@Test
-	public void test() {
-		fail("Not yet implemented");
+	public void testParseListResponseEmptyTaskList() {
+		ArrayList<Task> taskList = new ArrayList<Task>();
+		assertEquals(ResponseParser.parseListResponse(taskList, "ALL"), "The task list is empty");
+	}
+	
+	@Test
+	public void testParseListResponseOneTaskList() throws CEOException {
+		ArrayList<Task> taskList = new ArrayList<Task>();
+		taskList.add(new Task(null, "Eating"));
+		assertEquals(ResponseParser.parseListResponse(taskList, "ALL"), "The task list is empty");
+		
 	}
 
 }
