@@ -32,41 +32,95 @@ public class ResponseParserTest {
 	}
 
 	@Test
-	public void testParseListResponseALLEmptyTaskList() {
+	public void testParseListResponseEmptyTaskListALL() {
 		ArrayList<Task> taskList = new ArrayList<Task>();
 		assertEquals(ResponseParser.parseListResponse(taskList, "ALL"), "The task list is empty");
 	}
 	
 	@Test
-	public void testParseListResponseALLOneTaskList() throws CEOException {
-		ArrayList<Task> taskList = new ArrayList<Task>();
-		taskList.add(new FloatingTask(null, "Eating", false));
-		assertEquals("Here shows task list for type ALL\n0. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action", 
-				ResponseParser.parseListResponse(taskList, "ALL"));
-	}
-	
-	@Test
-	public void testParseListResponseALLTwoTasksList() throws CEOException, ParseException {
-		ArrayList<Task> taskList = new ArrayList<Task>();
-		taskList.add(new FloatingTask("1", "Eating", false));
-		taskList.add(new DeadlineTask("2", "Pooping", CommandParser.stringToDate("2014/09/28/23:59"), false));
-		assertEquals("Here shows task list for type ALL\n0. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action\n\n0. Pooping"
-				+ "\nType: Deadline\t\t\t\t\tStatus: Needs Action	Due At: Sep 28, 2014 11:59:00 PM", 
-				ResponseParser.parseListResponse(taskList, "ALL"));
-	}
-	
-	@Test
-	public void testParseListResponseFLOATINGEmptyTaskList() {
+	public void testParseListResponseEmptyTaskListFLOATING() {
 		ArrayList<Task> taskList = new ArrayList<Task>();
 		assertEquals(ResponseParser.parseListResponse(taskList, "FLOATING"), "The task list is empty");
 	}
 	
 	@Test
-	public void testParseListResponseFLOATINGOneTaskList() throws CEOException {
+	public void testParseListResponseEmptyTaskListDEADLINE() {
+		ArrayList<Task> taskList = new ArrayList<Task>();
+		assertEquals(ResponseParser.parseListResponse(taskList, "DEADLINE"), "The task list is empty");
+	}
+	
+	@Test
+	public void testParseListResponseEmptyTaskListPERIODIC() {
+		ArrayList<Task> taskList = new ArrayList<Task>();
+		assertEquals(ResponseParser.parseListResponse(taskList, "PERIODIC"), "The task list is empty");
+	}
+	
+	@Test
+	public void testParseListResponseThreeTasksListALL() throws CEOException, ParseException {
 		ArrayList<Task> taskList = new ArrayList<Task>();
 		taskList.add(new FloatingTask(null, "Eating", false));
-		assertEquals("Here shows task list for type FLOATINGL\n0. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action", 
+		taskList.add(new DeadlineTask(null, "Pooping", CommandParser.stringToDate("2014/09/28/23:59"), false));
+		taskList.add(new PeriodicTask(null, "Drinking", CommandParser.stringToDate("2014/09/28/23:59"),
+				CommandParser.stringToDate("2014/10/28/23:59")));
+		assertEquals("Here shows task list for type ALL\n"
+				+ "0. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action\n\n"
+				+ "0. Pooping\nType: Deadline\t\t\t\t\tStatus: Needs Action	Due At: Sep 28, 2014 11:59:00 PM\n\n"
+				+ "0. Drinking\nType: Periodic\t\t\t\t\tFrom: Sep 28, 2014 11:59:00 PM To Oct 28, 2014 11:59:00 PM"
+				, 
+				ResponseParser.parseListResponse(taskList, "ALL"));
+	}
+
+	@Test
+	public void testParseListResponseThreeTasksListFLOATING() throws CEOException, ParseException {
+		ArrayList<Task> taskList = new ArrayList<Task>();
+		taskList.add(new FloatingTask(null, "Eating", false));
+		taskList.add(new DeadlineTask(null, "Pooping", CommandParser.stringToDate("2014/09/28/23:59"), false));
+		taskList.add(new PeriodicTask(null, "Drinking", CommandParser.stringToDate("2014/09/28/23:59"),
+				CommandParser.stringToDate("2014/10/28/23:59")));
+		assertEquals("Here shows task list for type FLOATING\n"
+				+ "0. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action", 
 				ResponseParser.parseListResponse(taskList, "FLOATING"));
+	}
+	
+	@Test
+	public void testParseListResponseThreeTasksListDEADLINE() throws CEOException, ParseException {
+		ArrayList<Task> taskList = new ArrayList<Task>();
+		taskList.add(new FloatingTask(null, "Eating", false));
+		taskList.add(new DeadlineTask(null, "Pooping", CommandParser.stringToDate("2014/09/28/23:59"), false));
+		taskList.add(new PeriodicTask(null, "Drinking", CommandParser.stringToDate("2014/09/28/23:59"),
+				CommandParser.stringToDate("2014/10/28/23:59")));
+		assertEquals("Here shows task list for type DEADLINE\n"
+				+ "0. Pooping\nType: Deadline\t\t\t\t\tStatus: Needs Action	Due At: Sep 28, 2014 11:59:00 PM", 
+				ResponseParser.parseListResponse(taskList, "DEADLINE"));
+	}
+	
+	@Test
+	public void testParseListResponseThreeTasksListPERIODIC() throws CEOException, ParseException {
+		ArrayList<Task> taskList = new ArrayList<Task>();
+		taskList.add(new FloatingTask(null, "Eating", false));
+		taskList.add(new DeadlineTask(null, "Pooping", CommandParser.stringToDate("2014/09/28/23:59"), false));
+		taskList.add(new PeriodicTask(null, "Drinking", CommandParser.stringToDate("2014/09/28/23:59"),
+				CommandParser.stringToDate("2014/10/28/23:59")));
+		assertEquals("Here shows task list for type PERIODIC\n"
+				+ "0. Drinking\nType: Periodic\t\t\t\t\tFrom: Sep 28, 2014 11:59:00 PM To Oct 28, 2014 11:59:00 PM", 
+				ResponseParser.parseListResponse(taskList, "PERIODIC"));
+	}
+	
+	@Test 
+	public void testParseShowDetailResponseNull() {
+		Task task = null;
+		int taskID = 1;
+		assertEquals(ResponseParser.parseShowDetailResponse(task, taskID), 
+				"Unable to show detail for task 1");
+	}
+	
+	
+	@Test 
+	public void testParseShowDetailResponseTask() {
+		Task task = null;
+		int taskID = 1;
+		assertEquals(ResponseParser.parseShowDetailResponse(task, taskID), 
+				"Unable to show detail for task 1");
 	}
 
 }
