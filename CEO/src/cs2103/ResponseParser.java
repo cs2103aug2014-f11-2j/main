@@ -32,7 +32,7 @@ public class ResponseParser {
 				sb.append(taskToString(task));
 			}
 			if (sb.length()>0){
-				sb.delete(sb.length()-2, sb.length());
+				sb.deleteCharAt(sb.length()-1);
 				return sb.toString();
 			}else{
 				return null;
@@ -65,7 +65,7 @@ public class ResponseParser {
 			sb.append(completeToString(((FloatingTask) task).getComplete()));
 		}else if (task instanceof DeadlineTask){
 			sb.append(STRING_TYPE_DEADLINE);
-			sb.append("\t\t\t\t\tStatus: ");
+			sb.append("\tStatus: ");
 			sb.append(completeToString(((DeadlineTask) task).getComplete()));
 			sb.append("\tDue At: ");
 			sb.append(dateToString(((DeadlineTask) task).getDueTime()));
@@ -86,15 +86,16 @@ public class ResponseParser {
 			return null;
 		}
 		String taskSummary = taskToString(task);
-		if (taskSummary==null){
+		if (taskSummary==null || taskSummary.equals("")){
 			return null;
 		}
 		StringBuffer sb = new StringBuffer();
 		sb.append(taskSummary);
+		sb.deleteCharAt(sb.length()-1);
 		sb.append(STRING_LOCATION);
 		sb.append(task.getLocation()).append("\n");
 		sb.append(STRING_DESCRIPTION);
-		sb.append(task.getDescription()).append("\n");
+		sb.append(task.getDescription()).append("\n\n");
 		return sb.toString();
 	}
 	
