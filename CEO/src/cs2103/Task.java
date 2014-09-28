@@ -1,12 +1,8 @@
 package cs2103; 
 
 class Task implements Comparable<Task>{;
-	/*private final static String TYPE_FLOATING="floating";
-	private final static String TYPE_DEADLINE="deadline";
-	private final static String TYPE_PERIODIC="periodic";*/
 	private int taskID;
 	private String taskUID;
-	//private String type;
 	private String title;
 	private String description;
 	private String location;
