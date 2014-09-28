@@ -56,7 +56,7 @@ public class ResponseParserTest {
 	}
 	
 	@Test
-	public void testParseListResponsFLOATINGEmptyTaskList() {
+	public void testParseListResponseFLOATINGEmptyTaskList() {
 		ArrayList<Task> taskList = new ArrayList<Task>();
 		assertEquals(ResponseParser.parseListResponse(taskList, "FLOATING"), "The task list is empty");
 	}
@@ -65,7 +65,7 @@ public class ResponseParserTest {
 	public void testParseListResponseFLOATINGOneTaskList() throws CEOException {
 		ArrayList<Task> taskList = new ArrayList<Task>();
 		taskList.add(new FloatingTask(null, "Eating", false));
-		assertEquals("Here shows task list for type ALL\n0. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action", 
+		assertEquals("Here shows task list for type FLOATINGL\n0. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action", 
 				ResponseParser.parseListResponse(taskList, "FLOATING"));
 	}
 

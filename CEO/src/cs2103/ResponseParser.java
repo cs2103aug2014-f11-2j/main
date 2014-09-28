@@ -32,19 +32,19 @@ public class ResponseParser {
 		} else{
 			StringBuffer sb = new StringBuffer();
 			sb.append(String.format(MESSAGE_LIST_FORMAT, taskType));
-			if (taskType.equals(LIST_TYPE_ALL)) {
+			if (taskType.equalsIgnoreCase(LIST_TYPE_ALL)) {
 				for (Task task:taskList){
 					sb.append(taskToString(task));
 				}
-			} else if (taskType.equals(LIST_TYPE_FLOATING)) {
+			} else if (taskType.equalsIgnoreCase(LIST_TYPE_FLOATING)) {
 				for (Task task:taskList){
 					if (task instanceof FloatingTask) {
 						sb.append(taskToString(task));
 					}
 				}
-			} else if (taskType.equals(LIST_TYPE_DEADLINE)) {
+			} else if (taskType.equalsIgnoreCase(LIST_TYPE_DEADLINE)) {
 				
-			} else if (taskType.equals(LIST_TYPE_PERIODIC)) {
+			} else if (taskType.equalsIgnoreCase(LIST_TYPE_PERIODIC)) {
 				
 			}
 			if (sb.length() > 0){
