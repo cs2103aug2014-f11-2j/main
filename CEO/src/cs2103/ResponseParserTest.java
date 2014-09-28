@@ -41,7 +41,7 @@ public class ResponseParserTest {
 	public void testParseListResponseOneTaskList() throws CEOException {
 		ArrayList<Task> taskList = new ArrayList<Task>();
 		taskList.add(new FloatingTask(null, "Eating", false));
-		assertEquals("Here shows task list for type ALL\n1. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action", 
+		assertEquals("Here shows task list for type ALL\n0. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action", 
 				ResponseParser.parseListResponse(taskList, "ALL"));
 	}
 	
@@ -50,8 +50,8 @@ public class ResponseParserTest {
 		ArrayList<Task> taskList = new ArrayList<Task>();
 		taskList.add(new FloatingTask(null, "Eating", false));
 		taskList.add(new DeadlineTask(null, "Pooping", CommandParser.stringToDate("2012/06/28/06:32"), false));
-		assertEquals("Here shows task list for type ALL\n1. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action\n2. Pooping"
-				+ "\nType: Deadline\tStatus: Needs Action	Due At: Jun 28, 2012 6:32:00 AM", 
+		assertEquals("Here shows task list for type ALL\n0. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action\n\n0. Pooping"
+				+ "\nType: Deadline\t\t\t\t\tStatus: Needs Action	Due At: Jun 28, 2012 6:32:00 AM", 
 				ResponseParser.parseListResponse(taskList, "ALL"));
 	}
 

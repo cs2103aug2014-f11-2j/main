@@ -32,7 +32,7 @@ public class ResponseParser {
 				sb.append(taskToString(task));
 			}
 			if (sb.length()>0){
-				sb.deleteCharAt(sb.length()-1);
+				sb.delete(sb.length()-2, sb.length());
 				return sb.toString();
 			}else{
 				return null;
@@ -65,7 +65,7 @@ public class ResponseParser {
 			sb.append(completeToString(((FloatingTask) task).getComplete()));
 		}else if (task instanceof DeadlineTask){
 			sb.append(STRING_TYPE_DEADLINE);
-			sb.append("\tStatus: ");
+			sb.append("\t\t\t\t\tStatus: ");
 			sb.append(completeToString(((DeadlineTask) task).getComplete()));
 			sb.append("\tDue At: ");
 			sb.append(dateToString(((DeadlineTask) task).getDueTime()));
@@ -78,7 +78,7 @@ public class ResponseParser {
 		}else{
 			return null;
 		}
-		return sb.append("\n").toString();
+		return sb.append("\n\n").toString();
 	}
 	
 	private static String taskDetailToString(Task task){
