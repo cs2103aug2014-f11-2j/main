@@ -17,6 +17,10 @@ public class CommandLineUI {
 	private static final String MESSAGE_UPDATE_ERROR_FORMAT = "Failed to update task %1$d";
 	private static final String MESSAGE_SHOW_ERROR_FORMAT = "Failed to show task %1$d";
 	private static final String MESSAGE_DELETE_ERROR_FORMAT = "Failed to delete task %1$d";
+	private static final String TYPE_FLOATING = "Floating";
+	private static final String TYPE_DEADLINE = "Deadline";
+	private static final String TYPE_PERIODIC = "Periodic";
+	private static final String MESSAGE_LIST_FORMAT = "Here shows task list for type %1$s\n";
 	
 	public enum CommandType {
 		ADD, LIST, SHOWDETAIL, DELETE, UPDATE, EXIT, INVALID;
@@ -153,19 +157,20 @@ public class CommandLineUI {
 
 	private String list(String parameter) {
 		TaskType taskType = CommandParser.determineTaskType(parameter);
+		printFeedback(String.format(MESSAGE_LIST_FORMAT, taskType));
 		switch (taskType){
 		case ALL:
-			return ResponseParser.parseListResponse(commandExecutor.listTask(), "ALL");
+			return ResponseParser.parseListResponse(commandExecutor.listTask());
 		case FLOATING:
-			return ResponseParser.parseListResponse(commandExecutor.listTask("FLOATING"), "FLOATING");
+			return ResponseParser.parseListResponse(commandExecutor.listTask(TYPE_FLOATING));
 		case DEADLINE:
-			return ResponseParser.parseListResponse(commandExecutor.listTask("DEADLINE"), "DEADLINE");
+			return ResponseParser.parseListResponse(commandExecutor.listTask(TYPE_DEADLINE));
 		case PERIODIC:
-			return ResponseParser.parseListResponse(commandExecutor.listTask("PERIODIC"), "PERIODIC");
+			return ResponseParser.parseListResponse(commandExecutor.listTask(TYPE_PERIODIC));
 		case INVALID:
 		default:
 			printFeedback(MESSAGE_INVALID_TASKTYPE);
-			return ResponseParser.parseListResponse(commandExecutor.listTask(), "ALL");
+			return ResponseParser.parseListResponse(commandExecutor.listTask());
 		}
 	}
 
