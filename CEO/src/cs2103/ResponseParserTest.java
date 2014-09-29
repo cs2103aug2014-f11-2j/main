@@ -32,7 +32,7 @@ public class ResponseParserTest {
 	}
 	
 	@Test
-	public void testParseListResponseThreeTasksListALL() throws CEOException, ParseException {
+	public void testParseListResponseThreeTasks() throws CEOException, ParseException {
 		ArrayList<Task> taskList = new ArrayList<Task>();
 		taskList.add(new FloatingTask(null, "Eating", false));
 		taskList.add(new DeadlineTask(null, "Pooping", CommandParser.stringToDate("2014/09/28/23:59"), false));

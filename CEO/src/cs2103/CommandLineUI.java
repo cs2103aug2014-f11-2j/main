@@ -20,7 +20,6 @@ public class CommandLineUI {
 	private static final String TYPE_FLOATING = "Floating";
 	private static final String TYPE_DEADLINE = "Deadline";
 	private static final String TYPE_PERIODIC = "Periodic";
-	private static final String MESSAGE_LIST_FORMAT = "Here shows task list for type %1$s\n";
 	
 	public enum CommandType {
 		ADD, LIST, SHOWDETAIL, DELETE, UPDATE, EXIT, INVALID;
@@ -157,7 +156,6 @@ public class CommandLineUI {
 
 	private String list(String parameter) {
 		TaskType taskType = CommandParser.determineTaskType(parameter);
-		printFeedback(String.format(MESSAGE_LIST_FORMAT, taskType));
 		switch (taskType){
 		case ALL:
 			return ResponseParser.parseListResponse(commandExecutor.listTask());
