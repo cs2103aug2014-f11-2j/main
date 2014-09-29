@@ -16,7 +16,7 @@ public class CommandLineUI {
 	private static final String MESSAGE_ADD_ERROR = "Failed to add new task";
 	private static final String MESSAGE_UPDATE_FORMAT = "You have updated task %1$d";
 	private static final String MESSAGE_UPDATE_ERROR_FORMAT = "Failed to update task %1$d";
-	private static final String MESSAGE_SHOW_ERROR_FORMAT = "Failed to show task %1$d";
+	private static final String MESSAGE_SHOW_ERROR_FORMAT = "Failed to show task with ID %1$s";
 	private static final String MESSAGE_DELETE_ERROR_FORMAT = "Failed to delete task %1$d";
 
 	
@@ -103,7 +103,7 @@ public class CommandLineUI {
 		try {
 			response=ResponseParser.parseShowDetailResponse(commandExecutor.showTaskDetail(taskID),taskID);
 		} catch (CEOException e) {
-			response = String.format(MESSAGE_SHOW_ERROR_FORMAT, taskID);
+			response = String.format(MESSAGE_SHOW_ERROR_FORMAT, parameters);
 		}
 		return response;
 	}

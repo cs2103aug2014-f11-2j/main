@@ -155,5 +155,22 @@ class CommandExecutor {
 		newTask.updateDescription(task.getDescription());
 		return newTask;
 	}
-
+	
+	private final class UndoTask{
+		private String commandType;
+		private Task task;
+		
+		public UndoTask(String commandType, Task task){
+			this.commandType = commandType;
+			this.task = task;
+		}
+		
+		public String getCommandType(){
+			return this.commandType;
+		}
+		
+		public Task getUndoTask(){
+			return this.task;
+		}
+	}
 }
