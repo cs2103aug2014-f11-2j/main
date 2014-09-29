@@ -34,7 +34,7 @@ import net.fortuna.ical4j.util.CompatibilityHints;
 import net.fortuna.ical4j.util.UidGenerator;
 
 class StorageEngine {
-	public ArrayList<Task> taskList;
+	private ArrayList<Task> taskList;
 	private net.fortuna.ical4j.model.Calendar calendar;
 	private IndexedComponentList indexedComponents;
 	private final File file;
@@ -58,7 +58,15 @@ class StorageEngine {
 	}
 	
 	public ArrayList<Task> getTaskList(){
-		return taskList;
+		return this.taskList;
+	}
+	
+	public Task getTaskByID(int taskID) throws CEOException{
+		if (taskID > this.taskList.size() || taskID < 1){
+			throw new CEOException(CEOException.INVALID_TASKID);
+		}else{
+			return this.taskList.get(taskID-1);
+		}
 	}
 	
 	private void createNewFile() throws CEOException{

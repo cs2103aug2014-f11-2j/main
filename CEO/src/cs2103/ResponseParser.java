@@ -56,17 +56,17 @@ public class ResponseParser {
 		sb.append(STRING_TYPE);
 		if (task instanceof FloatingTask){
 			sb.append(TYPE_FLOATING);
-			sb.append("\t\t\t\t\tStatus: ");
+			sb.append("\t\tStatus: ");
 			sb.append(completeToString(((FloatingTask) task).getComplete()));
 		}else if (task instanceof DeadlineTask){
 			sb.append(TYPE_DEADLINE);
-			sb.append("\tStatus: ");
+			sb.append("\t\tStatus: ");
 			sb.append(completeToString(((DeadlineTask) task).getComplete()));
 			sb.append("\tDue At: ");
 			sb.append(dateToString(((DeadlineTask) task).getDueTime()));
 		}else if (task instanceof PeriodicTask){
 			sb.append(TYPE_PERIODIC);
-			sb.append("\t\t\t\t\tFrom: ");
+			sb.append("\t\tFrom: ");
 			sb.append(dateToString(((PeriodicTask) task).getStartTime()));
 			sb.append(" To ");
 			sb.append(dateToString(((PeriodicTask) task).getEndTime()));

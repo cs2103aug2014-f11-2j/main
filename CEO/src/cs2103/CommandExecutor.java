@@ -9,6 +9,10 @@ import java.text.ParseException;
 
 class CommandExecutor {
 	private final StorageEngine storage;
+	private static final String TYPE_FLOATING = "FLOATING";
+	private static final String TYPE_DEADLINE = "DEADLINE";
+	private static final String TYPE_PERIODIC = "PERIODIC";
+	private static final String TYPE_ALL = "ALL";
 	
 	public CommandExecutor(String dataFile){
 		this.storage = new StorageEngine(dataFile);
@@ -33,21 +37,24 @@ class CommandExecutor {
 		
 	}
 	
-	public ArrayList<Task> listTask(String type){
-		if (type.equalsIgnoreCase("PERIODIC")){
+	public ArrayList<Task> listTask(String type) throws CEOException{
+		if (type.equalsIgnoreCase(TYPE_ALL)){
+			return getAllList();
+		}else if (type.equalsIgnoreCase(TYPE_PERIODIC)){
 			return getPeriodicList();
-		}else if (type.equalsIgnoreCase("DEADLINE")){
+		}else if (type.equalsIgnoreCase(TYPE_DEADLINE)){
 			return getDeadlineList();
-		}else if (type.equalsIgnoreCase("FLOATING")){
+		}else if (type.equalsIgnoreCase(TYPE_FLOATING)){
 			return getFloatingList();
 		}else{
-			return null;
+			throw new CEOException(CEOException.INVALID_TASK_TYPE);
 		}
 	}
 	
 	private ArrayList<Task> getPeriodicList(){
+		ArrayList<Task> taskList = storage.getTaskList();
 		ArrayList<Task> returnList = new ArrayList<Task>();
-		for (Task task:storage.taskList){
+		for (Task task:taskList){
 			if (task instanceof PeriodicTask){
 				returnList.add(task);
 			}
@@ -56,8 +63,9 @@ class CommandExecutor {
 	}
 	
 	private ArrayList<Task> getDeadlineList(){
+		ArrayList<Task> taskList = storage.getTaskList();
 		ArrayList<Task> returnList = new ArrayList<Task>();
-		for (Task task:storage.taskList){
+		for (Task task:taskList){
 			if (task instanceof DeadlineTask){
 				returnList.add(task);
 			}
@@ -66,8 +74,9 @@ class CommandExecutor {
 	}
 	
 	private ArrayList<Task> getFloatingList(){
+		ArrayList<Task> taskList = storage.getTaskList();
 		ArrayList<Task> returnList = new ArrayList<Task>();
-		for (Task task:storage.taskList){
+		for (Task task:taskList){
 			if (task instanceof FloatingTask){
 				returnList.add(task);
 			}
@@ -75,36 +84,27 @@ class CommandExecutor {
 		return returnList;
 	}
 	
-	public ArrayList<Task> listTask(){
-		return storage.taskList;
+	public ArrayList<Task> getAllList(){
+		return storage.getTaskList();
 	}
 	
 	public Task showTaskDetail(int taskID) throws CEOException{
-		if (taskID>storage.taskList.size() || taskID < 1){
-			throw new CEOException(CEOException.INVALID_TASKID);
-		}
-		return storage.taskList.get(taskID-1);
+		return storage.getTaskByID(taskID);
 	}
 	
 	public void deleteTask(int taskID) throws CEOException{
-		if (taskID>storage.taskList.size() || taskID < 1){
-			throw new CEOException(CEOException.INVALID_TASKID);
-		}
-		storage.deleteTask(storage.taskList.get(taskID-1));
+		storage.deleteTask(storage.getTaskByID(taskID));
 	}
 	
 	public void updateTask(int taskID, String title, String description, String location, String complete, String startTime, String endTime) throws CEOException{
-		if (taskID>this.storage.taskList.size() || taskID < 1){
-			throw new CEOException(CEOException.INVALID_TASKID);
-		}
-		Task task = storage.taskList.get(taskID-1);
+		Task task = storage.getTaskByID(taskID);
 		try{
 			Task newTask = updateTaskType(task, startTime, endTime);
 			if (title!=null){
 				if (title.equals("")){
-					newTask.updateTitle(title);
-				}else{
 					throw new CEOException(CEOException.NO_TITLE);
+				}else{
+					newTask.updateTitle(title);
 				}
 			}
 			if (description!=null){

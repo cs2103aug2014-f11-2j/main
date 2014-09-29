@@ -16,7 +16,7 @@ class CommandParser {
 		String[] parameters = userInput.trim().split("\\s+");
 		Queue<String> result = new LinkedList<String>();
 		for (String s:parameters){
-			result.add(s);
+			result.add(s.trim());
 		}
 		return result;
 	}
