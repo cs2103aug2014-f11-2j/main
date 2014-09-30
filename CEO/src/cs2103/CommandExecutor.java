@@ -1,6 +1,7 @@
 package cs2103;
 
 import java.util.ArrayList; 
+import java.util.Stack;
 import java.text.ParseException;
 //import java.util.regex.Matcher;
 //import java.util.regex.Pattern;
@@ -9,6 +10,8 @@ import java.text.ParseException;
 
 class CommandExecutor {
 	private final StorageEngine storage;
+	private Stack<TaskBackup> backupList;
+	private ArrayList<TaskBackup> trashList;
 	
 	public CommandExecutor(String dataFile){
 		this.storage = new StorageEngine(dataFile);
@@ -138,6 +141,21 @@ class CommandExecutor {
 		return newTask;
 	}
 	
+	private void backupTask(CommandLineUI.CommandType commandType, Task task){
+		if (this.backupList==null){
+			this.backupList = new Stack<TaskBackup>();
+		}
+		if (commandType.equals(CommandLineUI.CommandType.DELETE)){
+
+		}
+	}
+	
+	private void moveToTrash(Task task){
+		if (this.trashList==null){
+			this.trashList = new ArrayList<TaskBackup>();
+		}
+	}
+	
 	private final class TaskBackup{
 		private CommandLineUI.CommandType commandType;
 		private Task task;
@@ -157,6 +175,18 @@ class CommandExecutor {
 		
 		public String getTaskUID(){
 			return this.task.getTaskUID();
+		}
+		
+		@Override
+		public boolean equals(Object o){
+			if (o==null) return false;
+			if (o instanceof TaskBackup && this.getCommandType().equals(CommandLineUI.CommandType.DELETE)){
+				TaskBackup other = (TaskBackup) o;
+				if (other.getCommandType().equals(CommandLineUI.CommandType.DELETE) && this.getTaskUID().equals(other.getTaskUID())){
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }
