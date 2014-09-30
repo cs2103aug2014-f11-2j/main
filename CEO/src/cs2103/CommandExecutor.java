@@ -9,10 +9,6 @@ import java.text.ParseException;
 
 class CommandExecutor {
 	private final StorageEngine storage;
-	private static final String TYPE_FLOATING = "FLOATING";
-	private static final String TYPE_DEADLINE = "DEADLINE";
-	private static final String TYPE_PERIODIC = "PERIODIC";
-	private static final String TYPE_ALL = "ALL";
 	
 	public CommandExecutor(String dataFile){
 		this.storage = new StorageEngine(dataFile);
@@ -37,21 +33,7 @@ class CommandExecutor {
 		
 	}
 	
-	public ArrayList<Task> listTask(String type) throws CEOException{
-		if (type.equalsIgnoreCase(TYPE_ALL)){
-			return getAllList();
-		}else if (type.equalsIgnoreCase(TYPE_PERIODIC)){
-			return getPeriodicList();
-		}else if (type.equalsIgnoreCase(TYPE_DEADLINE)){
-			return getDeadlineList();
-		}else if (type.equalsIgnoreCase(TYPE_FLOATING)){
-			return getFloatingList();
-		}else{
-			throw new CEOException(CEOException.INVALID_TASK_TYPE);
-		}
-	}
-	
-	private ArrayList<Task> getPeriodicList(){
+	public ArrayList<Task> getPeriodicList(){
 		ArrayList<Task> taskList = storage.getTaskList();
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for (Task task:taskList){
@@ -62,7 +44,7 @@ class CommandExecutor {
 		return returnList;
 	}
 	
-	private ArrayList<Task> getDeadlineList(){
+	public ArrayList<Task> getDeadlineList(){
 		ArrayList<Task> taskList = storage.getTaskList();
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for (Task task:taskList){
@@ -73,7 +55,7 @@ class CommandExecutor {
 		return returnList;
 	}
 	
-	private ArrayList<Task> getFloatingList(){
+	public ArrayList<Task> getFloatingList(){
 		ArrayList<Task> taskList = storage.getTaskList();
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for (Task task:taskList){
@@ -156,21 +138,25 @@ class CommandExecutor {
 		return newTask;
 	}
 	
-	private final class UndoTask{
-		private String commandType;
+	private final class TaskBackup{
+		private CommandLineUI.CommandType commandType;
 		private Task task;
 		
-		public UndoTask(String commandType, Task task){
+		public TaskBackup(CommandLineUI.CommandType commandType, Task task){
 			this.commandType = commandType;
 			this.task = task;
 		}
 		
-		public String getCommandType(){
+		public CommandLineUI.CommandType getCommandType(){
 			return this.commandType;
 		}
 		
-		public Task getUndoTask(){
+		public Task getBackupTask(){
 			return this.task;
+		}
+		
+		public String getTaskUID(){
+			return this.task.getTaskUID();
 		}
 	}
 }

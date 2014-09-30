@@ -1,6 +1,5 @@
 package cs2103;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
@@ -10,15 +9,14 @@ public class CommandLineUI {
 	private static final String MESSAGE_EXIT = "You have exited CEO. Hope to see you again.";
 	private static final String MESSAGE_USER_PROMPT = "Command me please: ";
 	private static final String MESSAGE_COMMAND_ERROR = "Your input command is invalid, please check your command and try again";
-	private static final String MESSAGE_INVALID_TASKTYPE = "Your input TaskType is invalid, corrected to All";
-	private static final String MESSAGE_DELETE_FORMAT = "You have deleted task %1$d";
+	private static final String MESSAGE_INVALID_TASKTYPE_FORMAT = "Your input Task Type %1$s is invalid, corrected to All";
+	private static final String MESSAGE_DELETE_FORMAT = "You have deleted task with ID %1$s";
+	private static final String MESSAGE_DELETE_ERROR_FORMAT = "Failed to delete task with ID %1$s";
 	private static final String MESSAGE_ADD = "You have added a new task.";
 	private static final String MESSAGE_ADD_ERROR = "Failed to add new task";
-	private static final String MESSAGE_UPDATE_FORMAT = "You have updated task %1$d";
-	private static final String MESSAGE_UPDATE_ERROR_FORMAT = "Failed to update task %1$d";
+	private static final String MESSAGE_UPDATE_FORMAT = "You have updated task with ID %1$s";
+	private static final String MESSAGE_UPDATE_ERROR_FORMAT = "Failed to update task with ID %1$s";
 	private static final String MESSAGE_SHOW_ERROR_FORMAT = "Failed to show task with ID %1$s";
-	private static final String MESSAGE_DELETE_ERROR_FORMAT = "Failed to delete task %1$d";
-
 	
 	public enum CommandType {
 		ADD, LIST, SHOWDETAIL, DELETE, UPDATE, EXIT, INVALID;
@@ -26,6 +24,7 @@ public class CommandLineUI {
 	public enum TaskType {
 		ALL, FLOATING, DEADLINE, PERIODIC, INVALID;
 	}
+	
 	private final CommandExecutor commandExecutor;
 	private Scanner scanner = new Scanner(System.in);
 	
@@ -113,18 +112,19 @@ public class CommandLineUI {
 		String response;
 		try {
 			commandExecutor.deleteTask(taskID);
-			response = String.format(MESSAGE_DELETE_FORMAT, taskID);
+			response = String.format(MESSAGE_DELETE_FORMAT, parameter);
 		} catch (CEOException e) {
-			response = String.format(MESSAGE_DELETE_ERROR_FORMAT, taskID);
+			response = String.format(MESSAGE_DELETE_ERROR_FORMAT, parameter);
 		}
 		return response;
 	}
 
 	private String update(Queue<String> parameterList) {
 		String result;
+		String taskIDString = parameterList.poll();
 		int taskID=0;
 		try{
-			taskID = CommandParser.parseIntegerParameter(parameterList.poll());
+			taskID = CommandParser.parseIntegerParameter(taskIDString);
 			Map<String, String> parameterMap = CommandParser.separateParameters(parameterList);
 			String title = CommandParser.getTitle(parameterMap);
 			String description = CommandParser.getDescription(parameterMap);
@@ -146,22 +146,29 @@ public class CommandLineUI {
 			if (title==null && description==null && location==null && complete==null && timeString==null){
 				throw new CEOException(CEOException.LESS_THAN_ONE_PARA);
 			}
-			result = String.format(MESSAGE_UPDATE_FORMAT, taskID);
+			result = String.format(MESSAGE_UPDATE_FORMAT, taskIDString);
 		}catch (CEOException e){
-			result = String.format(MESSAGE_UPDATE_ERROR_FORMAT, taskID);
+			result = String.format(MESSAGE_UPDATE_ERROR_FORMAT, taskIDString);
 		}
 		return result;
 	}
 
 	private String list(String parameter) {
-		ArrayList<Task> taskList;
-		try {
-			taskList = commandExecutor.listTask(parameter);
-		} catch (CEOException e) {
-			printFeedback(MESSAGE_INVALID_TASKTYPE);
-			taskList = commandExecutor.getAllList();
+		TaskType taskType = CommandParser.determineTaskType(parameter);
+		switch (taskType){
+		case ALL:
+			return ResponseParser.parseListResponse(commandExecutor.getAllList());
+		case FLOATING:
+			return ResponseParser.parseListResponse(commandExecutor.getFloatingList());
+		case DEADLINE:
+			return ResponseParser.parseListResponse(commandExecutor.getDeadlineList());
+		case PERIODIC:
+			return ResponseParser.parseListResponse(commandExecutor.getPeriodicList());
+		case INVALID:
+		default:
+			printFeedback(String.format(MESSAGE_INVALID_TASKTYPE_FORMAT, parameter));
+			return ResponseParser.parseListResponse(commandExecutor.getAllList());
 		}
-		return ResponseParser.parseListResponse(taskList);
 	}
 
 	private String add(Queue<String> parameterList){
