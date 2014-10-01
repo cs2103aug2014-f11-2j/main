@@ -51,7 +51,7 @@ class StorageEngine {
 				createNewFile();
 			}
 			ug = new UidGenerator("test");
-			read();
+			this.taskList = read();
 		} catch (CEOException | IOException e) {
 			e.printStackTrace();
 		}
@@ -81,27 +81,28 @@ class StorageEngine {
 	}
 	
 	@SuppressWarnings("unchecked") 
-	private void read() throws CEOException{
+	private ArrayList<Task> read() throws CEOException{
 		try{	
 			FileInputStream fin = new FileInputStream(file);
 			CalendarBuilder builder = new CalendarBuilder();
 			this.calendar = builder.build(fin);
-			this.taskList = new ArrayList<Task>();
+			ArrayList<Task> taskList = new ArrayList<Task>();
 			for (Iterator<VToDo> i = this.calendar.getComponents(Component.VTODO).iterator(); i.hasNext();){
 				VToDo component = i.next();
-				this.taskList.add(parseVToDo(component));
+				taskList.add(parseVToDo(component));
 			}
 			for (Iterator<VEvent> i = this.calendar.getComponents(Component.VEVENT).iterator(); i.hasNext();){
 				VEvent component = i.next();
-				this.taskList.add(parseVEvent(component));
+				taskList.add(parseVEvent(component));
 			}
 			indexedComponents = new IndexedComponentList(calendar.getComponents(), Property.UID);
-			Collections.sort(this.taskList);
+			Collections.sort(taskList);
 			int count=0;
-			for (Task task:this.taskList){
+			for (Task task:taskList){
 				count++;
 				task.updateTaskID(count);
 			}
+			return taskList;
 		}catch(IOException e){
 			throw new CEOException(CEOException.READ_ERROR);
 		} catch (ParseException | ParserException e) {
@@ -131,7 +132,7 @@ class StorageEngine {
 			calendar.getComponents().add(updating);
 		}
 		write();
-		read();
+		this.taskList = read();
 	}
 	
 	public void deleteTask(Task task) throws CEOException{
@@ -142,7 +143,7 @@ class StorageEngine {
 			calendar.getComponents().remove(existing);
 		}
 		write();
-		read();
+		this.taskList = read();
 	}
 	
 	private Component taskToComponent(Task task) throws CEOException{
