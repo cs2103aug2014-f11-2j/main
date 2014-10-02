@@ -30,7 +30,6 @@ public class CommandLineUI {
 	
 	public CommandLineUI(String dataFile){
 		this.commandExecutor = new CommandExecutor(dataFile);
-		
 	}
 	
 	public static void main(String[] args){
@@ -155,19 +154,23 @@ public class CommandLineUI {
 
 	private String list(String parameter) {
 		TaskType taskType = CommandParser.determineTaskType(parameter);
-		switch (taskType){
-		case ALL:
-			return ResponseParser.parseListResponse(commandExecutor.getAllList());
-		case FLOATING:
-			return ResponseParser.parseListResponse(commandExecutor.getFloatingList());
-		case DEADLINE:
-			return ResponseParser.parseListResponse(commandExecutor.getDeadlineList());
-		case PERIODIC:
-			return ResponseParser.parseListResponse(commandExecutor.getPeriodicList());
-		case INVALID:
-		default:
-			printFeedback(String.format(MESSAGE_INVALID_TASKTYPE_FORMAT, parameter));
-			return ResponseParser.parseListResponse(commandExecutor.getAllList());
+		try{
+			switch (taskType){
+			case ALL:
+				return ResponseParser.parseListResponse(commandExecutor.getAllList());
+			case FLOATING:
+				return ResponseParser.parseListResponse(commandExecutor.getFloatingList());
+			case DEADLINE:
+				return ResponseParser.parseListResponse(commandExecutor.getDeadlineList());
+			case PERIODIC:
+				return ResponseParser.parseListResponse(commandExecutor.getPeriodicList());
+			case INVALID:
+			default:
+				printFeedback(String.format(MESSAGE_INVALID_TASKTYPE_FORMAT, parameter));
+				return ResponseParser.parseListResponse(commandExecutor.getAllList());
+			}
+		} catch (CEOException e){
+			return CEOException.READ_ERROR;
 		}
 	}
 

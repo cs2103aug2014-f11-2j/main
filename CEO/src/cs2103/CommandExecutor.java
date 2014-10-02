@@ -10,11 +10,17 @@ import java.text.ParseException;
 
 class CommandExecutor {
 	private final StorageEngine storage;
+	private ArrayList<Task> taskList;
 	private Stack<TaskBackup> backupList;
 	private ArrayList<TaskBackup> trashList;
 	
 	public CommandExecutor(String dataFile){
 		this.storage = new StorageEngine(dataFile);
+		try {
+			this.taskList = storage.getTaskList();
+		} catch (CEOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void addTask(String title, String description, String location, String startTime, String endTime) throws CEOException{
@@ -36,8 +42,8 @@ class CommandExecutor {
 		
 	}
 	
-	public ArrayList<Task> getPeriodicList(){
-		ArrayList<Task> taskList = storage.getTaskList();
+	public ArrayList<Task> getPeriodicList() throws CEOException{
+		this.taskList = storage.getTaskList();
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for (Task task:taskList){
 			if (task instanceof PeriodicTask){
@@ -47,8 +53,8 @@ class CommandExecutor {
 		return returnList;
 	}
 	
-	public ArrayList<Task> getDeadlineList(){
-		ArrayList<Task> taskList = storage.getTaskList();
+	public ArrayList<Task> getDeadlineList() throws CEOException{
+		this.taskList = storage.getTaskList();
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for (Task task:taskList){
 			if (task instanceof DeadlineTask){
@@ -58,8 +64,8 @@ class CommandExecutor {
 		return returnList;
 	}
 	
-	public ArrayList<Task> getFloatingList(){
-		ArrayList<Task> taskList = storage.getTaskList();
+	public ArrayList<Task> getFloatingList() throws CEOException{
+		this.taskList = storage.getTaskList();
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for (Task task:taskList){
 			if (task instanceof FloatingTask){
@@ -69,20 +75,29 @@ class CommandExecutor {
 		return returnList;
 	}
 	
-	public ArrayList<Task> getAllList(){
-		return storage.getTaskList();
+	public ArrayList<Task> getAllList() throws CEOException{
+		this.taskList = storage.getTaskList();
+		return this.taskList;
+	}
+	
+	private Task getTaskByID(int taskID) throws CEOException{
+		if (taskID > this.taskList.size() || taskID < 1){
+			throw new CEOException(CEOException.INVALID_TASKID);
+		}else{
+			return this.taskList.get(taskID-1);
+		}
 	}
 	
 	public Task showTaskDetail(int taskID) throws CEOException{
-		return storage.getTaskByID(taskID);
+		return getTaskByID(taskID);
 	}
 	
 	public void deleteTask(int taskID) throws CEOException{
-		storage.deleteTask(storage.getTaskByID(taskID));
+		storage.deleteTask(getTaskByID(taskID));
 	}
 	
 	public void updateTask(int taskID, String title, String description, String location, String complete, String startTime, String endTime) throws CEOException{
-		Task task = storage.getTaskByID(taskID);
+		Task task = getTaskByID(taskID);
 		try{
 			Task newTask = updateTaskType(task, startTime, endTime);
 			if (title!=null){

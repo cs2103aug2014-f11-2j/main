@@ -34,7 +34,7 @@ import net.fortuna.ical4j.util.CompatibilityHints;
 import net.fortuna.ical4j.util.UidGenerator;
 
 class StorageEngine {
-	private ArrayList<Task> taskList;
+
 	private net.fortuna.ical4j.model.Calendar calendar;
 	private IndexedComponentList indexedComponents;
 	private final File file;
@@ -51,22 +51,13 @@ class StorageEngine {
 				createNewFile();
 			}
 			ug = new UidGenerator("test");
-			this.taskList = read();
 		} catch (CEOException | IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public ArrayList<Task> getTaskList(){
-		return this.taskList;
-	}
-	
-	public Task getTaskByID(int taskID) throws CEOException{
-		if (taskID > this.taskList.size() || taskID < 1){
-			throw new CEOException(CEOException.INVALID_TASKID);
-		}else{
-			return this.taskList.get(taskID-1);
-		}
+	public ArrayList<Task> getTaskList() throws CEOException{
+		return readFromFile();
 	}
 	
 	private void createNewFile() throws CEOException{
@@ -81,7 +72,7 @@ class StorageEngine {
 	}
 	
 	@SuppressWarnings("unchecked") 
-	private ArrayList<Task> read() throws CEOException{
+	private ArrayList<Task> readFromFile() throws CEOException{
 		try{	
 			FileInputStream fin = new FileInputStream(file);
 			CalendarBuilder builder = new CalendarBuilder();
@@ -131,7 +122,7 @@ class StorageEngine {
 			calendar.getComponents().remove(existing);
 			calendar.getComponents().add(updating);
 		}
-		syncWithFile();
+		writeToFile();
 	}
 	
 	public void deleteTask(Task task) throws CEOException{
@@ -141,12 +132,7 @@ class StorageEngine {
 		}else{
 			calendar.getComponents().remove(existing);
 		}
-		syncWithFile();
-	}
-	
-	private void syncWithFile() throws CEOException{
 		writeToFile();
-		this.taskList = read();
 	}
 	
 	private Component taskToComponent(Task task) throws CEOException{
