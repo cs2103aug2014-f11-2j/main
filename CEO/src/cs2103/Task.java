@@ -15,9 +15,11 @@ class Task implements Comparable<Task>{;
 			throw new CEOException("No Title Error");
 		}
 	}
+	
 	public int getTaskID(){
 		return this.taskID;
 	}
+	
 	public String getTaskUID(){
 		return this.taskUID;
 	}

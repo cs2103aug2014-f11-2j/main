@@ -231,7 +231,7 @@ class StorageEngine {
 		return task;
 	}
 	
-	public String readTitle(Component component) throws CEOException{
+	private String readTitle(Component component) throws CEOException{
 		if (component.getProperty(Property.SUMMARY)!=null){
 			return component.getProperty(Property.SUMMARY).getValue();
 		}else{
@@ -239,11 +239,11 @@ class StorageEngine {
 		}
 	}
 	
-	public String completeToStatus(boolean complete){
+	private String completeToStatus(boolean complete){
 		return complete?"COMPLETED":"NEEDS-ACTION";
 	}
 	
-	public boolean statusToComplete(String status){
+	private boolean statusToComplete(String status){
 		if (status.equals("COMPLETED")){
 			return true;
 		}else{

@@ -50,7 +50,7 @@ public class CommandLineUI {
 		System.out.println(MESSAGE_WELCOME);
 	}
 	
-	public void userLoop() {
+	private void userLoop() {
 		printWelcomeMessage();
 		String feedback;
 		while (true) {
