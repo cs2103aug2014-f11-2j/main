@@ -11,7 +11,7 @@ import java.text.ParseException;
 class CommandExecutor {
 	private final StorageEngine storage;
 	private ArrayList<Task> taskList;
-	private Stack<TaskBackup> backupList;
+	private Stack<TaskBackup> undoStack;
 	private ArrayList<TaskBackup> trashList;
 	
 	public CommandExecutor(String dataFile){
@@ -45,7 +45,7 @@ class CommandExecutor {
 	public ArrayList<Task> getPeriodicList() throws CEOException{
 		this.taskList = storage.getTaskList();
 		ArrayList<Task> returnList = new ArrayList<Task>();
-		for (Task task:taskList){
+		for (Task task:this.taskList){
 			if (task instanceof PeriodicTask){
 				returnList.add(task);
 			}
@@ -56,7 +56,7 @@ class CommandExecutor {
 	public ArrayList<Task> getDeadlineList() throws CEOException{
 		this.taskList = storage.getTaskList();
 		ArrayList<Task> returnList = new ArrayList<Task>();
-		for (Task task:taskList){
+		for (Task task:this.taskList){
 			if (task instanceof DeadlineTask){
 				returnList.add(task);
 			}
@@ -67,7 +67,7 @@ class CommandExecutor {
 	public ArrayList<Task> getFloatingList() throws CEOException{
 		this.taskList = storage.getTaskList();
 		ArrayList<Task> returnList = new ArrayList<Task>();
-		for (Task task:taskList){
+		for (Task task:this.taskList){
 			if (task instanceof FloatingTask){
 				returnList.add(task);
 			}
@@ -157,8 +157,8 @@ class CommandExecutor {
 	}
 	
 	private void backupTask(CommandLineUI.CommandType commandType, Task task){
-		if (this.backupList==null){
-			this.backupList = new Stack<TaskBackup>();
+		if (this.undoStack==null){
+			this.undoStack = new Stack<TaskBackup>();
 		}
 		if (commandType.equals(CommandLineUI.CommandType.DELETE)){
 
