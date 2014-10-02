@@ -77,7 +77,7 @@ class StorageEngine {
 		TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
 		TimeZone timeZone = registry.getTimeZone(TimeZone.getDefault().getID());
 		this.calendar.getComponents().add(timeZone.getVTimeZone());
-		write();
+		writeToFile();
 	}
 	
 	@SuppressWarnings("unchecked") 
@@ -110,7 +110,7 @@ class StorageEngine {
 		}
 	}
 
-	private void write() throws CEOException{
+	private void writeToFile() throws CEOException{
 		try {
 			calendar.validate();
 			FileOutputStream fout;
@@ -131,8 +131,7 @@ class StorageEngine {
 			calendar.getComponents().remove(existing);
 			calendar.getComponents().add(updating);
 		}
-		write();
-		this.taskList = read();
+		syncWithFile();
 	}
 	
 	public void deleteTask(Task task) throws CEOException{
@@ -142,7 +141,11 @@ class StorageEngine {
 		}else{
 			calendar.getComponents().remove(existing);
 		}
-		write();
+		syncWithFile();
+	}
+	
+	private void syncWithFile() throws CEOException{
+		writeToFile();
 		this.taskList = read();
 	}
 	
