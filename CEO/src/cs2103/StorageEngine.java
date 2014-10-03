@@ -113,7 +113,7 @@ class StorageEngine {
 		}
 	}
 	
-	public void updateTask(Task task) throws CEOException{
+	public ArrayList<Task> updateTask(Task task) throws CEOException{
 		Component updating = taskToComponent(task);
 		Component existing = this.indexedComponents.getComponent(updating.getProperty(Property.UID).getValue());
 		if (existing == null){
@@ -123,9 +123,10 @@ class StorageEngine {
 			calendar.getComponents().add(updating);
 		}
 		writeToFile();
+		return readFromFile();
 	}
 	
-	public void deleteTask(Task task) throws CEOException{
+	public ArrayList<Task> deleteTask(Task task) throws CEOException{
 		Component existing = this.indexedComponents.getComponent(task.getTaskUID());
 		if (existing == null){
 			throw new CEOException(CEOException.TASK_NOT_EXIST);
@@ -133,6 +134,7 @@ class StorageEngine {
 			calendar.getComponents().remove(existing);
 		}
 		writeToFile();
+		return readFromFile();
 	}
 	
 	private Component taskToComponent(Task task) throws CEOException{

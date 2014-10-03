@@ -35,7 +35,7 @@ class CommandExecutor {
 			}
 			task.updateDescription(description);
 			task.updateLocation(location);
-			storage.updateTask(task);
+			this.taskList = storage.updateTask(task);
 		}catch(ParseException e){
 			throw new CEOException(CEOException.INVALID_TIME);
 		}
@@ -43,7 +43,6 @@ class CommandExecutor {
 	}
 	
 	public ArrayList<Task> getPeriodicList() throws CEOException{
-		this.taskList = storage.getTaskList();
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for (Task task:this.taskList){
 			if (task instanceof PeriodicTask){
@@ -54,7 +53,6 @@ class CommandExecutor {
 	}
 	
 	public ArrayList<Task> getDeadlineList() throws CEOException{
-		this.taskList = storage.getTaskList();
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for (Task task:this.taskList){
 			if (task instanceof DeadlineTask){
@@ -65,7 +63,6 @@ class CommandExecutor {
 	}
 	
 	public ArrayList<Task> getFloatingList() throws CEOException{
-		this.taskList = storage.getTaskList();
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for (Task task:this.taskList){
 			if (task instanceof FloatingTask){
@@ -76,7 +73,6 @@ class CommandExecutor {
 	}
 	
 	public ArrayList<Task> getAllList() throws CEOException{
-		this.taskList = storage.getTaskList();
 		return this.taskList;
 	}
 	
@@ -93,7 +89,7 @@ class CommandExecutor {
 	}
 	
 	public void deleteTask(int taskID) throws CEOException{
-		storage.deleteTask(getTaskByID(taskID));
+		this.taskList = storage.deleteTask(getTaskByID(taskID));
 	}
 	
 	public void updateTask(int taskID, String title, String description, String location, String complete, String startTime, String endTime) throws CEOException{
@@ -120,7 +116,7 @@ class CommandExecutor {
 					((DeadlineTask) newTask).updateComplete(CommandParser.parseComplete(complete));
 				}
 			}
-			storage.updateTask(newTask);
+			this.taskList = storage.updateTask(newTask);
 		}catch (ParseException e){
 			throw new CEOException(CEOException.INVALID_TIME);
 		}
