@@ -3,6 +3,8 @@ package cs2103;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
+import java.util.Date;
+import java.util.ArrayList;
 
 public class CommandLineUI {
 	private static final String MESSAGE_WELCOME = "Welcome to the CEO. CEO is ready for use.";
@@ -17,7 +19,8 @@ public class CommandLineUI {
 	private static final String MESSAGE_UPDATE_FORMAT = "You have updated task with ID %1$s";
 	private static final String MESSAGE_UPDATE_ERROR_FORMAT = "Failed to update task with ID %1$s";
 	private static final String MESSAGE_SHOW_ERROR_FORMAT = "Failed to show task with ID %1$s";
-	
+	private static final String MESSAGE_URGENT_ALERT = "URGENT ALERT!:";
+	private static final String MESSAGE_URGENT_ERROR = "Failed to retrieve latest deadline";
 	public enum CommandType {
 		ADD, LIST, SHOWDETAIL, DELETE, UPDATE, EXIT, INVALID;
 	}
@@ -53,6 +56,7 @@ public class CommandLineUI {
 		printWelcomeMessage();
 		String feedback;
 		while (true) {
+			latestTask();
 			printUserPrompt();
 			feedback=takeUserInput();
 			if (feedback.equalsIgnoreCase("EXIT")){
@@ -200,5 +204,67 @@ public class CommandLineUI {
 	
 	private static void printFeedback(String feedback) {
 		System.out.println(feedback);
+	}
+	
+	//To retrieve the nearest deadline from tasklist
+	private void latestTask() {
+		try{
+			String alertedTask = null;
+			Date alertedDate = null;
+			ArrayList<Task> existingPeriodic = commandExecutor.getPeriodicList();
+			ArrayList<Task> existingDeadline = commandExecutor.getDeadlineList();
+			String periodicInfo = null;
+			Date latestPeriodic = null;
+			String deadlineInfo = null;
+			Date latestDeadline = null;
+			if(existingPeriodic.isEmpty() && existingDeadline.isEmpty()) {
+				return;
+			}
+			
+			
+			
+			if(!existingPeriodic.isEmpty()) {
+				periodicInfo = (existingPeriodic.get(0)).getTitle();
+				latestPeriodic = ((PeriodicTask)existingPeriodic.get(0)).getStartTime();
+				for(int i=1; i<existingPeriodic.size(); i++) {
+					if((((PeriodicTask)existingPeriodic.get(i)).getStartTime()).before(latestPeriodic)) {
+						latestPeriodic = ((PeriodicTask)existingPeriodic.get(0)).getEndTime();
+						periodicInfo = (existingPeriodic.get(i)).getTitle();
+					}
+				}
+			}
+			if(!existingDeadline.isEmpty()) {
+				deadlineInfo = (existingDeadline.get(0)).getTitle();
+				latestDeadline = ((DeadlineTask)existingDeadline.get(0)).getDueTime();
+				for(int i=1; i<existingPeriodic.size(); i++) {
+					if((((DeadlineTask)existingDeadline.get(i)).getDueTime()).before(latestDeadline)) {
+						latestDeadline = ((DeadlineTask)existingDeadline.get(0)).getDueTime();
+						deadlineInfo = (existingDeadline.get(i)).getTitle();
+					}
+				}
+			}
+			
+			if((!existingDeadline.isEmpty()) && (!existingPeriodic.isEmpty())) {
+				if(latestPeriodic.before(latestDeadline)) {
+					alertedDate = latestPeriodic;
+					alertedTask = periodicInfo;
+				} else {
+					alertedDate = latestDeadline;
+					alertedTask = deadlineInfo;
+				}
+			} else if(!existingDeadline.isEmpty()) {
+				alertedDate = latestDeadline;
+				alertedTask = deadlineInfo;
+				System.out.println(MESSAGE_URGENT_ALERT);
+				System.out.println(alertedTask + " deadline: " +alertedDate);
+			} else {
+				alertedDate = latestPeriodic;
+				alertedTask = periodicInfo;
+				System.out.println(MESSAGE_URGENT_ALERT);
+				System.out.println(alertedTask + " deadline: " +alertedDate);
+			}
+		} catch (CEOException e) {
+			System.out.println(MESSAGE_URGENT_ERROR);
+		}
 	}
 }
