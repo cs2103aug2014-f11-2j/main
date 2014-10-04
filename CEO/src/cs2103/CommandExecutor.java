@@ -7,13 +7,10 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.text.ParseException;
-//import java.util.regex.Matcher;
-//import java.util.regex.Pattern;
 import java.text.SimpleDateFormat;
 
 import net.fortuna.ical4j.model.Recur;
 
-//import net.fortuna.ical4j.model.Recur;
 
 class CommandExecutor {
 	private final StorageEngine storage;
@@ -29,30 +26,35 @@ class CommandExecutor {
 		}
 	}
 	
-	public void addTask(String title, String description, String location, String startTime, String endTime, String recurrence) throws CEOException{
-		try{
-			Task task;
-			if (startTime == null && endTime == null){
-				task = new FloatingTask(null, title, false);
-			}else if (endTime==null){
-				task = new DeadlineTask(null, title, stringToDate(startTime), false);
-			}else if (recurrence==null){
-				task = new PeriodicTask(null, title, stringToDate(startTime), stringToDate(endTime), location);
-			}else{
-				task = new RecurringTask(null, title, stringToDate(startTime), stringToDate(endTime), location, stringToRecur(recurrence));
-			}
-			task.updateDescription(description);
-			this.taskList = storage.updateTask(task);
-		}catch(ParseException e){
-			throw new CEOException(CEOException.INVALID_TIME);
+	public void addTask(String title, String description, String location, Date startTime, Date endTime, Recur recurrence) throws CEOException{
+		Task task;
+		if (startTime == null && endTime == null){
+			task = new FloatingTask(null, title, false);
+		}else if (endTime==null){
+			task = new DeadlineTask(null, title, startTime, false);
+		}else if (recurrence==null){
+			task = new PeriodicTask(null, title, location, startTime, endTime);
+		}else{
+			task = new RecurringTask(null, title, startTime, endTime, location, recurrence);
 		}
-		
+		task.updateDescription(description);
+		this.taskList = storage.updateTask(task);
 	}
 	
 	public ArrayList<Task> getPeriodicList() throws CEOException{
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for (Task task:this.taskList){
-			if (task instanceof PeriodicTask){
+			if (task instanceof PeriodicTask && !(task instanceof RecurringTask)){
+				returnList.add(task);
+			}
+		}
+		return returnList;
+	}
+	
+	public ArrayList<Task> getRecurringList(){
+		ArrayList<Task> returnList = new ArrayList<Task>();
+		for (Task task:this.taskList){
+			if (task instanceof RecurringTask){
 				returnList.add(task);
 			}
 		}
@@ -72,7 +74,7 @@ class CommandExecutor {
 	public ArrayList<Task> getFloatingList() throws CEOException{
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for (Task task:this.taskList){
-			if (task instanceof FloatingTask){
+			if (task instanceof FloatingTask && !(task instanceof DeadlineTask)){
 				returnList.add(task);
 			}
 		}
@@ -99,7 +101,7 @@ class CommandExecutor {
 		this.taskList = storage.deleteTask(getTaskByID(taskID));
 	}
 	
-	public void updateTask(int taskID, String title, String description, String location, String complete, String startTime, String endTime, String recurrence) throws CEOException{
+	public void updateTask(int taskID, String title, String description, String location, String complete, Date[] time, boolean timeFlag, Recur recurrence, boolean recurFlag) throws CEOException{
 		Task task = getTaskByID(taskID);
 		try{
 			Task newTask = updateTaskType(task, startTime, endTime, recurrence);
@@ -116,8 +118,6 @@ class CommandExecutor {
 			if (complete!=null){
 				if(newTask instanceof FloatingTask){
 					((FloatingTask) newTask).updateComplete(CommandParser.parseComplete(complete));
-				}else if (newTask instanceof DeadlineTask){
-					((DeadlineTask) newTask).updateComplete(CommandParser.parseComplete(complete));
 				}
 			}
 			if(newTask instanceof PeriodicTask){
@@ -134,14 +134,14 @@ class CommandExecutor {
 	private Task updateTaskType(Task task, String startTime, String endTime, String recurrence) throws CEOException, ParseException{
 		Task newTask;
 		if (startTime==null && endTime==null && recurrence == null){
-			if (task instanceof FloatingTask){
-				newTask = new FloatingTask(task.getTaskUID(),task.getTitle(),((FloatingTask)task).getComplete());
-			}else if (task instanceof DeadlineTask){
+			if (task instanceof DeadlineTask){
 				newTask = new DeadlineTask(task.getTaskUID(),task.getTitle(),((DeadlineTask)task).getDueTime(), ((DeadlineTask)task).getComplete());
-			}else if (task instanceof PeriodicTask){
-				newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),((PeriodicTask)task).getStartTime(), ((PeriodicTask)task).getEndTime(), ((PeriodicTask)task).getLocation());
+			}else if (task instanceof FloatingTask){
+				newTask = new FloatingTask(task.getTaskUID(),task.getTitle(),((FloatingTask)task).getComplete());
 			}else if (task instanceof RecurringTask){
 				newTask = new RecurringTask(task.getTaskUID(),task.getTitle(),((RecurringTask)task).getStartTime(), ((RecurringTask)task).getEndTime(), ((RecurringTask)task).getLocation(), ((RecurringTask)task).getRecurrence());
+			}else if (task instanceof PeriodicTask){
+				newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),((PeriodicTask)task).getStartTime(), ((PeriodicTask)task).getEndTime(), ((PeriodicTask)task).getLocation());
 			}else{
 				throw new CEOException(CEOException.INVALID_TASK_OBJ);
 			}
@@ -167,47 +167,7 @@ class CommandExecutor {
 		return newTask;
 	}
 
-	private static Date stringToDate(String timeString) throws ParseException{
-		TimeZone tz=TimeZone.getDefault();
-		SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd/HH:mm");
-		dateFormat.setTimeZone(tz);
-		return dateFormat.parse(timeString);
-	}
 	
-
-	private static Recur stringToRecur(String recurrence) throws CEOException{
-		if (recurrence == null){
-			return null;
-		}
-		Pattern p = Pattern.compile("([0-9]+)([hdwmy])");
-		Matcher m = p.matcher(recurrence);
-		if (m.find()){
-			int interval=Integer.parseInt(m.group(1));
-			String frequency;
-			String found=m.group(2);
-			if (found.equals("h")){
-				frequency=Recur.HOURLY;
-			} else if (found.equals("d")){
-				frequency=Recur.DAILY;
-			} else if (found.equals("w")){
-				frequency=Recur.WEEKLY;
-			} else if (found.equals("m")){
-				frequency=Recur.MONTHLY;
-			} else if (found.equals("y")){
-				frequency=Recur.YEARLY;
-			} else {
-				throw new CEOException(CEOException.INVALID_RECUR);
-			}
-			Recur recur=new Recur();
-			recur.setFrequency(frequency);
-			recur.setInterval(interval);
-			return recur;
-		} else if (recurrence.equals("0")){
-			return null;
-		} else {
-			throw new CEOException(CEOException.INVALID_RECUR);
-		}
-	}
 	
 	private void backupTask(CommandLineUI.CommandType commandType, Task task){
 		if (this.undoStack==null){

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
+import net.fortuna.ical4j.model.Recur;
+
 public class ResponseParser {
 
 	private static final String MESSAGE_SHOWDETAIL_FORMAT = "The details for Task %1$d:\n";
@@ -13,9 +15,11 @@ public class ResponseParser {
 	private static final String TYPE_FLOATING = "Floating";
 	private static final String TYPE_DEADLINE = "Deadline";
 	private static final String TYPE_PERIODIC = "Periodic";
+	private static final String TYPE_RECURRING = "Recurring";
 	private static final String STRING_TYPE = "Type: ";
 	private static final String STRING_LOCATION = "Location: ";
 	private static final String STRING_DESCRIPTION = "Description: ";
+	private static final String STRING_RECUR = "Recurrence: ";
 	
 	public static String parseListResponse(ArrayList<Task> taskList){
 		if (taskList==null || taskList.size()==0){
@@ -55,17 +59,18 @@ public class ResponseParser {
 		sb.append(STRING_TYPE);
 		if (task instanceof FloatingTask){
 			sb.append(TYPE_FLOATING);
+			if (task instanceof DeadlineTask){
+				sb.append("\tDue At: ");
+				sb.append(dateToString(((DeadlineTask) task).getDueTime()));
+			}
 			sb.append("\t\tStatus: ");
 			sb.append(completeToString(((FloatingTask) task).getComplete()));
-		}else if (task instanceof DeadlineTask){
-			sb.append(TYPE_DEADLINE);
-			sb.append("\t\tStatus: ");
-			sb.append(completeToString(((DeadlineTask) task).getComplete()));
-			sb.append("\tDue At: ");
-			sb.append(dateToString(((DeadlineTask) task).getDueTime()));
 		}else if (task instanceof PeriodicTask){
-			sb.append(TYPE_PERIODIC);
-			
+			if (task instanceof RecurringTask){
+				sb.append(TYPE_RECURRING);
+			}else{
+				sb.append(TYPE_PERIODIC);
+			}
 			sb.append("\t\tFrom: ");
 			sb.append(dateToString(((PeriodicTask) task).getStartTime()));
 			sb.append(" To ");
@@ -89,6 +94,10 @@ public class ResponseParser {
 		if (task instanceof PeriodicTask){
 			sb.append(STRING_LOCATION);
 			sb.append(((PeriodicTask)task).getLocation()).append("\n");
+			if (task instanceof RecurringTask){
+				sb.append(STRING_RECUR);
+				
+			}
 		}
 		sb.append(STRING_DESCRIPTION);
 		sb.append(task.getDescription()).append("\n");
@@ -103,5 +112,13 @@ public class ResponseParser {
 	
 	public static String completeToString(boolean complete){
 		return complete?"Completed":"Needs Action";
+	}
+	
+	private static String recurToString(Recur recur){
+		StringBuffer sb = new StringBuffer();
+		sb.append("Every ");
+		sb.append(recur.getInterval()).append(" ");
+		sb.append(recur.getFrequency()).append("\t");
+		
 	}
 }

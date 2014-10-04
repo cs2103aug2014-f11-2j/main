@@ -12,7 +12,7 @@ public class PeriodicTask extends Task {
 	private String location;
 
 	
-	public PeriodicTask(String taskUID, String title, Date startTime, Date endTime, String location) throws CEOException {
+	public PeriodicTask(String taskUID, String title, String location, Date startTime, Date endTime) throws CEOException {
 		super(taskUID, title);
 		this.updateTime(startTime, endTime);
 		this.updateLocation(location);

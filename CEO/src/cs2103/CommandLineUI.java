@@ -138,11 +138,9 @@ public class CommandLineUI {
 			if (timeString==null){
 				commandExecutor.updateTask(taskID, title, description, location, complete, null, null, recurString);
 			}else{
-				String[] time = CommandParser.getTime(timeString);
+				Date[] time = CommandParser.getTime(timeString);
 				if (time[0]==null && time[1]==null){
 					commandExecutor.updateTask(taskID, title, description, location, complete, "", "", null);
-				}else if(time[1]==null){
-					commandExecutor.updateTask(taskID, title, description, location, complete, time[0], "", null);
 				}else{
 					commandExecutor.updateTask(taskID, title, description, location, complete, time[0], time[1], recurString);
 				}
@@ -192,10 +190,10 @@ public class CommandLineUI {
 			String timeString = CommandParser.getTimeString(parameterMap);
 			String recurString = CommandParser.getRecurString(parameterMap);
 			if (timeString==null){
-				commandExecutor.addTask(title, description, location, null, null, recurString);
+				commandExecutor.addTask(title, description, location, null, null, CommandParser.stringToRecur(recurString));
 			}else{
-				String[] time = CommandParser.getTime(timeString);
-				commandExecutor.addTask(title, description, location, time[0], time[1], recurString);
+				Date[] time = CommandParser.getTime(timeString);
+				commandExecutor.addTask(title, description, location, time[0], time[1], CommandParser.stringToRecur(recurString));
 			}
 			result = MESSAGE_ADD;
 		}catch (CEOException e){

@@ -172,15 +172,15 @@ class CommandParser {
 		return result;
 	}
 	
-	public static String[] getTime(String timeString) throws CEOException{
-		String[] time = new String[2];
+	public static Date[] getTime(String timeString) throws CEOException{
+		Date[] time = new Date[2];
 		time[0]=null; time[1]=null;
 		if (timeString!=null){
 			Pattern p = Pattern.compile("\\d{4}/\\d{2}/\\d{2}/\\d{2}:\\d{2}");
 			Matcher m = p.matcher(timeString);
 			int i = 0;
 			while(m.find() && i < 2){
-				time[i] = m.group();
+				time[i] = stringToDate(m.group());
 				i++;
 			}
 		}
@@ -211,4 +211,52 @@ class CommandParser {
 		}
 	}
 	
+	private static Date stringToDate(String timeString) throws CEOException{
+		if (timeString == null){
+			return null;
+		}
+		try {
+			TimeZone tz=TimeZone.getDefault();
+			SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd/HH:mm");
+			dateFormat.setTimeZone(tz);
+			return dateFormat.parse(timeString);
+		} catch (ParseException e) {
+			throw new CEOException(CEOException.INVALID_TIME);
+		}
+	}
+	
+
+	public static Recur stringToRecur(String recurrence) throws CEOException{
+		if (recurrence == null){
+			return null;
+		}
+		Pattern p = Pattern.compile("([0-9]+)([hdwmy])");
+		Matcher m = p.matcher(recurrence);
+		if (m.find()){
+			int interval=Integer.parseInt(m.group(1));
+			String frequency;
+			String found=m.group(2);
+			if (found.equals("h")){
+				frequency=Recur.HOURLY;
+			} else if (found.equals("d")){
+				frequency=Recur.DAILY;
+			} else if (found.equals("w")){
+				frequency=Recur.WEEKLY;
+			} else if (found.equals("m")){
+				frequency=Recur.MONTHLY;
+			} else if (found.equals("y")){
+				frequency=Recur.YEARLY;
+			} else {
+				throw new CEOException(CEOException.INVALID_RECUR);
+			}
+			Recur recur=new Recur();
+			recur.setFrequency(frequency);
+			recur.setInterval(interval);
+			return recur;
+		} else if (recurrence.equals("0")){
+			return null;
+		} else {
+			throw new CEOException(CEOException.INVALID_RECUR);
+		}
+	}
 }

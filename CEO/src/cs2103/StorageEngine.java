@@ -141,14 +141,14 @@ class StorageEngine {
 	}
 	
 	private Component taskToComponent(Task task) throws CEOException{
-		if (task instanceof PeriodicTask){
-			return periodicToComponent((PeriodicTask)task);
-		}else if (task instanceof DeadlineTask){
+		if (task instanceof DeadlineTask){
 			return deadlineToComponent((DeadlineTask)task);
 		}else if (task instanceof FloatingTask){
 			return floatingToComponent((FloatingTask)task);
 		}else if (task instanceof RecurringTask){
 			return recurringToComponent((RecurringTask)task);
+		}else if (task instanceof PeriodicTask){
+			return periodicToComponent((PeriodicTask)task);
 		}else{
 			throw new CEOException(CEOException.INVALID_TASK_OBJ);
 		}
@@ -197,7 +197,7 @@ class StorageEngine {
 		}else{
 			component.getProperties().add(new Uid(task.getTaskUID()));
 		}
-		component.getProperties().add(task.getRecurrence());
+		component.getProperties().add(new RRule(task.getRecurrence()));
 		component.getProperties().add(new Description(task.getDescription()));
 		component.getProperties().add(new Location(task.getLocation()));
 		return component;
@@ -218,7 +218,7 @@ class StorageEngine {
 		String componentLocation = readLocation(component);
 		Recur componentRecurrence = readRecur(component);
 		if (componentRecurrence == null){
-			task = new PeriodicTask(componentUID, componentTitle, componentStartTime, componentEndTime, componentLocation);
+			task = new PeriodicTask(componentUID, componentTitle, componentLocation, componentStartTime, componentEndTime);
 		} else {
 			task = new RecurringTask(componentUID, componentTitle, componentStartTime, componentEndTime, componentLocation, componentRecurrence);
 		}
