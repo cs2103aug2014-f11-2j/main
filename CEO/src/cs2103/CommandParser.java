@@ -175,7 +175,7 @@ class CommandParser {
 	public static Date[] getTime(String timeString) throws CEOException{
 		Date[] time = new Date[2];
 		time[0]=null; time[1]=null;
-		if (timeString!=null){
+		if (timeString != null){
 			Pattern p = Pattern.compile("\\d{4}/\\d{2}/\\d{2}/\\d{2}:\\d{2}");
 			Matcher m = p.matcher(timeString);
 			int i = 0;
@@ -227,7 +227,7 @@ class CommandParser {
 	
 
 	public static Recur stringToRecur(String recurrence) throws CEOException{
-		if (recurrence == null){
+		if (recurrence == null || recurrence.equals("")){
 			return null;
 		}
 		Pattern p = Pattern.compile("([0-9]+)([hdwmy])");

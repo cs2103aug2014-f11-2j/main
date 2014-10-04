@@ -6,6 +6,8 @@ import java.util.Scanner;
 import java.util.Date;
 import java.util.ArrayList;
 
+import net.fortuna.ical4j.model.Recur;
+
 public class CommandLineUI {
 	private static final String MESSAGE_WELCOME = "Welcome to the CEO. CEO is ready for use.";
 	private static final String MESSAGE_EXIT = "You have exited CEO. Hope to see you again.";
@@ -132,21 +134,16 @@ public class CommandLineUI {
 			String title = CommandParser.getTitle(parameterMap);
 			String description = CommandParser.getDescription(parameterMap);
 			String location = CommandParser.getLocation(parameterMap);
-			String complete = CommandParser.getComplete(parameterMap);
+			String completeString = CommandParser.getComplete(parameterMap);
 			String timeString = CommandParser.getTimeString(parameterMap);
 			String recurString = CommandParser.getRecurString(parameterMap);
-			if (timeString==null){
-				commandExecutor.updateTask(taskID, title, description, location, complete, null, null, recurString);
-			}else{
-				Date[] time = CommandParser.getTime(timeString);
-				if (time[0]==null && time[1]==null){
-					commandExecutor.updateTask(taskID, title, description, location, complete, "", "", null);
-				}else{
-					commandExecutor.updateTask(taskID, title, description, location, complete, time[0], time[1], recurString);
-				}
-			}
-			if (title==null && description==null && location==null && complete==null && timeString==null){
+			Date[] time = CommandParser.getTime(timeString);
+			Recur recur = CommandParser.stringToRecur(recurString);
+			boolean complete = CommandParser.parseComplete(completeString);
+			if (title==null && description==null && location==null && completeString==null && timeString==null && recurString==null){
 				throw new CEOException(CEOException.LESS_THAN_ONE_PARA);
+			}else{
+				commandExecutor.updateTask(taskID, title, description, location, complete, completeString != null, time, timeString != null, recur, recurString != null);
 			}
 			result = String.format(MESSAGE_UPDATE_FORMAT, taskIDString);
 		}catch (CEOException e){
@@ -189,12 +186,8 @@ public class CommandLineUI {
 			String location = CommandParser.getLocation(parameterMap);
 			String timeString = CommandParser.getTimeString(parameterMap);
 			String recurString = CommandParser.getRecurString(parameterMap);
-			if (timeString==null){
-				commandExecutor.addTask(title, description, location, null, null, CommandParser.stringToRecur(recurString));
-			}else{
-				Date[] time = CommandParser.getTime(timeString);
-				commandExecutor.addTask(title, description, location, time[0], time[1], CommandParser.stringToRecur(recurString));
-			}
+			Date[] time = CommandParser.getTime(timeString);
+			commandExecutor.addTask(title, description, location, time[0], time[1], CommandParser.stringToRecur(recurString));
 			result = MESSAGE_ADD;
 		}catch (CEOException e){
 			result = MESSAGE_ADD_ERROR;

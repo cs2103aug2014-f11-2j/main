@@ -101,7 +101,7 @@ class CommandExecutor {
 		this.taskList = storage.deleteTask(getTaskByID(taskID));
 	}
 	
-	public void updateTask(int taskID, String title, String description, String location, String complete, Date[] time, boolean timeFlag, Recur recurrence, boolean recurFlag) throws CEOException{
+	public void updateTask(int taskID, String title, String description, String location, boolean complete, boolean completeFlag, Date[] time, boolean timeFlag, Recur recurrence, boolean recurFlag) throws CEOException{
 		Task task = getTaskByID(taskID);
 		try{
 			Task newTask = updateTaskType(task, startTime, endTime, recurrence);
