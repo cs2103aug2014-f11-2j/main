@@ -157,7 +157,6 @@ class StorageEngine {
 			component.getProperties().add(new Uid(task.getTaskUID()));
 		}
 		component.getProperties().add(new Description(task.getDescription()));
-		component.getProperties().add(new Location(task.getLocation()));
 		component.getProperties().add(new Status(completeToStatus(task.getComplete())));
 		return component;
 	}
@@ -170,7 +169,6 @@ class StorageEngine {
 			component.getProperties().add(new Uid(task.getTaskUID()));
 		}
 		component.getProperties().add(new Description(task.getDescription()));
-		component.getProperties().add(new Location(task.getLocation()));
 		component.getProperties().add(new Status(completeToStatus(task.getComplete())));
 		return component;
 	}
@@ -198,9 +196,9 @@ class StorageEngine {
 			componentStartTime=component.getStartDate().getDate();
 			componentEndTime=component.getEndDate().getDate();
 		}
-		Task task = new PeriodicTask(componentUID, componentTitle, componentStartTime, componentEndTime);
+		String componentLocation = component.getLocation()==null?"":component.getLocation().getValue();
+		Task task = new PeriodicTask(componentUID, componentTitle, componentStartTime, componentEndTime, componentLocation);
 		task.updateDescription(component.getDescription()==null?"":component.getDescription().getValue());
-		task.updateLocation(component.getLocation()==null?"":component.getLocation().getValue());
 		//Recur componentReccurence = getRecur(component);
 		return task;
 	}
@@ -215,7 +213,6 @@ class StorageEngine {
 			task = new DeadlineTask(componentUID, componentTitle, component.getDue().getDate(),component.getStatus()==null?false:statusToComplete(component.getStatus().getValue()));
 		}
 		task.updateDescription(component.getDescription()==null?"":component.getDescription().getValue());
-		task.updateLocation(component.getLocation()==null?"":component.getLocation().getValue());
 		return task;
 	}
 	

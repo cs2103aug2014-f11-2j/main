@@ -31,10 +31,9 @@ class CommandExecutor {
 			}else if (endTime==null){
 				task = new DeadlineTask(null, title, CommandParser.stringToDate(startTime), false);
 			}else{
-				task = new PeriodicTask(null, title, CommandParser.stringToDate(startTime), CommandParser.stringToDate(endTime));
+				task = new PeriodicTask(null, title, CommandParser.stringToDate(startTime), CommandParser.stringToDate(endTime), location);
 			}
 			task.updateDescription(description);
-			task.updateLocation(location);
 			this.taskList = storage.updateTask(task);
 		}catch(ParseException e){
 			throw new CEOException(CEOException.INVALID_TIME);
@@ -106,14 +105,16 @@ class CommandExecutor {
 			if (description!=null){
 				newTask.updateDescription(description);
 			}
-			if (location!=null){
-				newTask.updateLocation(location);
-			}
 			if (complete!=null){
 				if(newTask instanceof FloatingTask){
 					((FloatingTask) newTask).updateComplete(CommandParser.parseComplete(complete));
 				}else if (newTask instanceof DeadlineTask){
 					((DeadlineTask) newTask).updateComplete(CommandParser.parseComplete(complete));
+				}
+			}
+			if (location!=null){
+				if(newTask instanceof PeriodicTask){
+					((PeriodicTask) newTask).updateLocation(location);
 				}
 			}
 			this.taskList = storage.updateTask(newTask);
@@ -130,7 +131,7 @@ class CommandExecutor {
 			}else if (task instanceof DeadlineTask){
 				newTask = new DeadlineTask(task.getTaskUID(),task.getTitle(),((DeadlineTask)task).getDueTime(), ((DeadlineTask)task).getComplete());
 			}else if (task instanceof PeriodicTask){
-				newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),((PeriodicTask)task).getStartTime(), ((PeriodicTask)task).getEndTime());
+				newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),((PeriodicTask)task).getStartTime(), ((PeriodicTask)task).getEndTime(), ((PeriodicTask)task).getLocation());
 			}else{
 				throw new CEOException(CEOException.INVALID_TASK_OBJ);
 			}
@@ -143,11 +144,10 @@ class CommandExecutor {
 		}else if ((!startTime.equals("")) && endTime.equals("")){
 			newTask = new DeadlineTask(task.getTaskUID(),task.getTitle(),CommandParser.stringToDate(startTime), false);
 		}else if ((!startTime.equals("")) && (!endTime.equals(""))){
-			newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),CommandParser.stringToDate(startTime), CommandParser.stringToDate(endTime));
+			newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),CommandParser.stringToDate(startTime), CommandParser.stringToDate(endTime), null);
 		}else{
 			throw new CEOException(CEOException.INVALID_TIME);
 		}
-		newTask.updateLocation(task.getLocation());
 		newTask.updateDescription(task.getDescription());
 		return newTask;
 	}

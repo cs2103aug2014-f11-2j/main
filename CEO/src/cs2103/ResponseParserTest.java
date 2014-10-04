@@ -37,7 +37,7 @@ public class ResponseParserTest {
 		taskList.add(new FloatingTask(null, "Eating", false));
 		taskList.add(new DeadlineTask(null, "Pooping", CommandParser.stringToDate("2014/09/28/23:59"), false));
 		taskList.add(new PeriodicTask(null, "Drinking", CommandParser.stringToDate("2014/09/28/23:59"),
-				CommandParser.stringToDate("2014/10/28/23:59")));
+				CommandParser.stringToDate("2014/10/28/23:59"),null));
 		assertEquals("Here shows task list for type ALL\n"
 				+ "0. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action\n\n"
 				+ "0. Pooping\nType: Deadline\t\t\t\t\tStatus: Needs Action	Due At: Sep 28, 2014 11:59:00 PM\n\n"
@@ -70,7 +70,6 @@ public class ResponseParserTest {
 	public void testParseShowDetailResponseTaskWithDetails() throws CEOException {
 		Task task = new FloatingTask(null, "Eating", false);
 		task.updateDescription("Eating Chicken Rice");
-		task.updateLocation("Hawker Center");
 		int taskID = 1;
 		assertEquals("The details for Task 1:\n"
 				+ "0. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action\n\n"

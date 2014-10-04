@@ -5,7 +5,7 @@ class Task implements Comparable<Task>{;
 	private String taskUID;
 	private String title;
 	private String description;
-	private String location;
+
 
 	public Task(String taskUID, String title) throws CEOException{
 		if (title!=null){
@@ -32,10 +32,6 @@ class Task implements Comparable<Task>{;
 		return this.description;
 	}
 	
-	public String getLocation(){
-		return this.location;
-	}
-	
 	public void updateTaskID(int id){
 		this.taskID=id;
 	}
@@ -56,10 +52,6 @@ class Task implements Comparable<Task>{;
 		if (description!=null){
 			this.description=description;
 		}
-	}
-	
-	public void updateLocation(String location){
-		this.location=location;
 	}
 
 	@Override

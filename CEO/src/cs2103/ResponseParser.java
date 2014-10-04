@@ -85,8 +85,10 @@ public class ResponseParser {
 		}
 		StringBuffer sb = new StringBuffer();
 		sb.append(taskSummary);
-		sb.append(STRING_LOCATION);
-		sb.append(task.getLocation()).append("\n");
+		if (task instanceof PeriodicTask){
+			sb.append(STRING_LOCATION);
+			sb.append(((PeriodicTask)task).getLocation()).append("\n");
+		}
 		sb.append(STRING_DESCRIPTION);
 		sb.append(task.getDescription()).append("\n");
 		return sb.toString();

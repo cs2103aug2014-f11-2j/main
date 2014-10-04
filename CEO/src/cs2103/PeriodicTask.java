@@ -7,11 +7,13 @@ import java.util.Date;
 public class PeriodicTask extends Task {
 	private Date startTime;
 	private Date endTime;
+	private String location;
 	//private Recur recurrence;
 	
-	public PeriodicTask(String taskUID, String title, Date startTime, Date endTime) throws CEOException {
+	public PeriodicTask(String taskUID, String title, Date startTime, Date endTime, String location) throws CEOException {
 		super(taskUID, title);
 		this.updateTime(startTime, endTime);
+		this.updateLocation(location);
 	}
 	public Date getStartTime(){
 		return this.startTime;
@@ -31,6 +33,16 @@ public class PeriodicTask extends Task {
 			this.endTime=endTime;
 		}
 	}
+	
+	public String getLocation(){
+		return this.location;
+	}
+	
+	
+	public void updateLocation(String location){
+		this.location=location;
+	}
+
 	
 	/*public Recur getRecurrance(){
 		return this.recurrence;

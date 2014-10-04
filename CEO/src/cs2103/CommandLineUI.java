@@ -55,8 +55,8 @@ public class CommandLineUI {
 	private void userLoop() {
 		printWelcomeMessage();
 		String feedback;
+		latestTask();
 		while (true) {
-			latestTask();
 			printUserPrompt();
 			feedback=takeUserInput();
 			if (feedback.equalsIgnoreCase("EXIT")){
