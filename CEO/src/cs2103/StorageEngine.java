@@ -147,6 +147,8 @@ class StorageEngine {
 			return deadlineToComponent((DeadlineTask)task);
 		}else if (task instanceof FloatingTask){
 			return floatingToComponent((FloatingTask)task);
+		}else if (task instanceof RecurringTask){
+			return recurringToComponent((RecurringTask)task);
 		}else{
 			throw new CEOException(CEOException.INVALID_TASK_OBJ);
 		}
@@ -183,15 +185,26 @@ class StorageEngine {
 		}else{
 			component.getProperties().add(new Uid(task.getTaskUID()));
 		}
-		if (task.getRecurrence()!=null){
-			component.getProperties().add(task.getRecurrence());
+		component.getProperties().add(new Description(task.getDescription()));
+		component.getProperties().add(new Location(task.getLocation()));
+		return component;
+	}
+	
+	private Component recurringToComponent(RecurringTask task){
+		VEvent component = new VEvent(new net.fortuna.ical4j.model.DateTime(task.getStartTime()), new net.fortuna.ical4j.model.DateTime(task.getEndTime()),task.getTitle());
+		if (task.getTaskUID()==null){
+			component.getProperties().add(ug.generateUid());
+		}else{
+			component.getProperties().add(new Uid(task.getTaskUID()));
 		}
+		component.getProperties().add(task.getRecurrence());
 		component.getProperties().add(new Description(task.getDescription()));
 		component.getProperties().add(new Location(task.getLocation()));
 		return component;
 	}
 	
 	private Task parseVEvent(VEvent component) throws CEOException, ParseException{
+		Task task;
 		String componentUID = component.getUid().getValue();
 		String componentTitle = readTitle(component);
 		Date componentStartTime;
@@ -204,15 +217,19 @@ class StorageEngine {
 		}
 		String componentLocation = readLocation(component);
 		Recur componentRecurrence = readRecur(component);
-		Task task = new PeriodicTask(componentUID, componentTitle, componentStartTime, componentEndTime, componentLocation, componentRecurrence);
+		if (componentRecurrence == null){
+			task = new PeriodicTask(componentUID, componentTitle, componentStartTime, componentEndTime, componentLocation);
+		} else {
+			task = new RecurringTask(componentUID, componentTitle, componentStartTime, componentEndTime, componentLocation, componentRecurrence);
+		}
 		task.updateDescription(readDescription(component));
 		return task;
 	}
 	
 	private Task parseVToDo(VToDo component) throws CEOException, ParseException{
+		Task task;
 		String componentUID = component.getUid().getValue();
 		String componentTitle = readTitle(component);
-		Task task;
 		if (component.getDue()==null){
 			task = new FloatingTask(componentUID, componentTitle, readStatusToComplete(component));
 		}else{

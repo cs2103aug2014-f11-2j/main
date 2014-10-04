@@ -36,8 +36,10 @@ class CommandExecutor {
 				task = new FloatingTask(null, title, false);
 			}else if (endTime==null){
 				task = new DeadlineTask(null, title, stringToDate(startTime), false);
+			}else if (recurrence==null){
+				task = new PeriodicTask(null, title, stringToDate(startTime), stringToDate(endTime), location);
 			}else{
-				task = new PeriodicTask(null, title, stringToDate(startTime), stringToDate(endTime), location, stringToRecur(recurrence));
+				task = new RecurringTask(null, title, stringToDate(startTime), stringToDate(endTime), location, stringToRecur(recurrence));
 			}
 			task.updateDescription(description);
 			this.taskList = storage.updateTask(task);
@@ -100,7 +102,7 @@ class CommandExecutor {
 	public void updateTask(int taskID, String title, String description, String location, String complete, String startTime, String endTime, String recurrence) throws CEOException{
 		Task task = getTaskByID(taskID);
 		try{
-			Task newTask = updateTaskType(task, startTime, endTime);
+			Task newTask = updateTaskType(task, startTime, endTime, recurrence);
 			if (title!=null){
 				if (title.equals("")){
 					throw new CEOException(CEOException.NO_TITLE);
@@ -122,9 +124,6 @@ class CommandExecutor {
 				if (location!=null){
 					((PeriodicTask) newTask).updateLocation(location);
 				}
-				if (recurrence!=null){
-					((PeriodicTask) newTask).updateRecurrence(stringToRecur(recurrence));
-				}
 			}
 			this.taskList = storage.updateTask(newTask);
 		}catch (ParseException e){
@@ -132,15 +131,17 @@ class CommandExecutor {
 		}
 	}
 	
-	private Task updateTaskType(Task task, String startTime, String endTime) throws CEOException, ParseException{
+	private Task updateTaskType(Task task, String startTime, String endTime, String recurrence) throws CEOException, ParseException{
 		Task newTask;
-		if (startTime==null && endTime==null){
+		if (startTime==null && endTime==null && recurrence == null){
 			if (task instanceof FloatingTask){
 				newTask = new FloatingTask(task.getTaskUID(),task.getTitle(),((FloatingTask)task).getComplete());
 			}else if (task instanceof DeadlineTask){
 				newTask = new DeadlineTask(task.getTaskUID(),task.getTitle(),((DeadlineTask)task).getDueTime(), ((DeadlineTask)task).getComplete());
 			}else if (task instanceof PeriodicTask){
-				newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),((PeriodicTask)task).getStartTime(), ((PeriodicTask)task).getEndTime(), ((PeriodicTask)task).getLocation(), ((PeriodicTask)task).getRecurrence());
+				newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),((PeriodicTask)task).getStartTime(), ((PeriodicTask)task).getEndTime(), ((PeriodicTask)task).getLocation());
+			}else if (task instanceof RecurringTask){
+				newTask = new RecurringTask(task.getTaskUID(),task.getTitle(),((RecurringTask)task).getStartTime(), ((RecurringTask)task).getEndTime(), ((RecurringTask)task).getLocation(), ((RecurringTask)task).getRecurrence());
 			}else{
 				throw new CEOException(CEOException.INVALID_TASK_OBJ);
 			}
@@ -153,7 +154,12 @@ class CommandExecutor {
 		}else if ((!startTime.equals("")) && endTime.equals("")){
 			newTask = new DeadlineTask(task.getTaskUID(),task.getTitle(),stringToDate(startTime), false);
 		}else if ((!startTime.equals("")) && (!endTime.equals(""))){
-			newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),stringToDate(startTime), stringToDate(endTime), null, null);
+			if (recurrence == null){
+				newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),stringToDate(startTime), stringToDate(endTime), null);
+			}else{
+				Recur recur = stringToRecur(recurrence);
+				newTask = new RecurringTask(task.getTaskUID(),task.getTitle(),stringToDate(startTime), stringToDate(endTime), null, recur);
+			}
 		}else{
 			throw new CEOException(CEOException.INVALID_TIME);
 		}
@@ -190,7 +196,7 @@ class CommandExecutor {
 			} else if (found.equals("y")){
 				frequency=Recur.YEARLY;
 			} else {
-				throw new CEOException("Invalid Recurrence");
+				throw new CEOException(CEOException.INVALID_RECUR);
 			}
 			Recur recur=new Recur();
 			recur.setFrequency(frequency);
@@ -199,7 +205,7 @@ class CommandExecutor {
 		} else if (recurrence.equals("0")){
 			return null;
 		} else {
-			throw new CEOException("Invalid Recurrence");
+			throw new CEOException(CEOException.INVALID_RECUR);
 		}
 	}
 	
