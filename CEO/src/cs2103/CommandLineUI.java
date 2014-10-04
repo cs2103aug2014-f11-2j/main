@@ -134,16 +134,17 @@ public class CommandLineUI {
 			String location = CommandParser.getLocation(parameterMap);
 			String complete = CommandParser.getComplete(parameterMap);
 			String timeString = CommandParser.getTimeString(parameterMap);
+			String recurString = CommandParser.getRecurString(parameterMap);
 			if (timeString==null){
-				commandExecutor.updateTask(taskID, title, description, location, complete, null, null);
+				commandExecutor.updateTask(taskID, title, description, location, complete, null, null, recurString);
 			}else{
 				String[] time = CommandParser.getTime(timeString);
 				if (time[0]==null && time[1]==null){
-					commandExecutor.updateTask(taskID, title, description, location, complete, "", "");
+					commandExecutor.updateTask(taskID, title, description, location, complete, "", "", null);
 				}else if(time[1]==null){
-					commandExecutor.updateTask(taskID, title, description, location, complete, time[0], "");
+					commandExecutor.updateTask(taskID, title, description, location, complete, time[0], "", null);
 				}else{
-					commandExecutor.updateTask(taskID, title, description, location, complete, time[0], time[1]);
+					commandExecutor.updateTask(taskID, title, description, location, complete, time[0], time[1], recurString);
 				}
 			}
 			if (title==null && description==null && location==null && complete==null && timeString==null){
@@ -189,11 +190,12 @@ public class CommandLineUI {
 			String description = CommandParser.getDescription(parameterMap);
 			String location = CommandParser.getLocation(parameterMap);
 			String timeString = CommandParser.getTimeString(parameterMap);
+			String recurString = CommandParser.getRecurString(parameterMap);
 			if (timeString==null){
-				commandExecutor.addTask(title, description, location, null, null);
+				commandExecutor.addTask(title, description, location, null, null, recurString);
 			}else{
 				String[] time = CommandParser.getTime(timeString);
-				commandExecutor.addTask(title, description, location, time[0], time[1]);
+				commandExecutor.addTask(title, description, location, time[0], time[1], recurString);
 			}
 			result = MESSAGE_ADD;
 		}catch (CEOException e){

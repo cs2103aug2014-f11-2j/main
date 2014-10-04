@@ -1,10 +1,17 @@
 package cs2103;
 
 import java.util.ArrayList; 
+import java.util.Date;
 import java.util.Stack;
+import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.text.ParseException;
 //import java.util.regex.Matcher;
 //import java.util.regex.Pattern;
+import java.text.SimpleDateFormat;
+
+import net.fortuna.ical4j.model.Recur;
 
 //import net.fortuna.ical4j.model.Recur;
 
@@ -12,7 +19,6 @@ class CommandExecutor {
 	private final StorageEngine storage;
 	private ArrayList<Task> taskList;
 	private Stack<TaskBackup> undoStack;
-	private ArrayList<TaskBackup> trashList;
 	
 	public CommandExecutor(String dataFile){
 		this.storage = new StorageEngine(dataFile);
@@ -23,15 +29,15 @@ class CommandExecutor {
 		}
 	}
 	
-	public void addTask(String title, String description, String location, String startTime, String endTime) throws CEOException{
+	public void addTask(String title, String description, String location, String startTime, String endTime, String recurrence) throws CEOException{
 		try{
 			Task task;
 			if (startTime == null && endTime == null){
 				task = new FloatingTask(null, title, false);
 			}else if (endTime==null){
-				task = new DeadlineTask(null, title, CommandParser.stringToDate(startTime), false);
+				task = new DeadlineTask(null, title, stringToDate(startTime), false);
 			}else{
-				task = new PeriodicTask(null, title, CommandParser.stringToDate(startTime), CommandParser.stringToDate(endTime), location);
+				task = new PeriodicTask(null, title, stringToDate(startTime), stringToDate(endTime), location, stringToRecur(recurrence));
 			}
 			task.updateDescription(description);
 			this.taskList = storage.updateTask(task);
@@ -91,7 +97,7 @@ class CommandExecutor {
 		this.taskList = storage.deleteTask(getTaskByID(taskID));
 	}
 	
-	public void updateTask(int taskID, String title, String description, String location, String complete, String startTime, String endTime) throws CEOException{
+	public void updateTask(int taskID, String title, String description, String location, String complete, String startTime, String endTime, String recurrence) throws CEOException{
 		Task task = getTaskByID(taskID);
 		try{
 			Task newTask = updateTaskType(task, startTime, endTime);
@@ -112,9 +118,12 @@ class CommandExecutor {
 					((DeadlineTask) newTask).updateComplete(CommandParser.parseComplete(complete));
 				}
 			}
-			if (location!=null){
-				if(newTask instanceof PeriodicTask){
+			if(newTask instanceof PeriodicTask){
+				if (location!=null){
 					((PeriodicTask) newTask).updateLocation(location);
+				}
+				if (recurrence!=null){
+					((PeriodicTask) newTask).updateRecurrence(stringToRecur(recurrence));
 				}
 			}
 			this.taskList = storage.updateTask(newTask);
@@ -131,7 +140,7 @@ class CommandExecutor {
 			}else if (task instanceof DeadlineTask){
 				newTask = new DeadlineTask(task.getTaskUID(),task.getTitle(),((DeadlineTask)task).getDueTime(), ((DeadlineTask)task).getComplete());
 			}else if (task instanceof PeriodicTask){
-				newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),((PeriodicTask)task).getStartTime(), ((PeriodicTask)task).getEndTime(), ((PeriodicTask)task).getLocation());
+				newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),((PeriodicTask)task).getStartTime(), ((PeriodicTask)task).getEndTime(), ((PeriodicTask)task).getLocation(), ((PeriodicTask)task).getRecurrence());
 			}else{
 				throw new CEOException(CEOException.INVALID_TASK_OBJ);
 			}
@@ -142,14 +151,56 @@ class CommandExecutor {
 				newTask = new FloatingTask(task.getTaskUID(),task.getTitle(),false);
 			}
 		}else if ((!startTime.equals("")) && endTime.equals("")){
-			newTask = new DeadlineTask(task.getTaskUID(),task.getTitle(),CommandParser.stringToDate(startTime), false);
+			newTask = new DeadlineTask(task.getTaskUID(),task.getTitle(),stringToDate(startTime), false);
 		}else if ((!startTime.equals("")) && (!endTime.equals(""))){
-			newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),CommandParser.stringToDate(startTime), CommandParser.stringToDate(endTime), null);
+			newTask = new PeriodicTask(task.getTaskUID(),task.getTitle(),stringToDate(startTime), stringToDate(endTime), null, null);
 		}else{
 			throw new CEOException(CEOException.INVALID_TIME);
 		}
 		newTask.updateDescription(task.getDescription());
 		return newTask;
+	}
+
+	private static Date stringToDate(String timeString) throws ParseException{
+		TimeZone tz=TimeZone.getDefault();
+		SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd/HH:mm");
+		dateFormat.setTimeZone(tz);
+		return dateFormat.parse(timeString);
+	}
+	
+
+	private static Recur stringToRecur(String recurrence) throws CEOException{
+		if (recurrence == null){
+			return null;
+		}
+		Pattern p = Pattern.compile("([0-9]+)([hdwmy])");
+		Matcher m = p.matcher(recurrence);
+		if (m.find()){
+			int interval=Integer.parseInt(m.group(1));
+			String frequency;
+			String found=m.group(2);
+			if (found.equals("h")){
+				frequency=Recur.HOURLY;
+			} else if (found.equals("d")){
+				frequency=Recur.DAILY;
+			} else if (found.equals("w")){
+				frequency=Recur.WEEKLY;
+			} else if (found.equals("m")){
+				frequency=Recur.MONTHLY;
+			} else if (found.equals("y")){
+				frequency=Recur.YEARLY;
+			} else {
+				throw new CEOException("Invalid Recurrence");
+			}
+			Recur recur=new Recur();
+			recur.setFrequency(frequency);
+			recur.setInterval(interval);
+			return recur;
+		} else if (recurrence.equals("0")){
+			return null;
+		} else {
+			throw new CEOException("Invalid Recurrence");
+		}
 	}
 	
 	private void backupTask(CommandLineUI.CommandType commandType, Task task){
@@ -158,12 +209,6 @@ class CommandExecutor {
 		}
 		if (commandType.equals(CommandLineUI.CommandType.DELETE)){
 
-		}
-	}
-	
-	private void moveToTrash(Task task){
-		if (this.trashList==null){
-			this.trashList = new ArrayList<TaskBackup>();
 		}
 	}
 	
@@ -182,22 +227,6 @@ class CommandExecutor {
 		
 		public Task getBackupTask(){
 			return this.task;
-		}
-		
-		public String getTaskUID(){
-			return this.task.getTaskUID();
-		}
-		
-		@Override
-		public boolean equals(Object o){
-			if (o==null) return false;
-			if (o instanceof TaskBackup && this.getCommandType().equals(CommandLineUI.CommandType.DELETE)){
-				TaskBackup other = (TaskBackup) o;
-				if (other.getCommandType().equals(CommandLineUI.CommandType.DELETE) && this.getTaskUID().equals(other.getTaskUID())){
-					return true;
-				}
-			}
-			return false;
 		}
 	}
 }

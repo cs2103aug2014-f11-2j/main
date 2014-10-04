@@ -3,6 +3,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,22 +17,23 @@ import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.IndexedComponentList;
 import net.fortuna.ical4j.model.Property;
+import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.TimeZoneRegistry;
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
-//import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
-//import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.util.CompatibilityHints;
+import net.fortuna.ical4j.util.SimpleHostInfo;
 import net.fortuna.ical4j.util.UidGenerator;
 
 class StorageEngine {
@@ -50,10 +53,10 @@ class StorageEngine {
 			if (!file.exists() || file.length()==0){
 				createNewFile();
 			}
-			ug = new UidGenerator("test");
-		} catch (CEOException | IOException e) {
+			ug = new UidGenerator(new SimpleHostInfo("gmail.com"), InetAddress.getLocalHost().getHostName().toString());
+		} catch (CEOException | UnknownHostException e) {
 			e.printStackTrace();
-		}
+		} 
 	}
 	
 	public ArrayList<Task> getTaskList() throws CEOException{
@@ -157,7 +160,7 @@ class StorageEngine {
 			component.getProperties().add(new Uid(task.getTaskUID()));
 		}
 		component.getProperties().add(new Description(task.getDescription()));
-		component.getProperties().add(new Status(completeToStatus(task.getComplete())));
+		component.getProperties().add(completeToStatus(task.getComplete()));
 		return component;
 	}
 	
@@ -169,7 +172,7 @@ class StorageEngine {
 			component.getProperties().add(new Uid(task.getTaskUID()));
 		}
 		component.getProperties().add(new Description(task.getDescription()));
-		component.getProperties().add(new Status(completeToStatus(task.getComplete())));
+		component.getProperties().add(completeToStatus(task.getComplete()));
 		return component;
 	}
 	
@@ -179,6 +182,9 @@ class StorageEngine {
 			component.getProperties().add(ug.generateUid());
 		}else{
 			component.getProperties().add(new Uid(task.getTaskUID()));
+		}
+		if (task.getRecurrence()!=null){
+			component.getProperties().add(task.getRecurrence());
 		}
 		component.getProperties().add(new Description(task.getDescription()));
 		component.getProperties().add(new Location(task.getLocation()));
@@ -196,10 +202,10 @@ class StorageEngine {
 			componentStartTime=component.getStartDate().getDate();
 			componentEndTime=component.getEndDate().getDate();
 		}
-		String componentLocation = component.getLocation()==null?"":component.getLocation().getValue();
-		Task task = new PeriodicTask(componentUID, componentTitle, componentStartTime, componentEndTime, componentLocation);
-		task.updateDescription(component.getDescription()==null?"":component.getDescription().getValue());
-		//Recur componentReccurence = getRecur(component);
+		String componentLocation = readLocation(component);
+		Recur componentRecurrence = readRecur(component);
+		Task task = new PeriodicTask(componentUID, componentTitle, componentStartTime, componentEndTime, componentLocation, componentRecurrence);
+		task.updateDescription(readDescription(component));
 		return task;
 	}
 	
@@ -208,11 +214,11 @@ class StorageEngine {
 		String componentTitle = readTitle(component);
 		Task task;
 		if (component.getDue()==null){
-			task = new FloatingTask(componentUID, componentTitle, component.getStatus()==null?false:statusToComplete(component.getStatus().getValue()));
+			task = new FloatingTask(componentUID, componentTitle, readStatusToComplete(component));
 		}else{
-			task = new DeadlineTask(componentUID, componentTitle, component.getDue().getDate(),component.getStatus()==null?false:statusToComplete(component.getStatus().getValue()));
+			task = new DeadlineTask(componentUID, componentTitle, component.getDue().getDate(),readStatusToComplete(component));
 		}
-		task.updateDescription(component.getDescription()==null?"":component.getDescription().getValue());
+		task.updateDescription(readDescription(component));
 		return task;
 	}
 	
@@ -224,25 +230,40 @@ class StorageEngine {
 		}
 	}
 	
-	private String completeToStatus(boolean complete){
-		return complete?"COMPLETED":"NEEDS-ACTION";
+	private Status completeToStatus(boolean complete){
+		return complete?Status.VTODO_COMPLETED:Status.VTODO_NEEDS_ACTION;
 	}
 	
-	private boolean statusToComplete(String status){
-		if (status.equals("COMPLETED")){
+	private boolean readStatusToComplete(VToDo component){
+		if (component.getStatus().equals(Status.VTODO_COMPLETED)){
 			return true;
 		}else{
 			return false;
 		}
 	}
 	
-	/*private Recur getRecur(Component component){
+	private Recur readRecur(VEvent component){
 		if (component.getProperty(Property.RRULE)==null){
 			return null;
 		}else{
 			RRule rule = (RRule) component.getProperty(Property.RRULE);
 			return rule.getRecur();
 		}
-	}*/
+	}
 	
+	private String readDescription(Component component){
+		if (component.getProperty(Property.DESCRIPTION)==null){
+			return "";
+		}else{
+			return component.getProperty(Property.DESCRIPTION).getValue();
+		}
+	}
+	
+	private String readLocation(VEvent component){
+		if (component.getLocation()==null){
+			return "";
+		}else{
+			return component.getLocation().getValue();
+		}
+	}
 }

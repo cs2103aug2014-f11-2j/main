@@ -2,11 +2,10 @@ package cs2103;
 
 import java.util.Date;
 
-class DeadlineTask extends Task {
+class DeadlineTask extends FloatingTask {
 	private Date dueTime;
-	private boolean complete;
 	public DeadlineTask(String taskUID, String title, Date dueTime, boolean complete) throws CEOException {
-		super(taskUID, title);
+		super(taskUID, title, complete);
 		this.updateDueTime(dueTime);;
 		this.updateComplete(complete);
 	}
@@ -22,12 +21,5 @@ class DeadlineTask extends Task {
 			this.dueTime=dueTime;
 		}
 	}
-	
-	public boolean getComplete(){
-		return this.complete;
-	}
-	
-	public void updateComplete(boolean complete){
-		this.complete=complete;
-	}
+
 }

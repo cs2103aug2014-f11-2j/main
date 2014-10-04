@@ -35,9 +35,9 @@ public class ResponseParserTest {
 	public void testParseListResponseThreeTasks() throws CEOException, ParseException {
 		ArrayList<Task> taskList = new ArrayList<Task>();
 		taskList.add(new FloatingTask(null, "Eating", false));
-		taskList.add(new DeadlineTask(null, "Pooping", CommandParser.stringToDate("2014/09/28/23:59"), false));
-		taskList.add(new PeriodicTask(null, "Drinking", CommandParser.stringToDate("2014/09/28/23:59"),
-				CommandParser.stringToDate("2014/10/28/23:59"),null));
+		//taskList.add(new DeadlineTask(null, "Pooping", CommandParser.stringToDate("2014/09/28/23:59"), false));
+		//taskList.add(new PeriodicTask(null, "Drinking", CommandParser.stringToDate("2014/09/28/23:59"),
+		//		CommandParser.stringToDate("2014/10/28/23:59"),null, null));
 		assertEquals("Here shows task list for type ALL\n"
 				+ "0. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action\n\n"
 				+ "0. Pooping\nType: Deadline\t\t\t\t\tStatus: Needs Action	Due At: Sep 28, 2014 11:59:00 PM\n\n"

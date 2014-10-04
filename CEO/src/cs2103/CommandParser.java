@@ -11,6 +11,8 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.fortuna.ical4j.model.Recur;
+
 class CommandParser {
 	public static Queue<String> separateCommand(String userInput) {
 		String[] parameters = userInput.trim().split("\\s+");
@@ -146,6 +148,7 @@ class CommandParser {
 		}
 		return result;
 	}
+
 	
 	public static String getComplete(Map<String, String> parameterMap){
 		Queue<String> keywordQueue = new LinkedList<String>();
@@ -184,12 +187,17 @@ class CommandParser {
 		return time;
 	}
 	
-	public static Date stringToDate(String timeString) throws ParseException{
-		TimeZone tz=TimeZone.getDefault();
-		SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd/HH:mm");
-		dateFormat.setTimeZone(tz);
-		return dateFormat.parse(timeString);
+	public static String getRecurString(Map<String, String> parameterMap){
+		Queue<String> keywordQueue = new LinkedList<String>();
+		keywordQueue.add("R");
+		keywordQueue.add("recurrence");
+		String result = null;
+		while(result == null && !keywordQueue.isEmpty()){
+			result = getParameter(keywordQueue.poll(), parameterMap);
+		}
+		return result;
 	}
+	
 	
 	public static boolean parseComplete(String complete) throws CEOException{
 		if (complete==null){
@@ -203,36 +211,4 @@ class CommandParser {
 		}
 	}
 	
-	/*
-	public Recur stringToRecur(String recurrence) throws CEOException{
-		Pattern p = Pattern.compile("([0-9]+)([hdwmy])([0-9]+)");
-		Matcher m = p.matcher(recurrence);
-		if(m.find()){
-			int interval=Integer.parseInt(m.group(1));
-			int count=Integer.parseInt(m.group(3));
-			String frequency;
-			String found=m.group(2);
-			if (found.equals("h")){
-				frequency=Recur.HOURLY;
-			}else if (found.equals("d")){
-				frequency=Recur.DAILY;
-			}else if (found.equals("w")){
-				frequency=Recur.WEEKLY;
-			}else if (found.equals("m")){
-				frequency=Recur.MONTHLY;
-			}else if (found.equals("y")){
-				frequency=Recur.YEARLY;
-			}else{
-				throw new CEOException("Invalid Recurrence");
-			}
-			Recur recur=new Recur(frequency, count);
-			recur.setInterval(interval);
-			return recur;
-		}else if (recurrence.equals("0")){
-			return null;
-		}else{
-			throw new CEOException("Invalid Recurrence");
-		}
-	}
-	*/
 }

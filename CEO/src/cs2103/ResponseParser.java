@@ -65,6 +65,7 @@ public class ResponseParser {
 			sb.append(dateToString(((DeadlineTask) task).getDueTime()));
 		}else if (task instanceof PeriodicTask){
 			sb.append(TYPE_PERIODIC);
+			
 			sb.append("\t\tFrom: ");
 			sb.append(dateToString(((PeriodicTask) task).getStartTime()));
 			sb.append(" To ");
