@@ -10,6 +10,9 @@ class CommandExecutor {
 	private final StorageEngine storage;
 	private ArrayList<Task> taskList;
 	private Stack<TaskBackup> undoStack;
+	private static enum ActionType {
+		ADD, DELETE, UPDATE;
+	}
 	
 	public CommandExecutor(String dataFile){
 		this.storage = new StorageEngine(dataFile);
@@ -30,6 +33,7 @@ class CommandExecutor {
 			task = new PeriodicTask(null, title, location, startTime, endTime, recurrence);
 		}
 		task.updateDescription(description);
+		backupTask(ActionType.ADD, task);
 		this.taskList = storage.updateTask(task);
 	}
 	
@@ -80,7 +84,9 @@ class CommandExecutor {
 	}
 	
 	public void deleteTask(int taskID) throws CEOException{
-		this.taskList = storage.deleteTask(getTaskByID(taskID));
+		Task task = getTaskByID(taskID);
+		backupTask(ActionType.DELETE, task);
+		this.taskList = storage.deleteTask(task);
 	}
 	
 	public void updateTask(int taskID, String title, String description, String location, boolean complete, boolean completeFlag, Date[] time, boolean timeFlag, Recur recurrence, boolean recurFlag) throws CEOException{
@@ -108,6 +114,22 @@ class CommandExecutor {
 		if (recurFlag){
 			newTask = updateRecur(newTask, recurrence);
 		}
+		backupTask(ActionType.UPDATE, task);
+		this.taskList = storage.updateTask(newTask);
+	}
+	
+	public int undoTasks(int count) throws CEOException{
+		if (this.undoStack == null) return 0;
+		if (count < 1){
+			throw new CEOException(CEOException.INVALID_PARA);
+		} else if (count > this.undoStack.size()){
+			count = this.undoStack.size();
+		}
+		int i;
+		for (i=0;i < count;i++){
+			undoTask(this.undoStack.pop());
+		}
+		return i;
 	}
 	
 	private Task copyTask(Task task) throws CEOException{
@@ -191,29 +213,41 @@ class CommandExecutor {
 		return task;
 	}
 	
-	private void backupTask(CommandLineUI.CommandType commandType, Task task){
-		if (this.undoStack==null){
-			this.undoStack = new Stack<TaskBackup>();
-		}
-		if (commandType.equals(CommandLineUI.CommandType.DELETE)){
-
+	private void undoTask(TaskBackup taskBackup) throws CEOException{
+		switch(taskBackup.getActionType()){
+		case ADD:
+			this.taskList = storage.deleteTask(taskBackup.getTask());
+			break;
+		case UPDATE:
+		case DELETE:
+			this.taskList = storage.updateTask(taskBackup.getTask());
+			break;
+		default:
+			throw new CEOException(CEOException.UNEXPECTED_ERR);
 		}
 	}
 	
+	private void backupTask(ActionType actionType, Task task){
+		if (this.undoStack==null){
+			this.undoStack = new Stack<TaskBackup>();
+		}
+		undoStack.push(new TaskBackup(actionType, task));
+	}
+	
 	private final class TaskBackup{
-		private CommandLineUI.CommandType commandType;
-		private Task task;
+		private final ActionType actionType;
+		private final Task task;
 		
-		public TaskBackup(CommandLineUI.CommandType commandType, Task task){
-			this.commandType = commandType;
+		public TaskBackup(ActionType actionType, Task task){
+			this.actionType = actionType;
 			this.task = task;
 		}
 		
-		public CommandLineUI.CommandType getCommandType(){
-			return this.commandType;
+		public ActionType getActionType(){
+			return this.actionType;
 		}
 		
-		public Task getBackupTask(){
+		public Task getTask(){
 			return this.task;
 		}
 	}

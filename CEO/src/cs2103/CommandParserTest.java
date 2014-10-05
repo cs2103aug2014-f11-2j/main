@@ -50,25 +50,25 @@ public class CommandParserTest {
 
 	@Test
 	public void testDetermineCommandType() {
-		assertEquals(CommandLineUI.CommandType.INVALID, CommandParser.determineCommandType(null));
-		assertEquals(CommandLineUI.CommandType.LIST, CommandParser.determineCommandType("list"));
-		assertEquals(CommandLineUI.CommandType.UPDATE, CommandParser.determineCommandType("update"));
-		assertEquals(CommandLineUI.CommandType.EXIT, CommandParser.determineCommandType("exit"));
-		assertEquals(CommandLineUI.CommandType.ADD, CommandParser.determineCommandType("add"));
-		assertEquals(CommandLineUI.CommandType.DELETE, CommandParser.determineCommandType("delete"));
-		assertEquals(CommandLineUI.CommandType.SHOWDETAIL, CommandParser.determineCommandType("show"));
-		assertEquals(CommandLineUI.CommandType.INVALID, CommandParser.determineCommandType(""));
-		assertEquals(CommandLineUI.CommandType.INVALID, CommandParser.determineCommandType("hello"));
+		assertEquals(CommandParser.CommandType.INVALID, CommandParser.determineCommandType(null));
+		assertEquals(CommandParser.CommandType.LIST, CommandParser.determineCommandType("list"));
+		assertEquals(CommandParser.CommandType.UPDATE, CommandParser.determineCommandType("update"));
+		assertEquals(CommandParser.CommandType.EXIT, CommandParser.determineCommandType("exit"));
+		assertEquals(CommandParser.CommandType.ADD, CommandParser.determineCommandType("add"));
+		assertEquals(CommandParser.CommandType.DELETE, CommandParser.determineCommandType("delete"));
+		assertEquals(CommandParser.CommandType.SHOWDETAIL, CommandParser.determineCommandType("show"));
+		assertEquals(CommandParser.CommandType.INVALID, CommandParser.determineCommandType(""));
+		assertEquals(CommandParser.CommandType.INVALID, CommandParser.determineCommandType("hello"));
 	}
 	
 	@Test 
 	public void testDetermineTaskType() {
-		assertEquals(CommandLineUI.TaskType.INVALID, CommandParser.determineTaskType(null));
-		assertEquals(CommandLineUI.TaskType.ALL, CommandParser.determineTaskType("all"));
-		assertEquals(CommandLineUI.TaskType.FLOATING, CommandParser.determineTaskType("floating"));
-		assertEquals(CommandLineUI.TaskType.PERIODIC, CommandParser.determineTaskType("periodic"));
-		assertEquals(CommandLineUI.TaskType.DEADLINE, CommandParser.determineTaskType("deadline"));
-		assertEquals(CommandLineUI.TaskType.INVALID, CommandParser.determineTaskType("hello"));
+		assertEquals(CommandParser.TaskType.INVALID, CommandParser.determineTaskType(null));
+		assertEquals(CommandParser.TaskType.ALL, CommandParser.determineTaskType("all"));
+		assertEquals(CommandParser.TaskType.FLOATING, CommandParser.determineTaskType("floating"));
+		assertEquals(CommandParser.TaskType.PERIODIC, CommandParser.determineTaskType("periodic"));
+		assertEquals(CommandParser.TaskType.DEADLINE, CommandParser.determineTaskType("deadline"));
+		assertEquals(CommandParser.TaskType.INVALID, CommandParser.determineTaskType("hello"));
 	
 	}
 	@Test

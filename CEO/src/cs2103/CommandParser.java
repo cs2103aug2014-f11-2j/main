@@ -14,6 +14,13 @@ import java.util.regex.Pattern;
 import net.fortuna.ical4j.model.Recur;
 
 class CommandParser {
+	public static enum CommandType {
+		ADD, LIST, SHOWDETAIL, DELETE, UPDATE, EXIT, INVALID, UNDO;
+	}
+	public static enum TaskType {
+		ALL, FLOATING, DEADLINE, PERIODIC, INVALID;
+	}
+	
 	public static Queue<String> separateCommand(String userInput) {
 		String[] parameters = userInput.trim().split("\\s+");
 		Queue<String> result = new LinkedList<String>();
@@ -23,41 +30,43 @@ class CommandParser {
 		return result;
 	}
 	
-	public static CommandLineUI.CommandType determineCommandType(String command) {
+	public static CommandType determineCommandType(String command) {
 		if (command==null){
-			return CommandLineUI.CommandType.INVALID;
+			return CommandType.INVALID;
 		}
 		if (command.equalsIgnoreCase("list")){
-			return CommandLineUI.CommandType.LIST;
+			return CommandType.LIST;
 		}else if (command.equalsIgnoreCase("update")){
-			return CommandLineUI.CommandType.UPDATE;
+			return CommandType.UPDATE;
 		}else if (command.equalsIgnoreCase("exit")){
-			return CommandLineUI.CommandType.EXIT;
+			return CommandType.EXIT;
 		}else if (command.equalsIgnoreCase("add")){
-			return CommandLineUI.CommandType.ADD;
+			return CommandType.ADD;
 		}else if (command.equalsIgnoreCase("delete")){
-			return CommandLineUI.CommandType.DELETE;
+			return CommandType.DELETE;
 		}else if (command.equalsIgnoreCase("show")){
-			return CommandLineUI.CommandType.SHOWDETAIL;
+			return CommandType.SHOWDETAIL;
+		}else if (command.equalsIgnoreCase("undo")){
+			return CommandType.UNDO;
 		}else{
-			return CommandLineUI.CommandType.INVALID;
+			return CommandType.INVALID;
 		}
 	}
 	
-	public static CommandLineUI.TaskType determineTaskType(String parameter){
+	public static TaskType determineTaskType(String parameter){
 		if (parameter==null){
-			return CommandLineUI.TaskType.INVALID;
+			return TaskType.INVALID;
 		}
 		if (parameter.equalsIgnoreCase("all")){
-			return CommandLineUI.TaskType.ALL;
+			return TaskType.ALL;
 		}else if (parameter.equalsIgnoreCase("floating")){
-			return CommandLineUI.TaskType.FLOATING;
+			return TaskType.FLOATING;
 		}else if (parameter.equalsIgnoreCase("deadline")){
-			return CommandLineUI.TaskType.DEADLINE;
+			return TaskType.DEADLINE;
 		}else if (parameter.equalsIgnoreCase("periodic")){
-			return CommandLineUI.TaskType.PERIODIC;
+			return TaskType.PERIODIC;
 		}else{
-			return CommandLineUI.TaskType.INVALID;
+			return TaskType.INVALID;
 		}
 	}
 	
