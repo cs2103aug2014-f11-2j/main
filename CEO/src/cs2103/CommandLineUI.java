@@ -57,7 +57,7 @@ public class CommandLineUI {
 	private void userLoop() {
 		printWelcomeMessage();
 		String feedback;
-		latestTask();
+		alertTask();
 		while (true) {
 			printUserPrompt();
 			feedback=takeUserInput();
@@ -200,19 +200,15 @@ public class CommandLineUI {
 	}
 	
 	//To retrieve the nearest deadline from tasklist
-	private void latestTask() {
+	private void alertTask() {
 		try{
-			String alertedTask = null;
-			Date alertedDate = null;
-			ArrayList<Task> existingPeriodic = commandExecutor.getPeriodicList();
-			ArrayList<Task> existingDeadline = commandExecutor.getDeadlineList();
-			String periodicInfo = null;
-			Date latestPeriodic = null;
-			String deadlineInfo = null;
-			Date latestDeadline = null;
-			if(existingPeriodic.isEmpty() && existingDeadline.isEmpty()) {
-				return;
+			Date now = new Date();
+			ArrayList<PeriodicTask> periodicList = commandExecutor.getPeriodicList();
+			for (PeriodicTask task:periodicList){
+				
 			}
+			ArrayList<Task> existingDeadline = commandExecutor.getDeadlineList();
+			
 			
 			
 			

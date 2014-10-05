@@ -33,31 +33,31 @@ class CommandExecutor {
 		this.taskList = storage.updateTask(task);
 	}
 	
-	public ArrayList<Task> getPeriodicList() throws CEOException{
-		ArrayList<Task> returnList = new ArrayList<Task>();
+	public ArrayList<PeriodicTask> getPeriodicList() throws CEOException{
+		ArrayList<PeriodicTask> returnList = new ArrayList<PeriodicTask>();
 		for (Task task:this.taskList){
 			if (task instanceof PeriodicTask){
-				returnList.add(task);
+				returnList.add((PeriodicTask) task);
 			}
 		}
 		return returnList;
 	}
 	
-	public ArrayList<Task> getDeadlineList() throws CEOException{
-		ArrayList<Task> returnList = new ArrayList<Task>();
+	public ArrayList<DeadlineTask> getDeadlineList() throws CEOException{
+		ArrayList<DeadlineTask> returnList = new ArrayList<DeadlineTask>();
 		for (Task task:this.taskList){
 			if (task instanceof DeadlineTask){
-				returnList.add(task);
+				returnList.add((DeadlineTask) task);
 			}
 		}
 		return returnList;
 	}
 	
-	public ArrayList<Task> getFloatingList() throws CEOException{
-		ArrayList<Task> returnList = new ArrayList<Task>();
+	public ArrayList<FloatingTask> getFloatingList() throws CEOException{
+		ArrayList<FloatingTask> returnList = new ArrayList<FloatingTask>();
 		for (Task task:this.taskList){
 			if (task instanceof FloatingTask){
-				returnList.add(task);
+				returnList.add((FloatingTask) task);
 			}
 		}
 		return returnList;
