@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import net.fortuna.ical4j.model.Recur;
 
 public class CommandLineUI {
-	private static final String MESSAGE_WELCOME = "Welcome to the CEO. CEO is ready for use.";
+	private static final String MESSAGE_WELCOME_FORMAT = "Welcome to the CEO. %1$s is ready for use.";
 	private static final String MESSAGE_EXIT = "You have exited CEO. Hope to see you again.";
 	private static final String MESSAGE_USER_PROMPT = "Command me please: ";
 	private static final String MESSAGE_COMMAND_ERROR = "Your input command is invalid, please check your command and try again";
@@ -28,6 +28,7 @@ public class CommandLineUI {
 	
 	public CommandLineUI(String dataFile){
 		this.executor = new CommandExecutor(dataFile);
+		print(String.format(MESSAGE_WELCOME_FORMAT, dataFile));
 	}
 	
 	public static void main(String[] args){
@@ -43,28 +44,19 @@ public class CommandLineUI {
 		main.userLoop();
 	}
 	
-	private static void printWelcomeMessage() {
-		System.out.println(MESSAGE_WELCOME);
-	}
-	
 	private void userLoop() {
-		printWelcomeMessage();
 		String feedback;
 		alertTask();
 		updateTimeFromRecur();
 		while (true) {
-			printUserPrompt();
+			print(MESSAGE_USER_PROMPT);
 			feedback=takeUserInput();
 			if (feedback.equalsIgnoreCase("EXIT")){
-				printFeedback(MESSAGE_EXIT);
+				print(MESSAGE_EXIT);
 				break;
 			}
-			printFeedback(feedback);
+			print(feedback);
 		}
-	}
-	
-	private static void printUserPrompt() {
-		System.out.print(MESSAGE_USER_PROMPT);
 	}
 	
 	private String takeUserInput() {
@@ -132,7 +124,7 @@ public class CommandLineUI {
 				return ResponseParser.parsePeriodicListResponse(executor.getPeriodicList());
 			case INVALID:
 			default:
-				printFeedback(String.format(MESSAGE_INVALID_TASKTYPE_FORMAT, parameter));
+				print(String.format(MESSAGE_INVALID_TASKTYPE_FORMAT, parameter));
 				return ResponseParser.parseAllListResponse(executor.getAllList());
 			}
 		} catch (CEOException e){
@@ -202,7 +194,7 @@ public class CommandLineUI {
 		return String.format(MESSAGE_UNDO_FORMAT, result);
 	}
 	
-	private static void printFeedback(String feedback) {
+	private static void print(String feedback) {
 		if (feedback != null){
 			System.out.println(feedback);
 		}
@@ -211,9 +203,9 @@ public class CommandLineUI {
 	private void alertTask() {
 		try {
 			ArrayList<DeadlineTask> deadlineList = executor.getDeadlineList();
-			printFeedback(ResponseParser.alertDeadline(deadlineList));
+			print(ResponseParser.alertDeadline(deadlineList));
 			ArrayList<PeriodicTask> periodicList = executor.getPeriodicList();
-			printFeedback(ResponseParser.alertPeriodic(periodicList));
+			print(ResponseParser.alertPeriodic(periodicList));
 		} catch (CEOException e) {
 			e.printStackTrace();
 		}
