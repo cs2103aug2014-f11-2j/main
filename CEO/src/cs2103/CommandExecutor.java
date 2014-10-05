@@ -76,14 +76,7 @@ class CommandExecutor {
 	public ArrayList<Task> getAllList() throws CEOException{
 		return this.taskList;
 	}
-	
-	private Task getTaskByID(int taskID) throws CEOException{
-		if (taskID > this.taskList.size() || taskID < 1){
-			throw new CEOException(CEOException.INVALID_TASKID);
-		}else{
-			return this.taskList.get(taskID-1);
-		}
-	}
+
 	
 	public Task showTaskDetail(int taskID) throws CEOException{
 		return getTaskByID(taskID);
@@ -150,6 +143,18 @@ class CommandExecutor {
 			redoTask(this.redoStack.pop());
 		}
 		return i;
+	}
+	
+	public void updateTimeFromRecur(PeriodicTask task) throws CEOException{
+		DateTime now = new DateTime();
+		if (task.getRecurrence() != null){
+			if (task.getStartTime().before(now)){
+				Date startTime = (task.getRecurrence().getNextDate(new net.fortuna.ical4j.model.DateTime(task.getStartTime()), now));
+				Date endTime = new Date(task.getEndTime().getTime() - task.getStartTime().getTime() + startTime.getTime());
+				task.updateTime(startTime, endTime);
+				this.taskList = storage.updateTask(task);
+			}
+		}
 	}
 	
 	private Task copyTask(Task task) throws CEOException{
@@ -233,28 +238,6 @@ class CommandExecutor {
 		return task;
 	}
 	
-	public void updateTimeFromRecur(PeriodicTask task) throws CEOException{
-		DateTime now = new DateTime();
-		if (task.getRecurrence() != null){
-			if (task.getStartTime().before(now)){
-				Date startTime = (task.getRecurrence().getNextDate(new net.fortuna.ical4j.model.DateTime(task.getStartTime()), now));
-				Date endTime = new Date(task.getEndTime().getTime() - task.getStartTime().getTime() + startTime.getTime());
-				task.updateTime(startTime, endTime);
-				this.taskList = storage.updateTask(task);
-			}
-		}
-	}
-	
-	private Uid generateUid() throws CEOException{
-		try {
-			UidGenerator ug = new UidGenerator(new SimpleHostInfo("gmail.com"), InetAddress.getLocalHost().getHostName().toString());
-			return ug.generateUid();
-		} catch (UnknownHostException e) {
-			throw new CEOException(CEOException.UNEXPECTED_ERR);
-		}
-		
-	}
-	
 	private void undoTask(TaskBackup taskBackup) throws CEOException{
 		if (this.redoStack == null) this.redoStack = new Stack<TaskBackup>();
 		this.redoStack.push(taskBackup);
@@ -284,6 +267,25 @@ class CommandExecutor {
 		default:
 			throw new CEOException(CEOException.UNEXPECTED_ERR);
 		}
+	}
+	
+	
+	private Task getTaskByID(int taskID) throws CEOException{
+		if (taskID > this.taskList.size() || taskID < 1){
+			throw new CEOException(CEOException.INVALID_TASKID);
+		}else{
+			return this.taskList.get(taskID-1);
+		}
+	}
+
+	private Uid generateUid() throws CEOException{
+		try {
+			UidGenerator ug = new UidGenerator(new SimpleHostInfo("gmail.com"), InetAddress.getLocalHost().getHostName().toString());
+			return ug.generateUid();
+		} catch (UnknownHostException e) {
+			throw new CEOException(CEOException.UNEXPECTED_ERR);
+		}
+		
 	}
 	
 	private void backupTask(ActionType actionType, Task task){

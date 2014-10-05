@@ -242,7 +242,7 @@ public class ResponseParser {
 		return dateFormat.format(date);
 	}
 	
-	public static String completeToString(boolean complete){
+	private static String completeToString(boolean complete){
 		return complete?"Completed":"Needs Action";
 	}
 	
