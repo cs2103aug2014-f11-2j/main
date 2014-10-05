@@ -195,7 +195,9 @@ public class CommandLineUI {
 	}
 	
 	private static void printFeedback(String feedback) {
-		System.out.println(feedback);
+		if (feedback != null){
+			System.out.println(feedback);
+		}
 	}
 	
 	//To retrieve the nearest deadline from tasklist

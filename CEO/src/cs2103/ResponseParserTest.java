@@ -43,7 +43,7 @@ public class ResponseParserTest {
 				+ "0. Pooping\nType: Deadline\t\t\t\t\tStatus: Needs Action	Due At: Sep 28, 2014 11:59:00 PM\n\n"
 				+ "0. Drinking\nType: Periodic\t\t\t\t\tFrom: Sep 28, 2014 11:59:00 PM To Oct 28, 2014 11:59:00 PM"
 				, 
-				ResponseParser.parseListResponse(taskList));
+				ResponseParser.parseAllListResponse(taskList));
 	}
 
 	
@@ -51,8 +51,12 @@ public class ResponseParserTest {
 	public void testParseShowDetailResponseNull() {
 		Task task = null;
 		int taskID = 1;
-		assertEquals(ResponseParser.parseShowDetailResponse(task, taskID), 
-				"Unable to show detail for task 1");
+		try {
+			assertEquals(ResponseParser.parseShowDetailResponse(task, taskID), 
+					"Unable to show detail for task 1");
+		} catch (CEOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Test 

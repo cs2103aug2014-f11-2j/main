@@ -85,32 +85,61 @@ public class ResponseParser {
 		if (taskList==null || taskList.size()==0){
 			return null;
 		}else{
-			long timeNow = System.currentTimeMillis();
-			StringBuffer sb = new StringBuffer();
-			sb.append(MESSAGE_TASKS_DUE);
-			for (DeadlineTask task:taskList){
-				if (task.getDueTime().getTime() - timeNow < DAY_IN_MILLIS){
+			ArrayList<DeadlineTask> alertList = getAlertDeadlineList(taskList);
+			if (alertList == null || alertList.size() == 0){
+				return null;
+			}else{
+				StringBuffer sb = new StringBuffer();
+				sb.append(MESSAGE_TASKS_DUE);
+				for (DeadlineTask task:alertList){
 					sb.append(deadlineToSummary(task));
 				}
+				return deleteLastChar(sb);
 			}
-			return deleteLastChar(sb);
 		}
 	}
+	
 	
 	public static String alertPeriodic(ArrayList<PeriodicTask> taskList){
 		if (taskList==null || taskList.size()==0){
 			return null;
 		}else{
-			long timeNow = System.currentTimeMillis();
-			StringBuffer sb = new StringBuffer();
-			sb.append(MESSAGE_TASKS_STARTING);
-			for (PeriodicTask task:taskList){
-				if (task.getStartTime().getTime() - timeNow < DAY_IN_MILLIS){
+			ArrayList<PeriodicTask> alertList = getAlertPeriodicList(taskList);
+			if (alertList == null || alertList.size() == 0){
+				return null;
+			}else{
+				StringBuffer sb = new StringBuffer();
+				sb.append(MESSAGE_TASKS_STARTING);
+				for (PeriodicTask task:alertList){
 					sb.append(periodicToSummary(task));
 				}
+				return deleteLastChar(sb);
 			}
-			return deleteLastChar(sb);
 		}
+	}
+	
+	private static ArrayList<DeadlineTask> getAlertDeadlineList(ArrayList<DeadlineTask> taskList){
+		ArrayList<DeadlineTask> alertList = new ArrayList<DeadlineTask>();
+		long timeNow = System.currentTimeMillis();
+		for (DeadlineTask task:taskList){
+			long timeDifference = task.getDueTime().getTime() - timeNow;
+			if (timeDifference >= 0 && timeDifference < DAY_IN_MILLIS){
+				alertList.add(task);
+			}
+		}
+		return alertList;
+	}
+
+	private static ArrayList<PeriodicTask> getAlertPeriodicList(ArrayList<PeriodicTask> taskList){
+		ArrayList<PeriodicTask> alertList = new ArrayList<PeriodicTask>();
+		long timeNow = System.currentTimeMillis();
+		for (PeriodicTask task:taskList){
+			long timeDifference = task.getStartTime().getTime() - timeNow;
+			if (timeDifference >= 0 && timeDifference < DAY_IN_MILLIS){
+				alertList.add(task);
+			}
+		}
+		return alertList;
 	}
 	
 	public static String parseShowDetailResponse(Task task, int taskID) throws CEOException{
