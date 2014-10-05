@@ -12,6 +12,8 @@ public class ResponseParser {
 	private static final String MESSAGE_SHOWDETAIL_FORMAT = "The details for Task %1$d:\n";
 	private static final String MESSAGE_EMPTY_LIST = "The task list is empty";
 	private static final String MESSAGE_SHOWDETAIL_ERROR_FOMRAT = "Unable to show detail for task %1$d";
+	private static final String MESSAGE_TASKS_DUE = "Tasks due within one day:\n";
+	private static final String MESSAGE_TASKS_STARTING = "Tasks start within one day:\n";
 	private static final String TYPE_FLOATING = "Floating";
 	private static final String TYPE_DEADLINE = "Deadline";
 	private static final String TYPE_PERIODIC = "Periodic";
@@ -20,6 +22,8 @@ public class ResponseParser {
 	private static final String STRING_LOCATION = "Location: ";
 	private static final String STRING_DESCRIPTION = "Description: ";
 	private static final String STRING_RECUR = "Recurrence: ";
+	
+	private static final long DAY_IN_MILLIS = 86400000L;
 	
 	public static String parseAllListResponse(ArrayList<Task> taskList) throws CEOException{
 		if (taskList==null || taskList.size()==0){
@@ -72,6 +76,38 @@ public class ResponseParser {
 			StringBuffer sb = new StringBuffer();
 			for (PeriodicTask task:taskList){
 				sb.append(periodicToSummary(task));
+			}
+			return deleteLastChar(sb);
+		}
+	}
+	
+	public static String alertDeadline(ArrayList<DeadlineTask> taskList){
+		if (taskList==null || taskList.size()==0){
+			return null;
+		}else{
+			long timeNow = System.currentTimeMillis();
+			StringBuffer sb = new StringBuffer();
+			sb.append(MESSAGE_TASKS_DUE);
+			for (DeadlineTask task:taskList){
+				if (task.getDueTime().getTime() - timeNow < DAY_IN_MILLIS){
+					sb.append(deadlineToSummary(task));
+				}
+			}
+			return deleteLastChar(sb);
+		}
+	}
+	
+	public static String alertPeriodic(ArrayList<PeriodicTask> taskList){
+		if (taskList==null || taskList.size()==0){
+			return null;
+		}else{
+			long timeNow = System.currentTimeMillis();
+			StringBuffer sb = new StringBuffer();
+			sb.append(MESSAGE_TASKS_STARTING);
+			for (PeriodicTask task:taskList){
+				if (task.getStartTime().getTime() - timeNow < DAY_IN_MILLIS){
+					sb.append(periodicToSummary(task));
+				}
 			}
 			return deleteLastChar(sb);
 		}

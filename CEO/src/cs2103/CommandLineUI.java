@@ -21,8 +21,7 @@ public class CommandLineUI {
 	private static final String MESSAGE_UPDATE_FORMAT = "You have updated task with ID %1$s";
 	private static final String MESSAGE_UPDATE_ERROR_FORMAT = "Failed to update task with ID %1$s";
 	private static final String MESSAGE_SHOW_ERROR_FORMAT = "Failed to show task with ID %1$s";
-	private static final String MESSAGE_URGENT_ALERT = "URGENT ALERT!:";
-	private static final String MESSAGE_URGENT_ERROR = "Failed to retrieve latest deadline";
+
 	public enum CommandType {
 		ADD, LIST, SHOWDETAIL, DELETE, UPDATE, EXIT, INVALID;
 	}
@@ -157,17 +156,17 @@ public class CommandLineUI {
 		try{
 			switch (taskType){
 			case ALL:
-				return ResponseParser.parseListResponse(commandExecutor.getAllList());
+				return ResponseParser.parseAllListResponse(commandExecutor.getAllList());
 			case FLOATING:
-				return ResponseParser.parseListResponse(commandExecutor.getFloatingList());
+				return ResponseParser.parseFloatingListResponse(commandExecutor.getFloatingList());
 			case DEADLINE:
-				return ResponseParser.parseListResponse(commandExecutor.getDeadlineList());
+				return ResponseParser.parseDeadlineListResponse(commandExecutor.getDeadlineList());
 			case PERIODIC:
-				return ResponseParser.parseListResponse(commandExecutor.getPeriodicList());
+				return ResponseParser.parsePeriodicListResponse(commandExecutor.getPeriodicList());
 			case INVALID:
 			default:
 				printFeedback(String.format(MESSAGE_INVALID_TASKTYPE_FORMAT, parameter));
-				return ResponseParser.parseListResponse(commandExecutor.getAllList());
+				return ResponseParser.parseAllListResponse(commandExecutor.getAllList());
 			}
 		} catch (CEOException e){
 			return CEOException.READ_ERROR;
@@ -201,59 +200,15 @@ public class CommandLineUI {
 	
 	//To retrieve the nearest deadline from tasklist
 	private void alertTask() {
-		try{
-			Date now = new Date();
+		try {
+			ArrayList<DeadlineTask> deadlineList;
+			deadlineList = commandExecutor.getDeadlineList();
+			printFeedback(ResponseParser.alertDeadline(deadlineList));
 			ArrayList<PeriodicTask> periodicList = commandExecutor.getPeriodicList();
-			for (PeriodicTask task:periodicList){
-				
-			}
-			ArrayList<Task> existingDeadline = commandExecutor.getDeadlineList();
-			
-			
-			
-			
-			if(!existingPeriodic.isEmpty()) {
-				periodicInfo = (existingPeriodic.get(0)).getTitle();
-				latestPeriodic = ((PeriodicTask)existingPeriodic.get(0)).getStartTime();
-				for(int i=1; i<existingPeriodic.size(); i++) {
-					if((((PeriodicTask)existingPeriodic.get(i)).getStartTime()).before(latestPeriodic)) {
-						latestPeriodic = ((PeriodicTask)existingPeriodic.get(0)).getEndTime();
-						periodicInfo = (existingPeriodic.get(i)).getTitle();
-					}
-				}
-			}
-			if(!existingDeadline.isEmpty()) {
-				deadlineInfo = (existingDeadline.get(0)).getTitle();
-				latestDeadline = ((DeadlineTask)existingDeadline.get(0)).getDueTime();
-				for(int i=1; i<existingPeriodic.size(); i++) {
-					if((((DeadlineTask)existingDeadline.get(i)).getDueTime()).before(latestDeadline)) {
-						latestDeadline = ((DeadlineTask)existingDeadline.get(0)).getDueTime();
-						deadlineInfo = (existingDeadline.get(i)).getTitle();
-					}
-				}
-			}
-			
-			if((!existingDeadline.isEmpty()) && (!existingPeriodic.isEmpty())) {
-				if(latestPeriodic.before(latestDeadline)) {
-					alertedDate = latestPeriodic;
-					alertedTask = periodicInfo;
-				} else {
-					alertedDate = latestDeadline;
-					alertedTask = deadlineInfo;
-				}
-			} else if(!existingDeadline.isEmpty()) {
-				alertedDate = latestDeadline;
-				alertedTask = deadlineInfo;
-				System.out.println(MESSAGE_URGENT_ALERT);
-				System.out.println(alertedTask + " deadline: " +alertedDate);
-			} else {
-				alertedDate = latestPeriodic;
-				alertedTask = periodicInfo;
-				System.out.println(MESSAGE_URGENT_ALERT);
-				System.out.println(alertedTask + " deadline: " +alertedDate);
-			}
+			printFeedback(ResponseParser.alertPeriodic(periodicList));
 		} catch (CEOException e) {
-			System.out.println(MESSAGE_URGENT_ERROR);
+			e.printStackTrace();
 		}
+		
 	}
 }

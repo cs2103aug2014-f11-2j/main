@@ -1,11 +1,7 @@
 package cs2103;
 
 import static org.junit.Assert.*;
-
-import java.text.ParseException;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
 
 import org.junit.Test;
@@ -89,8 +85,6 @@ public class CommandParserTest {
 	
 	@Test 
 	public void testSeparateParameters() {
-		Map<String,String> expected = new HashMap<String, String>();
-		Map<String,String> actual = new HashMap<String, String>();
 		
 	}
 	
