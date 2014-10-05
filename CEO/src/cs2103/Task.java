@@ -1,13 +1,15 @@
 package cs2103; 
 
+import net.fortuna.ical4j.model.property.Uid;
+
 class Task implements Comparable<Task>{;
 	private int taskID;
-	private String taskUID;
+	private Uid taskUID;
 	private String title;
 	private String description;
 
 
-	public Task(String taskUID, String title) throws CEOException{
+	public Task(Uid taskUID, String title) throws CEOException{
 		if (title!=null){
 			this.taskUID=taskUID;
 			this.title=title;
@@ -20,7 +22,7 @@ class Task implements Comparable<Task>{;
 		return this.taskID;
 	}
 	
-	public String getTaskUID(){
+	public Uid getTaskUID(){
 		return this.taskUID;
 	}
 	
@@ -36,7 +38,7 @@ class Task implements Comparable<Task>{;
 		this.taskID=id;
 	}
 	
-	public void updateTaskUID(String taskUID) throws CEOException{
+	public void updateTaskUID(Uid taskUID) throws CEOException{
 		if (taskUID==null){
 			throw new CEOException("Invalid UID");
 		}else{
@@ -59,7 +61,7 @@ class Task implements Comparable<Task>{;
 		if (this.taskUID==null){
 			return -1;
 		}else{
-			return this.taskUID.compareTo(o.taskUID);
+			return this.taskUID.getValue().compareTo(o.taskUID.getValue());
 		}
 	}
 }

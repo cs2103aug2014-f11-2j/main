@@ -130,7 +130,7 @@ class StorageEngine {
 	}
 	
 	public ArrayList<Task> deleteTask(Task task) throws CEOException{
-		Component existing = this.indexedComponents.getComponent(task.getTaskUID());
+		Component existing = this.indexedComponents.getComponent(task.getTaskUID().getValue());
 		if (existing == null){
 			throw new CEOException(CEOException.TASK_NOT_EXIST);
 		}else{
@@ -154,11 +154,7 @@ class StorageEngine {
 	
 	private Component floatingToComponent(FloatingTask task) {
 		VToDo component = new VToDo(new net.fortuna.ical4j.model.DateTime(new Date()), task.getTitle());
-		if (task.getTaskUID()==null){
-			component.getProperties().add(ug.generateUid());
-		}else{
-			component.getProperties().add(new Uid(task.getTaskUID()));
-		}
+		component.getProperties().add(task.getTaskUID());
 		component.getProperties().add(new Description(task.getDescription()));
 		component.getProperties().add(completeToStatus(task.getComplete()));
 		return component;
@@ -166,11 +162,7 @@ class StorageEngine {
 	
 	private Component deadlineToComponent(DeadlineTask task) {
 		VToDo component = new VToDo(new net.fortuna.ical4j.model.DateTime(task.getDueTime()), new net.fortuna.ical4j.model.DateTime(task.getDueTime()),task.getTitle());
-		if (task.getTaskUID()==null){
-			component.getProperties().add(ug.generateUid());
-		}else{
-			component.getProperties().add(new Uid(task.getTaskUID()));
-		}
+		component.getProperties().add(task.getTaskUID());
 		component.getProperties().add(new Description(task.getDescription()));
 		component.getProperties().add(completeToStatus(task.getComplete()));
 		return component;
@@ -178,11 +170,7 @@ class StorageEngine {
 	
 	private Component periodicToComponent(PeriodicTask task) {
 		VEvent component = new VEvent(new net.fortuna.ical4j.model.DateTime(task.getStartTime()), new net.fortuna.ical4j.model.DateTime(task.getEndTime()),task.getTitle());
-		if (task.getTaskUID()==null){
-			component.getProperties().add(ug.generateUid());
-		}else{
-			component.getProperties().add(new Uid(task.getTaskUID()));
-		}
+		component.getProperties().add(task.getTaskUID());
 		if (task.getRecurrence()!=null){
 			component.getProperties().add(new RRule(task.getRecurrence()));
 		}
@@ -193,7 +181,7 @@ class StorageEngine {
 	
 	private Task parseVEvent(VEvent component) throws CEOException, ParseException{
 		Task task;
-		String componentUID = component.getUid().getValue();
+		Uid componentUID = component.getUid();
 		String componentTitle = readTitle(component);
 		Date componentStartTime;
 		Date componentEndTime;
@@ -212,7 +200,7 @@ class StorageEngine {
 	
 	private Task parseVToDo(VToDo component) throws CEOException, ParseException{
 		Task task;
-		String componentUID = component.getUid().getValue();
+		Uid componentUID = component.getUid();
 		String componentTitle = readTitle(component);
 		if (component.getDue()==null){
 			task = new FloatingTask(componentUID, componentTitle, readStatusToComplete(component));

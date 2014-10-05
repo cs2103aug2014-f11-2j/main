@@ -82,6 +82,8 @@ public class CommandLineUI {
 				return show(separateResult.poll());
 			case UNDO:
 				return undo(separateResult.poll());
+			case REDO:
+				return redo(separateResult.poll());
 			case INVALID:
 			default:
 				return MESSAGE_COMMAND_ERROR;
@@ -188,6 +190,17 @@ public class CommandLineUI {
 		int result = 0;
 		try {
 			result = executor.undoTasks(count);
+		} catch (CEOException e) {
+			e.printStackTrace();
+		}
+		return String.format(MESSAGE_UNDO_FORMAT, result);
+	}
+	
+	private String redo(String parameter) {
+		int count = CommandParser.parseIntegerParameter(parameter);
+		int result = 0;
+		try {
+			result = executor.redoTasks(count);
 		} catch (CEOException e) {
 			e.printStackTrace();
 		}

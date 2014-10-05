@@ -2,10 +2,12 @@ package cs2103;
 
 import java.util.Date;
 
+import net.fortuna.ical4j.model.property.Uid;
+
 class DeadlineTask extends Task {
 	private Date dueTime;
 	private boolean complete;
-	public DeadlineTask(String taskUID, String title, Date dueTime, boolean complete) throws CEOException {
+	public DeadlineTask(Uid taskUID, String title, Date dueTime, boolean complete) throws CEOException {
 		super(taskUID, title);
 		this.updateDueTime(dueTime);;
 		this.updateComplete(complete);

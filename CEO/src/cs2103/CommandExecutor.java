@@ -1,17 +1,24 @@
 package cs2103;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList; 
 import java.util.Date;
 import java.util.Stack;
 
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.property.Uid;
+import net.fortuna.ical4j.util.SimpleHostInfo;
+import net.fortuna.ical4j.util.UidGenerator;
 
 
 class CommandExecutor {
 	private final StorageEngine storage;
 	private ArrayList<Task> taskList;
 	private Stack<TaskBackup> undoStack;
+	private Stack<TaskBackup> redoStack;
+	
 	private static enum ActionType {
 		ADD, DELETE, UPDATE;
 	}
@@ -35,6 +42,7 @@ class CommandExecutor {
 			task = new PeriodicTask(null, title, location, startTime, endTime, recurrence);
 		}
 		task.updateDescription(description);
+		task.updateTaskUID(generateUid());
 		backupTask(ActionType.ADD, task);
 		this.taskList = storage.updateTask(task);
 	}
@@ -134,6 +142,20 @@ class CommandExecutor {
 		return i;
 	}
 	
+	public int redoTasks(int count) throws CEOException{
+		if (this.redoStack == null) return 0;
+		if (count < 1){
+			throw new CEOException(CEOException.INVALID_PARA);
+		} else if (count > this.redoStack.size()){
+			count = this.redoStack.size();
+		}
+		int i;
+		for (i=0;i < count;i++){
+			redoTask(this.redoStack.pop());
+		}
+		return i;
+	}
+	
 	private Task copyTask(Task task) throws CEOException{
 		if (task instanceof DeadlineTask){
 			return new DeadlineTask(task.getTaskUID(),task.getTitle(),((DeadlineTask)task).getDueTime(), ((DeadlineTask)task).getComplete());
@@ -227,13 +249,40 @@ class CommandExecutor {
 		}
 	}
 	
+	private Uid generateUid() throws CEOException{
+		try {
+			UidGenerator ug = new UidGenerator(new SimpleHostInfo("gmail.com"), InetAddress.getLocalHost().getHostName().toString());
+			return ug.generateUid();
+		} catch (UnknownHostException e) {
+			throw new CEOException(CEOException.UNEXPECTED_ERR);
+		}
+		
+	}
+	
 	private void undoTask(TaskBackup taskBackup) throws CEOException{
+		if (this.redoStack == null) this.redoStack = new Stack<TaskBackup>();
+		this.redoStack.push(taskBackup);
 		switch(taskBackup.getActionType()){
 		case ADD:
 			this.taskList = storage.deleteTask(taskBackup.getTask());
 			break;
 		case UPDATE:
 		case DELETE:
+			this.taskList = storage.updateTask(taskBackup.getTask());
+			break;
+		default:
+			throw new CEOException(CEOException.UNEXPECTED_ERR);
+		}
+	}
+	
+	private void redoTask(TaskBackup taskBackup) throws CEOException{
+		this.undoStack.push(taskBackup);
+		switch(taskBackup.getActionType()){
+		case DELETE:
+			this.taskList = storage.deleteTask(taskBackup.getTask());
+			break;
+		case UPDATE:
+		case ADD:
 			this.taskList = storage.updateTask(taskBackup.getTask());
 			break;
 		default:

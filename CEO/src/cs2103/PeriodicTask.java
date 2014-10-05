@@ -1,7 +1,9 @@
 package cs2103;
 
 import java.util.Date;
+
 import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.property.Uid;
 
 public class PeriodicTask extends Task {
 	private Date startTime;
@@ -9,7 +11,7 @@ public class PeriodicTask extends Task {
 	private String location;
 	private Recur recurrence;
 	
-	public PeriodicTask(String taskUID, String title, String location, Date startTime, Date endTime, Recur recurrence) throws CEOException {
+	public PeriodicTask(Uid taskUID, String title, String location, Date startTime, Date endTime, Recur recurrence) throws CEOException {
 		super(taskUID, title);
 		this.updateTime(startTime, endTime);
 		this.updateLocation(location);
