@@ -49,7 +49,7 @@ public class CommandLineUI {
 		alertTask();
 		updateTimeFromRecur();
 		while (true) {
-			print(MESSAGE_USER_PROMPT);
+			printPrompt(MESSAGE_USER_PROMPT);
 			feedback=takeUserInput();
 			if (feedback.equalsIgnoreCase("EXIT")){
 				print(MESSAGE_EXIT);
@@ -197,6 +197,12 @@ public class CommandLineUI {
 	private static void print(String feedback) {
 		if (feedback != null){
 			System.out.println(feedback);
+		}
+	}
+	
+	private static void printPrompt(String prompt){
+		if (prompt != null){
+			System.out.print(prompt);
 		}
 	}
 	
