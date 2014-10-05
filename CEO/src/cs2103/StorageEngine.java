@@ -145,8 +145,6 @@ class StorageEngine {
 			return deadlineToComponent((DeadlineTask)task);
 		}else if (task instanceof FloatingTask){
 			return floatingToComponent((FloatingTask)task);
-		}else if (task instanceof RecurringTask){
-			return recurringToComponent((RecurringTask)task);
 		}else if (task instanceof PeriodicTask){
 			return periodicToComponent((PeriodicTask)task);
 		}else{
@@ -185,19 +183,9 @@ class StorageEngine {
 		}else{
 			component.getProperties().add(new Uid(task.getTaskUID()));
 		}
-		component.getProperties().add(new Description(task.getDescription()));
-		component.getProperties().add(new Location(task.getLocation()));
-		return component;
-	}
-	
-	private Component recurringToComponent(RecurringTask task){
-		VEvent component = new VEvent(new net.fortuna.ical4j.model.DateTime(task.getStartTime()), new net.fortuna.ical4j.model.DateTime(task.getEndTime()),task.getTitle());
-		if (task.getTaskUID()==null){
-			component.getProperties().add(ug.generateUid());
-		}else{
-			component.getProperties().add(new Uid(task.getTaskUID()));
+		if (task.getRecurrence()!=null){
+			component.getProperties().add(new RRule(task.getRecurrence()));
 		}
-		component.getProperties().add(new RRule(task.getRecurrence()));
 		component.getProperties().add(new Description(task.getDescription()));
 		component.getProperties().add(new Location(task.getLocation()));
 		return component;
@@ -217,11 +205,7 @@ class StorageEngine {
 		}
 		String componentLocation = readLocation(component);
 		Recur componentRecurrence = readRecur(component);
-		if (componentRecurrence == null){
-			task = new PeriodicTask(componentUID, componentTitle, componentLocation, componentStartTime, componentEndTime);
-		} else {
-			task = new RecurringTask(componentUID, componentTitle, componentStartTime, componentEndTime, componentLocation, componentRecurrence);
-		}
+		task = new PeriodicTask(componentUID, componentTitle, componentLocation, componentStartTime, componentEndTime, componentRecurrence);
 		task.updateDescription(readDescription(component));
 		return task;
 	}
