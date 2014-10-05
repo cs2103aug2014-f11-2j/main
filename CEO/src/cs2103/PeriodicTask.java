@@ -1,8 +1,6 @@
 package cs2103;
 
 import java.util.Date;
-
-import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.Recur;
 
 public class PeriodicTask extends Task {
