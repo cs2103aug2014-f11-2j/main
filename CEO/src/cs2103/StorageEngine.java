@@ -3,8 +3,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,30 +31,22 @@ import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.util.CompatibilityHints;
-import net.fortuna.ical4j.util.SimpleHostInfo;
-import net.fortuna.ical4j.util.UidGenerator;
 
 class StorageEngine {
 
 	private net.fortuna.ical4j.model.Calendar calendar;
 	private IndexedComponentList indexedComponents;
 	private final File file;
-	UidGenerator ug;
 	
-	public StorageEngine(String dataFile){
+	public StorageEngine(String dataFile) throws CEOException{
 		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION,true);
 		if (dataFile==null){
 			dataFile="default.ics";
 		}
 		this.file = new File(dataFile);
-		try {
-			if (!file.exists() || file.length()==0){
-				createNewFile();
-			}
-			ug = new UidGenerator(new SimpleHostInfo("gmail.com"), InetAddress.getLocalHost().getHostName().toString());
-		} catch (CEOException | UnknownHostException e) {
-			e.printStackTrace();
-		} 
+		if (!file.exists() || file.length()==0){
+			createNewFile();
+		}
 	}
 	
 	public ArrayList<Task> getTaskList() throws CEOException{

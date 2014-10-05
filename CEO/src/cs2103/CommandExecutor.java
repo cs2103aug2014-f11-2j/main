@@ -23,13 +23,9 @@ class CommandExecutor {
 		ADD, DELETE, UPDATE;
 	}
 	
-	public CommandExecutor(String dataFile){
+	public CommandExecutor(String dataFile) throws CEOException{
 		this.storage = new StorageEngine(dataFile);
-		try {
-			this.taskList = storage.getTaskList();
-		} catch (CEOException e) {
-			e.printStackTrace();
-		}
+		this.taskList = storage.getTaskList();
 	}
 	
 	public void addTask(String title, String description, String location, Date startTime, Date endTime, Recur recurrence) throws CEOException{
