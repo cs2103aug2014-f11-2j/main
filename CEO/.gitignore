@@ -1,2 +1,4 @@
-/bin/
+/bin/*
+!/bin/ical4j.properties
 /default.ics
+/bin/
