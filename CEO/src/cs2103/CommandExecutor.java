@@ -3,6 +3,8 @@ package cs2103;
 import java.util.ArrayList; 
 import java.util.Date;
 import java.util.Stack;
+
+import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
 
 
@@ -211,6 +213,18 @@ class CommandExecutor {
 			((PeriodicTask) task).updateRecurrence(recur);
 		}
 		return task;
+	}
+	
+	public void updateTimeFromRecur(PeriodicTask task) throws CEOException{
+		DateTime now = new DateTime();
+		if (task.getRecurrence() != null){
+			if (task.getStartTime().before(now)){
+				Date startTime = (task.getRecurrence().getNextDate(new net.fortuna.ical4j.model.DateTime(task.getStartTime()), now));
+				Date endTime = new Date(task.getEndTime().getTime() - task.getStartTime().getTime() + startTime.getTime());
+				task.updateTime(startTime, endTime);
+				this.taskList = storage.updateTask(task);
+			}
+		}
 	}
 	
 	private void undoTask(TaskBackup taskBackup) throws CEOException{

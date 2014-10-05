@@ -23,11 +23,11 @@ public class CommandLineUI {
 	private static final String MESSAGE_SHOW_ERROR_FORMAT = "Failed to show task with ID %1$s";
 	private static final String MESSAGE_UNDO_FORMAT = "Successfully undo %1$d tasks";
 	
-	private final CommandExecutor commandExecutor;
+	private final CommandExecutor executor;
 	private Scanner scanner = new Scanner(System.in);
 	
 	public CommandLineUI(String dataFile){
-		this.commandExecutor = new CommandExecutor(dataFile);
+		this.executor = new CommandExecutor(dataFile);
 	}
 	
 	public static void main(String[] args){
@@ -51,6 +51,7 @@ public class CommandLineUI {
 		printWelcomeMessage();
 		String feedback;
 		alertTask();
+		updateTimeFromRecur();
 		while (true) {
 			printUserPrompt();
 			feedback=takeUserInput();
@@ -109,7 +110,7 @@ public class CommandLineUI {
 			String timeString = CommandParser.getTimeString(parameterMap);
 			String recurString = CommandParser.getRecurString(parameterMap);
 			Date[] time = CommandParser.getTime(timeString);
-			commandExecutor.addTask(title, description, location, time[0], time[1], CommandParser.stringToRecur(recurString));
+			executor.addTask(title, description, location, time[0], time[1], CommandParser.stringToRecur(recurString));
 			result = MESSAGE_ADD;
 		}catch (CEOException e){
 			result = MESSAGE_ADD_ERROR;
@@ -122,17 +123,17 @@ public class CommandLineUI {
 		try{
 			switch (taskType){
 			case ALL:
-				return ResponseParser.parseAllListResponse(commandExecutor.getAllList());
+				return ResponseParser.parseAllListResponse(executor.getAllList());
 			case FLOATING:
-				return ResponseParser.parseFloatingListResponse(commandExecutor.getFloatingList());
+				return ResponseParser.parseFloatingListResponse(executor.getFloatingList());
 			case DEADLINE:
-				return ResponseParser.parseDeadlineListResponse(commandExecutor.getDeadlineList());
+				return ResponseParser.parseDeadlineListResponse(executor.getDeadlineList());
 			case PERIODIC:
-				return ResponseParser.parsePeriodicListResponse(commandExecutor.getPeriodicList());
+				return ResponseParser.parsePeriodicListResponse(executor.getPeriodicList());
 			case INVALID:
 			default:
 				printFeedback(String.format(MESSAGE_INVALID_TASKTYPE_FORMAT, parameter));
-				return ResponseParser.parseAllListResponse(commandExecutor.getAllList());
+				return ResponseParser.parseAllListResponse(executor.getAllList());
 			}
 		} catch (CEOException e){
 			return CEOException.READ_ERROR;
@@ -143,7 +144,7 @@ public class CommandLineUI {
 		int taskID=CommandParser.parseIntegerParameter(parameters);
 		String response;
 		try {
-			response=ResponseParser.parseShowDetailResponse(commandExecutor.showTaskDetail(taskID),taskID);
+			response=ResponseParser.parseShowDetailResponse(executor.showTaskDetail(taskID),taskID);
 		} catch (CEOException e) {
 			response = String.format(MESSAGE_SHOW_ERROR_FORMAT, parameters);
 		}
@@ -154,7 +155,7 @@ public class CommandLineUI {
 		int taskID=CommandParser.parseIntegerParameter(parameter);
 		String response;
 		try {
-			commandExecutor.deleteTask(taskID);
+			executor.deleteTask(taskID);
 			response = String.format(MESSAGE_DELETE_FORMAT, parameter);
 		} catch (CEOException e) {
 			response = String.format(MESSAGE_DELETE_ERROR_FORMAT, parameter);
@@ -181,7 +182,7 @@ public class CommandLineUI {
 			if (title==null && description==null && location==null && completeString==null && timeString==null && recurString==null){
 				throw new CEOException(CEOException.LESS_THAN_ONE_PARA);
 			}else{
-				commandExecutor.updateTask(taskID, title, description, location, complete, completeString != null, time, timeString != null, recur, recurString != null);
+				executor.updateTask(taskID, title, description, location, complete, completeString != null, time, timeString != null, recur, recurString != null);
 			}
 			result = String.format(MESSAGE_UPDATE_FORMAT, taskIDString);
 		}catch (CEOException e){
@@ -190,11 +191,11 @@ public class CommandLineUI {
 		return result;
 	}
 	
-	private String undo(String parameter){
+	private String undo(String parameter) {
 		int count = CommandParser.parseIntegerParameter(parameter);
 		int result = 0;
 		try {
-			result = commandExecutor.undoTasks(count);
+			result = executor.undoTasks(count);
 		} catch (CEOException e) {
 			e.printStackTrace();
 		}
@@ -209,12 +210,24 @@ public class CommandLineUI {
 	
 	private void alertTask() {
 		try {
-			ArrayList<DeadlineTask> deadlineList = commandExecutor.getDeadlineList();
+			ArrayList<DeadlineTask> deadlineList = executor.getDeadlineList();
 			printFeedback(ResponseParser.alertDeadline(deadlineList));
-			ArrayList<PeriodicTask> periodicList = commandExecutor.getPeriodicList();
+			ArrayList<PeriodicTask> periodicList = executor.getPeriodicList();
 			printFeedback(ResponseParser.alertPeriodic(periodicList));
 		} catch (CEOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private void updateTimeFromRecur() {
+		try {
+			ArrayList<PeriodicTask> periodicList = executor.getPeriodicList();
+			for (PeriodicTask task:periodicList){
+				executor.updateTimeFromRecur(task);
+			}
+		} catch (CEOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 }

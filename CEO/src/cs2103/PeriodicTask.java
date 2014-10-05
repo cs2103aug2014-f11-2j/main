@@ -9,10 +9,11 @@ public class PeriodicTask extends Task {
 	private String location;
 	private Recur recurrence;
 	
-	public PeriodicTask(String taskUID, String title, String location, Date startTime, Date endTime, Recur recur) throws CEOException {
+	public PeriodicTask(String taskUID, String title, String location, Date startTime, Date endTime, Recur recurrence) throws CEOException {
 		super(taskUID, title);
 		this.updateTime(startTime, endTime);
 		this.updateLocation(location);
+		this.updateRecurrence(recurrence);
 	}
 	public Date getStartTime(){
 		return this.startTime;
