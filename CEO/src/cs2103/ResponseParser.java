@@ -22,22 +22,21 @@ public class ResponseParser {
 	private static final String STRING_LOCATION = "Location: ";
 	private static final String STRING_DESCRIPTION = "Description: ";
 	private static final String STRING_RECUR = "Recurrence: ";
-	
 	private static final long DAY_IN_MILLIS = 86400000L;
 	
 	public static String parseAllListResponse(ArrayList<Task> taskList) throws CEOException{
-		if (taskList==null || taskList.size()==0){
+		if (taskList == null || taskList.size() == 0){
 			return MESSAGE_EMPTY_LIST;
-		}else{
+		} else {
 			StringBuffer sb = new StringBuffer();
 			for (Task task:taskList){
 				if (task instanceof FloatingTask){
 					sb.append(floatingToSummary((FloatingTask) task));
-				}else if (task instanceof DeadlineTask){
+				} else if (task instanceof DeadlineTask){
 					sb.append(deadlineToSummary((DeadlineTask) task));
-				}else if (task instanceof PeriodicTask){
+				} else if (task instanceof PeriodicTask){
 					sb.append(periodicToSummary((PeriodicTask) task));
-				}else{
+				} else {
 					throw new CEOException(CEOException.INVALID_TASKID);
 				}
 			}
@@ -46,9 +45,9 @@ public class ResponseParser {
 	}
 	
 	public static String parseFloatingListResponse(ArrayList<FloatingTask> taskList){
-		if (taskList==null || taskList.size()==0){
+		if (taskList == null || taskList.size() == 0){
 			return MESSAGE_EMPTY_LIST;
-		}else{
+		} else {
 			StringBuffer sb = new StringBuffer();
 			for (FloatingTask task:taskList){
 				sb.append(floatingToSummary(task));
@@ -58,9 +57,9 @@ public class ResponseParser {
 	}
 	
 	public static String parseDeadlineListResponse(ArrayList<DeadlineTask> taskList){
-		if (taskList==null || taskList.size()==0){
+		if (taskList == null || taskList.size() == 0){
 			return MESSAGE_EMPTY_LIST;
-		}else{
+		} else {
 			StringBuffer sb = new StringBuffer();
 			for (DeadlineTask task:taskList){
 				sb.append(deadlineToSummary(task));
@@ -70,9 +69,9 @@ public class ResponseParser {
 	}
 	
 	public static String parsePeriodicListResponse(ArrayList<PeriodicTask> taskList){
-		if (taskList==null || taskList.size()==0){
+		if (taskList == null || taskList.size() == 0){
 			return MESSAGE_EMPTY_LIST;
-		}else{
+		} else {
 			StringBuffer sb = new StringBuffer();
 			for (PeriodicTask task:taskList){
 				sb.append(periodicToSummary(task));
@@ -82,13 +81,13 @@ public class ResponseParser {
 	}
 	
 	public static String alertDeadline(ArrayList<DeadlineTask> taskList){
-		if (taskList==null || taskList.size()==0){
+		if (taskList == null || taskList.size() == 0){
 			return null;
-		}else{
+		} else {
 			ArrayList<DeadlineTask> alertList = getAlertDeadlineList(taskList);
 			if (alertList == null || alertList.size() == 0){
 				return null;
-			}else{
+			} else {
 				StringBuffer sb = new StringBuffer();
 				sb.append(MESSAGE_TASKS_DUE);
 				for (DeadlineTask task:alertList){
@@ -101,13 +100,13 @@ public class ResponseParser {
 	
 	
 	public static String alertPeriodic(ArrayList<PeriodicTask> taskList){
-		if (taskList==null || taskList.size()==0){
+		if (taskList == null || taskList.size() == 0){
 			return null;
-		}else{
+		} else {
 			ArrayList<PeriodicTask> alertList = getAlertPeriodicList(taskList);
 			if (alertList == null || alertList.size() == 0){
 				return null;
-			}else{
+			} else {
 				StringBuffer sb = new StringBuffer();
 				sb.append(MESSAGE_TASKS_STARTING);
 				for (PeriodicTask task:alertList){
@@ -145,16 +144,16 @@ public class ResponseParser {
 	public static String parseShowDetailResponse(Task task, int taskID) throws CEOException{
 		if (task == null){
 			return String.format(MESSAGE_SHOWDETAIL_ERROR_FOMRAT,taskID);
-		}else{
+		} else {
 			StringBuffer sb = new StringBuffer();
 			sb.append(String.format(MESSAGE_SHOWDETAIL_FORMAT, taskID));
 			if (task instanceof FloatingTask){
 				sb.append(floatingToDetail((FloatingTask) task));
-			}else if (task instanceof DeadlineTask){
+			} else if (task instanceof DeadlineTask){
 				sb.append(deadlineToDetail((DeadlineTask) task));
-			}else if (task instanceof PeriodicTask){
+			} else if (task instanceof PeriodicTask){
 				sb.append(periodicToDetail((PeriodicTask) task));
-			}else{
+			} else{
 				throw new CEOException(CEOException.INVALID_TASKID);
 			}
 			sb.deleteCharAt(sb.length()-1);
@@ -193,7 +192,7 @@ public class ResponseParser {
 		sb.append(STRING_TYPE);
 		if (task.getRecurrence() == null){
 			sb.append(TYPE_PERIODIC);
-		}else{
+		} else {
 			sb.append(TYPE_RECURRING);
 		}
 		sb.append("\t\tFrom: ");
@@ -257,7 +256,7 @@ public class ResponseParser {
 		if (sb.length() > 0){
 			sb.deleteCharAt(sb.length() - 1);
 			return sb.toString();
-		}else{
+		} else {
 			return null;
 		}
 	}

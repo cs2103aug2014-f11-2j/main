@@ -69,7 +69,7 @@ public class CommandLineUI {
 		String commandTypeString = separateResult.poll();
 		if (commandTypeString==null || commandTypeString.equals("")){
 			return MESSAGE_COMMAND_ERROR;
-		}else{
+		} else {
 			CommandParser.CommandType commandType = CommandParser.determineCommandType(commandTypeString);
 			switch (commandType){
 			case LIST:
@@ -177,7 +177,7 @@ public class CommandLineUI {
 			Date[] time = CommandParser.getTime(timeString);
 			Recur recur = CommandParser.stringToRecur(recurString);
 			boolean complete = CommandParser.parseComplete(completeString);
-			if (title==null && description==null && location==null && completeString==null && timeString==null && recurString==null){
+			if (title == null && description == null && location == null && completeString == null && timeString == null && recurString == null){
 				throw new CEOException(CEOException.LESS_THAN_ONE_PARA);
 			}else{
 				executor.updateTask(taskID, title, description, location, complete, completeString != null, time, timeString != null, recur, recurString != null);

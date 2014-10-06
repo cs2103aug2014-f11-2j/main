@@ -7,6 +7,7 @@ import net.fortuna.ical4j.model.property.Uid;
 class DeadlineTask extends Task {
 	private Date dueTime;
 	private boolean complete;
+	
 	public DeadlineTask(Uid taskUID, String title, Date dueTime, boolean complete) throws CEOException {
 		super(taskUID, title);
 		this.updateDueTime(dueTime);;
@@ -26,7 +27,7 @@ class DeadlineTask extends Task {
 	}
 	
 	public void updateDueTime(Date dueTime) throws CEOException{
-		if (dueTime==null){
+		if (dueTime == null){
 			throw new CEOException("Invalid deadline");
 		}else{
 			this.dueTime=dueTime;

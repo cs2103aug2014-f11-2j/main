@@ -31,55 +31,55 @@ class CommandParser {
 	}
 	
 	public static CommandType determineCommandType(String command) {
-		if (command==null){
+		if (command == null){
 			return CommandType.INVALID;
 		}
 		if (command.equalsIgnoreCase("list")){
 			return CommandType.LIST;
-		}else if (command.equalsIgnoreCase("update")){
+		} else if (command.equalsIgnoreCase("update")){
 			return CommandType.UPDATE;
-		}else if (command.equalsIgnoreCase("exit")){
+		} else if (command.equalsIgnoreCase("exit")){
 			return CommandType.EXIT;
-		}else if (command.equalsIgnoreCase("add")){
+		} else if (command.equalsIgnoreCase("add")){
 			return CommandType.ADD;
-		}else if (command.equalsIgnoreCase("delete")){
+		} else if (command.equalsIgnoreCase("delete")){
 			return CommandType.DELETE;
-		}else if (command.equalsIgnoreCase("show")){
+		} else if (command.equalsIgnoreCase("show")){
 			return CommandType.SHOWDETAIL;
-		}else if (command.equalsIgnoreCase("undo")){
+		} else if (command.equalsIgnoreCase("undo")){
 			return CommandType.UNDO;
-		}else if (command.equalsIgnoreCase("redo")){
+		} else if (command.equalsIgnoreCase("redo")){
 			return CommandType.REDO;
-		}else{
+		} else {
 			return CommandType.INVALID;
 		}
 	}
 	
 	public static TaskType determineTaskType(String parameter){
-		if (parameter==null){
+		if (parameter == null){
 			return TaskType.INVALID;
 		}
 		if (parameter.equalsIgnoreCase("all")){
 			return TaskType.ALL;
-		}else if (parameter.equalsIgnoreCase("floating")){
+		} else if (parameter.equalsIgnoreCase("floating")){
 			return TaskType.FLOATING;
-		}else if (parameter.equalsIgnoreCase("deadline")){
+		} else if (parameter.equalsIgnoreCase("deadline")){
 			return TaskType.DEADLINE;
-		}else if (parameter.equalsIgnoreCase("periodic")){
+		} else if (parameter.equalsIgnoreCase("periodic")){
 			return TaskType.PERIODIC;
-		}else{
+		} else {
 			return TaskType.INVALID;
 		}
 	}
 	
 	public static int parseIntegerParameter(String parameters){
-		if (parameters==null || parameters.equals("")){
+		if (parameters == null || parameters.equals("")){
 			return -1;
-		}else{
+		} else {
 			parameters=parameters.trim();
 			if (parameters.matches("[0-9]+")){
 				return Integer.parseInt(parameters);
-			}else{
+			} else {
 				return -1;
 			}
 		}
@@ -90,7 +90,7 @@ class CommandParser {
 		if (!parameterList.peek().matches("-\\S+")){
 			throw new CEOException(CEOException.INVALID_PARA);
 		}
-		String parameterType=null;
+		String parameterType = null;
 		StringBuffer parameter = new StringBuffer();
 		while(!parameterList.isEmpty()){
 			String parameterString = parameterList.poll();
@@ -101,14 +101,14 @@ class CommandParser {
 				}
 				if (parameterString.matches("--\\w+")){
 					parameterType=parameterString.substring(2);
-				}else if (parameterString.matches("-[A-Z]")){
+				} else if (parameterString.matches("-[A-Z]")){
 					parameterType=parameterString.substring(1);
 				}
-			}else{
+			} else {
 				parameter.append(parameterString).append(' ');
 			}
 		}
-		if (parameterType!=null){
+		if (parameterType != null){
 			parameterMap.put(parameterType, parameter.toString().trim());
 		}
 		return parameterMap;
@@ -117,7 +117,7 @@ class CommandParser {
 	public static String getParameter(String parameterType, Map<String, String> parameterMap){
 		if (parameterMap.containsKey(parameterType)){
 			String value=parameterMap.get(parameterType);
-			if (value==null){
+			if (value == null){
 				return "";
 			}else{
 				return value;
@@ -185,7 +185,7 @@ class CommandParser {
 	
 	public static Date[] getTime(String timeString) throws CEOException{
 		Date[] time = new Date[2];
-		time[0]=null; time[1]=null;
+		time[0] = null; time[1] = null;
 		if (timeString != null){
 			Pattern p = Pattern.compile("\\d{4}/\\d{2}/\\d{2}/\\d{2}:\\d{2}");
 			Matcher m = p.matcher(timeString);
@@ -211,13 +211,13 @@ class CommandParser {
 	
 	
 	public static boolean parseComplete(String complete) throws CEOException{
-		if (complete==null){
+		if (complete == null){
 			return false;
-		}else if (complete.equalsIgnoreCase("true")){
+		} else if (complete.equalsIgnoreCase("true")){
 			return true;
-		}else if (complete.equalsIgnoreCase("false")){
+		} else if (complete.equalsIgnoreCase("false")){
 			return false;
-		}else{
+		} else {
 			throw new CEOException(CEOException.INVALID_COMPLETE);
 		}
 	}
