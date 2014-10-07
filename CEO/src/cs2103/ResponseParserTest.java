@@ -3,7 +3,10 @@ package cs2103;
 import static org.junit.Assert.*;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.TimeZone;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -32,12 +35,12 @@ public class ResponseParserTest {
 	}
 	
 	@Test
-	public void testParseListResponseThreeTasks() throws CEOException, ParseException {
+	public void testParseAllListResponseThreeTasks() throws CEOException, ParseException {
 		ArrayList<Task> taskList = new ArrayList<Task>();
 		taskList.add(new FloatingTask(null, "Eating", false));
-		//taskList.add(new DeadlineTask(null, "Pooping", CommandParser.stringToDate("2014/09/28/23:59"), false));
-		//taskList.add(new PeriodicTask(null, "Drinking", CommandParser.stringToDate("2014/09/28/23:59"),
-		//		CommandParser.stringToDate("2014/10/28/23:59"),null, null));
+		taskList.add(new DeadlineTask(null, "Pooping", stringToDate("2014/09/28/23:59"), false));
+		taskList.add(new PeriodicTask(null, "Drinking", null, stringToDate("2014/09/28/23:59"),
+				stringToDate("2014/10/28/23:59"), null));
 		assertEquals("Here shows task list for type ALL\n"
 				+ "0. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action\n\n"
 				+ "0. Pooping\nType: Deadline\t\t\t\t\tStatus: Needs Action	Due At: Sep 28, 2014 11:59:00 PM\n\n"
@@ -45,7 +48,30 @@ public class ResponseParserTest {
 				, 
 				ResponseParser.parseAllListResponse(taskList));
 	}
-
+	@Test
+	public void testParseFloatingListResponse() {
+		
+	}
+	
+	@Test
+	public void testParseDeadlineListResponse() {
+		
+	}
+	
+	@Test
+	public void testParsePeriodicListResponse() {
+		
+	}
+	
+	@Test 
+	public void testAlertDeadline() {
+		
+	}
+	
+	@Test
+	public void testAlertPeriodic(){
+		
+	}
 	
 	@Test 
 	public void testParseShowDetailResponseNull() {
@@ -80,5 +106,20 @@ public class ResponseParserTest {
 				+ "Location: Hawker Center\n"
 				+ "Description: Eating Chicken Rice",
 				ResponseParser.parseShowDetailResponse(task, taskID));		
+	}
+	
+	// Used to create tasks for testing
+	private static Date stringToDate(String timeString) throws CEOException{
+		if (timeString == null){
+			return null;
+		}
+		try {
+			TimeZone tz=TimeZone.getDefault();
+			SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd/HH:mm");
+			dateFormat.setTimeZone(tz);
+			return dateFormat.parse(timeString);
+		} catch (ParseException e) {
+			throw new CEOException(CEOException.INVALID_TIME);
+		}
 	}
 }
