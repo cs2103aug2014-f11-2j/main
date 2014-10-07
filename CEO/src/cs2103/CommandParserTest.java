@@ -75,12 +75,12 @@ public class CommandParserTest {
 	public void testParseIntegerParameter() {
 		assertEquals(-1, CommandParser.parseIntegerParameter(""));
 		assertEquals(-1, CommandParser.parseIntegerParameter(null));
-		assertEquals(9, CommandParser.parseIntegerParameter("9"));
+		assertEquals(-1, CommandParser.parseIntegerParameter("9m"));
 		assertEquals(0, CommandParser.parseIntegerParameter("0"));
-		assertEquals(5, CommandParser.parseIntegerParameter("5"));
+		assertEquals(-1, CommandParser.parseIntegerParameter("123v5"));
 		assertEquals(-1, CommandParser.parseIntegerParameter("-1"));
 		assertEquals(15, CommandParser.parseIntegerParameter("15"));
-		assertEquals(999, CommandParser.parseIntegerParameter("999")); // should there be a limit?
+		assertEquals(-1, CommandParser.parseIntegerParameter("re34fs"));
 	}
 	
 	@Test 

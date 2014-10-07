@@ -12,24 +12,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ResponseParserTest {
-
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
-
-	@Before
-	public void setUp() throws Exception {
-		//ArrayList<Task> taskList = new ArrayList<Task>();
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		
-	}
 	
 	@Test
 	public void testParseListResponseThreeTasks() throws CEOException, ParseException {
