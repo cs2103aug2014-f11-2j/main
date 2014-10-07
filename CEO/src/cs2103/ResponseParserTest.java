@@ -15,51 +15,67 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ResponseParserTest {
-
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
-
-	@Before
-	public void setUp() throws Exception {
-		//ArrayList<Task> taskList = new ArrayList<Task>();
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		
+	
+	@Test
+	public void testParseAllListResponseNoTasks() throws CEOException, ParseException {
+		ArrayList<Task> taskList = new ArrayList<Task>();
+		assertEquals("The task list is empty", ResponseParser.parseAllListResponse(taskList));
 	}
 	
 	@Test
-	public void testParseAllListResponseThreeTasks() throws CEOException, ParseException {
+	public void testParseAllListResponseWithTasks() throws CEOException, ParseException {
 		ArrayList<Task> taskList = new ArrayList<Task>();
 		taskList.add(new FloatingTask(null, "Eating", false));
 		taskList.add(new DeadlineTask(null, "Pooping", stringToDate("2014/09/28/23:59"), false));
 		taskList.add(new PeriodicTask(null, "Drinking", null, stringToDate("2014/09/28/23:59"),
 				stringToDate("2014/10/28/23:59"), null));
-		assertEquals("Here shows task list for type ALL\n"
-				+ "0. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action\n\n"
-				+ "0. Pooping\nType: Deadline\t\t\t\t\tStatus: Needs Action	Due At: Sep 28, 2014 11:59:00 PM\n\n"
-				+ "0. Drinking\nType: Periodic\t\t\t\t\tFrom: Sep 28, 2014 11:59:00 PM To Oct 28, 2014 11:59:00 PM"
+		assertEquals(//"Here shows task list for type ALL\n"
+				 "1. Eating\nType: Floating\t\tStatus: Needs Action\n"
+				+ "2. Pooping\nType: Deadline\t\tStatus: Needs Action	Due At: Sep 28, 2014 11:59:00 PM\n"
+				+ "3. Drinking\nType: Periodic\t\tFrom: Sep 28, 2014 11:59:00 PM To Oct 28, 2014 11:59:00 PM"
 				, 
 				ResponseParser.parseAllListResponse(taskList));
 	}
+	
 	@Test
-	public void testParseFloatingListResponse() {
+	public void testParseFloatingListResponseNoTasks() {
+		ArrayList<FloatingTask> taskList = new ArrayList<FloatingTask>();
+		assertEquals("The task list is empty", ResponseParser.parseFloatingListResponse(taskList));
+	}
+	
+	@Test
+	public void testParseFloatingListResponseWithTasks() throws CEOException {
+		ArrayList<FloatingTask> taskList = new ArrayList<FloatingTask>();
+		taskList.add(new FloatingTask(null, "Eating", false));
+		taskList.add(new FloatingTask(null, "Drinking", false));
+		assertEquals("1. Eating\nType: Floating\t\tStatus: Needs Action\n"
+				+ "2. Drinking\nType: Floating\t\tStatus: Needs Action"
+				, ResponseParser.parseFloatingListResponse(taskList));
+	}
+	
+	@Test
+	public void testParseDeadlineListResponseNoTasks() {
+		ArrayList<DeadlineTask> taskList = new ArrayList<DeadlineTask>();
+		assertEquals("The task list is empty", ResponseParser.parseDeadlineListResponse(taskList));
+	}
+	
+	@Test
+	public void testParseDeadlineListResponseWithTasks() throws CEOException {
+		ArrayList<DeadlineTask> taskList = new ArrayList<DeadlineTask>();
+		taskList.add(new DeadlineTask(null, "Pooping", stringToDate("2014/09/28/23:59"), false));
+		taskList.add(new DeadlineTask(null, "Wiping", stringToDate("2014/09/29/23:59"), false));
+		assertEquals("2. Pooping\nType: Deadline\t\tStatus: Needs Action	Due At: Sep 28, 2014 11:59:00 PM\n" 
+				+ "2. Wiping\nType: Deadline\t\tStatus: Needs Action	Due At: Sep 29, 2014 11:59:00 PM\n"
+				, ResponseParser.parseDeadlineListResponse(taskList));
+	}
+	
+	@Test
+	public void testParsePeriodicListResponseNoTasks() {
 		
 	}
 	
 	@Test
-	public void testParseDeadlineListResponse() {
-		
-	}
-	
-	@Test
-	public void testParsePeriodicListResponse() {
+	public void testParsePeriodicListResponseWithTasks() {
 		
 	}
 	
@@ -90,7 +106,7 @@ public class ResponseParserTest {
 		Task task = new FloatingTask(null, "Eating", false);
 		int taskID = 1;
 		assertEquals("The details for Task 1:\n"
-				+ "0. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action\n\n"
+				+ "1. Eating\nType: Floating\t\tStatus: Needs Action\n"
 				+ "Location: null\n"
 				+ "Description: null",
 				ResponseParser.parseShowDetailResponse(task, taskID));		
@@ -102,7 +118,7 @@ public class ResponseParserTest {
 		task.updateDescription("Eating Chicken Rice");
 		int taskID = 1;
 		assertEquals("The details for Task 1:\n"
-				+ "0. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action\n\n"
+				+ "1. Eating\nType: Floating\t\tStatus: Needs Action\n"
 				+ "Location: Hawker Center\n"
 				+ "Description: Eating Chicken Rice",
 				ResponseParser.parseShowDetailResponse(task, taskID));		
