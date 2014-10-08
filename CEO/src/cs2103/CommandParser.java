@@ -94,7 +94,9 @@ class CommandParser {
 		Map<String,String> parameterMap = new HashMap<String, String>();
 		while(!parameterList.isEmpty()){
 			String[] splitResult = splitFirstWord(parameterList.poll());
-			parameterMap.put(splitResult[0], splitResult[1]);
+			if (splitResult[0] != null){
+				parameterMap.put(splitResult[0], splitResult[1]);
+			}
 		}
 		return parameterMap;
 	}
@@ -224,8 +226,8 @@ class CommandParser {
 			result[0] = parameterString;
 			return result;
 		}else{
-			result[0] = parameterString.substring(0, spaceIndex);
-			result[1] = parameterString.substring(spaceIndex);
+			result[0] = parameterString.substring(0, spaceIndex).trim();
+			result[1] = parameterString.substring(spaceIndex).trim();
 			return result;
 		}
 	}
