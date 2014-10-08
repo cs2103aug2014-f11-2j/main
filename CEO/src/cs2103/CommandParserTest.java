@@ -9,7 +9,7 @@ import org.junit.Test;
 
 
 public class CommandParserTest {
-
+	
 	@Test
 	public void testSeperateCommandNoParameters() {
 		Queue<String> expected = new LinkedList<String>();

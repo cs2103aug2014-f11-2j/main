@@ -22,10 +22,14 @@ class CommandParser {
 	}
 	
 	public static Queue<String> separateCommand(String userInput) {
-		String[] parameters = userInput.trim().split("\\s+");
+		String[] parameters = userInput.trim().split("\\s+-");
+		String[] command = parameters[0].split("\\s+");
 		Queue<String> result = new LinkedList<String>();
-		for (String s:parameters){
+		for (String s:command){
 			result.add(s.trim());
+		}
+		for (int i = 1;i < parameters.length; i++){
+			result.add(removeDash(parameters[i]));
 		}
 		return result;
 	}
@@ -86,30 +90,11 @@ class CommandParser {
 	}
 	
 	public static Map<String,String> separateParameters(Queue<String> parameterList) throws CEOException{
+		if (parameterList == null) throw new CEOException(CEOException.INVALID_PARA);
 		Map<String,String> parameterMap = new HashMap<String, String>();
-		if (!parameterList.peek().matches("-\\S+")){
-			throw new CEOException(CEOException.INVALID_PARA);
-		}
-		String parameterType = null;
-		StringBuffer parameter = new StringBuffer();
 		while(!parameterList.isEmpty()){
-			String parameterString = parameterList.poll();
-			if (parameterString.matches("--\\w+|-[A-Z]")){
-				if (parameterType!=null){
-					parameterMap.put(parameterType, parameter.toString().trim());
-					parameter=new StringBuffer();
-				}
-				if (parameterString.matches("--\\w+")){
-					parameterType=parameterString.substring(2);
-				} else if (parameterString.matches("-[A-Z]")){
-					parameterType=parameterString.substring(1);
-				}
-			} else {
-				parameter.append(parameterString).append(' ');
-			}
-		}
-		if (parameterType != null){
-			parameterMap.put(parameterType, parameter.toString().trim());
+			String[] splitResult = splitFirstWord(parameterList.poll());
+			parameterMap.put(splitResult[0], splitResult[1]);
 		}
 		return parameterMap;
 	}
@@ -222,6 +207,29 @@ class CommandParser {
 		}
 	}
 	
+	private static String removeDash(String parameterString){
+		if (parameterString.startsWith("-")){
+			return parameterString.substring(1);
+		}else{
+			return parameterString;
+		}
+	}
+	
+	private static String[] splitFirstWord(String parameterString){
+		String[] result = new String[2];
+		result[0] = null; result[1] = null;
+		if (parameterString == null || parameterString.equals("")) return result;
+		int spaceIndex = parameterString.indexOf(' ');
+		if (spaceIndex == -1){
+			result[0] = parameterString;
+			return result;
+		}else{
+			result[0] = parameterString.substring(0, spaceIndex);
+			result[1] = parameterString.substring(spaceIndex);
+			return result;
+		}
+	}
+	
 	private static Date stringToDate(String timeString) throws CEOException{
 		if (timeString == null){
 			return null;
@@ -236,7 +244,6 @@ class CommandParser {
 		}
 	}
 	
-
 	public static Recur stringToRecur(String recurrence) throws CEOException{
 		if (recurrence == null || recurrence.equals("")){
 			return null;
