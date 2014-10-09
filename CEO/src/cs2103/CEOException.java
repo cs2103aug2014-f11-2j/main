@@ -12,6 +12,7 @@ class CEOException extends Exception {
 	public static final String WRITE_ERROR = "WRITE_ERROR";
 	public static final String READ_ERROR = "READ_ERROR";
 	public static final String INVALID_PARA = "INVALID_PARAMETER";
+	public static final String INVALID_CMD = "INVALID_COMMAND";
 	public static final String INVALID_COMPLETE = "INVALID_COMPLETE";
 	public static final String LESS_THAN_ONE_PARA = "LESS_THAN_ONE_PARAMETER";
 	public static final String INVALID_RECUR = "INVALID_RECURRENCE";

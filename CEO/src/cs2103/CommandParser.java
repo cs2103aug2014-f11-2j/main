@@ -17,19 +17,33 @@ class CommandParser {
 	public static enum CommandType {
 		ADD, LIST, SHOWDETAIL, DELETE, UPDATE, EXIT, INVALID, UNDO, REDO;
 	}
+	
 	public static enum TaskType {
 		ALL, FLOATING, DEADLINE, PERIODIC, INVALID;
 	}
 	
-	public static Queue<String> separateCommand(String userInput) {
-		String[] parameters = userInput.trim().split("\\s+-");
-		String[] command = parameters[0].split("\\s+");
+	private static String[] multiParameterCommands = {"add", "update", "search"};
+	private static String[] allowedSeparateLiteral = {"\\s+-", "\\s+/", ";"};
+	
+	public static Queue<String> separateCommand(String userInput) throws CEOException {
+		if (userInput == null) throw new CEOException(CEOException.INVALID_CMD);
 		Queue<String> result = new LinkedList<String>();
-		for (String s:command){
-			result.add(s.trim());
-		}
-		for (int i = 1;i < parameters.length; i++){
-			result.add(removeDash(parameters[i]));
+		if (checkMultiParameter(splitFirstWord(userInput)[0])){
+			String[] parameters = splitMultiParameter(userInput);
+			String[] command = splitFirstWord(parameters[0]);
+			for (String s:command){
+				result.add(s.trim());
+			}
+			for (int i = 1;i < parameters.length; i++){
+				result.add(removeDash(parameters[i]));
+			}
+		} else {
+			String[] command = splitFirstWord(userInput);
+			for (String s:command){
+				if (s != null){
+					result.add(s.trim());
+				}
+			}
 		}
 		return result;
 	}
@@ -209,7 +223,28 @@ class CommandParser {
 		}
 	}
 	
-	private static String removeDash(String parameterString){
+	private static boolean checkMultiParameter(String commandType) throws CEOException{
+		if (commandType == null) throw new CEOException(CEOException.INVALID_CMD);
+		for (String s:multiParameterCommands){
+			if (commandType.equalsIgnoreCase(s)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private static String[] splitMultiParameter(String userInput) throws CEOException{
+		if (userInput == null) throw new CEOException(CEOException.INVALID_CMD);
+		String[] parameters;
+		for (String regex:allowedSeparateLiteral){
+			parameters = userInput.trim().split(regex);
+			if (parameters.length > 1) return parameters;
+		}
+		throw new CEOException(CEOException.LESS_THAN_ONE_PARA);
+	}
+	
+	private static String removeDash(String parameterString) throws CEOException{
+		if (parameterString == null) throw new CEOException(CEOException.INVALID_PARA);
 		if (parameterString.startsWith("-")){
 			return parameterString.substring(1);
 		}else{
@@ -217,15 +252,17 @@ class CommandParser {
 		}
 	}
 	
-	private static String[] splitFirstWord(String parameterString){
-		String[] result = new String[2];
-		result[0] = null; result[1] = null;
-		if (parameterString == null || parameterString.equals("")) return result;
+	private static String[] splitFirstWord(String parameterString) throws CEOException{
+		if (parameterString == null) throw new CEOException(CEOException.INVALID_PARA);
+		String[] result;
+		if (parameterString == null || parameterString.equals("")) return null;
 		int spaceIndex = parameterString.indexOf(' ');
 		if (spaceIndex == -1){
+			result = new String[1];
 			result[0] = parameterString;
 			return result;
 		}else{
+			result = new String[2];
 			result[0] = parameterString.substring(0, spaceIndex).trim();
 			result[1] = parameterString.substring(spaceIndex).trim();
 			return result;

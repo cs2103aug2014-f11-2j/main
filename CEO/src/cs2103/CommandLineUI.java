@@ -64,34 +64,38 @@ public class CommandLineUI {
 	}
 	
 	private String takeUserInput() {
-		String userInput = scanner.nextLine();
-		Queue<String> separateResult=CommandParser.separateCommand(userInput);
-		String commandTypeString = separateResult.poll();
-		if (commandTypeString==null || commandTypeString.equals("")){
-			return MESSAGE_COMMAND_ERROR;
-		} else {
-			CommandParser.CommandType commandType = CommandParser.determineCommandType(commandTypeString);
-			switch (commandType){
-			case LIST:
-				return list(separateResult.poll());
-			case UPDATE:
-				return update(separateResult);
-			case EXIT:
-				return "EXIT";
-			case ADD:
-				return add(separateResult);
-			case DELETE:
-				return delete(separateResult.poll());
-			case SHOWDETAIL:
-				return show(separateResult.poll());
-			case UNDO:
-				return undo(separateResult.poll());
-			case REDO:
-				return redo(separateResult.poll());
-			case INVALID:
-			default:
+		try {
+			String userInput = scanner.nextLine();
+			Queue<String> separateResult = CommandParser.separateCommand(userInput);
+			String commandTypeString = separateResult.poll();
+			if (commandTypeString==null || commandTypeString.equals("")){
 				return MESSAGE_COMMAND_ERROR;
+			} else {
+				CommandParser.CommandType commandType = CommandParser.determineCommandType(commandTypeString);
+				switch (commandType){
+				case LIST:
+					return list(separateResult.poll());
+				case UPDATE:
+					return update(separateResult);
+				case EXIT:
+					return "EXIT";
+				case ADD:
+					return add(separateResult);
+				case DELETE:
+					return delete(separateResult.poll());
+				case SHOWDETAIL:
+					return show(separateResult.poll());
+				case UNDO:
+					return undo(separateResult.poll());
+				case REDO:
+					return redo(separateResult.poll());
+				case INVALID:
+				default:
+					return MESSAGE_COMMAND_ERROR;
+				}
 			}
+		} catch (CEOException e) {
+			return MESSAGE_COMMAND_ERROR;
 		}
 	}
 	
