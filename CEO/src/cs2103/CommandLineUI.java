@@ -49,23 +49,32 @@ public class CommandLineUI {
 	}
 	
 	private void userLoop() {
-		String feedback;
 		alertTask();
 		updateTimeFromRecur();
 		while (true) {
 			printPrompt(MESSAGE_USER_PROMPT);
-			feedback=takeUserInput();
-			if (feedback.equalsIgnoreCase("EXIT")){
-				print(MESSAGE_EXIT);
-				break;
+			String command = takeUserInput();
+			if (command != null){
+				String feedback=processUserInput(command);
+				if (feedback.equalsIgnoreCase("EXIT")){
+					print(MESSAGE_EXIT);
+					break;
+				}
+				print(feedback);
 			}
-			print(feedback);
 		}
 	}
 	
-	private String takeUserInput() {
+	private String takeUserInput(){
+		String userInput = scanner.nextLine();
+		if (userInput.equals("")){
+			userInput = null;
+		}
+		return userInput;
+	}
+	
+	private String processUserInput(String userInput) {
 		try {
-			String userInput = scanner.nextLine();
 			Queue<String> separateResult = CommandParser.separateCommand(userInput);
 			String commandTypeString = separateResult.poll();
 			if (commandTypeString==null || commandTypeString.equals("")){

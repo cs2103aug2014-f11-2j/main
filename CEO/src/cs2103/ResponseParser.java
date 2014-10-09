@@ -167,7 +167,7 @@ public class ResponseParser {
 		sb.append(task.getTaskID()).append(". ").append(task.getTitle()).append("\n");
 		sb.append(STRING_TYPE);
 		sb.append(TYPE_FLOATING);
-		sb.append("\t\tStatus: ");
+		sb.append("\tStatus: ");
 		sb.append(completeToString(task.getComplete()));
 		return sb.append("\n").toString();
 	}
@@ -178,7 +178,7 @@ public class ResponseParser {
 		sb.append(task.getTaskID()).append(". ").append(task.getTitle()).append("\n");
 		sb.append(STRING_TYPE);
 		sb.append(TYPE_DEADLINE);
-		sb.append("\t\tStatus: ");
+		sb.append("\tStatus: ");
 		sb.append(completeToString(task.getComplete()));
 		sb.append("\tDue At: ");
 		sb.append(dateToString(task.getDueTime()));
@@ -195,7 +195,7 @@ public class ResponseParser {
 		} else {
 			sb.append(TYPE_RECURRING);
 		}
-		sb.append("\t\tFrom: ");
+		sb.append("\tFrom: ");
 		sb.append(dateToString(task.getStartTime()));
 		sb.append(" To ");
 		sb.append(dateToString(task.getEndTime()));
