@@ -143,9 +143,9 @@ public class CommandLineUI {
 	}
 	
 	private String show(String parameters) {
-		int taskID=CommandParser.parseIntegerParameter(parameters);
 		String response;
 		try {
+			int taskID=CommandParser.parseIntegerParameter(parameters);
 			response=ResponseParser.parseShowDetailResponse(executor.showTaskDetail(taskID),taskID);
 		} catch (CEOException e) {
 			response = String.format(MESSAGE_SHOW_ERROR_FORMAT, parameters);
@@ -154,9 +154,9 @@ public class CommandLineUI {
 	}
 
 	private String delete(String parameter) {
-		int taskID=CommandParser.parseIntegerParameter(parameter);
 		String response;
 		try {
+			int taskID=CommandParser.parseIntegerParameter(parameter);
 			executor.deleteTask(taskID);
 			response = String.format(MESSAGE_DELETE_FORMAT, parameter);
 		} catch (CEOException e) {
@@ -194,9 +194,9 @@ public class CommandLineUI {
 	}
 	
 	private String undo(String parameter) {
-		int count = CommandParser.parseIntegerParameter(parameter);
 		int result = 0;
 		try {
+			int count = CommandParser.parseIntegerParameter(parameter);
 			result = executor.undoTasks(count);
 		} catch (CEOException e) {
 			e.printStackTrace();
@@ -205,9 +205,9 @@ public class CommandLineUI {
 	}
 	
 	private String redo(String parameter) {
-		int count = CommandParser.parseIntegerParameter(parameter);
 		int result = 0;
 		try {
+			int count = CommandParser.parseIntegerParameter(parameter);
 			result = executor.redoTasks(count);
 		} catch (CEOException e) {
 			e.printStackTrace();

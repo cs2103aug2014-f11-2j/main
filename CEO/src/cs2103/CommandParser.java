@@ -26,7 +26,7 @@ class CommandParser {
 	private static String[] allowedSeparateLiteral = {"\\s+-", "\\s+/", ";"};
 	
 	public static Queue<String> separateCommand(String userInput) throws CEOException {
-		if (userInput == null) throw new CEOException(CEOException.INVALID_CMD);
+		checkNullString(userInput, CEOException.INVALID_CMD);
 		Queue<String> result = new LinkedList<String>();
 		if (checkMultiParameter(splitFirstWord(userInput)[0])){
 			String[] parameters = splitMultiParameter(userInput);
@@ -90,16 +90,13 @@ class CommandParser {
 		}
 	}
 	
-	public static int parseIntegerParameter(String parameters){
-		if (parameters == null || parameters.equals("")){
-			return -1;
+	public static int parseIntegerParameter(String parameter) throws CEOException{
+		checkNullString(parameter, CEOException.INVALID_PARA);
+		parameter = parameter.trim();
+		if (parameter.matches("[0-9]+")){
+			return Integer.parseInt(parameter);
 		} else {
-			parameters=parameters.trim();
-			if (parameters.matches("[0-9]+")){
-				return Integer.parseInt(parameters);
-			} else {
-				return -1;
-			}
+			return -1;
 		}
 	}
 	
@@ -223,8 +220,12 @@ class CommandParser {
 		}
 	}
 	
+	private static void checkNullString(String str, String expectedException) throws CEOException{
+		if (str == null || str.equals("")) throw new CEOException(expectedException);
+	}
+	
 	private static boolean checkMultiParameter(String commandType) throws CEOException{
-		if (commandType == null) throw new CEOException(CEOException.INVALID_CMD);
+		checkNullString(commandType, CEOException.INVALID_CMD);
 		for (String s:multiParameterCommands){
 			if (commandType.equalsIgnoreCase(s)){
 				return true;
@@ -234,7 +235,7 @@ class CommandParser {
 	}
 	
 	private static String[] splitMultiParameter(String userInput) throws CEOException{
-		if (userInput == null) throw new CEOException(CEOException.INVALID_CMD);
+		checkNullString(userInput, CEOException.INVALID_CMD);
 		String[] parameters;
 		for (String regex:allowedSeparateLiteral){
 			parameters = userInput.trim().split(regex);
@@ -244,7 +245,7 @@ class CommandParser {
 	}
 	
 	private static String removeDash(String parameterString) throws CEOException{
-		if (parameterString == null) throw new CEOException(CEOException.INVALID_PARA);
+		checkNullString(parameterString, CEOException.INVALID_PARA);
 		if (parameterString.startsWith("-")){
 			return parameterString.substring(1);
 		}else{
@@ -253,7 +254,7 @@ class CommandParser {
 	}
 	
 	private static String[] splitFirstWord(String parameterString) throws CEOException{
-		if (parameterString == null) throw new CEOException(CEOException.INVALID_PARA);
+		checkNullString(parameterString, CEOException.INVALID_PARA);
 		String[] result;
 		if (parameterString == null || parameterString.equals("")) return null;
 		int spaceIndex = parameterString.indexOf(' ');
