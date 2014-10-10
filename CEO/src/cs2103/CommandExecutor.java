@@ -14,6 +14,7 @@ import net.fortuna.ical4j.util.UidGenerator;
 
 
 class CommandExecutor {
+	private static CommandExecutor executor;
 	private final StorageEngine storage;
 	private ArrayList<Task> taskList;
 	private Stack<TaskBackup> undoStack;
@@ -23,9 +24,16 @@ class CommandExecutor {
 		ADD, DELETE, UPDATE;
 	}
 	
-	public CommandExecutor(String dataFile) throws CEOException{
-		this.storage = new StorageEngine(dataFile);
+	private CommandExecutor(String dataFile) throws CEOException{
+		this.storage = StorageEngine.getInstance(dataFile);
 		this.taskList = storage.getTaskList();
+	}
+	
+	public static CommandExecutor getInstance(String dataFile) throws CEOException{
+		if (executor == null){
+			executor = new CommandExecutor(dataFile);
+		}
+		return executor;
 	}
 	
 	public void addTask(String title, String description, String location, Date startTime, Date endTime, Recur recurrence) throws CEOException{

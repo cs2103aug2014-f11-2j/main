@@ -34,12 +34,12 @@ import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.util.CompatibilityHints;
 
 class StorageEngine {
-
+	private static StorageEngine storage;
 	private net.fortuna.ical4j.model.Calendar calendar;
 	private IndexedComponentList indexedComponents;
 	private final File file;
 	
-	public StorageEngine(String dataFile) throws CEOException{
+	private StorageEngine(String dataFile) throws CEOException{
 		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION,true);
 		if (dataFile == null){
 			dataFile = "default.ics";
@@ -48,6 +48,13 @@ class StorageEngine {
 		if (!file.exists() || file.length()==0){
 			createNewFile();
 		}
+	}
+	
+	public static StorageEngine getInstance(String dataFile) throws CEOException{
+		if (storage == null){
+			storage = new StorageEngine(dataFile);
+		}
+		return storage;
 	}
 	
 	public ArrayList<Task> getTaskList() throws CEOException{

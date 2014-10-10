@@ -26,10 +26,18 @@ public class CommandLineUI {
 	
 	private final CommandExecutor executor;
 	private Scanner scanner = new Scanner(System.in);
+	private static CommandLineUI commandLine;
 	
-	public CommandLineUI(String dataFile) throws CEOException{
-		this.executor = new CommandExecutor(dataFile);
+	private CommandLineUI(String dataFile) throws CEOException{
+		this.executor = CommandExecutor.getInstance(dataFile);
 		print(String.format(MESSAGE_WELCOME_FORMAT, dataFile));
+	}
+	
+	public static CommandLineUI getInstance(String dataFile) throws CEOException{
+		if (commandLine == null){
+			commandLine = new CommandLineUI(dataFile);
+		}
+		return commandLine;
 	}
 	
 	public static void main(String[] args){
@@ -37,11 +45,11 @@ public class CommandLineUI {
 		try{
 			if (args.length > 1){
 				System.err.println("Incorrect Argument");
-				main = new CommandLineUI(args[0]);
+				main = CommandLineUI.getInstance(args[0]);
 			}else if (args.length == 1){
-				main = new CommandLineUI(args[0]);
+				main = CommandLineUI.getInstance(args[0]);
 			}else{
-				main = new CommandLineUI("default.ics");
+				main = CommandLineUI.getInstance("default.ics");
 			}
 		main.userLoop();
 		} catch (CEOException e){
