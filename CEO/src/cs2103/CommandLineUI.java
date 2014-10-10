@@ -49,49 +49,62 @@ public class CommandLineUI {
 	}
 	
 	private void userLoop() {
-		String feedback;
 		alertTask();
 		updateTimeFromRecur();
 		while (true) {
 			printPrompt(MESSAGE_USER_PROMPT);
-			feedback=takeUserInput();
-			if (feedback.equalsIgnoreCase("EXIT")){
-				print(MESSAGE_EXIT);
-				break;
+			String command = takeUserInput();
+			if (command != null){
+				String feedback=processUserInput(command);
+				if (feedback.equalsIgnoreCase("EXIT")){
+					print(MESSAGE_EXIT);
+					break;
+				}
+				print(feedback);
 			}
-			print(feedback);
 		}
 	}
 	
-	private String takeUserInput() {
+	private String takeUserInput(){
 		String userInput = scanner.nextLine();
-		Queue<String> separateResult=CommandParser.separateCommand(userInput);
-		String commandTypeString = separateResult.poll();
-		if (commandTypeString==null || commandTypeString.equals("")){
-			return MESSAGE_COMMAND_ERROR;
-		}else{
-			CommandParser.CommandType commandType = CommandParser.determineCommandType(commandTypeString);
-			switch (commandType){
-			case LIST:
-				return list(separateResult.poll());
-			case UPDATE:
-				return update(separateResult);
-			case EXIT:
-				return "EXIT";
-			case ADD:
-				return add(separateResult);
-			case DELETE:
-				return delete(separateResult.poll());
-			case SHOWDETAIL:
-				return show(separateResult.poll());
-			case UNDO:
-				return undo(separateResult.poll());
-			case REDO:
-				return redo(separateResult.poll());
-			case INVALID:
-			default:
+		if (userInput.equals("")){
+			userInput = null;
+		}
+		return userInput;
+	}
+	
+	private String processUserInput(String userInput) {
+		try {
+			Queue<String> separateResult = CommandParser.separateCommand(userInput);
+			String commandTypeString = separateResult.poll();
+			if (commandTypeString==null || commandTypeString.equals("")){
 				return MESSAGE_COMMAND_ERROR;
+			} else {
+				CommandParser.CommandType commandType = CommandParser.determineCommandType(commandTypeString);
+				switch (commandType){
+				case LIST:
+					return list(separateResult.poll());
+				case UPDATE:
+					return update(separateResult);
+				case EXIT:
+					return "EXIT";
+				case ADD:
+					return add(separateResult);
+				case DELETE:
+					return delete(separateResult.poll());
+				case SHOWDETAIL:
+					return show(separateResult.poll());
+				case UNDO:
+					return undo(separateResult.poll());
+				case REDO:
+					return redo(separateResult.poll());
+				case INVALID:
+				default:
+					return MESSAGE_COMMAND_ERROR;
+				}
 			}
+		} catch (CEOException e) {
+			return MESSAGE_COMMAND_ERROR;
 		}
 	}
 	
@@ -139,9 +152,9 @@ public class CommandLineUI {
 	}
 	
 	private String show(String parameters) {
-		int taskID=CommandParser.parseIntegerParameter(parameters);
 		String response;
 		try {
+			int taskID=CommandParser.parseIntegerParameter(parameters);
 			response=ResponseParser.parseShowDetailResponse(executor.showTaskDetail(taskID),taskID);
 		} catch (CEOException e) {
 			response = String.format(MESSAGE_SHOW_ERROR_FORMAT, parameters);
@@ -150,9 +163,9 @@ public class CommandLineUI {
 	}
 
 	private String delete(String parameter) {
-		int taskID=CommandParser.parseIntegerParameter(parameter);
 		String response;
 		try {
+			int taskID=CommandParser.parseIntegerParameter(parameter);
 			executor.deleteTask(taskID);
 			response = String.format(MESSAGE_DELETE_FORMAT, parameter);
 		} catch (CEOException e) {
@@ -177,7 +190,7 @@ public class CommandLineUI {
 			Date[] time = CommandParser.getTime(timeString);
 			Recur recur = CommandParser.stringToRecur(recurString);
 			boolean complete = CommandParser.parseComplete(completeString);
-			if (title==null && description==null && location==null && completeString==null && timeString==null && recurString==null){
+			if (title == null && description == null && location == null && completeString == null && timeString == null && recurString == null){
 				throw new CEOException(CEOException.LESS_THAN_ONE_PARA);
 			}else{
 				executor.updateTask(taskID, title, description, location, complete, completeString != null, time, timeString != null, recur, recurString != null);
@@ -190,9 +203,9 @@ public class CommandLineUI {
 	}
 	
 	private String undo(String parameter) {
-		int count = CommandParser.parseIntegerParameter(parameter);
 		int result = 0;
 		try {
+			int count = CommandParser.parseIntegerParameter(parameter);
 			result = executor.undoTasks(count);
 		} catch (CEOException e) {
 			e.printStackTrace();
@@ -201,9 +214,9 @@ public class CommandLineUI {
 	}
 	
 	private String redo(String parameter) {
-		int count = CommandParser.parseIntegerParameter(parameter);
 		int result = 0;
 		try {
+			int count = CommandParser.parseIntegerParameter(parameter);
 			result = executor.redoTasks(count);
 		} catch (CEOException e) {
 			e.printStackTrace();

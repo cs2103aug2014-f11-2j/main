@@ -9,9 +9,9 @@ import org.junit.Test;
 
 
 public class CommandParserTest {
-
+	
 	@Test
-	public void testSeperateCommandNoParameters() {
+	public void testSeperateCommandNoParameters() throws CEOException {
 		Queue<String> expected = new LinkedList<String>();
 		Queue<String> actual = new LinkedList<String>();
 		expected.add("");
@@ -20,7 +20,7 @@ public class CommandParserTest {
 	}
 	
 	@Test
-	public void testSeperateCommandOneParameter() {
+	public void testSeperateCommandOneParameter() throws CEOException {
 		Queue<String> expected = new LinkedList<String>();
 		Queue<String> actual = new LinkedList<String>();
 		expected.add("add");
@@ -29,7 +29,7 @@ public class CommandParserTest {
 	}
 	
 	@Test
-	public void testSeperateCommandTwoParameters() {
+	public void testSeperateCommandTwoParameters() throws CEOException {
 		Queue<String> expected = new LinkedList<String>();
 		Queue<String> actual = new LinkedList<String>();
 		expected.add("add");
@@ -39,7 +39,7 @@ public class CommandParserTest {
 	}
 	
 	@Test
-	public void testSeperateCommandTwoParametersMultipleSpaces() {
+	public void testSeperateCommandTwoParametersMultipleSpaces() throws CEOException {
 		Queue<String> expected = new LinkedList<String>();
 		Queue<String> actual = new LinkedList<String>();
 		expected.add("add");
@@ -72,15 +72,15 @@ public class CommandParserTest {
 	
 	}
 	@Test
-	public void testParseIntegerParameter() {
+	public void testParseIntegerParameter() throws CEOException {
 		assertEquals(-1, CommandParser.parseIntegerParameter(""));
 		assertEquals(-1, CommandParser.parseIntegerParameter(null));
-		assertEquals(9, CommandParser.parseIntegerParameter("9"));
+		assertEquals(-1, CommandParser.parseIntegerParameter("9m"));
 		assertEquals(0, CommandParser.parseIntegerParameter("0"));
-		assertEquals(5, CommandParser.parseIntegerParameter("5"));
+		assertEquals(-1, CommandParser.parseIntegerParameter("123v5"));
 		assertEquals(-1, CommandParser.parseIntegerParameter("-1"));
 		assertEquals(15, CommandParser.parseIntegerParameter("15"));
-		assertEquals(999, CommandParser.parseIntegerParameter("999")); // should there be a limit?
+		assertEquals(-1, CommandParser.parseIntegerParameter("re34fs"));
 	}
 	
 	@Test 

@@ -32,9 +32,9 @@ class CommandExecutor {
 		Task task;
 		if (startTime == null && endTime == null){
 			task = new FloatingTask(null, title, false);
-		}else if (endTime==null){
+		} else if (endTime == null){
 			task = new DeadlineTask(null, title, startTime, false);
-		}else{
+		} else {
 			task = new PeriodicTask(null, title, location, startTime, endTime, recurrence);
 		}
 		task.updateDescription(description);
@@ -93,13 +93,13 @@ class CommandExecutor {
 		Task newTask;
 		if (timeFlag){
 			newTask = updateTaskType(task, time[0], time[1]);
-		}else{
+		} else {
 			newTask = copyTask(task);
 		}
 		if (title!=null){
 			if (title.equals("")){
 				throw new CEOException(CEOException.NO_TITLE);
-			}else{
+			} else {
 				newTask.updateTitle(title);
 			}
 		}
@@ -149,7 +149,7 @@ class CommandExecutor {
 		DateTime now = new DateTime();
 		if (task.getRecurrence() != null){
 			if (task.getStartTime().before(now)){
-				Date startTime = (task.getRecurrence().getNextDate(new net.fortuna.ical4j.model.DateTime(task.getStartTime()), now));
+				Date startTime = (task.getRecurrence().getNextDate(new DateTime(task.getStartTime()), now));
 				Date endTime = new Date(task.getEndTime().getTime() - task.getStartTime().getTime() + startTime.getTime());
 				task.updateTime(startTime, endTime);
 				this.taskList = storage.updateTask(task);
@@ -160,11 +160,11 @@ class CommandExecutor {
 	private Task copyTask(Task task) throws CEOException{
 		if (task instanceof DeadlineTask){
 			return new DeadlineTask(task.getTaskUID(),task.getTitle(),((DeadlineTask)task).getDueTime(), ((DeadlineTask)task).getComplete());
-		}else if (task instanceof FloatingTask){
+		} else if (task instanceof FloatingTask){
 			return new FloatingTask(task.getTaskUID(),task.getTitle(),((FloatingTask)task).getComplete());
-		}else if (task instanceof PeriodicTask){
+		} else if (task instanceof PeriodicTask){
 			return new PeriodicTask(task.getTaskUID(),task.getTitle(),((PeriodicTask)task).getLocation(), ((PeriodicTask)task).getStartTime(), ((PeriodicTask)task).getEndTime(), ((PeriodicTask)task).getRecurrence());
-		}else{
+		} else {
 			throw new CEOException(CEOException.INVALID_TASK_OBJ);
 		}
 	}
@@ -172,9 +172,9 @@ class CommandExecutor {
 	private Task updateTaskType(Task task, Date startTime, Date endTime) throws CEOException{
 		if (startTime == null && endTime == null){
 			return convertToFloating(task);
-		}else if (endTime == null){
+		} else if (endTime == null){
 			return convertToDeadline(task, startTime);
-		}else{
+		} else {
 			return convertToPeriodic(task, startTime, endTime);
 		}
 	}
@@ -182,11 +182,11 @@ class CommandExecutor {
 	private FloatingTask convertToFloating(Task task) throws CEOException{
 		if (task instanceof FloatingTask){
 			return new FloatingTask(task.getTaskUID(), task.getTitle(), ((FloatingTask)task).getComplete());
-		}else if (task instanceof DeadlineTask){
+		} else if (task instanceof DeadlineTask){
 			return new FloatingTask(task.getTaskUID(), task.getTitle(), ((DeadlineTask)task).getComplete());
-		}else if (task instanceof PeriodicTask){
+		} else if (task instanceof PeriodicTask){
 			return new FloatingTask(task.getTaskUID(), task.getTitle(), false);
-		}else{
+		} else {
 			throw new CEOException(CEOException.INVALID_TASK_OBJ);
 		}
 	}
@@ -194,11 +194,11 @@ class CommandExecutor {
 	private DeadlineTask convertToDeadline(Task task, Date startTime) throws CEOException{
 		if (task instanceof FloatingTask){
 			return new DeadlineTask(task.getTaskUID(),task.getTitle(), startTime, ((FloatingTask)task).getComplete());
-		}else if (task instanceof DeadlineTask){
+		} else if (task instanceof DeadlineTask){
 			return new DeadlineTask(task.getTaskUID(),task.getTitle(), startTime, ((DeadlineTask)task).getComplete());
-		}else if (task instanceof PeriodicTask){
+		} else if (task instanceof PeriodicTask){
 			return new DeadlineTask(task.getTaskUID(),task.getTitle(), startTime, false);
-		}else{
+		} else {
 			throw new CEOException(CEOException.INVALID_TASK_OBJ);
 		}
 	}
@@ -206,9 +206,9 @@ class CommandExecutor {
 	private PeriodicTask convertToPeriodic(Task task, Date startTime, Date endTime) throws CEOException{
 		if (task instanceof FloatingTask || task instanceof DeadlineTask){
 			return new PeriodicTask(task.getTaskUID(), task.getTitle(), null, startTime, endTime, null);
-		}else if (task instanceof PeriodicTask){
+		} else if (task instanceof PeriodicTask){
 			return new PeriodicTask(task.getTaskUID(), task.getTitle(), ((PeriodicTask) task).getLocation(), startTime, endTime, ((PeriodicTask) task).getRecurrence());
-		}else{
+		} else {
 			throw new CEOException(CEOException.INVALID_TASK_OBJ);
 		}
 	}
@@ -225,7 +225,7 @@ class CommandExecutor {
 	private Task updateComplete(Task task, boolean complete){
 		if (task instanceof FloatingTask){
 			((FloatingTask) task).updateComplete(complete);
-		}else if (task instanceof DeadlineTask){
+		} else if (task instanceof DeadlineTask){
 			((DeadlineTask) task).updateComplete(complete);
 		}
 		return task;
@@ -273,7 +273,7 @@ class CommandExecutor {
 	private Task getTaskByID(int taskID) throws CEOException{
 		if (taskID > this.taskList.size() || taskID < 1){
 			throw new CEOException(CEOException.INVALID_TASKID);
-		}else{
+		} else {
 			return this.taskList.get(taskID-1);
 		}
 	}

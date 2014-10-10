@@ -17,6 +17,7 @@ public class PeriodicTask extends Task {
 		this.updateLocation(location);
 		this.updateRecurrence(recurrence);
 	}
+	
 	public Date getStartTime(){
 		return this.startTime;
 	}
@@ -26,11 +27,11 @@ public class PeriodicTask extends Task {
 	}
 	
 	public void updateTime(Date startTime, Date endTime) throws CEOException{
-		if (startTime==null || endTime==null){
+		if (startTime == null || endTime == null){
 			throw new CEOException(CEOException.INVALID_TIME);
-		}else if (startTime.after(endTime)){
+		} else if (startTime.after(endTime)){
 			throw new CEOException(CEOException.INVALID_TIME);
-		}else{
+		} else {
 			this.startTime=startTime;
 			this.endTime=endTime;
 		}

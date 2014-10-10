@@ -8,19 +8,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ResponseParserTest {
-	
-	@Test
-	public void testParseAllListResponseNoTasks() throws CEOException, ParseException {
-		ArrayList<Task> taskList = new ArrayList<Task>();
-		assertEquals("The task list is empty", ResponseParser.parseAllListResponse(taskList));
-	}
+
 	
 	@Test
 	public void testParseAllListResponseWithTasks() throws CEOException, ParseException {

@@ -8,12 +8,11 @@ class Task implements Comparable<Task>{;
 	private String title;
 	private String description;
 
-
 	public Task(Uid taskUID, String title) throws CEOException{
 		if (title!=null){
 			this.taskUID=taskUID;
 			this.title=title;
-		}else{
+		} else {
 			throw new CEOException("No Title Error");
 		}
 	}
@@ -39,7 +38,7 @@ class Task implements Comparable<Task>{;
 	}
 	
 	public void updateTaskUID(Uid taskUID) throws CEOException{
-		if (taskUID==null){
+		if (taskUID == null){
 			throw new CEOException("Invalid UID");
 		}else{
 			this.taskUID=taskUID;
@@ -51,14 +50,14 @@ class Task implements Comparable<Task>{;
 	}
 	
 	public void updateDescription(String description){
-		if (description!=null){
+		if (description != null){
 			this.description=description;
 		}
 	}
 
 	@Override
 	public int compareTo(Task o) {
-		if (this.taskUID==null){
+		if (this.taskUID == null){
 			return -1;
 		}else{
 			return this.taskUID.getValue().compareTo(o.taskUID.getValue());

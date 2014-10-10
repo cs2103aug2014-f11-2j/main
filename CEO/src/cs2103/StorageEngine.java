@@ -13,6 +13,7 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.IndexedComponentList;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.Recur;
@@ -40,8 +41,8 @@ class StorageEngine {
 	
 	public StorageEngine(String dataFile) throws CEOException{
 		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION,true);
-		if (dataFile==null){
-			dataFile="default.ics";
+		if (dataFile == null){
+			dataFile = "default.ics";
 		}
 		this.file = new File(dataFile);
 		if (!file.exists() || file.length()==0){
@@ -80,13 +81,7 @@ class StorageEngine {
 				taskList.add(parseVEvent(component));
 			}
 			indexedComponents = new IndexedComponentList(calendar.getComponents(), Property.UID);
-			Collections.sort(taskList);
-			int count=0;
-			for (Task task:taskList){
-				count++;
-				task.updateTaskID(count);
-			}
-			return taskList;
+			return sortTaskList(taskList);
 		}catch(IOException e){
 			throw new CEOException(CEOException.READ_ERROR);
 		} catch (ParseException | ParserException e) {
@@ -143,7 +138,7 @@ class StorageEngine {
 	}
 	
 	private Component floatingToComponent(FloatingTask task) {
-		VToDo component = new VToDo(new net.fortuna.ical4j.model.DateTime(new Date()), task.getTitle());
+		VToDo component = new VToDo(new DateTime(new Date()), task.getTitle());
 		component.getProperties().add(task.getTaskUID());
 		component.getProperties().add(new Description(task.getDescription()));
 		component.getProperties().add(completeToStatus(task.getComplete()));
@@ -151,7 +146,7 @@ class StorageEngine {
 	}
 	
 	private Component deadlineToComponent(DeadlineTask task) {
-		VToDo component = new VToDo(new net.fortuna.ical4j.model.DateTime(task.getDueTime()), new net.fortuna.ical4j.model.DateTime(task.getDueTime()),task.getTitle());
+		VToDo component = new VToDo(new DateTime(task.getDueTime()), new DateTime(task.getDueTime()),task.getTitle());
 		component.getProperties().add(task.getTaskUID());
 		component.getProperties().add(new Description(task.getDescription()));
 		component.getProperties().add(completeToStatus(task.getComplete()));
@@ -159,9 +154,9 @@ class StorageEngine {
 	}
 	
 	private Component periodicToComponent(PeriodicTask task) {
-		VEvent component = new VEvent(new net.fortuna.ical4j.model.DateTime(task.getStartTime()), new net.fortuna.ical4j.model.DateTime(task.getEndTime()),task.getTitle());
+		VEvent component = new VEvent(new DateTime(task.getStartTime()), new DateTime(task.getEndTime()),task.getTitle());
 		component.getProperties().add(task.getTaskUID());
-		if (task.getRecurrence()!=null){
+		if (task.getRecurrence() != null){
 			component.getProperties().add(new RRule(task.getRecurrence()));
 		}
 		component.getProperties().add(new Description(task.getDescription()));
@@ -175,7 +170,7 @@ class StorageEngine {
 		String componentTitle = readTitle(component);
 		Date componentStartTime;
 		Date componentEndTime;
-		if (component.getStartDate()==null||component.getEndDate()==null){
+		if (component.getStartDate() == null||component.getEndDate() == null){
 			throw new CEOException(CEOException.ILLEGAL_FILE);
 		}else{
 			componentStartTime=component.getStartDate().getDate();
@@ -192,7 +187,7 @@ class StorageEngine {
 		Task task;
 		Uid componentUID = component.getUid();
 		String componentTitle = readTitle(component);
-		if (component.getDue()==null){
+		if (component.getDue() == null){
 			task = new FloatingTask(componentUID, componentTitle, readStatusToComplete(component));
 		}else{
 			task = new DeadlineTask(componentUID, componentTitle, component.getDue().getDate(),readStatusToComplete(component));
@@ -202,7 +197,7 @@ class StorageEngine {
 	}
 	
 	private String readTitle(Component component) throws CEOException{
-		if (component.getProperty(Property.SUMMARY)!=null){
+		if (component.getProperty(Property.SUMMARY) != null){
 			return component.getProperty(Property.SUMMARY).getValue();
 		}else{
 			throw new CEOException(CEOException.ILLEGAL_FILE);
@@ -222,7 +217,7 @@ class StorageEngine {
 	}
 	
 	private Recur readRecur(VEvent component){
-		if (component.getProperty(Property.RRULE)==null){
+		if (component.getProperty(Property.RRULE) == null){
 			return null;
 		}else{
 			RRule rule = (RRule) component.getProperty(Property.RRULE);
@@ -231,7 +226,7 @@ class StorageEngine {
 	}
 	
 	private String readDescription(Component component){
-		if (component.getProperty(Property.DESCRIPTION)==null){
+		if (component.getProperty(Property.DESCRIPTION) == null){
 			return "";
 		}else{
 			return component.getProperty(Property.DESCRIPTION).getValue();
@@ -239,10 +234,20 @@ class StorageEngine {
 	}
 	
 	private String readLocation(VEvent component){
-		if (component.getLocation()==null){
+		if (component.getLocation() == null){
 			return "";
 		}else{
 			return component.getLocation().getValue();
 		}
+	}
+	
+	private ArrayList<Task> sortTaskList(ArrayList<Task> taskList){
+		Collections.sort(taskList);
+		int count=0;
+		for (Task task:taskList){
+			count++;
+			task.updateTaskID(count);
+		}
+		return taskList;
 	}
 }

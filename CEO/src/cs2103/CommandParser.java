@@ -17,99 +17,97 @@ class CommandParser {
 	public static enum CommandType {
 		ADD, LIST, SHOWDETAIL, DELETE, UPDATE, EXIT, INVALID, UNDO, REDO;
 	}
+	
 	public static enum TaskType {
 		ALL, FLOATING, DEADLINE, PERIODIC, INVALID;
 	}
 	
-	public static Queue<String> separateCommand(String userInput) {
-		String[] parameters = userInput.trim().split("\\s+");
+	private static String[] multiParameterCommands = {"add", "update", "search"};
+	private static String[] allowedSeparateLiteral = {"\\s+-", "\\s+/", ";"};
+	
+	public static Queue<String> separateCommand(String userInput) throws CEOException {
+		checkNullString(userInput, CEOException.INVALID_CMD);
 		Queue<String> result = new LinkedList<String>();
-		for (String s:parameters){
-			result.add(s.trim());
+		if (checkMultiParameter(splitFirstWord(userInput)[0])){
+			String[] parameters = splitMultiParameter(userInput);
+			String[] command = splitFirstWord(parameters[0]);
+			for (String s:command){
+				result.add(s.trim());
+			}
+			for (int i = 1;i < parameters.length; i++){
+				result.add(removeDash(parameters[i]));
+			}
+		} else {
+			String[] command = splitFirstWord(userInput);
+			for (String s:command){
+				if (s != null){
+					result.add(s.trim());
+				}
+			}
 		}
 		return result;
 	}
 	
 	public static CommandType determineCommandType(String command) {
-		if (command==null){
+		if (command == null){
 			return CommandType.INVALID;
 		}
 		if (command.equalsIgnoreCase("list")){
 			return CommandType.LIST;
-		}else if (command.equalsIgnoreCase("update")){
+		} else if (command.equalsIgnoreCase("update")){
 			return CommandType.UPDATE;
-		}else if (command.equalsIgnoreCase("exit")){
+		} else if (command.equalsIgnoreCase("exit")){
 			return CommandType.EXIT;
-		}else if (command.equalsIgnoreCase("add")){
+		} else if (command.equalsIgnoreCase("add")){
 			return CommandType.ADD;
-		}else if (command.equalsIgnoreCase("delete")){
+		} else if (command.equalsIgnoreCase("delete")){
 			return CommandType.DELETE;
-		}else if (command.equalsIgnoreCase("show")){
+		} else if (command.equalsIgnoreCase("show")){
 			return CommandType.SHOWDETAIL;
-		}else if (command.equalsIgnoreCase("undo")){
+		} else if (command.equalsIgnoreCase("undo")){
 			return CommandType.UNDO;
-		}else if (command.equalsIgnoreCase("redo")){
+		} else if (command.equalsIgnoreCase("redo")){
 			return CommandType.REDO;
-		}else{
+		} else {
 			return CommandType.INVALID;
 		}
 	}
 	
 	public static TaskType determineTaskType(String parameter){
-		if (parameter==null){
+		if (parameter == null){
 			return TaskType.INVALID;
 		}
 		if (parameter.equalsIgnoreCase("all")){
 			return TaskType.ALL;
-		}else if (parameter.equalsIgnoreCase("floating")){
+		} else if (parameter.equalsIgnoreCase("floating")){
 			return TaskType.FLOATING;
-		}else if (parameter.equalsIgnoreCase("deadline")){
+		} else if (parameter.equalsIgnoreCase("deadline")){
 			return TaskType.DEADLINE;
-		}else if (parameter.equalsIgnoreCase("periodic")){
+		} else if (parameter.equalsIgnoreCase("periodic")){
 			return TaskType.PERIODIC;
-		}else{
+		} else {
 			return TaskType.INVALID;
 		}
 	}
 	
-	public static int parseIntegerParameter(String parameters){
-		if (parameters==null || parameters.equals("")){
+	public static int parseIntegerParameter(String parameter) throws CEOException{
+		checkNullString(parameter, CEOException.INVALID_PARA);
+		parameter = parameter.trim();
+		if (parameter.matches("[0-9]+")){
+			return Integer.parseInt(parameter);
+		} else {
 			return -1;
-		}else{
-			parameters=parameters.trim();
-			if (parameters.matches("[0-9]+")){
-				return Integer.parseInt(parameters);
-			}else{
-				return -1;
-			}
 		}
 	}
 	
 	public static Map<String,String> separateParameters(Queue<String> parameterList) throws CEOException{
+		if (parameterList == null) throw new CEOException(CEOException.INVALID_PARA);
 		Map<String,String> parameterMap = new HashMap<String, String>();
-		if (!parameterList.peek().matches("-\\S+")){
-			throw new CEOException(CEOException.INVALID_PARA);
-		}
-		String parameterType=null;
-		StringBuffer parameter = new StringBuffer();
 		while(!parameterList.isEmpty()){
-			String parameterString = parameterList.poll();
-			if (parameterString.matches("--\\w+|-[A-Z]")){
-				if (parameterType!=null){
-					parameterMap.put(parameterType, parameter.toString().trim());
-					parameter=new StringBuffer();
-				}
-				if (parameterString.matches("--\\w+")){
-					parameterType=parameterString.substring(2);
-				}else if (parameterString.matches("-[A-Z]")){
-					parameterType=parameterString.substring(1);
-				}
-			}else{
-				parameter.append(parameterString).append(' ');
+			String[] splitResult = splitFirstWord(parameterList.poll());
+			if (splitResult[0] != null){
+				parameterMap.put(splitResult[0], splitResult[1]);
 			}
-		}
-		if (parameterType!=null){
-			parameterMap.put(parameterType, parameter.toString().trim());
 		}
 		return parameterMap;
 	}
@@ -117,7 +115,7 @@ class CommandParser {
 	public static String getParameter(String parameterType, Map<String, String> parameterMap){
 		if (parameterMap.containsKey(parameterType)){
 			String value=parameterMap.get(parameterType);
-			if (value==null){
+			if (value == null){
 				return "";
 			}else{
 				return value;
@@ -185,7 +183,7 @@ class CommandParser {
 	
 	public static Date[] getTime(String timeString) throws CEOException{
 		Date[] time = new Date[2];
-		time[0]=null; time[1]=null;
+		time[0] = null; time[1] = null;
 		if (timeString != null){
 			Pattern p = Pattern.compile("\\d{4}/\\d{2}/\\d{2}/\\d{2}:\\d{2}");
 			Matcher m = p.matcher(timeString);
@@ -211,14 +209,64 @@ class CommandParser {
 	
 	
 	public static boolean parseComplete(String complete) throws CEOException{
-		if (complete==null){
+		if (complete == null){
 			return false;
-		}else if (complete.equalsIgnoreCase("true")){
+		} else if (complete.equalsIgnoreCase("true")){
 			return true;
-		}else if (complete.equalsIgnoreCase("false")){
+		} else if (complete.equalsIgnoreCase("false")){
 			return false;
-		}else{
+		} else {
 			throw new CEOException(CEOException.INVALID_COMPLETE);
+		}
+	}
+	
+	private static void checkNullString(String str, String expectedException) throws CEOException{
+		if (str == null || str.equals("")) throw new CEOException(expectedException);
+	}
+	
+	private static boolean checkMultiParameter(String commandType) throws CEOException{
+		checkNullString(commandType, CEOException.INVALID_CMD);
+		for (String s:multiParameterCommands){
+			if (commandType.equalsIgnoreCase(s)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private static String[] splitMultiParameter(String userInput) throws CEOException{
+		checkNullString(userInput, CEOException.INVALID_CMD);
+		String[] parameters;
+		for (String regex:allowedSeparateLiteral){
+			parameters = userInput.trim().split(regex);
+			if (parameters.length > 1) return parameters;
+		}
+		throw new CEOException(CEOException.LESS_THAN_ONE_PARA);
+	}
+	
+	private static String removeDash(String parameterString) throws CEOException{
+		checkNullString(parameterString, CEOException.INVALID_PARA);
+		if (parameterString.startsWith("-")){
+			return parameterString.substring(1);
+		}else{
+			return parameterString;
+		}
+	}
+	
+	private static String[] splitFirstWord(String parameterString) throws CEOException{
+		checkNullString(parameterString, CEOException.INVALID_PARA);
+		String[] result;
+		if (parameterString == null || parameterString.equals("")) return null;
+		int spaceIndex = parameterString.indexOf(' ');
+		if (spaceIndex == -1){
+			result = new String[1];
+			result[0] = parameterString;
+			return result;
+		}else{
+			result = new String[2];
+			result[0] = parameterString.substring(0, spaceIndex).trim();
+			result[1] = parameterString.substring(spaceIndex).trim();
+			return result;
 		}
 	}
 	
@@ -236,7 +284,6 @@ class CommandParser {
 		}
 	}
 	
-
 	public static Recur stringToRecur(String recurrence) throws CEOException{
 		if (recurrence == null || recurrence.equals("")){
 			return null;
