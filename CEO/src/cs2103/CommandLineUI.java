@@ -22,6 +22,7 @@ public class CommandLineUI {
 	private static final String MESSAGE_UPDATE_ERROR_FORMAT = "Failed to update task with ID %1$s";
 	private static final String MESSAGE_SHOW_ERROR_FORMAT = "Failed to show task with ID %1$s";
 	private static final String MESSAGE_UNDO_FORMAT = "Successfully undo %1$d tasks";
+	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d tasks";
 	
 	private final CommandExecutor executor;
 	private Scanner scanner = new Scanner(System.in);
@@ -221,7 +222,7 @@ public class CommandLineUI {
 		} catch (CEOException e) {
 			e.printStackTrace();
 		}
-		return String.format(MESSAGE_UNDO_FORMAT, result);
+		return String.format(MESSAGE_REDO_FORMAT, result);
 	}
 	
 	private static void print(String feedback) {

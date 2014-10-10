@@ -2,7 +2,7 @@ package cs2103;
 
 import net.fortuna.ical4j.model.property.Uid;
 
-class Task implements Comparable<Task>{;
+abstract class Task implements Comparable<Task>{;
 	private int taskID;
 	private Uid taskUID;
 	private String title;
