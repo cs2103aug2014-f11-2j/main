@@ -153,7 +153,7 @@ class CommandExecutor {
 		return i;
 	}
 	
-	public void updateTimeFromRecur(PeriodicTask task) throws CEOException{
+	public boolean updateTimeFromRecur(PeriodicTask task) throws CEOException{
 		DateTime now = new DateTime();
 		if (task.getRecurrence() != null){
 			if (task.getStartTime().before(now)){
@@ -161,8 +161,10 @@ class CommandExecutor {
 				Date endTime = new Date(task.getEndTime().getTime() - task.getStartTime().getTime() + startTime.getTime());
 				task.updateTime(startTime, endTime);
 				this.taskList = storage.updateTask(task);
+				return true;
 			}
 		}
+		return false;
 	}
 	
 	private Task copyTask(Task task) throws CEOException{

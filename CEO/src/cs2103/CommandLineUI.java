@@ -23,6 +23,7 @@ public class CommandLineUI {
 	private static final String MESSAGE_SHOW_ERROR_FORMAT = "Failed to show task with ID %1$s";
 	private static final String MESSAGE_UNDO_FORMAT = "Successfully undo %1$d tasks";
 	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d tasks";
+	private static final String MESSAGE_UPDATE_RECUR_TIME_FORMAT = "Successfully updated %1$d recurring tasks";
 	
 	private final CommandExecutor executor;
 	private Scanner scanner = new Scanner(System.in);
@@ -58,8 +59,8 @@ public class CommandLineUI {
 	}
 	
 	private void userLoop() {
-		alertTask();
 		updateTimeFromRecur();
+		alertTask();
 		while (true) {
 			printPrompt(MESSAGE_USER_PROMPT);
 			String command = takeUserInput();
@@ -257,14 +258,17 @@ public class CommandLineUI {
 	}
 	
 	private void updateTimeFromRecur() {
+		int count = 0;
 		try {
 			ArrayList<PeriodicTask> periodicList = executor.getPeriodicList();
 			for (PeriodicTask task:periodicList){
-				executor.updateTimeFromRecur(task);
+				if (executor.updateTimeFromRecur(task)){
+					count++;
+				}
 			}
 		} catch (CEOException e) {
 			e.printStackTrace();
 		}
-		
+		print(String.format(MESSAGE_UPDATE_RECUR_TIME_FORMAT, count));
 	}
 }
