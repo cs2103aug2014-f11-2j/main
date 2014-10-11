@@ -8,14 +8,45 @@ import java.util.Locale;
 import net.fortuna.ical4j.model.Recur;
 
 public class ResponseParser {
-	public static final String HELP_DEFAULT = "";
-	public static final String HELP_ADD = "";
-	public static final String HELP_DELETE = "";
-	public static final String HELP_UPDATE = "";
-	public static final String HELP_LIST = "";
-	public static final String HELP_SHOW = "";
-	public static final String HELP_REDO = "";
-	public static final String HELP_UNDO = "";
+	public static final String HELP_DEFAULT = "The most common commands are:	\n" +
+			                                  "    add --title <taskTitle>                add task with title only\n" +
+			                                  "											  subfields are compulsory for add command. Type help --add for more" +
+			                                  "    list all                               list all existing tasks\n" +
+			                                  "    delete <taskID>                        delete task with corresponding taskID" +
+			                                  "    update -<taskID> --title <newTitle>    update title of existing task with new title.         " +
+			                                  "											  subfields for compulsory for update command. Type help --update for more";
+	public static final String HELP_ADD = "Add options:\n" +
+										  "    --title <taskTitle>                             title for task\n" +
+										  "    --description <description>                     description for task\n" +
+										  "    --location <location>                           location for task. Can be anywhere\n" +
+										  "    --time <YYYY/MM/DD/HH:MM> OR \n" +
+										  "           <YYYY/MM/DD/HH:MM TO YYYY/MM/DD/HH:MM> OR \n" +
+										  "           <HH:MM>\n" +
+										  "    --recurring <numberOfDays>d<numberOfTimes>\n\n" +
+										  "E.g add --title taskTitle --description desc --time 23:59";
+	public static final String HELP_DELETE = "Delete has no extra options, and deletes task with specified id\n" +
+											 "E.g delete 1";
+	public static final String HELP_UPDATE = "Update options:\n" +
+											  "    --title <taskTitle>                         title for task\n" +
+											  "    --description <description>                 description for task\n" +
+											  "    --location <location>                       location for task. Can be anywhere\n" +
+											  "    --time <YYYY/MM/DD/HH:MM> OR \n" +
+											  "           <YYYY/MM/DD/HH:MM TO YYYY/MM/DD/HH:MM> OR \n" +
+											  "           <HH:MM>\n" +
+											  "    --recurring <numberOfDays>d<numberOfTimes>\n\n" +
+											  "E.g update -1 --recurring 2d5 --location random location";;
+	public static final String HELP_LIST = "List options:\n" +
+											"    floating                list tasks with no dates set\n" +
+											"    periodic                list tasks that are recurring\n" +
+											"    deadline                list tasks that have a single deadline\n\n" +
+											"    all                     list all tasks" +
+											"E.g list deadline";
+	public static final String HELP_SHOW = "Delete has no extra options, and displays task details with specified id\n" +
+			                               "E.g delete 1";
+	public static final String HELP_REDO = "Redo has no extra options, and redo the number of instructions executed as indicated\n" +
+											"E.g redo 2";
+	public static final String HELP_UNDO = "Undo has no extra options, and undo the number of instructions executed as indicated\n" +
+			                               "E.g undo 2";
 	private static final String MESSAGE_SHOWDETAIL_FORMAT = "The details for Task %1$d:\n";
 	private static final String MESSAGE_EMPTY_LIST = "The task list is empty";
 	private static final String MESSAGE_SHOWDETAIL_ERROR_FOMRAT = "Unable to show detail for task %1$d";
