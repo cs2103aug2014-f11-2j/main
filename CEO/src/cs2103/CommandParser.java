@@ -15,7 +15,7 @@ import net.fortuna.ical4j.model.Recur;
 
 class CommandParser {
 	public static enum CommandType {
-		ADD, LIST, SHOWDETAIL, DELETE, UPDATE, EXIT, INVALID, UNDO, REDO;
+		ADD, LIST, SHOWDETAIL, DELETE, UPDATE, EXIT, INVALID, UNDO, REDO, HELP;
 	}
 	
 	public static enum TaskType {
@@ -68,7 +68,9 @@ class CommandParser {
 			return CommandType.UNDO;
 		} else if (command.equalsIgnoreCase("redo")){
 			return CommandType.REDO;
-		} else {
+		} else if (command.equalsIgnoreCase("help")){
+			return CommandType.HELP;
+		}else {
 			return CommandType.INVALID;
 		}
 	}

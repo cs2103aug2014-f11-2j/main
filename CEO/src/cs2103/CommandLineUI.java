@@ -108,6 +108,8 @@ public class CommandLineUI {
 					return undo(separateResult.poll());
 				case REDO:
 					return redo(separateResult.poll());
+				case HELP:
+					return getHelp(separateResult.poll());
 				case INVALID:
 				default:
 					return MESSAGE_COMMAND_ERROR;
@@ -161,13 +163,13 @@ public class CommandLineUI {
 		}
 	}
 	
-	private String show(String parameters) {
+	private String show(String parameter) {
 		String response;
 		try {
-			int taskID=CommandParser.parseIntegerParameter(parameters);
+			int taskID=CommandParser.parseIntegerParameter(parameter);
 			response=ResponseParser.parseShowDetailResponse(executor.showTaskDetail(taskID),taskID);
 		} catch (CEOException e) {
-			response = String.format(MESSAGE_SHOW_ERROR_FORMAT, parameters);
+			response = String.format(MESSAGE_SHOW_ERROR_FORMAT, parameter);
 		}
 		return response;
 	}
@@ -270,5 +272,28 @@ public class CommandLineUI {
 			e.printStackTrace();
 		}
 		print(String.format(MESSAGE_UPDATE_RECUR_TIME_FORMAT, count));
+	}
+	
+	private String getHelp(String parameter){
+		CommandParser.CommandType commandType = CommandParser.determineCommandType(parameter);
+		switch (commandType){
+		case LIST:
+			return ResponseParser.HELP_LIST;
+		case UPDATE:
+			return ResponseParser.HELP_UPDATE;
+		case ADD:
+			return ResponseParser.HELP_ADD;
+		case DELETE:
+			return ResponseParser.HELP_DELETE;
+		case SHOWDETAIL:
+			return ResponseParser.HELP_SHOW;
+		case UNDO:
+			return ResponseParser.HELP_UNDO;
+		case REDO:
+			return ResponseParser.HELP_REDO;
+		case INVALID:
+		default:
+			return ResponseParser.HELP_DEFAULT;
+		}
 	}
 }

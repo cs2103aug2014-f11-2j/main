@@ -8,7 +8,14 @@ import java.util.Locale;
 import net.fortuna.ical4j.model.Recur;
 
 public class ResponseParser {
-
+	public static final String HELP_DEFAULT = "";
+	public static final String HELP_ADD = "";
+	public static final String HELP_DELETE = "";
+	public static final String HELP_UPDATE = "";
+	public static final String HELP_LIST = "";
+	public static final String HELP_SHOW = "";
+	public static final String HELP_REDO = "";
+	public static final String HELP_UNDO = "";
 	private static final String MESSAGE_SHOWDETAIL_FORMAT = "The details for Task %1$d:\n";
 	private static final String MESSAGE_EMPTY_LIST = "The task list is empty";
 	private static final String MESSAGE_SHOWDETAIL_ERROR_FOMRAT = "Unable to show detail for task %1$d";
