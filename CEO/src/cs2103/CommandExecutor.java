@@ -96,11 +96,7 @@ class CommandExecutor {
 		if (timeFlag){
 			newTask = updateTaskType(task, time[0], time[1]);
 		} else {
-			try {
-				newTask = (Task) task.clone();
-			} catch (CloneNotSupportedException e) {
-				throw new CEOException(CEOException.CLONE_FAILED);
-			}
+			newTask = cloneTask(task);
 		}
 		if (title != null){
 			newTask.updateTitle(title);
@@ -128,6 +124,15 @@ class CommandExecutor {
 			return task.toDeadline(startTime);
 		} else {
 			return task.toPeriodic(startTime, endTime);
+		}
+	}
+	
+	private Task cloneTask(Task task) throws CEOException{
+		try {
+			Task newTask = (Task) task.clone();
+			return newTask;
+		} catch (CloneNotSupportedException e) {
+			throw new CEOException(CEOException.CLONE_FAILED);
 		}
 	}
 	
@@ -190,6 +195,7 @@ class CommandExecutor {
 	}
 	
 	private void redoTask(TaskBackup taskBackup) throws CEOException{
+		if (this.undoStack == null) this.undoStack = new Stack<TaskBackup>();
 		this.undoStack.push(taskBackup);
 		switch(taskBackup.getActionType()){
 		case DELETE:
