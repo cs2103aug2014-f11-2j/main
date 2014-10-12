@@ -1,19 +1,30 @@
 package cs2103; 
 
-import net.fortuna.ical4j.model.property.Uid;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Date;
 
-class Task implements Comparable<Task>{;
+import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.property.Uid;
+import net.fortuna.ical4j.util.SimpleHostInfo;
+import net.fortuna.ical4j.util.UidGenerator;
+
+abstract class Task implements Comparable<Task>, Cloneable{;
 	private int taskID;
 	private Uid taskUID;
 	private String title;
 	private String description;
 
 	public Task(Uid taskUID, String title) throws CEOException{
-		if (title!=null){
-			this.taskUID=taskUID;
-			this.title=title;
+		if (title == null || title.equals("")){
+			throw new CEOException(CEOException.NO_TITLE);
 		} else {
-			throw new CEOException("No Title Error");
+			if (taskUID == null){
+				taskUID = generateUid();
+			} else {
+				this.taskUID=taskUID;
+			}
+			this.title=title;
 		}
 	}
 	
@@ -37,14 +48,6 @@ class Task implements Comparable<Task>{;
 		this.taskID=id;
 	}
 	
-	public void updateTaskUID(Uid taskUID) throws CEOException{
-		if (taskUID == null){
-			throw new CEOException("Invalid UID");
-		}else{
-			this.taskUID=taskUID;
-		}
-	}
-	
 	public void updateTitle(String title){
 		this.title=title;
 	}
@@ -63,4 +66,22 @@ class Task implements Comparable<Task>{;
 			return this.taskUID.getValue().compareTo(o.taskUID.getValue());
 		}
 	}
+	
+	private static Uid generateUid() throws CEOException{
+		try {
+			UidGenerator ug = new UidGenerator(new SimpleHostInfo("gmail.com"), InetAddress.getLocalHost().getHostName().toString());
+			return ug.generateUid();
+		} catch (UnknownHostException e) {
+			throw new CEOException(CEOException.UNEXPECTED_ERR);
+		}
+	}
+	
+	public abstract void updateComplete(boolean complete);
+	public abstract void updateLocation(String location);
+	public abstract void updateRecurrence(Recur recurrence);
+	public abstract FloatingTask toFloating() throws CEOException;
+	public abstract DeadlineTask toDeadline(Date dueTime) throws CEOException;
+	public abstract PeriodicTask toPeriodic(Date startTime, Date endTime) throws CEOException;
+	@Override
+	public abstract Object clone() throws CloneNotSupportedException;
 }

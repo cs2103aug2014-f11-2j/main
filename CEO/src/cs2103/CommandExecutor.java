@@ -1,19 +1,15 @@
 package cs2103;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList; 
 import java.util.Date;
 import java.util.Stack;
 
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
-import net.fortuna.ical4j.model.property.Uid;
-import net.fortuna.ical4j.util.SimpleHostInfo;
-import net.fortuna.ical4j.util.UidGenerator;
 
 
 class CommandExecutor {
+	private static CommandExecutor executor;
 	private final StorageEngine storage;
 	private ArrayList<Task> taskList;
 	private Stack<TaskBackup> undoStack;
@@ -23,9 +19,16 @@ class CommandExecutor {
 		ADD, DELETE, UPDATE;
 	}
 	
-	public CommandExecutor(String dataFile) throws CEOException{
-		this.storage = new StorageEngine(dataFile);
+	private CommandExecutor(String dataFile) throws CEOException{
+		this.storage = StorageEngine.getInstance(dataFile);
 		this.taskList = storage.getTaskList();
+	}
+	
+	public static CommandExecutor getInstance(String dataFile) throws CEOException{
+		if (executor == null){
+			executor = new CommandExecutor(dataFile);
+		}
+		return executor;
 	}
 	
 	public void addTask(String title, String description, String location, Date startTime, Date endTime, Recur recurrence) throws CEOException{
@@ -38,7 +41,6 @@ class CommandExecutor {
 			task = new PeriodicTask(null, title, location, startTime, endTime, recurrence);
 		}
 		task.updateDescription(description);
-		task.updateTaskUID(generateUid());
 		backupTask(ActionType.ADD, task);
 		this.taskList = storage.updateTask(task);
 	}
@@ -94,27 +96,44 @@ class CommandExecutor {
 		if (timeFlag){
 			newTask = updateTaskType(task, time[0], time[1]);
 		} else {
-			newTask = copyTask(task);
+			newTask = cloneTask(task);
 		}
-		if (title!=null){
-			if (title.equals("")){
-				throw new CEOException(CEOException.NO_TITLE);
-			} else {
-				newTask.updateTitle(title);
-			}
+		if (title != null){
+			newTask.updateTitle(title);
 		}
-		if (description!=null){
+		if (description != null){
 			newTask.updateDescription(description);
 		}
-		newTask = updateLocation(newTask, location);
+		if (location != null){
+			newTask.updateLocation(location);
+		}
 		if (completeFlag){
-			newTask = updateComplete(newTask, complete);
+			newTask.updateComplete(complete);
 		}
 		if (recurFlag){
-			newTask = updateRecur(newTask, recurrence);
+			newTask.updateRecurrence(recurrence);
 		}
 		backupTask(ActionType.UPDATE, task);
 		this.taskList = storage.updateTask(newTask);
+	}
+	
+	private Task updateTaskType(Task task, Date startTime, Date endTime) throws CEOException{
+		if (startTime == null && endTime == null){
+			return task.toFloating();
+		} else if (endTime == null){
+			return task.toDeadline(startTime);
+		} else {
+			return task.toPeriodic(startTime, endTime);
+		}
+	}
+	
+	private Task cloneTask(Task task) throws CEOException{
+		try {
+			Task newTask = (Task) task.clone();
+			return newTask;
+		} catch (CloneNotSupportedException e) {
+			throw new CEOException(CEOException.CLONE_FAILED);
+		}
 	}
 	
 	public int undoTasks(int count) throws CEOException{
@@ -145,7 +164,7 @@ class CommandExecutor {
 		return i;
 	}
 	
-	public void updateTimeFromRecur(PeriodicTask task) throws CEOException{
+	public boolean updateTimeFromRecur(PeriodicTask task) throws CEOException{
 		DateTime now = new DateTime();
 		if (task.getRecurrence() != null){
 			if (task.getStartTime().before(now)){
@@ -153,89 +172,10 @@ class CommandExecutor {
 				Date endTime = new Date(task.getEndTime().getTime() - task.getStartTime().getTime() + startTime.getTime());
 				task.updateTime(startTime, endTime);
 				this.taskList = storage.updateTask(task);
+				return true;
 			}
 		}
-	}
-	
-	private Task copyTask(Task task) throws CEOException{
-		if (task instanceof DeadlineTask){
-			return new DeadlineTask(task.getTaskUID(),task.getTitle(),((DeadlineTask)task).getDueTime(), ((DeadlineTask)task).getComplete());
-		} else if (task instanceof FloatingTask){
-			return new FloatingTask(task.getTaskUID(),task.getTitle(),((FloatingTask)task).getComplete());
-		} else if (task instanceof PeriodicTask){
-			return new PeriodicTask(task.getTaskUID(),task.getTitle(),((PeriodicTask)task).getLocation(), ((PeriodicTask)task).getStartTime(), ((PeriodicTask)task).getEndTime(), ((PeriodicTask)task).getRecurrence());
-		} else {
-			throw new CEOException(CEOException.INVALID_TASK_OBJ);
-		}
-	}
-	
-	private Task updateTaskType(Task task, Date startTime, Date endTime) throws CEOException{
-		if (startTime == null && endTime == null){
-			return convertToFloating(task);
-		} else if (endTime == null){
-			return convertToDeadline(task, startTime);
-		} else {
-			return convertToPeriodic(task, startTime, endTime);
-		}
-	}
-	
-	private FloatingTask convertToFloating(Task task) throws CEOException{
-		if (task instanceof FloatingTask){
-			return new FloatingTask(task.getTaskUID(), task.getTitle(), ((FloatingTask)task).getComplete());
-		} else if (task instanceof DeadlineTask){
-			return new FloatingTask(task.getTaskUID(), task.getTitle(), ((DeadlineTask)task).getComplete());
-		} else if (task instanceof PeriodicTask){
-			return new FloatingTask(task.getTaskUID(), task.getTitle(), false);
-		} else {
-			throw new CEOException(CEOException.INVALID_TASK_OBJ);
-		}
-	}
-	
-	private DeadlineTask convertToDeadline(Task task, Date startTime) throws CEOException{
-		if (task instanceof FloatingTask){
-			return new DeadlineTask(task.getTaskUID(),task.getTitle(), startTime, ((FloatingTask)task).getComplete());
-		} else if (task instanceof DeadlineTask){
-			return new DeadlineTask(task.getTaskUID(),task.getTitle(), startTime, ((DeadlineTask)task).getComplete());
-		} else if (task instanceof PeriodicTask){
-			return new DeadlineTask(task.getTaskUID(),task.getTitle(), startTime, false);
-		} else {
-			throw new CEOException(CEOException.INVALID_TASK_OBJ);
-		}
-	}
-	
-	private PeriodicTask convertToPeriodic(Task task, Date startTime, Date endTime) throws CEOException{
-		if (task instanceof FloatingTask || task instanceof DeadlineTask){
-			return new PeriodicTask(task.getTaskUID(), task.getTitle(), null, startTime, endTime, null);
-		} else if (task instanceof PeriodicTask){
-			return new PeriodicTask(task.getTaskUID(), task.getTitle(), ((PeriodicTask) task).getLocation(), startTime, endTime, ((PeriodicTask) task).getRecurrence());
-		} else {
-			throw new CEOException(CEOException.INVALID_TASK_OBJ);
-		}
-	}
-	
-	private Task updateLocation(Task task, String location) throws CEOException{
-		if (task instanceof PeriodicTask){
-			if (location != null){
-				((PeriodicTask) task).updateLocation(location);
-			}
-		}
-		return task;
-	}
-	
-	private Task updateComplete(Task task, boolean complete){
-		if (task instanceof FloatingTask){
-			((FloatingTask) task).updateComplete(complete);
-		} else if (task instanceof DeadlineTask){
-			((DeadlineTask) task).updateComplete(complete);
-		}
-		return task;
-	}
-	
-	private Task updateRecur(Task task, Recur recur){
-		if (task instanceof PeriodicTask){
-			((PeriodicTask) task).updateRecurrence(recur);
-		}
-		return task;
+		return false;
 	}
 	
 	private void undoTask(TaskBackup taskBackup) throws CEOException{
@@ -255,6 +195,7 @@ class CommandExecutor {
 	}
 	
 	private void redoTask(TaskBackup taskBackup) throws CEOException{
+		if (this.undoStack == null) this.undoStack = new Stack<TaskBackup>();
 		this.undoStack.push(taskBackup);
 		switch(taskBackup.getActionType()){
 		case DELETE:
@@ -269,23 +210,12 @@ class CommandExecutor {
 		}
 	}
 	
-	
 	private Task getTaskByID(int taskID) throws CEOException{
 		if (taskID > this.taskList.size() || taskID < 1){
 			throw new CEOException(CEOException.INVALID_TASKID);
 		} else {
 			return this.taskList.get(taskID-1);
 		}
-	}
-
-	private Uid generateUid() throws CEOException{
-		try {
-			UidGenerator ug = new UidGenerator(new SimpleHostInfo("gmail.com"), InetAddress.getLocalHost().getHostName().toString());
-			return ug.generateUid();
-		} catch (UnknownHostException e) {
-			throw new CEOException(CEOException.UNEXPECTED_ERR);
-		}
-		
 	}
 	
 	private void backupTask(ActionType actionType, Task task){

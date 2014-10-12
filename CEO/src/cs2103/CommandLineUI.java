@@ -22,13 +22,23 @@ public class CommandLineUI {
 	private static final String MESSAGE_UPDATE_ERROR_FORMAT = "Failed to update task with ID %1$s";
 	private static final String MESSAGE_SHOW_ERROR_FORMAT = "Failed to show task with ID %1$s";
 	private static final String MESSAGE_UNDO_FORMAT = "Successfully undo %1$d tasks";
+	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d tasks";
+	private static final String MESSAGE_UPDATE_RECUR_TIME_FORMAT = "Successfully updated %1$d recurring tasks";
 	
 	private final CommandExecutor executor;
 	private Scanner scanner = new Scanner(System.in);
+	private static CommandLineUI commandLine;
 	
-	public CommandLineUI(String dataFile) throws CEOException{
-		this.executor = new CommandExecutor(dataFile);
+	private CommandLineUI(String dataFile) throws CEOException{
+		this.executor = CommandExecutor.getInstance(dataFile);
 		print(String.format(MESSAGE_WELCOME_FORMAT, dataFile));
+	}
+	
+	public static CommandLineUI getInstance(String dataFile) throws CEOException{
+		if (commandLine == null){
+			commandLine = new CommandLineUI(dataFile);
+		}
+		return commandLine;
 	}
 	
 	public static void main(String[] args){
@@ -36,11 +46,11 @@ public class CommandLineUI {
 		try{
 			if (args.length > 1){
 				System.err.println("Incorrect Argument");
-				main = new CommandLineUI(args[0]);
+				main = CommandLineUI.getInstance(args[0]);
 			}else if (args.length == 1){
-				main = new CommandLineUI(args[0]);
+				main = CommandLineUI.getInstance(args[0]);
 			}else{
-				main = new CommandLineUI("default.ics");
+				main = CommandLineUI.getInstance("default.ics");
 			}
 		main.userLoop();
 		} catch (CEOException e){
@@ -49,8 +59,8 @@ public class CommandLineUI {
 	}
 	
 	private void userLoop() {
-		alertTask();
 		updateTimeFromRecur();
+		alertTask();
 		while (true) {
 			printPrompt(MESSAGE_USER_PROMPT);
 			String command = takeUserInput();
@@ -98,6 +108,8 @@ public class CommandLineUI {
 					return undo(separateResult.poll());
 				case REDO:
 					return redo(separateResult.poll());
+				case HELP:
+					return getHelp(separateResult.poll());
 				case INVALID:
 				default:
 					return MESSAGE_COMMAND_ERROR;
@@ -151,13 +163,13 @@ public class CommandLineUI {
 		}
 	}
 	
-	private String show(String parameters) {
+	private String show(String parameter) {
 		String response;
 		try {
-			int taskID=CommandParser.parseIntegerParameter(parameters);
+			int taskID=CommandParser.parseIntegerParameter(parameter);
 			response=ResponseParser.parseShowDetailResponse(executor.showTaskDetail(taskID),taskID);
 		} catch (CEOException e) {
-			response = String.format(MESSAGE_SHOW_ERROR_FORMAT, parameters);
+			response = String.format(MESSAGE_SHOW_ERROR_FORMAT, parameter);
 		}
 		return response;
 	}
@@ -221,7 +233,7 @@ public class CommandLineUI {
 		} catch (CEOException e) {
 			e.printStackTrace();
 		}
-		return String.format(MESSAGE_UNDO_FORMAT, result);
+		return String.format(MESSAGE_REDO_FORMAT, result);
 	}
 	
 	private static void print(String feedback) {
@@ -248,14 +260,40 @@ public class CommandLineUI {
 	}
 	
 	private void updateTimeFromRecur() {
+		int count = 0;
 		try {
 			ArrayList<PeriodicTask> periodicList = executor.getPeriodicList();
 			for (PeriodicTask task:periodicList){
-				executor.updateTimeFromRecur(task);
+				if (executor.updateTimeFromRecur(task)){
+					count++;
+				}
 			}
 		} catch (CEOException e) {
 			e.printStackTrace();
 		}
-		
+		print(String.format(MESSAGE_UPDATE_RECUR_TIME_FORMAT, count));
+	}
+	
+	private String getHelp(String parameter){
+		CommandParser.CommandType commandType = CommandParser.determineCommandType(parameter);
+		switch (commandType){
+		case LIST:
+			return ResponseParser.HELP_LIST;
+		case UPDATE:
+			return ResponseParser.HELP_UPDATE;
+		case ADD:
+			return ResponseParser.HELP_ADD;
+		case DELETE:
+			return ResponseParser.HELP_DELETE;
+		case SHOWDETAIL:
+			return ResponseParser.HELP_SHOW;
+		case UNDO:
+			return ResponseParser.HELP_UNDO;
+		case REDO:
+			return ResponseParser.HELP_REDO;
+		case INVALID:
+		default:
+			return ResponseParser.HELP_DEFAULT;
+		}
 	}
 }

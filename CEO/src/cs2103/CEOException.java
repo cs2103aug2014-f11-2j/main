@@ -17,6 +17,8 @@ class CEOException extends Exception {
 	public static final String LESS_THAN_ONE_PARA = "LESS_THAN_ONE_PARAMETER";
 	public static final String INVALID_RECUR = "INVALID_RECURRENCE";
 	public static final String UNEXPECTED_ERR = "UNEXPECTED_ERROR";
+	public static final String CLONE_FAILED = "CLONE_OBJECT_FAILED";
+	public static final String INVALID_UID = "INVALID_UID";
 	public CEOException(String errorMSG){
 		if (errorMSG.equals(ILLEGAL_FILE)||errorMSG.equals(READ_ERROR)){
 			System.exit(-1);

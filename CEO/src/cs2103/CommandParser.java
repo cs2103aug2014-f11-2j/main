@@ -15,7 +15,7 @@ import net.fortuna.ical4j.model.Recur;
 
 class CommandParser {
 	public static enum CommandType {
-		ADD, LIST, SHOWDETAIL, DELETE, UPDATE, EXIT, INVALID, UNDO, REDO;
+		ADD, LIST, SHOWDETAIL, DELETE, UPDATE, EXIT, INVALID, UNDO, REDO, HELP;
 	}
 	
 	public static enum TaskType {
@@ -68,7 +68,9 @@ class CommandParser {
 			return CommandType.UNDO;
 		} else if (command.equalsIgnoreCase("redo")){
 			return CommandType.REDO;
-		} else {
+		} else if (command.equalsIgnoreCase("help")){
+			return CommandType.HELP;
+		}else {
 			return CommandType.INVALID;
 		}
 	}
@@ -185,7 +187,7 @@ class CommandParser {
 		Date[] time = new Date[2];
 		time[0] = null; time[1] = null;
 		if (timeString != null){
-			Pattern p = Pattern.compile("\\d{4}/\\d{2}/\\d{2}/\\d{2}:\\d{2}");
+			Pattern p = Pattern.compile("\\d{4}/\\d{2}/\\d{2}\\s\\d{2}:\\d{2}");
 			Matcher m = p.matcher(timeString);
 			int i = 0;
 			while(m.find() && i < 2){
@@ -276,7 +278,7 @@ class CommandParser {
 		}
 		try {
 			TimeZone tz=TimeZone.getDefault();
-			SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd/HH:mm");
+			SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd HH:mm");
 			dateFormat.setTimeZone(tz);
 			return dateFormat.parse(timeString);
 		} catch (ParseException e) {
