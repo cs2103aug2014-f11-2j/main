@@ -28,6 +28,7 @@ public class CommandLineUI {
 	private final CommandExecutor executor;
 	private Scanner scanner = new Scanner(System.in);
 	private static CommandLineUI commandLine;
+	private static ResponseParser responseParser = ResponseParser.getInstance();
 	
 	private CommandLineUI(String dataFile) throws CEOException{
 		this.executor = CommandExecutor.getInstance(dataFile);

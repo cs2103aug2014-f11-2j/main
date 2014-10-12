@@ -82,6 +82,16 @@ public class ResponseParser {
 	private static final String STRING_RECUR = "Recurrence: ";
 	private static final long DAY_IN_MILLIS = 86400000L;
 	
+	private static ResponseParser responseParser_instance = null;
+	
+	// singleton 
+	public static ResponseParser getInstance() {
+		if ((responseParser_instance) == null) {
+			responseParser_instance = new ResponseParser();
+		}
+		return responseParser_instance;
+	}
+	
 	public static String parseAddResponse(String title, String description, String location, Date startTime, Date endTime, Recur recurrence) throws CEOException {
 		String result;
 		if (startTime == null && endTime == null){
