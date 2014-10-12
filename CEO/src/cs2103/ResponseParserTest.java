@@ -39,8 +39,8 @@ public class ResponseParserTest {
 		ArrayList<FloatingTask> taskList = new ArrayList<FloatingTask>();
 		taskList.add(new FloatingTask(null, "Eating", false));
 		taskList.add(new FloatingTask(null, "Drinking", false));
-		assertEquals("1. Eating\nType: Floating\t\tStatus: Needs Action\n"
-				+ "2. Drinking\nType: Floating\t\tStatus: Needs Action"
+		assertEquals("0. Eating\nType: Floating\t\tStatus: Needs Action\n"
+				+ "0. Drinking\nType: Floating\t\tStatus: Needs Action"
 				, ResponseParser.parseFloatingListResponse(taskList));
 	}
 	
@@ -55,8 +55,8 @@ public class ResponseParserTest {
 		ArrayList<DeadlineTask> taskList = new ArrayList<DeadlineTask>();
 		taskList.add(new DeadlineTask(null, "Pooping", stringToDate("2014/09/28/23:59"), false));
 		taskList.add(new DeadlineTask(null, "Wiping", stringToDate("2014/09/29/23:59"), false));
-		assertEquals("2. Pooping\nType: Deadline\t\tStatus: Needs Action	Due At: Sep 28, 2014 11:59:00 PM\n" 
-				+ "2. Wiping\nType: Deadline\t\tStatus: Needs Action	Due At: Sep 29, 2014 11:59:00 PM\n"
+		assertEquals("0. Pooping\nType: Deadline\t\tStatus: Needs Action	Due At: Sep 28, 2014 11:59:00 PM\n" 
+				+ "0. Wiping\nType: Deadline\t\tStatus: Needs Action	Due At: Sep 29, 2014 11:59:00 PM\n"
 				, ResponseParser.parseDeadlineListResponse(taskList));
 	}
 	
@@ -97,7 +97,7 @@ public class ResponseParserTest {
 		Task task = new FloatingTask(null, "Eating", false);
 		int taskID = 1;
 		assertEquals("The details for Task 1:\n"
-				+ "1. Eating\nType: Floating\t\tStatus: Needs Action\n"
+				+ "0. Eating\nType: Floating\t\tStatus: Needs Action\n"
 				+ "Location: null\n"
 				+ "Description: null",
 				ResponseParser.parseShowDetailResponse(task, taskID));		
@@ -109,7 +109,7 @@ public class ResponseParserTest {
 		task.updateDescription("Eating Chicken Rice");
 		int taskID = 1;
 		assertEquals("The details for Task 1:\n"
-				+ "1. Eating\nType: Floating\t\tStatus: Needs Action\n"
+				+ "0. Eating\nType: Floating\t\tStatus: Needs Action\n"
 				+ "Location: Hawker Center\n"
 				+ "Description: Eating Chicken Rice",
 				ResponseParser.parseShowDetailResponse(task, taskID));		

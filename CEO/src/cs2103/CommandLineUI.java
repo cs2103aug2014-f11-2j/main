@@ -14,9 +14,9 @@ public class CommandLineUI {
 	private static final String MESSAGE_USER_PROMPT = "Command me please: ";
 	private static final String MESSAGE_COMMAND_ERROR = "Your input command is invalid, please check your command and try again";
 	private static final String MESSAGE_INVALID_TASKTYPE_FORMAT = "Your input Task Type %1$s is invalid, corrected to All";
-	private static final String MESSAGE_DELETE_FORMAT = "You have deleted task with ID %1$s";
+	private static final String MESSAGE_DELETE_FORMAT = "You have succesfully deleted task with ID %1$s";
 	private static final String MESSAGE_DELETE_ERROR_FORMAT = "Failed to delete task with ID %1$s";
-	private static final String MESSAGE_ADD = "You have added a new task.";
+	private static final String MESSAGE_ADD = "You have succesfully added a new task.\n %1$s";
 	private static final String MESSAGE_ADD_ERROR = "Failed to add new task";
 	private static final String MESSAGE_UPDATE_FORMAT = "You have updated task with ID %1$s";
 	private static final String MESSAGE_UPDATE_ERROR_FORMAT = "Failed to update task with ID %1$s";
@@ -134,9 +134,10 @@ public class CommandLineUI {
 			String recurString = CommandParser.getRecurString(parameterMap);
 			Date[] time = CommandParser.getTime(timeString);
 			executor.addTask(title, description, location, time[0], time[1], CommandParser.stringToRecur(recurString));
-			result = MESSAGE_ADD;
+			result = ResponseParser.parseAddResponse(title,description,location,time[0],time[1], 
+					CommandParser.stringToRecur(recurString));
 		}catch (CEOException e){
-			result = MESSAGE_ADD_ERROR;
+			result = ResponseParser.parseAddResponseError();
 		}
 		return result;
 	}
@@ -169,7 +170,7 @@ public class CommandLineUI {
 			int taskID=CommandParser.parseIntegerParameter(parameter);
 			response=ResponseParser.parseShowDetailResponse(executor.showTaskDetail(taskID),taskID);
 		} catch (CEOException e) {
-			response = String.format(MESSAGE_SHOW_ERROR_FORMAT, parameter);
+			response = ResponseParser.parseShowDetailResponseError(parameter);
 		}
 		return response;
 	}
@@ -179,9 +180,9 @@ public class CommandLineUI {
 		try {
 			int taskID=CommandParser.parseIntegerParameter(parameter);
 			executor.deleteTask(taskID);
-			response = String.format(MESSAGE_DELETE_FORMAT, parameter);
+			response = ResponseParser.parseDeleteResponse(taskID);
 		} catch (CEOException e) {
-			response = String.format(MESSAGE_DELETE_ERROR_FORMAT, parameter);
+			response = ResponseParser.parseDeleteResponseError(parameter);
 		}
 		return response;
 	}

@@ -63,6 +63,11 @@ public class ResponseParser {
 	private static final String MESSAGE_SHOWDETAIL_ERROR_FOMRAT = "Unable to show detail for task %1$d";
 	private static final String MESSAGE_TASKS_DUE = "Tasks due within one day:\n";
 	private static final String MESSAGE_TASKS_STARTING = "Tasks start within one day:\n";
+	private static final String MESSAGE_DELETE_TASK = "You have succesfully deleted task with ID %1$s";
+	private static final String MESSAGE_DELETE_TASK_ERROR = "Failed to delete task with ID %1$s";
+	private static final String MESSAGE_ADD = "You have succesfully added a new task.\n %1$s";
+	private static final String MESSAGE_ADD_ERROR = "Failed to add new task";
+	private static final String MESSAGE_SHOW_ERROR_FORMAT = "Failed to show task with ID %1$s";
 	private static final String TYPE_FLOATING = "Floating";
 	private static final String TYPE_DEADLINE = "Deadline";
 	private static final String TYPE_PERIODIC = "Periodic";
@@ -72,6 +77,25 @@ public class ResponseParser {
 	private static final String STRING_DESCRIPTION = "Description: ";
 	private static final String STRING_RECUR = "Recurrence: ";
 	private static final long DAY_IN_MILLIS = 86400000L;
+	
+	public static String parseAddResponse(String title, String description, String location, Date startTime, Date endTime, Recur recurrence) throws CEOException {
+		String result;
+		if (startTime == null && endTime == null){
+			FloatingTask task = new FloatingTask(null, title, false);
+			result = String.format(MESSAGE_ADD,floatingToDetail(task));
+		} else if (endTime == null){
+			DeadlineTask task = new DeadlineTask(null, title, startTime, false);
+			result = String.format(MESSAGE_ADD,deadlineToDetail(task));
+		} else {
+			PeriodicTask task = new PeriodicTask(null, title, location, startTime, endTime, recurrence);
+			result = String.format(MESSAGE_ADD,periodicToDetail(task));
+		}
+		return result;
+	}
+	
+	public static String parseAddResponseError() {
+		return MESSAGE_ADD_ERROR;
+	}
 	
 	public static String parseAllListResponse(ArrayList<Task> taskList) throws CEOException{
 		if (taskList == null || taskList.size() == 0){
@@ -129,6 +153,14 @@ public class ResponseParser {
 		}
 	}
 	
+	public static String parseDeleteResponse(int taskID) {
+		return String.format(MESSAGE_DELETE_TASK, taskID);
+	}
+	
+	public static String parseDeleteResponseError(String parameter) {
+		return String.format(MESSAGE_DELETE_TASK_ERROR, parameter);
+	}
+	
 	public static String alertDeadline(ArrayList<DeadlineTask> taskList){
 		if (taskList == null || taskList.size() == 0){
 			return null;
@@ -146,7 +178,6 @@ public class ResponseParser {
 			}
 		}
 	}
-	
 	
 	public static String alertPeriodic(ArrayList<PeriodicTask> taskList){
 		if (taskList == null || taskList.size() == 0){
@@ -208,6 +239,10 @@ public class ResponseParser {
 			sb.deleteCharAt(sb.length()-1);
 			return sb.toString();
 		}
+	}
+	
+	public static String parseShowDetailResponseError(String parameter) {
+		return String.format(MESSAGE_SHOW_ERROR_FORMAT, parameter);
 	}
 	
 	private static String floatingToSummary(FloatingTask task){
