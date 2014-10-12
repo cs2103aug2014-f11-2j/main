@@ -22,7 +22,7 @@ class CommandParser {
 		ALL, FLOATING, DEADLINE, PERIODIC, INVALID;
 	}
 	
-	private static String[] multiParameterCommands = {"add", "update", "search"};
+	private static String[] multiParameterCommands = {"add", "update", "search", "new", "modify"};
 	private static String[] allowedSeparateLiteral = {"\\s+-", "\\s+/", ";"};
 	
 	public static Queue<String> separateCommand(String userInput) throws CEOException {
@@ -54,13 +54,13 @@ class CommandParser {
 		}
 		if (command.equalsIgnoreCase("list")){
 			return CommandType.LIST;
-		} else if (command.equalsIgnoreCase("update")){
+		} else if (command.equalsIgnoreCase("update") || command.equalsIgnoreCase("modify")){
 			return CommandType.UPDATE;
 		} else if (command.equalsIgnoreCase("exit")){
 			return CommandType.EXIT;
-		} else if (command.equalsIgnoreCase("add")){
+		} else if (command.equalsIgnoreCase("add") || command.equalsIgnoreCase("new")){
 			return CommandType.ADD;
-		} else if (command.equalsIgnoreCase("delete")){
+		} else if (command.equalsIgnoreCase("delete") || command.equalsIgnoreCase("remove") || command.equalsIgnoreCase("del")){
 			return CommandType.DELETE;
 		} else if (command.equalsIgnoreCase("show")){
 			return CommandType.SHOWDETAIL;
@@ -165,6 +165,7 @@ class CommandParser {
 		Queue<String> keywordQueue = new LinkedList<String>();
 		keywordQueue.add("C");
 		keywordQueue.add("complete");
+		keywordQueue.add("done");
 		String result = null;
 		while(result == null && !keywordQueue.isEmpty()){
 			result = getParameter(keywordQueue.poll(), parameterMap);
@@ -176,6 +177,8 @@ class CommandParser {
 		Queue<String> keywordQueue = new LinkedList<String>();
 		keywordQueue.add("T");
 		keywordQueue.add("time");
+		keywordQueue.add("by");
+		keywordQueue.add("from");
 		String result = null;
 		while(result == null && !keywordQueue.isEmpty()){
 			result = getParameter(keywordQueue.poll(), parameterMap);
@@ -211,8 +214,8 @@ class CommandParser {
 	
 	
 	public static boolean parseComplete(String complete) throws CEOException{
-		if (complete == null){
-			return false;
+		if (complete == null || complete.equals("")){
+			return true;
 		} else if (complete.equalsIgnoreCase("true")){
 			return true;
 		} else if (complete.equalsIgnoreCase("false")){
