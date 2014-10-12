@@ -129,7 +129,7 @@ public class CommandLineUI {
 			return ResponseParser.parseAddResponse(false);
 		} catch (FatalException e) {
 			printErrorAndExit();
-			return null;
+			return "";
 		}
 	}
 	
@@ -174,7 +174,7 @@ public class CommandLineUI {
 			return ResponseParser.parseDeleteResponse(parameter, false);
 		} catch (FatalException e) {
 			printErrorAndExit();
-			return null;
+			return "";
 		}
 	}
 
@@ -203,7 +203,7 @@ public class CommandLineUI {
 			return ResponseParser.parseUpdateResponse(taskIDString, false);
 		} catch (FatalException e) {
 			printErrorAndExit();
-			return null;
+			return "";
 		}
 	}
 	

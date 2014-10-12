@@ -30,7 +30,7 @@ public class PeriodicTask extends Task {
 		if (startTime == null || endTime == null){
 			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
 		} else if (startTime.after(endTime)){
-			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
+			throw new HandledException(HandledException.ExceptionType.END_BEFORE_START);
 		} else {
 			this.startTime=startTime;
 			this.endTime=endTime;
