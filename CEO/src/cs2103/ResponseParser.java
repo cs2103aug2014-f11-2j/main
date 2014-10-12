@@ -66,9 +66,23 @@ public class ResponseParser {
 										   "Example:\nredo 1\n";
 	public static final String HELP_UNDO = "Undo has no extra options\n" +
 			                               "Example:\nundo 1\n";
+	
+	private static final String MESSAGE_ADD = "You have successfully added a new task.";
+	private static final String MESSAGE_ADD_ERROR = "Failed to add new task";
+	private static final String MESSAGE_INVALID_TASKTYPE_FORMAT = "Your input Task Type %1$s is invalid, corrected to All";
 	private static final String MESSAGE_EMPTY_LIST = "The task list is empty";
+	private static final String MESSAGE_SHOW_FORMAT = "The details for Task %1$d:\n";
+	private static final String MESSAGE_SHOW_ERROR_FORMAT = "Failed to show task with ID %1$s";
 	private static final String MESSAGE_TASKS_DUE = "Tasks due within one day:\n";
 	private static final String MESSAGE_TASKS_STARTING = "Tasks start within one day:\n";
+	private static final String MESSAGE_DELETE_FORMAT = "You have deleted task with ID %1$s";
+	private static final String MESSAGE_DELETE_ERROR_FORMAT = "Failed to delete task with ID %1$s";
+	private static final String MESSAGE_UPDATE_FORMAT = "You have updated task with ID %1$s";
+	private static final String MESSAGE_UPDATE_ERROR_FORMAT = "Failed to update task with ID %1$s";
+	private static final String MESSAGE_UNDO_FORMAT = "Successfully undo %1$d tasks";
+	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d tasks";
+	private static final String MESSAGE_UPDATE_RECUR_TIME_FORMAT = "Successfully updated %1$d recurring tasks";
+	
 	private static final String TYPE_FLOATING = "Floating";
 	private static final String TYPE_DEADLINE = "Deadline";
 	private static final String TYPE_PERIODIC = "Periodic";
@@ -77,6 +91,7 @@ public class ResponseParser {
 	private static final String STRING_LOCATION = "Location: ";
 	private static final String STRING_DESCRIPTION = "Description: ";
 	private static final String STRING_RECUR = "Recurrence: ";
+	
 	private static final long DAY_IN_MILLIS = 86400000L;
 	
 	public static String parseAllListResponse(ArrayList<Task> taskList) throws HandledException{
@@ -135,6 +150,10 @@ public class ResponseParser {
 		}
 	}
 	
+	public static String parseListErrorResponse(String taskType){
+		return String.format(MESSAGE_INVALID_TASKTYPE_FORMAT, taskType);
+	}
+	
 	public static String alertDeadline(ArrayList<DeadlineTask> taskList){
 		if (taskList == null || taskList.size() == 0){
 			return null;
@@ -152,7 +171,6 @@ public class ResponseParser {
 			}
 		}
 	}
-	
 	
 	public static String alertPeriodic(ArrayList<PeriodicTask> taskList){
 		if (taskList == null || taskList.size() == 0){
@@ -201,6 +219,7 @@ public class ResponseParser {
 			throw new HandledException(HandledException.ExceptionType.INVALID_TASK_OBJ);
 		} else {
 			StringBuffer sb = new StringBuffer();
+			sb.append(String.format(MESSAGE_SHOW_FORMAT, task.getTaskID()));
 			if (task instanceof FloatingTask){
 				sb.append(floatingToDetail((FloatingTask) task));
 			} else if (task instanceof DeadlineTask){
@@ -213,6 +232,34 @@ public class ResponseParser {
 			sb.deleteCharAt(sb.length()-1);
 			return sb.toString();
 		}
+	}
+	
+	public static String parseShowErrorResponse(String taskID){
+		return String.format(MESSAGE_SHOW_ERROR_FORMAT, taskID);
+	}
+	
+	public static String parseAddResponse(boolean success){
+		return success?MESSAGE_ADD:MESSAGE_ADD_ERROR;
+	}
+	
+	public static String parseDeleteResponse(String taskID, boolean success){
+		return String.format(success?MESSAGE_DELETE_FORMAT:MESSAGE_DELETE_ERROR_FORMAT, taskID);
+	}
+	
+	public static String parseUpdateResponse(String taskID, boolean success){
+		return String.format(success?MESSAGE_UPDATE_FORMAT:MESSAGE_UPDATE_ERROR_FORMAT, taskID);
+	}
+	
+	public static String parseUndoResponse(int count){
+		return String.format(MESSAGE_UNDO_FORMAT, count);
+	}
+	
+	public static String parseRedoResponse(int count){
+		return String.format(MESSAGE_REDO_FORMAT, count);
+	}
+	
+	public static String parseUpdateTimeFromRecurResponse(int count){
+		return String.format(MESSAGE_UPDATE_RECUR_TIME_FORMAT, count);
 	}
 	
 	private static String floatingToSummary(FloatingTask task){

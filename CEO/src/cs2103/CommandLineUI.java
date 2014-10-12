@@ -13,19 +13,9 @@ public class CommandLineUI {
 	private static final String MESSAGE_EXIT = "You have exited CEO. Hope to see you again.";
 	private static final String MESSAGE_USER_PROMPT = "Command me please: ";
 	private static final String MESSAGE_COMMAND_ERROR = "Your input command is invalid, please check your command and try again";
-	private static final String MESSAGE_INVALID_TASKTYPE_FORMAT = "Your input Task Type %1$s is invalid, corrected to All";
-	private static final String MESSAGE_DELETE_FORMAT = "You have deleted task with ID %1$s";
-	private static final String MESSAGE_DELETE_ERROR_FORMAT = "Failed to delete task with ID %1$s";
-	private static final String MESSAGE_ADD = "You have added a new task.";
-	private static final String MESSAGE_ADD_ERROR = "Failed to add new task";
-	private static final String MESSAGE_UPDATE_FORMAT = "You have updated task with ID %1$s";
-	private static final String MESSAGE_UPDATE_ERROR_FORMAT = "Failed to update task with ID %1$s";
-	private static final String MESSAGE_SHOW_ERROR_FORMAT = "Failed to show task with ID %1$s";
-	private static final String MESSAGE_UNDO_FORMAT = "Successfully undo %1$d tasks";
-	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d tasks";
-	private static final String MESSAGE_UPDATE_RECUR_TIME_FORMAT = "Successfully updated %1$d recurring tasks";
-	private static final String MESSAGE_SHOW_FORMAT = "The details for Task %1$d:";
+	private static final String MESSAGE_FATAL_ERR = "A fatal error has occurred, program will now exit. Check log for detail";
 	private static final String MESSAGE_INCORRECT_ARG = "Incorrect Argument\n";
+	
 	private final CommandExecutor executor;
 	private Scanner scanner = new Scanner(System.in);
 	private static CommandLineUI commandLine;
@@ -122,7 +112,6 @@ public class CommandLineUI {
 	}
 	
 	private String add(Queue<String> parameterList){
-		String result;
 		try{
 			Map<String, String> parameterMap = CommandParser.separateParameters(parameterList);
 			String title = CommandParser.getTitle(parameterMap);
@@ -135,13 +124,13 @@ public class CommandLineUI {
 			String recurString = CommandParser.getRecurString(parameterMap);
 			Date[] time = CommandParser.getTime(timeString);
 			executor.addTask(title, description, location, time[0], time[1], CommandParser.stringToRecur(recurString));
-			result = MESSAGE_ADD;
+			return ResponseParser.parseAddResponse(true);
 		} catch (HandledException e){
-			result = MESSAGE_ADD_ERROR;
+			return ResponseParser.parseAddResponse(false);
 		} catch (FatalException e) {
-			result = MESSAGE_ADD_ERROR;
+			printErrorAndExit();
+			return null;
 		}
-		return result;
 	}
 	
 	private String list(String parameter) {
@@ -158,11 +147,11 @@ public class CommandLineUI {
 				return ResponseParser.parsePeriodicListResponse(executor.getPeriodicList());
 			case INVALID:
 			default:
-				print(String.format(MESSAGE_INVALID_TASKTYPE_FORMAT, parameter));
+				print(ResponseParser.parseListErrorResponse(parameter));
 				return ResponseParser.parseAllListResponse(executor.getAllList());
 			}
 		} catch (HandledException e){
-			return "List failed msg";
+			return ResponseParser.parseListErrorResponse(parameter);
 		}
 	}
 	
@@ -170,30 +159,26 @@ public class CommandLineUI {
 		try {
 			int taskID=CommandParser.parseIntegerParameter(parameter);
 			String result = ResponseParser.parseShowDetailResponse(executor.showTaskDetail(taskID));
-			print(String.format(MESSAGE_SHOW_FORMAT, parameter));
 			return result;
 		} catch (HandledException e) {
-			print(String.format(MESSAGE_SHOW_ERROR_FORMAT, parameter));
-			return null;
+			return ResponseParser.parseShowErrorResponse(parameter);
 		}
 	}
 
 	private String delete(String parameter) {
-		String response;
 		try {
 			int taskID=CommandParser.parseIntegerParameter(parameter);
 			executor.deleteTask(taskID);
-			response = String.format(MESSAGE_DELETE_FORMAT, parameter);
+			return ResponseParser.parseDeleteResponse(parameter, true);
 		} catch (HandledException e) {
-			response = String.format(MESSAGE_DELETE_ERROR_FORMAT, parameter);
+			return ResponseParser.parseDeleteResponse(parameter, false);
 		} catch (FatalException e) {
-			response = String.format(MESSAGE_DELETE_ERROR_FORMAT, parameter);
+			printErrorAndExit();
+			return null;
 		}
-		return response;
 	}
 
 	private String update(Queue<String> parameterList) {
-		String result;
 		String taskIDString = parameterList.poll();
 		int taskID=0;
 		try{
@@ -213,13 +198,13 @@ public class CommandLineUI {
 			}else{
 				executor.updateTask(taskID, title, description, location, complete, completeString != null, time, timeString != null, recur, recurString != null);
 			}
-			result = String.format(MESSAGE_UPDATE_FORMAT, taskIDString);
-		}catch (HandledException e){
-			result = String.format(MESSAGE_UPDATE_ERROR_FORMAT, taskIDString);
+			return ResponseParser.parseUpdateResponse(taskIDString, true);
+		} catch (HandledException e){
+			return ResponseParser.parseUpdateResponse(taskIDString, false);
 		} catch (FatalException e) {
-			result = String.format(MESSAGE_UPDATE_ERROR_FORMAT, taskIDString);
+			printErrorAndExit();
+			return null;
 		}
-		return result;
 	}
 	
 	private String undo(String parameter) {
@@ -232,7 +217,7 @@ public class CommandLineUI {
 		} catch (FatalException e) {
 			e.printStackTrace();
 		}
-		return String.format(MESSAGE_UNDO_FORMAT, result);
+		return ResponseParser.parseUndoResponse(result);
 	}
 	
 	private String redo(String parameter) {
@@ -245,7 +230,7 @@ public class CommandLineUI {
 		} catch (FatalException e) {
 			e.printStackTrace();
 		}
-		return String.format(MESSAGE_REDO_FORMAT, result);
+		return ResponseParser.parseRedoResponse(result);
 	}
 	
 	private static void print(String feedback) {
@@ -258,6 +243,11 @@ public class CommandLineUI {
 		if (prompt != null){
 			System.out.print(prompt);
 		}
+	}
+	
+	private static void printErrorAndExit(){
+		System.err.print(MESSAGE_FATAL_ERR);
+		System.exit(-1);
 	}
 	
 	private void alertTask() {
@@ -276,12 +266,12 @@ public class CommandLineUI {
 					count++;
 				}
 			}
+			print(ResponseParser.parseUpdateTimeFromRecurResponse(count));
 		} catch (HandledException e) {
-			e.printStackTrace();
+			print(ResponseParser.parseUpdateTimeFromRecurResponse(count));
 		} catch (FatalException e) {
-			e.printStackTrace();
+			printErrorAndExit();
 		}
-		print(String.format(MESSAGE_UPDATE_RECUR_TIME_FORMAT, count));
 	}
 	
 	private String getHelp(String parameter){
