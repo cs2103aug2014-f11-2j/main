@@ -25,8 +25,8 @@ class CommandParser {
 	private static String[] multiParameterCommands = {"add", "update", "search", "new", "modify"};
 	private static String[] allowedSeparateLiteral = {"\\s+-", "\\s+/", ";"};
 	
-	public static Queue<String> separateCommand(String userInput) throws CEOException {
-		checkNullString(userInput, CEOException.INVALID_CMD);
+	public static Queue<String> separateCommand(String userInput) throws HandledException{
+		checkNullString(userInput, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> result = new LinkedList<String>();
 		if (checkMultiParameter(splitFirstWord(userInput)[0])){
 			String[] parameters = splitMultiParameter(userInput);
@@ -92,8 +92,8 @@ class CommandParser {
 		}
 	}
 	
-	public static int parseIntegerParameter(String parameter) throws CEOException{
-		checkNullString(parameter, CEOException.INVALID_PARA);
+	public static int parseIntegerParameter(String parameter) throws HandledException {
+		checkNullString(parameter, HandledException.ExceptionType.INVALID_PARA);
 		parameter = parameter.trim();
 		if (parameter.matches("[0-9]+")){
 			return Integer.parseInt(parameter);
@@ -102,8 +102,8 @@ class CommandParser {
 		}
 	}
 	
-	public static Map<String,String> separateParameters(Queue<String> parameterList) throws CEOException{
-		if (parameterList == null) throw new CEOException(CEOException.INVALID_PARA);
+	public static Map<String,String> separateParameters(Queue<String> parameterList) throws HandledException{
+		if (parameterList == null) throw new HandledException(HandledException.ExceptionType.INVALID_PARA);
 		Map<String,String> parameterMap = new HashMap<String, String>();
 		while(!parameterList.isEmpty()){
 			String[] splitResult = splitFirstWord(parameterList.poll());
@@ -186,7 +186,7 @@ class CommandParser {
 		return result;
 	}
 	
-	public static Date[] getTime(String timeString) throws CEOException{
+	public static Date[] getTime(String timeString) throws HandledException{
 		Date[] time = new Date[2];
 		time[0] = null; time[1] = null;
 		if (timeString != null){
@@ -212,8 +212,7 @@ class CommandParser {
 		return result;
 	}
 	
-	
-	public static boolean parseComplete(String complete) throws CEOException{
+	public static boolean parseComplete(String complete) throws HandledException {
 		if (complete == null || complete.equals("")){
 			return true;
 		} else if (complete.equalsIgnoreCase("true")){
@@ -221,16 +220,16 @@ class CommandParser {
 		} else if (complete.equalsIgnoreCase("false")){
 			return false;
 		} else {
-			throw new CEOException(CEOException.INVALID_COMPLETE);
+			throw new HandledException(HandledException.ExceptionType.INVALID_COMPLETE);
 		}
 	}
 	
-	private static void checkNullString(String str, String expectedException) throws CEOException{
-		if (str == null || str.equals("")) throw new CEOException(expectedException);
+	private static void checkNullString(String str, HandledException.ExceptionType expectedException) throws HandledException{
+		if (str == null || str.equals("")) throw new HandledException(expectedException);
 	}
 	
-	private static boolean checkMultiParameter(String commandType) throws CEOException{
-		checkNullString(commandType, CEOException.INVALID_CMD);
+	private static boolean checkMultiParameter(String commandType) throws HandledException{
+		checkNullString(commandType, HandledException.ExceptionType.INVALID_CMD);
 		for (String s:multiParameterCommands){
 			if (commandType.equalsIgnoreCase(s)){
 				return true;
@@ -239,18 +238,18 @@ class CommandParser {
 		return false;
 	}
 	
-	private static String[] splitMultiParameter(String userInput) throws CEOException{
-		checkNullString(userInput, CEOException.INVALID_CMD);
+	private static String[] splitMultiParameter(String userInput) throws HandledException{
+		checkNullString(userInput, HandledException.ExceptionType.INVALID_CMD);
 		String[] parameters;
 		for (String regex:allowedSeparateLiteral){
 			parameters = userInput.trim().split(regex);
 			if (parameters.length > 1) return parameters;
 		}
-		throw new CEOException(CEOException.LESS_THAN_ONE_PARA);
+		throw new HandledException(HandledException.ExceptionType.LESS_THAN_ONE_PARA);
 	}
 	
-	private static String removeDash(String parameterString) throws CEOException{
-		checkNullString(parameterString, CEOException.INVALID_PARA);
+	private static String removeDash(String parameterString) throws HandledException{
+		checkNullString(parameterString, HandledException.ExceptionType.INVALID_PARA);
 		if (parameterString.startsWith("-")){
 			return parameterString.substring(1);
 		}else{
@@ -258,8 +257,8 @@ class CommandParser {
 		}
 	}
 	
-	private static String[] splitFirstWord(String parameterString) throws CEOException{
-		checkNullString(parameterString, CEOException.INVALID_PARA);
+	private static String[] splitFirstWord(String parameterString) throws HandledException{
+		checkNullString(parameterString, HandledException.ExceptionType.INVALID_PARA);
 		String[] result;
 		if (parameterString == null || parameterString.equals("")) return null;
 		int spaceIndex = parameterString.indexOf(' ');
@@ -275,7 +274,7 @@ class CommandParser {
 		}
 	}
 	
-	private static Date stringToDate(String timeString) throws CEOException{
+	private static Date stringToDate(String timeString) throws HandledException{
 		if (timeString == null){
 			return null;
 		}
@@ -285,11 +284,11 @@ class CommandParser {
 			dateFormat.setTimeZone(tz);
 			return dateFormat.parse(timeString);
 		} catch (ParseException e) {
-			throw new CEOException(CEOException.INVALID_TIME);
+			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
 		}
 	}
 	
-	public static Recur stringToRecur(String recurrence) throws CEOException{
+	public static Recur stringToRecur(String recurrence) throws HandledException{
 		if (recurrence == null || recurrence.equals("")){
 			return null;
 		}
@@ -310,7 +309,7 @@ class CommandParser {
 			} else if (found.equals("y")){
 				frequency=Recur.YEARLY;
 			} else {
-				throw new CEOException(CEOException.INVALID_RECUR);
+				throw new HandledException(HandledException.ExceptionType.INVALID_RECUR);
 			}
 			Recur recur=new Recur();
 			recur.setFrequency(frequency);
@@ -319,7 +318,7 @@ class CommandParser {
 		} else if (recurrence.equals("0")){
 			return null;
 		} else {
-			throw new CEOException(CEOException.INVALID_RECUR);
+			throw new HandledException(HandledException.ExceptionType.INVALID_RECUR);
 		}
 	}
 }

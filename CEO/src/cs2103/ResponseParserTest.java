@@ -10,7 +10,7 @@ import org.junit.Test;
 public class ResponseParserTest {
 	
 	@Test
-	public void testParseListResponseThreeTasks() throws CEOException, ParseException {
+	public void testParseListResponseThreeTasks() throws ParseException, HandledException {
 		ArrayList<Task> taskList = new ArrayList<Task>();
 		taskList.add(new FloatingTask(null, "Eating", false));
 		//taskList.add(new DeadlineTask(null, "Pooping", CommandParser.stringToDate("2014/09/28/23:59"), false));
@@ -26,19 +26,15 @@ public class ResponseParserTest {
 
 	
 	@Test 
-	public void testParseShowDetailResponseNull() {
+	public void testParseShowDetailResponseNull() throws HandledException {
 		Task task = null;
 		int taskID = 1;
-		try {
-			assertEquals(ResponseParser.parseShowDetailResponse(task, taskID), 
+		assertEquals(ResponseParser.parseShowDetailResponse(task, taskID), 
 					"Unable to show detail for task 1");
-		} catch (CEOException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	@Test 
-	public void testParseShowDetailResponseTaskWithNoDetails() throws CEOException {
+	public void testParseShowDetailResponseTaskWithNoDetails() throws HandledException{
 		Task task = new FloatingTask(null, "Eating", false);
 		int taskID = 1;
 		assertEquals("The details for Task 1:\n"
@@ -49,7 +45,7 @@ public class ResponseParserTest {
 	}
 	
 	@Test 
-	public void testParseShowDetailResponseTaskWithDetails() throws CEOException {
+	public void testParseShowDetailResponseTaskWithDetails() throws HandledException {
 		Task task = new FloatingTask(null, "Eating", false);
 		task.updateDescription("Eating Chicken Rice");
 		int taskID = 1;

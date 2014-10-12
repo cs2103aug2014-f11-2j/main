@@ -19,19 +19,19 @@ class CommandExecutor {
 		ADD, DELETE, UPDATE;
 	}
 	
-	private CommandExecutor(String dataFile) throws CEOException{
+	private CommandExecutor(String dataFile) throws HandledException, FatalException{
 		this.storage = StorageEngine.getInstance(dataFile);
 		this.taskList = storage.getTaskList();
 	}
 	
-	public static CommandExecutor getInstance(String dataFile) throws CEOException{
+	public static CommandExecutor getInstance(String dataFile) throws HandledException, FatalException{
 		if (executor == null){
 			executor = new CommandExecutor(dataFile);
 		}
 		return executor;
 	}
 	
-	public void addTask(String title, String description, String location, Date startTime, Date endTime, Recur recurrence) throws CEOException{
+	public void addTask(String title, String description, String location, Date startTime, Date endTime, Recur recurrence) throws HandledException, FatalException{
 		Task task;
 		if (startTime == null && endTime == null){
 			task = new FloatingTask(null, title, false);
@@ -45,7 +45,7 @@ class CommandExecutor {
 		this.taskList = storage.updateTask(task);
 	}
 	
-	public ArrayList<PeriodicTask> getPeriodicList() throws CEOException{
+	public ArrayList<PeriodicTask> getPeriodicList(){
 		ArrayList<PeriodicTask> returnList = new ArrayList<PeriodicTask>();
 		for (Task task:this.taskList){
 			if (task instanceof PeriodicTask){
@@ -55,7 +55,7 @@ class CommandExecutor {
 		return returnList;
 	}
 	
-	public ArrayList<DeadlineTask> getDeadlineList() throws CEOException{
+	public ArrayList<DeadlineTask> getDeadlineList(){
 		ArrayList<DeadlineTask> returnList = new ArrayList<DeadlineTask>();
 		for (Task task:this.taskList){
 			if (task instanceof DeadlineTask){
@@ -65,7 +65,7 @@ class CommandExecutor {
 		return returnList;
 	}
 	
-	public ArrayList<FloatingTask> getFloatingList() throws CEOException{
+	public ArrayList<FloatingTask> getFloatingList(){
 		ArrayList<FloatingTask> returnList = new ArrayList<FloatingTask>();
 		for (Task task:this.taskList){
 			if (task instanceof FloatingTask){
@@ -75,22 +75,22 @@ class CommandExecutor {
 		return returnList;
 	}
 	
-	public ArrayList<Task> getAllList() throws CEOException{
+	public ArrayList<Task> getAllList(){
 		return this.taskList;
 	}
 
 	
-	public Task showTaskDetail(int taskID) throws CEOException{
+	public Task showTaskDetail(int taskID) throws HandledException{
 		return getTaskByID(taskID);
 	}
 	
-	public void deleteTask(int taskID) throws CEOException{
+	public void deleteTask(int taskID) throws HandledException, FatalException{
 		Task task = getTaskByID(taskID);
 		backupTask(ActionType.DELETE, task);
 		this.taskList = storage.deleteTask(task);
 	}
 	
-	public void updateTask(int taskID, String title, String description, String location, boolean complete, boolean completeFlag, Date[] time, boolean timeFlag, Recur recurrence, boolean recurFlag) throws CEOException{
+	public void updateTask(int taskID, String title, String description, String location, boolean complete, boolean completeFlag, Date[] time, boolean timeFlag, Recur recurrence, boolean recurFlag) throws HandledException, FatalException{
 		Task task = getTaskByID(taskID);
 		Task newTask;
 		if (timeFlag){
@@ -117,7 +117,7 @@ class CommandExecutor {
 		this.taskList = storage.updateTask(newTask);
 	}
 	
-	private Task updateTaskType(Task task, Date startTime, Date endTime) throws CEOException{
+	private Task updateTaskType(Task task, Date startTime, Date endTime) throws HandledException{
 		if (startTime == null && endTime == null){
 			return task.toFloating();
 		} else if (endTime == null){
@@ -127,19 +127,19 @@ class CommandExecutor {
 		}
 	}
 	
-	private Task cloneTask(Task task) throws CEOException{
+	private Task cloneTask(Task task) throws HandledException{
 		try {
 			Task newTask = (Task) task.clone();
 			return newTask;
 		} catch (CloneNotSupportedException e) {
-			throw new CEOException(CEOException.CLONE_FAILED);
+			throw new HandledException(HandledException.ExceptionType.CLONE_FAILED);
 		}
 	}
 	
-	public int undoTasks(int count) throws CEOException{
+	public int undoTasks(int count) throws HandledException, FatalException{
 		if (this.undoStack == null) return 0;
 		if (count < 1){
-			throw new CEOException(CEOException.INVALID_PARA);
+			throw new HandledException(HandledException.ExceptionType.INVALID_PARA);
 		} else if (count > this.undoStack.size()){
 			count = this.undoStack.size();
 		}
@@ -150,10 +150,10 @@ class CommandExecutor {
 		return i;
 	}
 	
-	public int redoTasks(int count) throws CEOException{
+	public int redoTasks(int count) throws HandledException, FatalException{
 		if (this.redoStack == null) return 0;
 		if (count < 1){
-			throw new CEOException(CEOException.INVALID_PARA);
+			throw new HandledException(HandledException.ExceptionType.INVALID_PARA);
 		} else if (count > this.redoStack.size()){
 			count = this.redoStack.size();
 		}
@@ -164,7 +164,7 @@ class CommandExecutor {
 		return i;
 	}
 	
-	public boolean updateTimeFromRecur(PeriodicTask task) throws CEOException{
+	public boolean updateTimeFromRecur(PeriodicTask task) throws HandledException, FatalException{
 		DateTime now = new DateTime();
 		if (task.getRecurrence() != null){
 			if (task.getStartTime().before(now)){
@@ -178,7 +178,7 @@ class CommandExecutor {
 		return false;
 	}
 	
-	private void undoTask(TaskBackup taskBackup) throws CEOException{
+	private void undoTask(TaskBackup taskBackup) throws HandledException, FatalException{
 		if (this.redoStack == null) this.redoStack = new Stack<TaskBackup>();
 		this.redoStack.push(taskBackup);
 		switch(taskBackup.getActionType()){
@@ -190,11 +190,11 @@ class CommandExecutor {
 			this.taskList = storage.updateTask(taskBackup.getTask());
 			break;
 		default:
-			throw new CEOException(CEOException.UNEXPECTED_ERR);
+			throw new HandledException(HandledException.ExceptionType.UNEXPECTED_ERR);
 		}
 	}
 	
-	private void redoTask(TaskBackup taskBackup) throws CEOException{
+	private void redoTask(TaskBackup taskBackup) throws HandledException, FatalException{
 		if (this.undoStack == null) this.undoStack = new Stack<TaskBackup>();
 		this.undoStack.push(taskBackup);
 		switch(taskBackup.getActionType()){
@@ -206,13 +206,13 @@ class CommandExecutor {
 			this.taskList = storage.updateTask(taskBackup.getTask());
 			break;
 		default:
-			throw new CEOException(CEOException.UNEXPECTED_ERR);
+			throw new HandledException(HandledException.ExceptionType.UNEXPECTED_ERR);
 		}
 	}
 	
-	private Task getTaskByID(int taskID) throws CEOException{
+	private Task getTaskByID(int taskID) throws HandledException{
 		if (taskID > this.taskList.size() || taskID < 1){
-			throw new CEOException(CEOException.INVALID_TASKID);
+			throw new HandledException(HandledException.ExceptionType.INVALID_TASKID);
 		} else {
 			return this.taskList.get(taskID-1);
 		}

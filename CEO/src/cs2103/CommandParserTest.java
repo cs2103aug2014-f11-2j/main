@@ -11,7 +11,7 @@ import org.junit.Test;
 public class CommandParserTest {
 	
 	@Test
-	public void testSeperateCommandNoParameters() throws CEOException {
+	public void testSeperateCommandNoParameters() throws HandledException{
 		Queue<String> expected = new LinkedList<String>();
 		Queue<String> actual = new LinkedList<String>();
 		expected.add("");
@@ -20,7 +20,7 @@ public class CommandParserTest {
 	}
 	
 	@Test
-	public void testSeperateCommandOneParameter() throws CEOException {
+	public void testSeperateCommandOneParameter() throws HandledException{
 		Queue<String> expected = new LinkedList<String>();
 		Queue<String> actual = new LinkedList<String>();
 		expected.add("add");
@@ -29,7 +29,7 @@ public class CommandParserTest {
 	}
 	
 	@Test
-	public void testSeperateCommandTwoParameters() throws CEOException {
+	public void testSeperateCommandTwoParameters() throws HandledException{
 		Queue<String> expected = new LinkedList<String>();
 		Queue<String> actual = new LinkedList<String>();
 		expected.add("add");
@@ -39,7 +39,7 @@ public class CommandParserTest {
 	}
 	
 	@Test
-	public void testSeperateCommandTwoParametersMultipleSpaces() throws CEOException {
+	public void testSeperateCommandTwoParametersMultipleSpaces() throws HandledException{
 		Queue<String> expected = new LinkedList<String>();
 		Queue<String> actual = new LinkedList<String>();
 		expected.add("add");
@@ -72,7 +72,7 @@ public class CommandParserTest {
 	
 	}
 	@Test
-	public void testParseIntegerParameter() throws CEOException {
+	public void testParseIntegerParameter() throws HandledException{
 		assertEquals(-1, CommandParser.parseIntegerParameter(""));
 		assertEquals(-1, CommandParser.parseIntegerParameter(null));
 		assertEquals(-1, CommandParser.parseIntegerParameter("9m"));

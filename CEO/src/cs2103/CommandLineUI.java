@@ -29,12 +29,12 @@ public class CommandLineUI {
 	private Scanner scanner = new Scanner(System.in);
 	private static CommandLineUI commandLine;
 	
-	private CommandLineUI(String dataFile) throws CEOException{
+	private CommandLineUI(String dataFile) throws HandledException, FatalException{
 		this.executor = CommandExecutor.getInstance(dataFile);
 		print(String.format(MESSAGE_WELCOME_FORMAT, dataFile));
 	}
 	
-	public static CommandLineUI getInstance(String dataFile) throws CEOException{
+	public static CommandLineUI getInstance(String dataFile) throws HandledException, FatalException{
 		if (commandLine == null){
 			commandLine = new CommandLineUI(dataFile);
 		}
@@ -53,7 +53,7 @@ public class CommandLineUI {
 				main = CommandLineUI.getInstance("default.ics");
 			}
 		main.userLoop();
-		} catch (CEOException e){
+		} catch (HandledException | FatalException e){
 			e.printStackTrace();
 		}
 	}
@@ -115,7 +115,7 @@ public class CommandLineUI {
 					return MESSAGE_COMMAND_ERROR;
 				}
 			}
-		} catch (CEOException e) {
+		} catch (HandledException e) {
 			return MESSAGE_COMMAND_ERROR;
 		}
 	}
@@ -126,7 +126,7 @@ public class CommandLineUI {
 			Map<String, String> parameterMap = CommandParser.separateParameters(parameterList);
 			String title = CommandParser.getTitle(parameterMap);
 			if (title==null || title.equals("")){
-				throw new CEOException(CEOException.NO_TITLE);
+				throw new HandledException(HandledException.ExceptionType.NO_TITLE);
 			}
 			String description = CommandParser.getDescription(parameterMap);
 			String location = CommandParser.getLocation(parameterMap);
@@ -135,7 +135,9 @@ public class CommandLineUI {
 			Date[] time = CommandParser.getTime(timeString);
 			executor.addTask(title, description, location, time[0], time[1], CommandParser.stringToRecur(recurString));
 			result = MESSAGE_ADD;
-		}catch (CEOException e){
+		} catch (HandledException e){
+			result = MESSAGE_ADD_ERROR;
+		} catch (FatalException e) {
 			result = MESSAGE_ADD_ERROR;
 		}
 		return result;
@@ -158,8 +160,8 @@ public class CommandLineUI {
 				print(String.format(MESSAGE_INVALID_TASKTYPE_FORMAT, parameter));
 				return ResponseParser.parseAllListResponse(executor.getAllList());
 			}
-		} catch (CEOException e){
-			return CEOException.READ_ERROR;
+		} catch (HandledException e){
+			return "List failed msg";
 		}
 	}
 	
@@ -168,7 +170,7 @@ public class CommandLineUI {
 		try {
 			int taskID=CommandParser.parseIntegerParameter(parameter);
 			response=ResponseParser.parseShowDetailResponse(executor.showTaskDetail(taskID),taskID);
-		} catch (CEOException e) {
+		} catch (HandledException e) {
 			response = String.format(MESSAGE_SHOW_ERROR_FORMAT, parameter);
 		}
 		return response;
@@ -180,7 +182,9 @@ public class CommandLineUI {
 			int taskID=CommandParser.parseIntegerParameter(parameter);
 			executor.deleteTask(taskID);
 			response = String.format(MESSAGE_DELETE_FORMAT, parameter);
-		} catch (CEOException e) {
+		} catch (HandledException e) {
+			response = String.format(MESSAGE_DELETE_ERROR_FORMAT, parameter);
+		} catch (FatalException e) {
 			response = String.format(MESSAGE_DELETE_ERROR_FORMAT, parameter);
 		}
 		return response;
@@ -203,12 +207,14 @@ public class CommandLineUI {
 			Recur recur = CommandParser.stringToRecur(recurString);
 			boolean complete = CommandParser.parseComplete(completeString);
 			if (title == null && description == null && location == null && completeString == null && timeString == null && recurString == null){
-				throw new CEOException(CEOException.LESS_THAN_ONE_PARA);
+				throw new HandledException(HandledException.ExceptionType.LESS_THAN_ONE_PARA);
 			}else{
 				executor.updateTask(taskID, title, description, location, complete, completeString != null, time, timeString != null, recur, recurString != null);
 			}
 			result = String.format(MESSAGE_UPDATE_FORMAT, taskIDString);
-		}catch (CEOException e){
+		}catch (HandledException e){
+			result = String.format(MESSAGE_UPDATE_ERROR_FORMAT, taskIDString);
+		} catch (FatalException e) {
 			result = String.format(MESSAGE_UPDATE_ERROR_FORMAT, taskIDString);
 		}
 		return result;
@@ -219,7 +225,9 @@ public class CommandLineUI {
 		try {
 			int count = CommandParser.parseIntegerParameter(parameter);
 			result = executor.undoTasks(count);
-		} catch (CEOException e) {
+		} catch (HandledException e) {
+			e.printStackTrace();
+		} catch (FatalException e) {
 			e.printStackTrace();
 		}
 		return String.format(MESSAGE_UNDO_FORMAT, result);
@@ -230,7 +238,9 @@ public class CommandLineUI {
 		try {
 			int count = CommandParser.parseIntegerParameter(parameter);
 			result = executor.redoTasks(count);
-		} catch (CEOException e) {
+		} catch (HandledException e) {
+			e.printStackTrace();
+		} catch (FatalException e) {
 			e.printStackTrace();
 		}
 		return String.format(MESSAGE_REDO_FORMAT, result);
@@ -249,14 +259,10 @@ public class CommandLineUI {
 	}
 	
 	private void alertTask() {
-		try {
-			ArrayList<DeadlineTask> deadlineList = executor.getDeadlineList();
-			print(ResponseParser.alertDeadline(deadlineList));
-			ArrayList<PeriodicTask> periodicList = executor.getPeriodicList();
-			print(ResponseParser.alertPeriodic(periodicList));
-		} catch (CEOException e) {
-			e.printStackTrace();
-		}
+		ArrayList<DeadlineTask> deadlineList = executor.getDeadlineList();
+		print(ResponseParser.alertDeadline(deadlineList));
+		ArrayList<PeriodicTask> periodicList = executor.getPeriodicList();
+		print(ResponseParser.alertPeriodic(periodicList));
 	}
 	
 	private void updateTimeFromRecur() {
@@ -268,7 +274,9 @@ public class CommandLineUI {
 					count++;
 				}
 			}
-		} catch (CEOException e) {
+		} catch (HandledException e) {
+			e.printStackTrace();
+		} catch (FatalException e) {
 			e.printStackTrace();
 		}
 		print(String.format(MESSAGE_UPDATE_RECUR_TIME_FORMAT, count));

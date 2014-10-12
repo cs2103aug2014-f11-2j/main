@@ -9,7 +9,7 @@ class DeadlineTask extends Task {
 	private Date dueTime;
 	private boolean complete;
 	
-	public DeadlineTask(Uid taskUID, String title, Date dueTime, boolean complete) throws CEOException {
+	public DeadlineTask(Uid taskUID, String title, Date dueTime, boolean complete) throws HandledException {
 		super(taskUID, title);
 		this.updateDueTime(dueTime);;
 		this.updateComplete(complete);
@@ -27,30 +27,30 @@ class DeadlineTask extends Task {
 		return this.dueTime;
 	}
 	
-	public void updateDueTime(Date dueTime) throws CEOException{
+	public void updateDueTime(Date dueTime) throws HandledException{
 		if (dueTime == null){
-			throw new CEOException("Invalid deadline");
+			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
 		}else{
 			this.dueTime=dueTime;
 		}
 	}
 
 	@Override
-	public FloatingTask toFloating() throws CEOException {
+	public FloatingTask toFloating() throws HandledException {
 		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getTitle(), false);
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
 
 	@Override
-	public DeadlineTask toDeadline(Date dueTime) throws CEOException {
+	public DeadlineTask toDeadline(Date dueTime) throws HandledException {
 		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getTitle(), dueTime, this.getComplete());
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
 
 	@Override
-	public PeriodicTask toPeriodic(Date startTime, Date endTime) throws CEOException {
+	public PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
 		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getTitle(), null, startTime, endTime, null);
 		newTask.updateDescription(this.getDescription());
 		return newTask;
@@ -62,7 +62,7 @@ class DeadlineTask extends Task {
 			DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getTitle(), this.getDueTime(), this.getComplete());
 			newTask.updateDescription(this.getDescription());
 			return newTask;
-		} catch (CEOException e) {
+		} catch (HandledException e) {
 			throw new CloneNotSupportedException();
 		}
 	}

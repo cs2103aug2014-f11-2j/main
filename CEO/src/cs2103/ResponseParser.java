@@ -81,7 +81,7 @@ public class ResponseParser {
 	private static final String STRING_RECUR = "Recurrence: ";
 	private static final long DAY_IN_MILLIS = 86400000L;
 	
-	public static String parseAllListResponse(ArrayList<Task> taskList) throws CEOException{
+	public static String parseAllListResponse(ArrayList<Task> taskList) throws HandledException{
 		if (taskList == null || taskList.size() == 0){
 			return MESSAGE_EMPTY_LIST;
 		} else {
@@ -94,7 +94,7 @@ public class ResponseParser {
 				} else if (task instanceof PeriodicTask){
 					sb.append(periodicToSummary((PeriodicTask) task));
 				} else {
-					throw new CEOException(CEOException.INVALID_TASKID);
+					throw new HandledException(HandledException.ExceptionType.INVALID_TASK_OBJ);
 				}
 			}
 			return deleteLastChar(sb);
@@ -198,7 +198,7 @@ public class ResponseParser {
 		return alertList;
 	}
 	
-	public static String parseShowDetailResponse(Task task, int taskID) throws CEOException{
+	public static String parseShowDetailResponse(Task task, int taskID) throws HandledException{
 		if (task == null){
 			return String.format(MESSAGE_SHOWDETAIL_ERROR_FOMRAT,taskID);
 		} else {
@@ -211,7 +211,7 @@ public class ResponseParser {
 			} else if (task instanceof PeriodicTask){
 				sb.append(periodicToDetail((PeriodicTask) task));
 			} else{
-				throw new CEOException(CEOException.INVALID_TASKID);
+				throw new HandledException(HandledException.ExceptionType.INVALID_TASK_OBJ);
 			}
 			sb.deleteCharAt(sb.length()-1);
 			return sb.toString();

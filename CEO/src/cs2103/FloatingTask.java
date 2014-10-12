@@ -8,7 +8,7 @@ import net.fortuna.ical4j.model.property.Uid;
 class FloatingTask extends Task {
 	private boolean complete;
 	
-	public FloatingTask(Uid taskUID, String title, boolean complete) throws CEOException{
+	public FloatingTask(Uid taskUID, String title, boolean complete) throws HandledException{
 		super(taskUID, title);
 		this.updateComplete(complete);
 	}
@@ -22,23 +22,23 @@ class FloatingTask extends Task {
 	}
 
 	@Override
-	public FloatingTask toFloating() throws CEOException {
+	public FloatingTask toFloating() throws HandledException {
 		try {
 			return (FloatingTask) this.clone();
 		} catch (CloneNotSupportedException e) {
-			throw new CEOException(CEOException.CLONE_FAILED);
+			throw new HandledException(HandledException.ExceptionType.CLONE_FAILED);
 		}
 	}
 
 	@Override
-	public DeadlineTask toDeadline(Date dueTime) throws CEOException {
+	public DeadlineTask toDeadline(Date dueTime) throws HandledException {
 		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getTitle(), dueTime, this.getComplete());
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
 
 	@Override
-	public PeriodicTask toPeriodic(Date startTime, Date endTime) throws CEOException {
+	public PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
 		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getTitle(), null, startTime, endTime, null);
 		newTask.updateDescription(this.getDescription());
 		return newTask;
@@ -50,7 +50,7 @@ class FloatingTask extends Task {
 			FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getTitle(), this.getComplete());
 			newTask.updateDescription(this.getDescription());
 			return newTask;
-		} catch (CEOException e) {
+		} catch (HandledException e) {
 			throw new CloneNotSupportedException();
 		}
 	}

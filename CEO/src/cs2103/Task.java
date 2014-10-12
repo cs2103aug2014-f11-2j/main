@@ -15,9 +15,9 @@ abstract class Task implements Comparable<Task>, Cloneable{;
 	private String title;
 	private String description;
 
-	public Task(Uid taskUID, String title) throws CEOException{
+	public Task(Uid taskUID, String title) throws HandledException{
 		if (title == null || title.equals("")){
-			throw new CEOException(CEOException.NO_TITLE);
+			throw new HandledException(HandledException.ExceptionType.NO_TITLE);
 		} else {
 			if (taskUID == null){
 				taskUID = generateUid();
@@ -67,21 +67,21 @@ abstract class Task implements Comparable<Task>, Cloneable{;
 		}
 	}
 	
-	private static Uid generateUid() throws CEOException{
+	private static Uid generateUid() throws HandledException{
 		try {
 			UidGenerator ug = new UidGenerator(new SimpleHostInfo("gmail.com"), InetAddress.getLocalHost().getHostName().toString());
 			return ug.generateUid();
 		} catch (UnknownHostException e) {
-			throw new CEOException(CEOException.UNEXPECTED_ERR);
+			throw new HandledException(HandledException.ExceptionType.NETWORK_ERR);
 		}
 	}
 	
 	public abstract void updateComplete(boolean complete);
 	public abstract void updateLocation(String location);
 	public abstract void updateRecurrence(Recur recurrence);
-	public abstract FloatingTask toFloating() throws CEOException;
-	public abstract DeadlineTask toDeadline(Date dueTime) throws CEOException;
-	public abstract PeriodicTask toPeriodic(Date startTime, Date endTime) throws CEOException;
+	public abstract FloatingTask toFloating() throws HandledException;
+	public abstract DeadlineTask toDeadline(Date dueTime) throws HandledException;
+	public abstract PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException;
 	@Override
 	public abstract Object clone() throws CloneNotSupportedException;
 }

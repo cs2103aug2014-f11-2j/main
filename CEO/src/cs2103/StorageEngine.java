@@ -39,7 +39,7 @@ class StorageEngine {
 	private IndexedComponentList indexedComponents;
 	private final File file;
 	
-	private StorageEngine(String dataFile) throws CEOException{
+	private StorageEngine(String dataFile) throws HandledException, FatalException{
 		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION,true);
 		if (dataFile == null){
 			dataFile = "default.ics";
@@ -50,18 +50,18 @@ class StorageEngine {
 		}
 	}
 	
-	public static StorageEngine getInstance(String dataFile) throws CEOException{
+	public static StorageEngine getInstance(String dataFile) throws HandledException, FatalException{
 		if (storage == null){
 			storage = new StorageEngine(dataFile);
 		}
 		return storage;
 	}
 	
-	public ArrayList<Task> getTaskList() throws CEOException{
+	public ArrayList<Task> getTaskList() throws HandledException, FatalException{
 		return readFromFile();
 	}
 	
-	private void createNewFile() throws CEOException{
+	private void createNewFile() throws HandledException, FatalException{
 		this.calendar = new net.fortuna.ical4j.model.Calendar();
 		this.calendar.getProperties().add(new ProdId("-//cs2103-f11-2j//CEO 0.0//EN"));
 		this.calendar.getProperties().add(Version.VERSION_2_0);
@@ -73,7 +73,7 @@ class StorageEngine {
 	}
 	
 	@SuppressWarnings("unchecked") 
-	private ArrayList<Task> readFromFile() throws CEOException{
+	private ArrayList<Task> readFromFile() throws FatalException, HandledException{
 		try{	
 			FileInputStream fin = new FileInputStream(file);
 			CalendarBuilder builder = new CalendarBuilder();
@@ -90,13 +90,13 @@ class StorageEngine {
 			indexedComponents = new IndexedComponentList(calendar.getComponents(), Property.UID);
 			return sortTaskList(taskList);
 		}catch(IOException e){
-			throw new CEOException(CEOException.READ_ERROR);
+			throw new FatalException(FatalException.ExceptionType.READ_ERROR);
 		} catch (ParseException | ParserException e) {
-			throw new CEOException(CEOException.ILLEGAL_FILE);
+			throw new FatalException(FatalException.ExceptionType.ILLEGAL_FILE);
 		}
 	}
 
-	private void writeToFile() throws CEOException{
+	private void writeToFile() throws HandledException, FatalException{
 		try {
 			calendar.validate();
 			FileOutputStream fout;
@@ -104,11 +104,11 @@ class StorageEngine {
 			CalendarOutputter outputter = new CalendarOutputter();
 			outputter.output(this.calendar, fout);
 		} catch (IOException | ValidationException e) {
-			throw new CEOException(CEOException.WRITE_ERROR);
+			throw new FatalException(FatalException.ExceptionType.WRITE_ERROR);
 		}
 	}
 	
-	public ArrayList<Task> updateTask(Task task) throws CEOException{
+	public ArrayList<Task> updateTask(Task task) throws HandledException, FatalException{
 		Component updating = taskToComponent(task);
 		Component existing = this.indexedComponents.getComponent(updating.getProperty(Property.UID).getValue());
 		if (existing == null){
@@ -121,10 +121,10 @@ class StorageEngine {
 		return readFromFile();
 	}
 	
-	public ArrayList<Task> deleteTask(Task task) throws CEOException{
+	public ArrayList<Task> deleteTask(Task task) throws HandledException, FatalException{
 		Component existing = this.indexedComponents.getComponent(task.getTaskUID().getValue());
 		if (existing == null){
-			throw new CEOException(CEOException.TASK_NOT_EXIST);
+			throw new HandledException(HandledException.ExceptionType.TASK_NOT_EXIST);
 		}else{
 			calendar.getComponents().remove(existing);
 		}
@@ -132,7 +132,7 @@ class StorageEngine {
 		return readFromFile();
 	}
 	
-	private Component taskToComponent(Task task) throws CEOException{
+	private Component taskToComponent(Task task) throws HandledException{
 		if (task instanceof DeadlineTask){
 			return deadlineToComponent((DeadlineTask)task);
 		}else if (task instanceof FloatingTask){
@@ -140,7 +140,7 @@ class StorageEngine {
 		}else if (task instanceof PeriodicTask){
 			return periodicToComponent((PeriodicTask)task);
 		}else{
-			throw new CEOException(CEOException.INVALID_TASK_OBJ);
+			throw new HandledException(HandledException.ExceptionType.INVALID_TASK_OBJ);
 		}
 	}
 	
@@ -171,14 +171,14 @@ class StorageEngine {
 		return component;
 	}
 	
-	private Task parseVEvent(VEvent component) throws CEOException, ParseException{
+	private Task parseVEvent(VEvent component) throws ParseException, FatalException, HandledException{
 		Task task;
 		Uid componentUID = component.getUid();
 		String componentTitle = readTitle(component);
 		Date componentStartTime;
 		Date componentEndTime;
 		if (component.getStartDate() == null||component.getEndDate() == null){
-			throw new CEOException(CEOException.ILLEGAL_FILE);
+			throw new FatalException(FatalException.ExceptionType.ILLEGAL_FILE);
 		}else{
 			componentStartTime=component.getStartDate().getDate();
 			componentEndTime=component.getEndDate().getDate();
@@ -190,7 +190,7 @@ class StorageEngine {
 		return task;
 	}
 	
-	private Task parseVToDo(VToDo component) throws CEOException, ParseException{
+	private Task parseVToDo(VToDo component) throws ParseException, HandledException, FatalException{
 		Task task;
 		Uid componentUID = component.getUid();
 		String componentTitle = readTitle(component);
@@ -203,11 +203,11 @@ class StorageEngine {
 		return task;
 	}
 	
-	private String readTitle(Component component) throws CEOException{
+	private String readTitle(Component component) throws FatalException{
 		if (component.getProperty(Property.SUMMARY) != null){
 			return component.getProperty(Property.SUMMARY).getValue();
 		}else{
-			throw new CEOException(CEOException.ILLEGAL_FILE);
+			throw new FatalException(FatalException.ExceptionType.ILLEGAL_FILE);
 		}
 	}
 	
