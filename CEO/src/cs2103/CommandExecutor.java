@@ -7,7 +7,6 @@ import java.util.Stack;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
 
-
 class CommandExecutor {
 	private static CommandExecutor executor;
 	private final StorageEngine storage;
