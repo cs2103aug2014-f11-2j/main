@@ -53,4 +53,43 @@ public class PeriodicTask extends Task {
 	public void updateRecurrence(Recur recurrence){
 		this.recurrence=recurrence;
 	}
+
+	@Override
+	public FloatingTask toFloating() throws CEOException {
+		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getTitle(), false);
+		newTask.updateDescription(this.getDescription());
+		return newTask;
+	}
+
+	@Override
+	public DeadlineTask toDeadline(Date dueTime) throws CEOException {
+		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getTitle(), dueTime, false);
+		newTask.updateDescription(this.getDescription());
+		return newTask;
+	}
+
+	@Override
+	public PeriodicTask toPeriodic(Date startTime, Date endTime) throws CEOException {
+		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getTitle(), this.getLocation(), startTime, endTime, this.getRecurrence());
+		newTask.updateDescription(this.getDescription());
+		return newTask;
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		try {
+			PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getTitle(), this.getLocation(), this.getStartTime(), this.getEndTime(), this.getRecurrence());
+			newTask.updateDescription(this.getDescription());
+			return newTask;
+		} catch (CEOException e) {
+			throw new CloneNotSupportedException();
+		}
+		
+	}
+
+	@Override
+	public void updateComplete(boolean complete) {
+		return;
+	}
+	
 }
