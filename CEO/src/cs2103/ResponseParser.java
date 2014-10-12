@@ -24,7 +24,7 @@ public class ResponseParser {
 			                                  "\thelp\t-display this message";
 	public static final String HELP_ADD = "Add usage:\n"+
 			                              "\tadd [-N or --title <title>] ([-D or -description <description>] [-L or -location <location>] [-T or -time {<blank>|<YYYY/MM/DD hh:mm>|<<YYYY/MM/DD hh:mm> to <YYYY/MM/DD hh:mm>>}] [-R or -recurring <number h/d/w/m/y>])\n\n"+
-			                              "options:\n" +
+			                              "Options:\n" +
 										  "\t-title <taskTitle>\n\tElementary, specify title of the task\n" +
 										  "\t-description <description>\n\tOptional, describe task details\n" +
 										  "\t-location <location>\n\tOptional, describe task location, only available for periodic tasks\n" +
@@ -35,29 +35,37 @@ public class ResponseParser {
 										  "\t\t<Frequency> can be h/d/w/m/y, refers to:\n\t\tevery <Interval> (h)ours/(d)ays/(w)eek/(m)onth/(y)ear\n\n" +
 										  "Example:\nadd -title Task Title -description Describe this task -location office -time 2014/10/12 14:22 to 2014/10/13 14:22 -recurring 1w\n\n" + 
 										  "This will effectively adding a Periodic task with title \"Task Title\", with description \"Describe this task\", with location \"office\", with a time period from 2014/10/12 14:22 to 2014/10/13 14:22, and this task will recur every 1 week\n";
-	public static final String HELP_DELETE = "Delete has no extra options, and deletes task with specified id\n" +
-											 "E.g delete 1";
-	public static final String HELP_UPDATE = "Update options:\n" +
-											  "    --title <taskTitle>                         title for task\n" +
-											  "    --description <description>                 description for task\n" +
-											  "    --location <location>                       location for task. Can be anywhere\n" +
-											  "    --time <YYYY/MM/DD/HH:MM> OR \n" +
-											  "           <YYYY/MM/DD/HH:MM TO YYYY/MM/DD/HH:MM> OR \n" +
-											  "           <HH:MM>\n" +
-											  "    --recurring <numberOfDays>d<numberOfTimes>\n\n" +
-											  "E.g update -1 --recurring 2d5 --location random location";;
-	public static final String HELP_LIST = "List options:\n" +
-											"    floating                list tasks with no dates set\n" +
-											"    periodic                list tasks that are recurring\n" +
-											"    deadline                list tasks that have a single deadline\n\n" +
-											"    all                     list all tasks" +
-											"E.g list deadline";
-	public static final String HELP_SHOW = "Delete has no extra options, and displays task details with specified id\n" +
-			                               "E.g delete 1";
-	public static final String HELP_REDO = "Redo has no extra options, and redo the number of instructions executed as indicated\n" +
-											"E.g redo 2";
-	public static final String HELP_UNDO = "Undo has no extra options, and undo the number of instructions executed as indicated\n" +
-			                               "E.g undo 2";
+	public static final String HELP_DELETE = "Delete has no extra options\n" +
+											 "Example: delete 1\n";
+	public static final String HELP_UPDATE = "Update usage:\n" +
+											 "\tupdate <task ID> ([-N or -title <title>] [-C or -complete {true|false}] [-D or -description <description>] [-L or -location <location>]  [-T or -time {<blank>|<yyyy/MM/dd HH:mm>|<<yyyy/MM/dd HH:mm> to <yyyy/MM/dd HH:mm>>}] [-R or -recurring <number h/d/w/m/y>])\n\n"+
+											 "Options:\n" +
+											 "\t<Task ID>\n\tElementary, specify the task ID that require modification\n" +
+											 "\t-title <taskTitle>\n\tModify title of the task\n" +
+											 "\t-complete <true|false>\n\tIndicate the task is complete or not, unavailable for periodic tasks" +
+											 "\t-description <description>\n\tModify task details\n" +
+											 "\t-location <location>\n\tModify task location, only available for periodic tasks\n" +
+											 "\t-time\t<blank>\n\t\tModify this task to a floating task.\n" +
+											 "\t\t<yyyy/MM/dd HH:mm>\n\t\tModify this task to a deadline task\n" +
+											 "\t\t<yyyy/MM/dd HH:mm to yyyy/MM/dd HH:mm>\n\t\tModify this task to a periodic task\n" +
+											 "\t-recurring <Interval><Frequency>\n\tModify the recurrence period\n" +
+											 "\t\t<Frequency> can be h/d/w/m/y, refers to:\n\t\tevery <Interval> (h)ours/(d)ays/(w)eek/(m)onth/(y)ear\n\n" +
+											 "\t\tUse -recurring 0 to remove the recurrence" +
+											 "Example:\nupdate 1 -title Task Title -description Describe this task -time 2014/10/12 14:30 -complete true\n\n" + 
+											 "This will effectively update the task with Task ID 1 to a Deadline task with title \"Task Title\", with description \"Describe this task\", with a deadline at 2014/10/12 14:30 and indicate the task is complete\n";
+	public static final String HELP_LIST = "List usage:\n" +
+										   "list <floating|deadline|periodic|all>\n" +
+										   "\tfloating\t\tlist tasks with no dates set\n" +
+										   "\tperiodic\t\tlist tasks that are recurring\n" +
+										   "\tdeadline\t\tlist tasks that have a single deadline\n\n" +
+										   "\tall\t\tlist all tasks" +
+										   "Example:\nlist deadline\n";
+	public static final String HELP_SHOW = "Show has no extra options\n" +
+			                               "Example:\nshow 1\n";
+	public static final String HELP_REDO = "Redo has no extra options\n" +
+										   "Example:\nredo 1\n";
+	public static final String HELP_UNDO = "Undo has no extra options\n" +
+			                               "Example:\nundo 1\n";
 	private static final String MESSAGE_SHOWDETAIL_FORMAT = "The details for Task %1$d:\n";
 	private static final String MESSAGE_EMPTY_LIST = "The task list is empty";
 	private static final String MESSAGE_SHOWDETAIL_ERROR_FOMRAT = "Unable to show detail for task %1$d";
