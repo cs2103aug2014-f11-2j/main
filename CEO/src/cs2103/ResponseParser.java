@@ -166,7 +166,7 @@ public class ResponseParser {
 	}
 	
 	public static String parseUpdateResponse(int taskID) {
-		return String.format("You have updated task with ID %1$s", taskID);
+		return String.format(MESSAGE_UPDATE_FORMAT, taskID);
 	}
 	
 	public static String parseUpdateResponseError(String parameter) {
