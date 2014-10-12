@@ -24,6 +24,7 @@ public class CommandLineUI {
 	private static final String MESSAGE_UNDO_FORMAT = "Successfully undo %1$d tasks";
 	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d tasks";
 	private static final String MESSAGE_UPDATE_RECUR_TIME_FORMAT = "Successfully updated %1$d recurring tasks";
+	private static final String MESSAGE_SHOW_FORMAT = "The details for Task %1$d:";
 	
 	private final CommandExecutor executor;
 	private Scanner scanner = new Scanner(System.in);
@@ -166,14 +167,15 @@ public class CommandLineUI {
 	}
 	
 	private String show(String parameter) {
-		String response;
 		try {
 			int taskID=CommandParser.parseIntegerParameter(parameter);
-			response=ResponseParser.parseShowDetailResponse(executor.showTaskDetail(taskID),taskID);
+			String result = ResponseParser.parseShowDetailResponse(executor.showTaskDetail(taskID));
+			print(String.format(MESSAGE_SHOW_FORMAT, parameter));
+			return result;
 		} catch (HandledException e) {
-			response = String.format(MESSAGE_SHOW_ERROR_FORMAT, parameter);
+			print(String.format(MESSAGE_SHOW_ERROR_FORMAT, parameter));
+			return null;
 		}
-		return response;
 	}
 
 	private String delete(String parameter) {

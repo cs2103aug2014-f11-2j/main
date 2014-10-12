@@ -66,9 +66,7 @@ public class ResponseParser {
 										   "Example:\nredo 1\n";
 	public static final String HELP_UNDO = "Undo has no extra options\n" +
 			                               "Example:\nundo 1\n";
-	private static final String MESSAGE_SHOWDETAIL_FORMAT = "The details for Task %1$d:\n";
 	private static final String MESSAGE_EMPTY_LIST = "The task list is empty";
-	private static final String MESSAGE_SHOWDETAIL_ERROR_FOMRAT = "Unable to show detail for task %1$d";
 	private static final String MESSAGE_TASKS_DUE = "Tasks due within one day:\n";
 	private static final String MESSAGE_TASKS_STARTING = "Tasks start within one day:\n";
 	private static final String TYPE_FLOATING = "Floating";
@@ -198,12 +196,11 @@ public class ResponseParser {
 		return alertList;
 	}
 	
-	public static String parseShowDetailResponse(Task task, int taskID) throws HandledException{
+	public static String parseShowDetailResponse(Task task) throws HandledException{
 		if (task == null){
-			return String.format(MESSAGE_SHOWDETAIL_ERROR_FOMRAT,taskID);
+			throw new HandledException(HandledException.ExceptionType.INVALID_TASK_OBJ);
 		} else {
 			StringBuffer sb = new StringBuffer();
-			sb.append(String.format(MESSAGE_SHOWDETAIL_FORMAT, taskID));
 			if (task instanceof FloatingTask){
 				sb.append(floatingToDetail((FloatingTask) task));
 			} else if (task instanceof DeadlineTask){
