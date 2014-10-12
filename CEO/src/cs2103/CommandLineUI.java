@@ -143,6 +143,7 @@ public class CommandLineUI {
 	}
 	
 	private String list(String parameter) {
+		String response;
 		CommandParser.TaskType taskType = CommandParser.determineTaskType(parameter);
 		try{
 			switch (taskType){
@@ -157,18 +158,19 @@ public class CommandLineUI {
 			case INVALID:
 			default:
 				print(String.format(MESSAGE_INVALID_TASKTYPE_FORMAT, parameter));
-				return ResponseParser.parseAllListResponse(executor.getAllList());
+				response = ResponseParser.parseAllListResponse(executor.getAllList());
 			}
 		} catch (CEOException e){
 			return CEOException.READ_ERROR;
 		}
+		return response;
 	}
 	
 	private String show(String parameter) {
 		String response;
 		try {
-			int taskID=CommandParser.parseIntegerParameter(parameter);
-			response=ResponseParser.parseShowDetailResponse(executor.showTaskDetail(taskID),taskID);
+			int taskID = CommandParser.parseIntegerParameter(parameter);
+			response = ResponseParser.parseShowDetailResponse(executor.showTaskDetail(taskID),taskID);
 		} catch (CEOException e) {
 			response = ResponseParser.parseShowDetailResponseError(parameter);
 		}
@@ -190,7 +192,7 @@ public class CommandLineUI {
 	private String update(Queue<String> parameterList) {
 		String result;
 		String taskIDString = parameterList.poll();
-		int taskID=0;
+		int taskID = 0;
 		try{
 			taskID = CommandParser.parseIntegerParameter(taskIDString);
 			Map<String, String> parameterMap = CommandParser.separateParameters(parameterList);
@@ -208,9 +210,9 @@ public class CommandLineUI {
 			}else{
 				executor.updateTask(taskID, title, description, location, complete, completeString != null, time, timeString != null, recur, recurString != null);
 			}
-			result = String.format(MESSAGE_UPDATE_FORMAT, taskIDString);
+			result = ResponseParser.parseUpdateResponse(taskID);
 		}catch (CEOException e){
-			result = String.format(MESSAGE_UPDATE_ERROR_FORMAT, taskIDString);
+			result = ResponseParser.parseUpdateResponseError(taskIDString);
 		}
 		return result;
 	}
@@ -223,7 +225,7 @@ public class CommandLineUI {
 		} catch (CEOException e) {
 			e.printStackTrace();
 		}
-		return String.format(MESSAGE_UNDO_FORMAT, result);
+		return ResponseParser.parseUndoResponse(result);
 	}
 	
 	private String redo(String parameter) {
@@ -234,7 +236,7 @@ public class CommandLineUI {
 		} catch (CEOException e) {
 			e.printStackTrace();
 		}
-		return String.format(MESSAGE_REDO_FORMAT, result);
+		return ResponseParser.parseRedoResponse(result);
 	}
 	
 	private static void print(String feedback) {

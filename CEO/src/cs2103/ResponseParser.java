@@ -68,6 +68,10 @@ public class ResponseParser {
 	private static final String MESSAGE_ADD = "You have succesfully added a new task.\n %1$s";
 	private static final String MESSAGE_ADD_ERROR = "Failed to add new task";
 	private static final String MESSAGE_SHOW_ERROR_FORMAT = "Failed to show task with ID %1$s";
+	private static final String MESSAGE_UPDATE_FORMAT = "You have updated task with ID %1$s";
+	private static final String MESSAGE_UPDATE_ERROR_FORMAT = "Failed to update task with ID %1$s";
+	private static final String MESSAGE_UNDO_FORMAT = "Successfully undo %1$d tasks";
+	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d tasks";
 	private static final String TYPE_FLOATING = "Floating";
 	private static final String TYPE_DEADLINE = "Deadline";
 	private static final String TYPE_PERIODIC = "Periodic";
@@ -159,6 +163,22 @@ public class ResponseParser {
 	
 	public static String parseDeleteResponseError(String parameter) {
 		return String.format(MESSAGE_DELETE_TASK_ERROR, parameter);
+	}
+	
+	public static String parseUpdateResponse(int taskID) {
+		return String.format("You have updated task with ID %1$s", taskID);
+	}
+	
+	public static String parseUpdateResponseError(String parameter) {
+		return String.format(MESSAGE_UPDATE_ERROR_FORMAT,parameter);
+	}
+	
+	public static String parseUndoResponse(int result) {
+		return String.format(MESSAGE_UNDO_FORMAT, result);
+	}
+	
+	public static String parseRedoResponse(int result) {
+		return String.format(MESSAGE_REDO_FORMAT, result);
 	}
 	
 	public static String alertDeadline(ArrayList<DeadlineTask> taskList){
