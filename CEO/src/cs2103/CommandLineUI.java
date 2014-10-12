@@ -25,7 +25,7 @@ public class CommandLineUI {
 	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d tasks";
 	private static final String MESSAGE_UPDATE_RECUR_TIME_FORMAT = "Successfully updated %1$d recurring tasks";
 	private static final String MESSAGE_SHOW_FORMAT = "The details for Task %1$d:";
-	
+	private static final String MESSAGE_INCORRECT_ARG = "Incorrect Argument\n";
 	private final CommandExecutor executor;
 	private Scanner scanner = new Scanner(System.in);
 	private static CommandLineUI commandLine;
@@ -46,7 +46,7 @@ public class CommandLineUI {
 		CommandLineUI main;
 		try{
 			if (args.length > 1){
-				System.err.println("Incorrect Argument");
+				print(MESSAGE_INCORRECT_ARG);
 				main = CommandLineUI.getInstance(args[0]);
 			}else if (args.length == 1){
 				main = CommandLineUI.getInstance(args[0]);
