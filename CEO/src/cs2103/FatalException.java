@@ -12,26 +12,22 @@ public class FatalException extends Exception {
 	}
 	
 	public FatalException(ExceptionType exceptionType) {
-		printErrorMsg(exceptionType);
+		String errorMsg = getErrorMsg(exceptionType);
+		ErrorLogging log = ErrorLogging.getInstance();
+		log.printErrorMsg(errorMsg);
+		log.writeToLog(errorMsg, this);
 	}
 	
-	private void printErrorMsg(ExceptionType exceptionType){
+	private String getErrorMsg(ExceptionType exceptionType){
 		switch (exceptionType){
 		case ILLEGAL_FILE:
-			printErr(ILLEGAL_FILE);
-			break;
+			return ILLEGAL_FILE;
 		case WRITE_ERROR:
-			printErr(WRITE_ERROR);
-			break;
+			return WRITE_ERROR;
 		case READ_ERROR:
-			printErr(READ_ERROR);
-			break;
+			return READ_ERROR;
 		default:
-			break;
+			return null;
 		}
-	}
-	
-	private void printErr(String errorMsg){
-		System.err.println(errorMsg);
 	}
 }

@@ -25,63 +25,46 @@ public class HandledException extends Exception {
 	}
 	
 	public HandledException(ExceptionType exceptionType){
-		printErrorMsg(exceptionType);
-		
+		String errorMsg = getErrorMsg(exceptionType);
+		ErrorLogging log = ErrorLogging.getInstance();
+		log.printErrorMsg(errorMsg);
+		log.writeToLog(errorMsg, this);
 	}
 	
-	private void printErrorMsg(ExceptionType exceptionType){
+	private String getErrorMsg(ExceptionType exceptionType){
 		switch (exceptionType){
 		case INVALID_TASKID:
-			printErr(INVALID_TASKID);
-			break;
+			return INVALID_TASKID;
 		case INVALID_TASK_OBJ:
-			printErr(INVALID_TASK_OBJ);
-			break;
+			return INVALID_TASK_OBJ;
 		case INVALID_TASK_TYPE:
-			printErr(INVALID_TASK_TYPE);
-			break;
+			return INVALID_TASK_TYPE;
 		case INVALID_TIME:
-			printErr(INVALID_TIME);
-			break;
+			return INVALID_TIME;
 		case END_BEFORE_START:
-			printErr(END_BEFORE_START);
-			break;
+			return END_BEFORE_START;
 		case NO_TITLE:
-			printErr(NO_TITLE);
-			break;
+			return NO_TITLE;
 		case TASK_NOT_EXIST:
-			printErr(TASK_NOT_EXIST);
-			break;
+			return TASK_NOT_EXIST;
 		case INVALID_PARA:
-			printErr(INVALID_PARA);
-			break;
+			return INVALID_PARA;
 		case INVALID_CMD:
-			printErr(INVALID_CMD);
-			break;
+			return INVALID_CMD;
 		case INVALID_COMPLETE:
-			printErr(INVALID_COMPLETE);
-			break;
+			return INVALID_COMPLETE;
 		case LESS_THAN_ONE_PARA:
-			printErr(LESS_THAN_ONE_PARA);
-			break;
+			return LESS_THAN_ONE_PARA;
 		case INVALID_RECUR:
-			printErr(INVALID_RECUR);
-			break;
+			return INVALID_RECUR;
 		case CLONE_FAILED:
-			printErr(CLONE_FAILED);
-			break;
+			return CLONE_FAILED;
 		case NETWORK_ERR:
-			printErr(NETWORK_ERR);
-			break;
+			return NETWORK_ERR;
 		case UNEXPECTED_ERR:
-			printErr(UNEXPECTED_ERR);
-			break;
+			return UNEXPECTED_ERR;
 		default:
-			break;
+			return null;
 		}
-	}
-	
-	private void printErr(String errorMsg){
-		System.err.println(errorMsg);
 	}
 }
