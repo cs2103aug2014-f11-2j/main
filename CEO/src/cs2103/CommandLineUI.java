@@ -15,6 +15,7 @@ public class CommandLineUI {
 	private static final String MESSAGE_COMMAND_ERROR = "Your input command is invalid, please check your command and try again";
 	private static final String MESSAGE_FATAL_ERR = "A fatal error has occurred, program will now exit. Check log for detail";
 	private static final String MESSAGE_INCORRECT_ARG = "Incorrect Argument\n";
+	private static final String MESSAGE_INITIALIZATION_ERROR = "Failed to initialize CEO, program will now exit";
 	
 	private final CommandExecutor executor;
 	private Scanner scanner = new Scanner(System.in);
@@ -45,7 +46,7 @@ public class CommandLineUI {
 			}
 		main.userLoop();
 		} catch (HandledException | FatalException e){
-			e.printStackTrace();
+			System.err.println(MESSAGE_INITIALIZATION_ERROR);
 		}
 	}
 	

@@ -131,6 +131,7 @@ class CommandParser {
 		Queue<String> keywordQueue = new LinkedList<String>();
 		keywordQueue.add("N");
 		keywordQueue.add("title");
+		keywordQueue.add("summary");
 		String result = null;
 		while(result == null && !keywordQueue.isEmpty()){
 			result = getParameter(keywordQueue.poll(), parameterMap);
@@ -142,6 +143,7 @@ class CommandParser {
 		Queue<String> keywordQueue = new LinkedList<String>();
 		keywordQueue.add("D");
 		keywordQueue.add("description");
+		keywordQueue.add("detail");
 		String result = null;
 		while(result == null && !keywordQueue.isEmpty()){
 			result = getParameter(keywordQueue.poll(), parameterMap);
@@ -153,6 +155,7 @@ class CommandParser {
 		Queue<String> keywordQueue = new LinkedList<String>();
 		keywordQueue.add("L");
 		keywordQueue.add("location");
+		keywordQueue.add("place");
 		String result = null;
 		while(result == null && !keywordQueue.isEmpty()){
 			result = getParameter(keywordQueue.poll(), parameterMap);
@@ -260,7 +263,6 @@ class CommandParser {
 	private static String[] splitFirstWord(String parameterString) throws HandledException{
 		checkNullString(parameterString, HandledException.ExceptionType.INVALID_PARA);
 		String[] result;
-		if (parameterString == null || parameterString.equals("")) return null;
 		int spaceIndex = parameterString.indexOf(' ');
 		if (spaceIndex == -1){
 			result = new String[1];
