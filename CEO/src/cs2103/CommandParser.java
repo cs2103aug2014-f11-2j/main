@@ -162,7 +162,6 @@ class CommandParser {
 		}
 		return result;
 	}
-
 	
 	public static String getComplete(Map<String, String> parameterMap){
 		Queue<String> keywordQueue = new LinkedList<String>();
