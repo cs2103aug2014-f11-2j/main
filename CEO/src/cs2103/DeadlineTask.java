@@ -104,7 +104,7 @@ class DeadlineTask extends Task {
 	
 	private static String dateToString(Date date){
 		DateFormat dateFormat;
-		dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.US);
+		dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.UK);
 		return dateFormat.format(date);
 	}
 	
