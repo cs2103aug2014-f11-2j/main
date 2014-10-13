@@ -4,7 +4,13 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.Description;
+import net.fortuna.ical4j.model.property.Location;
+import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Uid;
 
 public class PeriodicTask extends Task {
@@ -142,5 +148,17 @@ public class PeriodicTask extends Task {
 		sb.append(recur.getInterval()).append(" ");
 		sb.append(recur.getFrequency()).append("\n");
 		return sb.toString();
+	}
+
+	@Override
+	public Component toComponent() {
+		VEvent component = new VEvent(new DateTime(this.getStartTime()), new DateTime(this.getEndTime()),this.getTitle());
+		component.getProperties().add(this.getTaskUID());
+		if (this.getRecurrence() != null){
+			component.getProperties().add(new RRule(this.getRecurrence()));
+		}
+		component.getProperties().add(new Description(this.getDescription()));
+		component.getProperties().add(new Location(this.getLocation()));
+		return component;
 	}
 }

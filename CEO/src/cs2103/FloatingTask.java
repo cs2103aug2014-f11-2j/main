@@ -2,7 +2,12 @@ package cs2103;
 
 import java.util.Date;
 
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.component.VToDo;
+import net.fortuna.ical4j.model.property.Description;
+import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Uid;
 
 class FloatingTask extends Task {
@@ -85,5 +90,18 @@ class FloatingTask extends Task {
 	
 	private static String completeToString(boolean complete){
 		return complete?"Completed":"Needs Action";
+	}
+
+	@Override
+	public Component toComponent() {
+		VToDo component = new VToDo(new DateTime(new Date()), this.getTitle());
+		component.getProperties().add(this.getTaskUID());
+		component.getProperties().add(new Description(this.getDescription()));
+		component.getProperties().add(completeToStatus(this.getComplete()));
+		return component;
+	}
+	
+	private static Status completeToStatus(boolean complete){
+		return complete?Status.VTODO_COMPLETED:Status.VTODO_NEEDS_ACTION;
 	}
 }

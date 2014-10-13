@@ -13,7 +13,6 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.IndexedComponentList;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.Recur;
@@ -23,8 +22,6 @@ import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.CalScale;
-import net.fortuna.ical4j.model.property.Description;
-import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Status;
@@ -109,8 +106,8 @@ class StorageEngine {
 	}
 	
 	public ArrayList<Task> updateTask(Task task) throws HandledException, FatalException{
-		Component updating = taskToComponent(task);
-		Component existing = this.indexedComponents.getComponent(updating.getProperty(Property.UID).getValue());
+		Component updating = task.toComponent();
+		Component existing = this.indexedComponents.getComponent(task.getTaskUID().getValue());
 		if (existing == null){
 			calendar.getComponents().add(updating);
 		}else{
@@ -130,45 +127,6 @@ class StorageEngine {
 		}
 		writeToFile();
 		return readFromFile();
-	}
-	
-	private Component taskToComponent(Task task) throws HandledException{
-		if (task instanceof DeadlineTask){
-			return deadlineToComponent((DeadlineTask)task);
-		}else if (task instanceof FloatingTask){
-			return floatingToComponent((FloatingTask)task);
-		}else if (task instanceof PeriodicTask){
-			return periodicToComponent((PeriodicTask)task);
-		}else{
-			throw new HandledException(HandledException.ExceptionType.INVALID_TASK_OBJ);
-		}
-	}
-	
-	private Component floatingToComponent(FloatingTask task) {
-		VToDo component = new VToDo(new DateTime(new Date()), task.getTitle());
-		component.getProperties().add(task.getTaskUID());
-		component.getProperties().add(new Description(task.getDescription()));
-		component.getProperties().add(completeToStatus(task.getComplete()));
-		return component;
-	}
-	
-	private Component deadlineToComponent(DeadlineTask task) {
-		VToDo component = new VToDo(new DateTime(task.getDueTime()), new DateTime(task.getDueTime()),task.getTitle());
-		component.getProperties().add(task.getTaskUID());
-		component.getProperties().add(new Description(task.getDescription()));
-		component.getProperties().add(completeToStatus(task.getComplete()));
-		return component;
-	}
-	
-	private Component periodicToComponent(PeriodicTask task) {
-		VEvent component = new VEvent(new DateTime(task.getStartTime()), new DateTime(task.getEndTime()),task.getTitle());
-		component.getProperties().add(task.getTaskUID());
-		if (task.getRecurrence() != null){
-			component.getProperties().add(new RRule(task.getRecurrence()));
-		}
-		component.getProperties().add(new Description(task.getDescription()));
-		component.getProperties().add(new Location(task.getLocation()));
-		return component;
 	}
 	
 	private Task parseVEvent(VEvent component) throws ParseException, FatalException, HandledException{
@@ -209,10 +167,6 @@ class StorageEngine {
 		}else{
 			throw new FatalException(FatalException.ExceptionType.ILLEGAL_FILE);
 		}
-	}
-	
-	private Status completeToStatus(boolean complete){
-		return complete?Status.VTODO_COMPLETED:Status.VTODO_NEEDS_ACTION;
 	}
 	
 	private boolean readStatusToComplete(VToDo component){

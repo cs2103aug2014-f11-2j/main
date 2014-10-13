@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
 
+import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.util.SimpleHostInfo;
@@ -88,4 +89,5 @@ abstract class Task implements Comparable<Task>, Cloneable{;
 	public abstract Object clone() throws CloneNotSupportedException;
 	public abstract String toSummary();
 	public abstract String toDetail();
+	public abstract Component toComponent();
 }
