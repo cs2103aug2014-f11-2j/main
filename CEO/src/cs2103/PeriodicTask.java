@@ -1,6 +1,8 @@
 package cs2103;
 
+import java.text.DateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.Uid;
@@ -10,6 +12,11 @@ public class PeriodicTask extends Task {
 	private Date endTime;
 	private String location;
 	private Recur recurrence;
+
+	private static final String TYPE_PERIODIC = "Periodic";
+	private static final String TYPE_RECURRING = "Recurring";
+	private static final String STRING_LOCATION = "Location: ";
+	private static final String STRING_RECUR = "Recurrence: ";
 	
 	public PeriodicTask(Uid taskUID, String title, String location, Date startTime, Date endTime, Recur recurrence) throws HandledException {
 		super(taskUID, title);
@@ -91,5 +98,49 @@ public class PeriodicTask extends Task {
 	public void updateComplete(boolean complete) {
 		return;
 	}
+
+	@Override
+	public String toSummary() {
+		StringBuffer sb = new StringBuffer();
+		sb.append(this.getTaskID()).append(". ").append(this.getTitle()).append("\n");
+		sb.append(STRING_TYPE);
+		if (this.getRecurrence() == null){
+			sb.append(TYPE_PERIODIC);
+		} else {
+			sb.append(TYPE_RECURRING);
+		}
+		sb.append("\tFrom: ");
+		sb.append(dateToString(this.getStartTime()));
+		sb.append(" To ");
+		sb.append(dateToString(this.getEndTime()));
+		return sb.append("\n").toString();
+	}
+
+	@Override
+	public String toDetail() {
+		StringBuffer sb = new StringBuffer();
+		sb.append(this.toSummary());
+		if (this.getRecurrence() != null){
+			sb.append(STRING_RECUR);
+			sb.append(recurToString(this.getRecurrence()));
+		}
+		sb.append(STRING_LOCATION);
+		sb.append(this.getLocation()).append("\n");
+		sb.append(STRING_DESCRIPTION);
+		sb.append(this.getDescription()).append("\n");
+		return sb.toString();
+	}
 	
+	private static String dateToString(Date date){
+		DateFormat dateFormat;
+		dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.US);
+		return dateFormat.format(date);
+	}
+	
+	private static String recurToString(Recur recur){
+		StringBuffer sb = new StringBuffer();
+		sb.append(recur.getInterval()).append(" ");
+		sb.append(recur.getFrequency()).append("\n");
+		return sb.toString();
+	}
 }

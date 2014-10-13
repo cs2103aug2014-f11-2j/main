@@ -1,6 +1,8 @@
 package cs2103;
 
+import java.text.DateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.Uid;
@@ -8,6 +10,7 @@ import net.fortuna.ical4j.model.property.Uid;
 class DeadlineTask extends Task {
 	private Date dueTime;
 	private boolean complete;
+	private static final String TYPE_DEADLINE = "Deadline";
 	
 	public DeadlineTask(Uid taskUID, String title, Date dueTime, boolean complete) throws HandledException {
 		super(taskUID, title);
@@ -77,4 +80,35 @@ class DeadlineTask extends Task {
 		return;
 	}
 
+	@Override
+	public String toSummary() {
+		StringBuffer sb = new StringBuffer();
+		sb.append(this.getTaskID()).append(". ").append(this.getTitle()).append("\n");
+		sb.append(STRING_TYPE);
+		sb.append(TYPE_DEADLINE);
+		sb.append("\tStatus: ");
+		sb.append(completeToString(this.getComplete()));
+		sb.append("\tDue At: ");
+		sb.append(dateToString(this.getDueTime()));
+		return sb.append("\n").toString();
+	}
+
+	@Override
+	public String toDetail() {
+		StringBuffer sb = new StringBuffer();
+		sb.append(this.toSummary());
+		sb.append(STRING_DESCRIPTION);
+		sb.append(this.getDescription());
+		return sb.append("\n").toString();
+	}
+	
+	private static String dateToString(Date date){
+		DateFormat dateFormat;
+		dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.US);
+		return dateFormat.format(date);
+	}
+	
+	private static String completeToString(boolean complete){
+		return complete?"Completed":"Needs Action";
+	}
 }

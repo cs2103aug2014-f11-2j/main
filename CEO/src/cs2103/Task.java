@@ -14,7 +14,9 @@ abstract class Task implements Comparable<Task>, Cloneable{;
 	private Uid taskUID;
 	private String title;
 	private String description;
-
+	protected static final String STRING_TYPE = "Type: ";
+	protected static final String STRING_DESCRIPTION = "Description: ";
+	
 	public Task(Uid taskUID, String title) throws HandledException{
 		if (title == null || title.equals("")){
 			throw new HandledException(HandledException.ExceptionType.NO_TITLE);
@@ -84,4 +86,6 @@ abstract class Task implements Comparable<Task>, Cloneable{;
 	public abstract PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException;
 	@Override
 	public abstract Object clone() throws CloneNotSupportedException;
+	public abstract String toSummary();
+	public abstract String toDetail();
 }

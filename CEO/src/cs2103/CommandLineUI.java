@@ -17,16 +17,16 @@ public class CommandLineUI {
 	private static final String MESSAGE_INCORRECT_ARG = "Incorrect Argument\n";
 	private static final String MESSAGE_INITIALIZATION_ERROR = "Failed to initialize CEO, program will now exit";
 	
+	private static CommandLineUI commandLine;
 	private final CommandExecutor executor;
 	private Scanner scanner = new Scanner(System.in);
-	private static CommandLineUI commandLine;
 	
 	private CommandLineUI(String dataFile) throws HandledException, FatalException{
 		this.executor = CommandExecutor.getInstance(dataFile);
 		print(String.format(MESSAGE_WELCOME_FORMAT, dataFile));
 	}
 	
-	public static CommandLineUI getInstance(String dataFile) throws HandledException, FatalException{
+	private static CommandLineUI getInstance(String dataFile) throws HandledException, FatalException{
 		if (commandLine == null){
 			commandLine = new CommandLineUI(dataFile);
 		}
@@ -136,30 +136,26 @@ public class CommandLineUI {
 	
 	private String list(String parameter) {
 		CommandParser.TaskType taskType = CommandParser.determineTaskType(parameter);
-		try{
-			switch (taskType){
-			case ALL:
-				return ResponseParser.parseAllListResponse(executor.getAllList());
-			case FLOATING:
-				return ResponseParser.parseFloatingListResponse(executor.getFloatingList());
-			case DEADLINE:
-				return ResponseParser.parseDeadlineListResponse(executor.getDeadlineList());
-			case PERIODIC:
-				return ResponseParser.parsePeriodicListResponse(executor.getPeriodicList());
-			case INVALID:
-			default:
-				print(ResponseParser.parseListErrorResponse(parameter));
-				return ResponseParser.parseAllListResponse(executor.getAllList());
-			}
-		} catch (HandledException e){
-			return ResponseParser.parseListErrorResponse(parameter);
+		switch (taskType){
+		case ALL:
+			return ResponseParser.parseAllListResponse(executor.getAllList());
+		case FLOATING:
+			return ResponseParser.parseFloatingListResponse(executor.getFloatingList());
+		case DEADLINE:
+			return ResponseParser.parseDeadlineListResponse(executor.getDeadlineList());
+		case PERIODIC:
+			return ResponseParser.parsePeriodicListResponse(executor.getPeriodicList());
+		case INVALID:
+		default:
+			print(ResponseParser.parseListErrorResponse(parameter));
+			return ResponseParser.parseAllListResponse(executor.getAllList());
 		}
 	}
 	
 	private String show(String parameter) {
 		try {
 			int taskID=CommandParser.parseIntegerParameter(parameter);
-			String result = ResponseParser.parseShowDetailResponse(executor.showTaskDetail(taskID));
+			String result = ResponseParser.parseShowDetailResponse(executor.getTaskByID(taskID));
 			return result;
 		} catch (HandledException e) {
 			return ResponseParser.parseShowErrorResponse(parameter);

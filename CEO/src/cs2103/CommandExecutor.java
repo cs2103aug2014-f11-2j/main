@@ -77,11 +77,6 @@ class CommandExecutor {
 	public ArrayList<Task> getAllList(){
 		return this.taskList;
 	}
-
-	
-	public Task showTaskDetail(int taskID) throws HandledException{
-		return getTaskByID(taskID);
-	}
 	
 	public void deleteTask(int taskID) throws HandledException, FatalException{
 		Task task = getTaskByID(taskID);
@@ -209,7 +204,7 @@ class CommandExecutor {
 		}
 	}
 	
-	private Task getTaskByID(int taskID) throws HandledException{
+	public Task getTaskByID(int taskID) throws HandledException{
 		if (taskID > this.taskList.size() || taskID < 1){
 			throw new HandledException(HandledException.ExceptionType.INVALID_TASKID);
 		} else {
