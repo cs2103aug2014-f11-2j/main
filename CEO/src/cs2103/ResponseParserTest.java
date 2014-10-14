@@ -15,7 +15,7 @@ public class ResponseParserTest {
 	@Test
 	public void testParseAllListResponseNoTasks() throws ParseException, HandledException {
 		ArrayList<Task> taskList = new ArrayList<Task>();
-		assertEquals("The task list is empty", ResponseParser.parseAllListResponse(taskList));
+		assertEquals("The task list is empty", ResponseParser.parseListResponse(taskList));
 	}
 	
 	@Test
@@ -30,44 +30,7 @@ public class ResponseParserTest {
 				+ "2. Pooping\nType: Deadline\t\tStatus: Needs Action	Due At: Sep 28, 2014 11:59:00 PM\n"
 				+ "3. Drinking\nType: Periodic\t\tFrom: Sep 28, 2014 11:59:00 PM To Oct 28, 2014 11:59:00 PM"
 				, 
-				ResponseParser.parseAllListResponse(taskList));
-	}
-	
-	@Test
-	public void testParseFloatingListResponseNoTasks() {
-		ArrayList<FloatingTask> taskList = new ArrayList<FloatingTask>();
-		assertEquals("The task list is empty", ResponseParser.parseFloatingListResponse(taskList));
-	}
-	
-	@Test
-	public void testParseFloatingListResponseWithTasks() throws HandledException{
-		ArrayList<FloatingTask> taskList = new ArrayList<FloatingTask>();
-		taskList.add(new FloatingTask(null, "Eating", false));
-		taskList.add(new FloatingTask(null, "Drinking", false));
-		assertEquals("1. Eating\nType: Floating\t\tStatus: Needs Action\n"
-				+ "2. Drinking\nType: Floating\t\tStatus: Needs Action"
-				, ResponseParser.parseFloatingListResponse(taskList));
-	}
-	
-	@Test
-	public void testParseDeadlineListResponseNoTasks() {
-		ArrayList<DeadlineTask> taskList = new ArrayList<DeadlineTask>();
-		assertEquals("The task list is empty", ResponseParser.parseDeadlineListResponse(taskList));
-	}
-	
-	@Test
-	public void testParseDeadlineListResponseWithTasks() throws HandledException{
-		ArrayList<DeadlineTask> taskList = new ArrayList<DeadlineTask>();
-		taskList.add(new DeadlineTask(null, "Pooping", stringToDate("2014/09/28 23:59"), false));
-		taskList.add(new DeadlineTask(null, "Wiping", stringToDate("2014/09/29 23:59"), false));
-		assertEquals("2. Pooping\nType: Deadline\t\tStatus: Needs Action	Due At: Sep 28, 2014 11:59:00 PM\n" 
-				+ "2. Wiping\nType: Deadline\t\tStatus: Needs Action	Due At: Sep 29, 2014 11:59:00 PM\n"
-				, ResponseParser.parseDeadlineListResponse(taskList));
-	}
-	
-	@Test
-	public void testParsePeriodicListResponseNoTasks() {
-		
+				ResponseParser.parseListResponse(taskList));
 	}
 	
 	@Test
@@ -79,12 +42,7 @@ public class ResponseParserTest {
 				+ "0. Pooping\nType: Deadline\t\t\t\t\tStatus: Needs Action	Due At: Sep 28, 2014 11:59:00 PM\n\n"
 				+ "0. Drinking\nType: Periodic\t\t\t\t\tFrom: Sep 28, 2014 11:59:00 PM To Oct 28, 2014 11:59:00 PM"
 				, 
-				ResponseParser.parseAllListResponse(taskList));
-	}
-
-	public void testParsePeriodicListResponseWithTasks() {
-		
-
+				ResponseParser.parseListResponse(taskList));
 	}
 	
 	@Test 

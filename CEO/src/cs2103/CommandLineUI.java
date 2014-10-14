@@ -58,11 +58,13 @@ public class CommandLineUI {
 			String command = takeUserInput();
 			if (command != null){
 				String feedback=processUserInput(command);
-				if (feedback.equalsIgnoreCase("EXIT")){
-					print(MESSAGE_EXIT);
-					break;
+				if (feedback != null && !feedback.equals("")){
+					if (feedback.equalsIgnoreCase("EXIT")){
+						print(MESSAGE_EXIT);
+						break;
+					}
+					print(feedback);
 				}
-				print(feedback);
 			}
 		}
 	}
@@ -138,17 +140,17 @@ public class CommandLineUI {
 		CommandParser.TaskType taskType = CommandParser.determineTaskType(parameter);
 		switch (taskType){
 		case ALL:
-			return ResponseParser.parseAllListResponse(executor.getAllList());
+			return ResponseParser.parseListResponse(executor.getAllList());
 		case FLOATING:
-			return ResponseParser.parseFloatingListResponse(executor.getFloatingList());
+			return ResponseParser.parseListResponse(executor.getFloatingList());
 		case DEADLINE:
-			return ResponseParser.parseDeadlineListResponse(executor.getDeadlineList());
+			return ResponseParser.parseListResponse(executor.getDeadlineList());
 		case PERIODIC:
-			return ResponseParser.parsePeriodicListResponse(executor.getPeriodicList());
+			return ResponseParser.parseListResponse(executor.getPeriodicList());
 		case INVALID:
 		default:
 			print(ResponseParser.parseListErrorResponse(parameter));
-			return ResponseParser.parseAllListResponse(executor.getAllList());
+			return ResponseParser.parseListResponse(executor.getAllList());
 		}
 	}
 	

@@ -110,48 +110,12 @@ public class ResponseParser {
 
 	private static final long DAY_IN_MILLIS = 86400000L;
 	
-	public static String parseAllListResponse(ArrayList<Task> taskList){
+	public static <T extends Task> String parseListResponse(ArrayList<T> taskList){
 		if (taskList == null || taskList.size() == 0){
 			return MESSAGE_EMPTY_LIST;
 		} else {
 			StringBuffer sb = new StringBuffer();
 			for (Task task:taskList){
-				sb.append(task.toSummary());
-			}
-			return deleteLastChar(sb);
-		}
-	}
-	
-	public static String parseFloatingListResponse(ArrayList<FloatingTask> taskList){
-		if (taskList == null || taskList.size() == 0){
-			return MESSAGE_EMPTY_LIST;
-		} else {
-			StringBuffer sb = new StringBuffer();
-			for (FloatingTask task:taskList){
-				sb.append(task.toSummary());
-			}
-			return deleteLastChar(sb);
-		}
-	}
-	
-	public static String parseDeadlineListResponse(ArrayList<DeadlineTask> taskList){
-		if (taskList == null || taskList.size() == 0){
-			return MESSAGE_EMPTY_LIST;
-		} else {
-			StringBuffer sb = new StringBuffer();
-			for (DeadlineTask task:taskList){
-				sb.append(task.toSummary());
-			}
-			return deleteLastChar(sb);
-		}
-	}
-	
-	public static String parsePeriodicListResponse(ArrayList<PeriodicTask> taskList){
-		if (taskList == null || taskList.size() == 0){
-			return MESSAGE_EMPTY_LIST;
-		} else {
-			StringBuffer sb = new StringBuffer();
-			for (PeriodicTask task:taskList){
 				sb.append(task.toSummary());
 			}
 			return deleteLastChar(sb);
