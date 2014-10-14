@@ -82,9 +82,7 @@ abstract class Task implements Comparable<Task>, Cloneable{;
 	public abstract void updateComplete(boolean complete);
 	public abstract void updateLocation(String location);
 	public abstract void updateRecurrence(Recur recurrence);
-	public abstract FloatingTask toFloating() throws HandledException;
-	public abstract DeadlineTask toDeadline(Date dueTime) throws HandledException;
-	public abstract PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException;
+	public abstract Task convert(Date[] time) throws HandledException;
 	@Override
 	public abstract Object clone() throws CloneNotSupportedException;
 	public abstract String toSummary();

@@ -44,21 +44,30 @@ class DeadlineTask extends Task {
 	}
 
 	@Override
-	public FloatingTask toFloating() throws HandledException {
+	public Task convert(Date[] time) throws HandledException {
+		if (time == null) throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
+		if (time[0] == null && time[1] == null){
+			return this.toFloating();
+		} else if (time[1] == null){
+			return this.toDeadline(time[0]);
+		} else {
+			return this.toPeriodic(time[0], time[1]);
+		}
+	}
+	
+	private FloatingTask toFloating() throws HandledException {
 		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getTitle(), false);
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
 
-	@Override
-	public DeadlineTask toDeadline(Date dueTime) throws HandledException {
+	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
 		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getTitle(), dueTime, this.getComplete());
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
 
-	@Override
-	public PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
+	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
 		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getTitle(), null, startTime, endTime, null);
 		newTask.updateDescription(this.getDescription());
 		return newTask;

@@ -88,7 +88,7 @@ class CommandExecutor {
 		Task task = getTaskByID(taskID);
 		Task newTask;
 		if (timeFlag){
-			newTask = updateTaskType(task, time[0], time[1]);
+			newTask = task.convert(time);
 		} else {
 			newTask = cloneTask(task);
 		}
@@ -109,16 +109,6 @@ class CommandExecutor {
 		}
 		backupTask(ActionType.UPDATE, task);
 		this.taskList = storage.updateTask(newTask);
-	}
-	
-	private Task updateTaskType(Task task, Date startTime, Date endTime) throws HandledException{
-		if (startTime == null && endTime == null){
-			return task.toFloating();
-		} else if (endTime == null){
-			return task.toDeadline(startTime);
-		} else {
-			return task.toPeriodic(startTime, endTime);
-		}
 	}
 	
 	private Task cloneTask(Task task) throws HandledException{
