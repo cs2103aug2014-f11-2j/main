@@ -179,11 +179,28 @@ class CommandExecutor {
 	}
 	
 	public ArrayList<Task> filterTime(Date[] time){
-		//TODO @Chun Hui
-		// if time[0] and time[1] are both null, return getFloatingList()
-		// if time[0] is not null and time[1] is null, get DeadlineList and return an arrayList of DeadlineTask items which dueTime is before time[0]
-		// if time[0] and time[1] are both not null, get PeriodicList and return an arrayList of PeriodicTask items which startTime is between time[0] and time[1]
-		return null;
+		ArrayList<Task> returnList = new ArrayList<Task>();
+		if(time[0] == null && time[1] == null){
+			ArrayList<FloatingTask> floatingList = getFloatingList();
+			for (FloatingTask task:floatingList){
+				returnList.add(task);
+			}
+		} else if (time[1] == null){
+			ArrayList<DeadlineTask> deadlineList = getDeadlineList();
+			for (DeadlineTask task:deadlineList){
+				if(task.getDueTime().before(time[0])){
+					returnList.add(task);
+				}
+			}
+		} else {
+			ArrayList<PeriodicTask> periodicList = getPeriodicList();
+			for (PeriodicTask task:periodicList){
+				if(task.getStartTime().after(time[0]) && task.getEndTime().before(time[1])){
+					returnList.add((PeriodicTask) task);
+				}
+			}
+		}
+		return returnList;
 	}
 	
 	public ArrayList<Task> filterTitle(ArrayList<Task> searchList, String titleKeyword){
