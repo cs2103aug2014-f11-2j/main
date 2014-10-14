@@ -254,10 +254,10 @@ public class CommandLineUI {
 	}
 	
 	private void alertTask() {
-		ArrayList<DeadlineTask> deadlineList = executor.getDeadlineList();
-		print(ResponseParser.alertDeadline(deadlineList));
-		ArrayList<PeriodicTask> periodicList = executor.getPeriodicList();
-		print(ResponseParser.alertPeriodic(periodicList));
+		ArrayList<DeadlineTask> deadlineAlertList = executor.getAlertDeadlineList();
+		print(ResponseParser.alertDeadline(deadlineAlertList));
+		ArrayList<PeriodicTask> periodicAlertList = executor.getAlertPeriodicList();
+		print(ResponseParser.alertPeriodic(periodicAlertList));
 	}
 	
 	private void updateTimeFromRecur() {

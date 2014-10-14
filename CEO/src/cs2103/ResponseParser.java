@@ -108,7 +108,7 @@ public class ResponseParser {
 	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d tasks";
 	private static final String MESSAGE_UPDATE_RECUR_TIME_FORMAT = "Successfully updated %1$d recurring tasks";
 
-	private static final long DAY_IN_MILLIS = 86400000L;
+
 	
 	public static <T extends Task> String parseListResponse(ArrayList<T> taskList){
 		if (taskList == null || taskList.size() == 0){
@@ -126,60 +126,26 @@ public class ResponseParser {
 		return String.format(MESSAGE_INVALID_TASKTYPE_FORMAT, taskType);
 	}
 	
-	public static String alertDeadline(ArrayList<DeadlineTask> taskList){
-		if (taskList == null || taskList.size() == 0){
+	public static String alertDeadline(ArrayList<DeadlineTask> alertList){
+		if (alertList == null || alertList.size() == 0){
 			return null;
 		} else {
-			ArrayList<DeadlineTask> alertList = getAlertDeadlineList(taskList);
-			if (alertList == null || alertList.size() == 0){
-				return null;
-			} else {
-				StringBuffer sb = new StringBuffer();
-				sb.append(MESSAGE_TASKS_DUE);
-				sb.append(parseListResponse(alertList));
-				return deleteLastChar(sb);
-			}
+			StringBuffer sb = new StringBuffer();
+			sb.append(MESSAGE_TASKS_DUE);
+			sb.append(parseListResponse(alertList));
+			return deleteLastChar(sb);
 		}
 	}
 	
-	public static String alertPeriodic(ArrayList<PeriodicTask> taskList){
-		if (taskList == null || taskList.size() == 0){
+	public static String alertPeriodic(ArrayList<PeriodicTask> alertList){
+		if (alertList == null || alertList.size() == 0){
 			return null;
 		} else {
-			ArrayList<PeriodicTask> alertList = getAlertPeriodicList(taskList);
-			if (alertList == null || alertList.size() == 0){
-				return null;
-			} else {
-				StringBuffer sb = new StringBuffer();
-				sb.append(MESSAGE_TASKS_STARTING);
-				sb.append(parseListResponse(alertList));
-				return deleteLastChar(sb);
-			}
+			StringBuffer sb = new StringBuffer();
+			sb.append(MESSAGE_TASKS_STARTING);
+			sb.append(parseListResponse(alertList));
+			return deleteLastChar(sb);
 		}
-	}
-	
-	private static ArrayList<DeadlineTask> getAlertDeadlineList(ArrayList<DeadlineTask> taskList){
-		ArrayList<DeadlineTask> alertList = new ArrayList<DeadlineTask>();
-		long timeNow = System.currentTimeMillis();
-		for (DeadlineTask task:taskList){
-			long timeDifference = task.getDueTime().getTime() - timeNow;
-			if (timeDifference >= 0 && timeDifference < DAY_IN_MILLIS){
-				alertList.add(task);
-			}
-		}
-		return alertList;
-	}
-
-	private static ArrayList<PeriodicTask> getAlertPeriodicList(ArrayList<PeriodicTask> taskList){
-		ArrayList<PeriodicTask> alertList = new ArrayList<PeriodicTask>();
-		long timeNow = System.currentTimeMillis();
-		for (PeriodicTask task:taskList){
-			long timeDifference = task.getStartTime().getTime() - timeNow;
-			if (timeDifference >= 0 && timeDifference < DAY_IN_MILLIS){
-				alertList.add(task);
-			}
-		}
-		return alertList;
 	}
 	
 	public static String parseShowDetailResponse(Task task) throws HandledException{
