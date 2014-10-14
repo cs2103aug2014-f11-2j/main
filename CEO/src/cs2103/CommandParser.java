@@ -15,14 +15,14 @@ import net.fortuna.ical4j.model.Recur;
 
 class CommandParser {
 	public static enum CommandType {
-		ADD, LIST, SHOWDETAIL, DELETE, UPDATE, EXIT, INVALID, UNDO, REDO, HELP;
+		ADD, LIST, SHOWDETAIL, DELETE, UPDATE, EXIT, UNDO, REDO, HELP, SEARCH, QUICK, INVALID;
 	}
 	
 	public static enum TaskType {
 		ALL, FLOATING, DEADLINE, PERIODIC, INVALID;
 	}
 	
-	private static String[] multiParameterCommands = {"add", "update", "search", "new", "modify"};
+	private static String[] multiParameterCommands = {"add", "update", "search", "new", "modify", "find"};
 	private static String[] allowedSeparateLiteral = {"\\s+-", "\\s+/", ";"};
 	
 	public static Queue<String> separateCommand(String userInput) throws HandledException{
@@ -56,13 +56,13 @@ class CommandParser {
 			return CommandType.LIST;
 		} else if (command.equalsIgnoreCase("update") || command.equalsIgnoreCase("modify")){
 			return CommandType.UPDATE;
-		} else if (command.equalsIgnoreCase("exit")){
+		} else if (command.equalsIgnoreCase("exit") || command.equalsIgnoreCase("bye")){
 			return CommandType.EXIT;
 		} else if (command.equalsIgnoreCase("add") || command.equalsIgnoreCase("new")){
 			return CommandType.ADD;
 		} else if (command.equalsIgnoreCase("delete") || command.equalsIgnoreCase("remove") || command.equalsIgnoreCase("del")){
 			return CommandType.DELETE;
-		} else if (command.equalsIgnoreCase("show")){
+		} else if (command.equalsIgnoreCase("show") || command.equalsIgnoreCase("detail")){
 			return CommandType.SHOWDETAIL;
 		} else if (command.equalsIgnoreCase("undo")){
 			return CommandType.UNDO;
@@ -70,7 +70,11 @@ class CommandParser {
 			return CommandType.REDO;
 		} else if (command.equalsIgnoreCase("help")){
 			return CommandType.HELP;
-		}else {
+		} else if (command.equalsIgnoreCase("search") || command.equalsIgnoreCase("find")){
+			return CommandType.SEARCH;
+		} else if (command.equalsIgnoreCase("quick") || command.equalsIgnoreCase("q")){
+			return CommandType.QUICK;
+		} else {
 			return CommandType.INVALID;
 		}
 	}

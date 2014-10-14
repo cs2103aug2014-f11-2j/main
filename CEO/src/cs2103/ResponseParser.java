@@ -136,9 +136,7 @@ public class ResponseParser {
 			} else {
 				StringBuffer sb = new StringBuffer();
 				sb.append(MESSAGE_TASKS_DUE);
-				for (DeadlineTask task:alertList){
-					sb.append(task.toSummary());
-				}
+				sb.append(parseListResponse(alertList));
 				return deleteLastChar(sb);
 			}
 		}
@@ -154,9 +152,7 @@ public class ResponseParser {
 			} else {
 				StringBuffer sb = new StringBuffer();
 				sb.append(MESSAGE_TASKS_STARTING);
-				for (PeriodicTask task:alertList){
-					sb.append(task.toSummary());
-				}
+				sb.append(parseListResponse(alertList));
 				return deleteLastChar(sb);
 			}
 		}
@@ -223,6 +219,12 @@ public class ResponseParser {
 	
 	public static String parseUpdateTimeFromRecurResponse(int count){
 		return String.format(MESSAGE_UPDATE_RECUR_TIME_FORMAT, count);
+	}
+	
+
+	public static String parseSearchErrorResponse() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	private static String deleteLastChar(StringBuffer sb){

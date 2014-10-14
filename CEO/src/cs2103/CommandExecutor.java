@@ -151,10 +151,46 @@ class CommandExecutor {
 		return i;
 	}
 	
+	public ArrayList<Task> filterTime(Date[] time){
+		//TODO @Chun Hui
+		// if time[0] and time[1] are both null, return getFloatingList()
+		// if time[0] is not null and time[1] is null, get DeadlineList and return an arrayList of DeadlineTask items which dueTime is before time[0]
+		// if time[0] and time[1] are both not null, get PeriodicList and return an arrayList of PeriodicTask items which startTime is between time[0] and time[1]
+		return null;
+	}
+	
+	public ArrayList<Task> filterTitle(ArrayList<Task> searchList, String titleKeyword){
+		//TODO @Han
+		ArrayList<Task> returnList = new ArrayList<Task>();
+		//Go through each Task object in searchList, if the Task.getTitle() contains the titleKeyword, add into returnList
+		return returnList;
+	}
+	
+	public ArrayList<Task> filterDescription(ArrayList<Task> searchList, String descriptionKeyword){
+		//TODO @Han
+		ArrayList<Task> returnList = new ArrayList<Task>();
+		//Go through each Task object in searchList, if the Task.getDescription() contains the descriptionKeyword, add into returnList
+		return returnList;
+	}
+	
+	public ArrayList<Task> filterLocation(ArrayList<Task> searchList, String locationKeyword){
+		//TODO @Han
+		ArrayList<Task> returnList = new ArrayList<Task>();
+		//Go through each Task object in searchList, if the Task is an instance of PeriodicTask and Task.getLocation() contains the locationKeyword, add into returnList
+		return returnList;
+	}
+	
+	public ArrayList<Task> filterComplete(ArrayList<Task> searchList, boolean complete){
+		//TODO @Han
+		ArrayList<Task> returnList = new ArrayList<Task>();
+		//Go through each Task object in searchList, if the Task is an instance of FloatingTask or DeadlineTask and Task.getComplete() matches the boolean complete, add into returnList
+		return returnList;
+	}
+	
 	public boolean updateTimeFromRecur(PeriodicTask task) throws HandledException, FatalException{
 		DateTime now = new DateTime();
 		if (task.getRecurrence() != null){
-			if (task.getStartTime().before(now)){
+			if (task.getEndTime().before(now)){
 				Date startTime = (task.getRecurrence().getNextDate(new DateTime(task.getStartTime()), now));
 				Date endTime = new Date(task.getEndTime().getTime() - task.getStartTime().getTime() + startTime.getTime());
 				task.updateTime(startTime, endTime);

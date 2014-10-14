@@ -104,6 +104,10 @@ public class CommandLineUI {
 					return redo(separateResult.poll());
 				case HELP:
 					return getHelp(separateResult.poll());
+				case SEARCH:
+					return search(separateResult);
+				case QUICK:
+					return quickAdd(separateResult.poll());
 				case INVALID:
 				default:
 					return MESSAGE_COMMAND_ERROR;
@@ -294,5 +298,43 @@ public class CommandLineUI {
 		default:
 			return ResponseParser.HELP_DEFAULT;
 		}
+	}
+	
+	private String search(Queue<String> parameterList){
+		try {
+			Map<String, String> parameterMap = CommandParser.separateParameters(parameterList);
+			String timeString = CommandParser.getTimeString(parameterMap);
+			ArrayList<Task> searchList;
+			if (timeString == null){
+				searchList = executor.getAllList();
+			} else {
+				Date[] time = CommandParser.getTime(timeString);
+				searchList = executor.filterTime(time);
+			}
+			String titleKeyword = CommandParser.getTitle(parameterMap);
+			if (titleKeyword != null){
+				searchList = executor.filterTitle(searchList, titleKeyword);
+			}
+			String descriptionKeyword = CommandParser.getDescription(parameterMap);
+			if (descriptionKeyword != null){
+				searchList = executor.filterDescription(searchList, descriptionKeyword);
+			}
+			String locationKeyword = CommandParser.getLocation(parameterMap);
+			if (locationKeyword != null){
+				searchList = executor.filterLocation(searchList, locationKeyword);
+			}
+			String completeKeyword = CommandParser.getComplete(parameterMap);
+			if (completeKeyword != null){
+				searchList = executor.filterComplete(searchList, CommandParser.parseComplete(completeKeyword));
+			}
+			return ResponseParser.parseListResponse(searchList);
+		} catch (HandledException e) {
+			return ResponseParser.parseSearchErrorResponse();
+		}
+	}
+	
+	private String quickAdd(String quickAddString){
+		//TODO DO NOT IMPLEMENT FOR NOW
+		return null;
 	}
 }
