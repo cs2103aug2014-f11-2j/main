@@ -43,5 +43,5 @@ Basic Command Line Interface Usage
  
  9. Display Help:
  
- `help`
+ `help (<add|list|show|delete|update|undo|redo|search>)`
 

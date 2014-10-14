@@ -91,6 +91,27 @@ public class ResponseParser {
 										   "Example:\nredo 1\n";
 	public static final String HELP_UNDO = "Undo has no extra options\n" +
 			                               "Example:\nundo 1\n";
+	public static final String HELP_SEARCH = "Search usage:\n" +
+			 								 "  search ([-N or -title <title>] [-C or -complete {true|false}]\n" +
+			 								 "         [-D or -description <description>]\n" +
+			 								 "         [-L or -location <location>]\n" +
+			 								 "         [-T or -time {<blank>|<YYYY/MM/DD hh:mm>|\n" +
+			 								 "         <<YYYY/MM/DD hh:mm> to <YYYY/MM/DD hh:mm>>}]\n" +
+			 								 "Options:\n" +
+			 								 "  -title <titleKeyword>       Specify title keyword for search\n" +
+			 								 "  -complete <true|false>      Specify the complete status you want to search\n" +
+			 								 "                              Periodic tasks will be excluded\n" +
+			 								 "  -description <description>  Specify description keyword for search\n" +
+			 								 "  -location <location>        Specify location keyword for search\n" +
+			 								 "                              only periodic tasks will be included\n" +
+			 								 "  -time <blank>                                  Only include floating tasks\n" +
+			 								 "        <yyyy/MM/dd HH:mm>                       Search deadline tasks that\n" +
+			 								 "                                                 due time is before this time\n" +
+			 								 "        <yyyy/MM/dd HH:mm to yyyy/MM/dd HH:mm>   Search Periodic tasks that\n" +
+			 								 "                                                 start Time is within the period\n" +
+			 								 "Example:\n" +
+			 								 "  search -title title keyword -description description keyword -complete true\n\n" +
+			 								 "This will effectively return the tasks which title contains \"task keyword\", description contains \"description keyword\" and is complete\n";
 	
 	private static final String MESSAGE_ADD = "You have successfully added a new task.";
 	private static final String MESSAGE_ADD_ERROR = "Failed to add new task";
@@ -107,8 +128,6 @@ public class ResponseParser {
 	private static final String MESSAGE_UNDO_FORMAT = "Successfully undo %1$d tasks";
 	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d tasks";
 	private static final String MESSAGE_UPDATE_RECUR_TIME_FORMAT = "Successfully updated %1$d recurring tasks";
-
-
 	
 	public static <T extends Task> String parseListResponse(ArrayList<T> taskList){
 		if (taskList == null || taskList.size() == 0){

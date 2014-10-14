@@ -294,6 +294,8 @@ public class CommandLineUI {
 			return ResponseParser.HELP_UNDO;
 		case REDO:
 			return ResponseParser.HELP_REDO;
+		case SEARCH:
+			return ResponseParser.HELP_SEARCH;
 		case INVALID:
 		default:
 			return ResponseParser.HELP_DEFAULT;
