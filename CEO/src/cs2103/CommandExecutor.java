@@ -163,10 +163,12 @@ class CommandExecutor {
 			}
 		}
 		// if time[0] is not null and time[1] is null, get DeadlineList and return an arrayList of DeadlineTask items which dueTime is before time[0]
-		else if(time[0]!=null && time[1]==null){
+			else if(time[0]!=null && time[1]==null){
 			for (Task task:this.taskList){
 				if (task instanceof DeadlineTask){
-					returnList.add((DeadlineTask) task);
+					if(((DeadlineTask) task).getDueTime().compareTo(time[0])<0){
+						returnList.add((DeadlineTask) task);
+					}
 				}
 			}
 		}
@@ -174,7 +176,11 @@ class CommandExecutor {
 		else if(time[0]!=null && time[1]!=null){
 			for (Task task:this.taskList){
 				if (task instanceof PeriodicTask){
-					returnList.add((PeriodicTask) task);
+					if(((PeriodicTask) task).getStartTime().compareTo(time[0])>0){
+						if(((PeriodicTask) task).getEndTime().compareTo(time[1])<0){
+							returnList.add((PeriodicTask) task);
+						}
+					}
 				}
 			}
 		}
