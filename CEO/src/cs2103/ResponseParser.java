@@ -104,11 +104,13 @@ public class ResponseParser {
 			 								 "  -description <description>  Specify description keyword for search\n" +
 			 								 "  -location <location>        Specify location keyword for search\n" +
 			 								 "                              only periodic tasks will be included\n" +
-			 								 "  -time <blank>                                  Only include floating tasks\n" +
-			 								 "        <yyyy/MM/dd HH:mm>                       Search deadline tasks that\n" +
-			 								 "                                                 due time is before this time\n" +
-			 								 "        <yyyy/MM/dd HH:mm to yyyy/MM/dd HH:mm>   Search Periodic tasks that\n" +
-			 								 "                                                 start Time is within the period\n" +
+			 								 "  -time <blank>                                  Exclude all floating tasks\n" +
+			 								 "        <yyyy/MM/dd HH:mm>                       Search deadline and periodic tasks\n" +
+			 								 "                                                 that due time or start time\n" +
+			 								 "                                                 is before given time point\n" +
+			 								 "        <yyyy/MM/dd HH:mm to yyyy/MM/dd HH:mm>   Search deadline and periodic tasks\n" +
+			 								 "                                                 that due time or start time\n" +
+			 								 "                                                 is within the given period\n" +
 			 								 "Example:\n" +
 			 								 "  search -title title keyword -description description keyword -complete true\n\n" +
 			 								 "This will effectively return the tasks which title contains \"task keyword\", description contains \"description keyword\" and is complete\n";
