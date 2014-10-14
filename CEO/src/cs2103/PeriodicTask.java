@@ -1,6 +1,7 @@
 package cs2103;
 
 import java.text.DateFormat;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
@@ -169,5 +170,16 @@ public class PeriodicTask extends Task {
 		component.getProperties().add(new Description(this.getDescription()));
 		component.getProperties().add(new Location(this.getLocation()));
 		return component;
+	}
+	
+	public static sortComparator getComparator(){
+		return new sortComparator();
+	}
+
+	public static class sortComparator implements Comparator<PeriodicTask>{
+		@Override
+		public int compare(PeriodicTask o1, PeriodicTask o2) {
+			return o1.getStartTime().compareTo(o2.getStartTime());
+		}
 	}
 }

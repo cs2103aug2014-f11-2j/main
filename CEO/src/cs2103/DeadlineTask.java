@@ -1,6 +1,7 @@
 package cs2103;
 
 import java.text.DateFormat;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
@@ -137,5 +138,16 @@ class DeadlineTask extends Task {
 	
 	private static Status completeToStatus(boolean complete){
 		return complete?Status.VTODO_COMPLETED:Status.VTODO_NEEDS_ACTION;
+	}
+	
+	public static sortComparator getComparator(){
+		return new sortComparator();
+	}
+	
+	private static class sortComparator implements Comparator<DeadlineTask>{
+		@Override
+		public int compare(DeadlineTask o1, DeadlineTask o2) {
+			return o1.getDueTime().compareTo(o2.getDueTime());
+		}
 	}
 }

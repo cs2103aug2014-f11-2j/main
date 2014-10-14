@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Stack;
 
+import edu.emory.mathcs.backport.java.util.Collections;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
 
@@ -51,6 +52,7 @@ class CommandExecutor {
 				returnList.add((PeriodicTask) task);
 			}
 		}
+		Collections.sort(returnList, PeriodicTask.getComparator());
 		return returnList;
 	}
 	
@@ -61,6 +63,7 @@ class CommandExecutor {
 				returnList.add((DeadlineTask) task);
 			}
 		}
+		Collections.sort(returnList, DeadlineTask.getComparator());
 		return returnList;
 	}
 	
