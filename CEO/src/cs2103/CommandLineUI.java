@@ -79,6 +79,7 @@ public class CommandLineUI {
 	
 	private String processUserInput(String userInput) {
 		try {
+			assert(userInput != null);
 			Queue<String> separateResult = CommandParser.separateCommand(userInput);
 			String commandTypeString = separateResult.poll();
 			if (commandTypeString==null || commandTypeString.equals("")){
@@ -345,5 +346,9 @@ public class CommandLineUI {
 	private String quickAdd(String quickAddString){
 		//TODO DO NOT IMPLEMENT FOR NOW
 		return null;
+	}
+	
+	public String testCommand(String testCommandInput){
+		return processUserInput(testCommandInput);
 	}
 }

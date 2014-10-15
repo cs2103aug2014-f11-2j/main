@@ -210,7 +210,6 @@ class CommandExecutor {
 		return returnList;
 	}
 	
-
 	public ArrayList<Task> filterKeyword(ArrayList<Task> searchList, String keywordString) {
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for (Task task:searchList){
