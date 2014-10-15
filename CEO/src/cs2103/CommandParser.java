@@ -26,10 +26,10 @@ class CommandParser {
 	public static final String[] allowedDescriptionLiteral = {"D", "description", "detail"};
 	public static final String[] allowedLocationLiteral = {"L", "location", "place"};
 	public static final String[] allowedCompleteLiteral = {"C", "complete", "status"};
-	public static final String[] allowedTimeLiteral = {"T", "time", "from", "by"};
 	public static final String[] allowedRecurrenceLiteral = {"R", "reccuring", "recur"};
 	public static final String[] allowedKeywordLiteral = {"K", "keyword"};
 	private static final String[] multiParameterCommands = {"add", "update", "search", "new", "modify", "find"};
+	private static final String[] allowedTimeLiteral = {"T", "time", "from", "by"};
 	private static final String[] allowedSeparateLiteral = {"\\s+-", "\\s+/", ";"};
 	
 	public static Queue<String> separateCommand(String userInput) throws HandledException{
@@ -142,6 +142,18 @@ class CommandParser {
 		}else{
 			return null;
 		}
+	}
+	
+	public static String getTimeString(Map<String, String> parameterMap){
+		for (String s:allowedTimeLiteral){
+			String result = getParameterFromMap(parameterMap, s);
+			if (result != null){
+				StringBuffer sb = new StringBuffer();
+				sb.append(s).append(' ').append(result);
+				return sb.toString();
+			}
+		}
+		return null;
 	}
 	
 	public static Date[] getTime(String timeString) throws HandledException{
