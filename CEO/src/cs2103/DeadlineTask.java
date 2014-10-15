@@ -150,4 +150,15 @@ class DeadlineTask extends Task {
 			return o1.getDueTime().compareTo(o2.getDueTime());
 		}
 	}
+
+	@Override
+	public boolean checkPeriod(Date[] time) {
+		if (time[0] == null && time[1] == null){
+			return true;
+		} else if (time[1] == null){
+			return this.getDueTime().before(time[0]);
+		} else {
+			return this.getDueTime().after(time[0]) && this.getDueTime().before(time[1]);
+		}
+	}
 }

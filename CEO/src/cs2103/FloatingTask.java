@@ -113,4 +113,9 @@ class FloatingTask extends Task {
 	private static Status completeToStatus(boolean complete){
 		return complete?Status.VTODO_COMPLETED:Status.VTODO_NEEDS_ACTION;
 	}
+
+	@Override
+	public boolean checkPeriod(Date[] time) {
+		return false;
+	}
 }

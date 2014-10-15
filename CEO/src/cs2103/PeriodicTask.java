@@ -182,4 +182,15 @@ public class PeriodicTask extends Task {
 			return o1.getStartTime().compareTo(o2.getStartTime());
 		}
 	}
+
+	@Override
+	public boolean checkPeriod(Date[] time) {
+		if (time[0] == null && time[1] == null){
+			return true;
+		} else if (time[1] == null){
+			return this.getStartTime().before(time[0]);
+		} else {
+			return this.getStartTime().after(time[0]) && this.getStartTime().before(time[1]);
+		}
+	}
 }

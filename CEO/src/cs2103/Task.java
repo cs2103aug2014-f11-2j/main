@@ -17,6 +17,7 @@ abstract class Task implements Comparable<Task>, Cloneable{;
 	private String description;
 	protected static final String STRING_TYPE = "Type: ";
 	protected static final String STRING_DESCRIPTION = "Description: ";
+	protected static final long DAY_IN_MILLIS = 86400000L;
 	
 	public Task(Uid taskUID, String title) throws HandledException{
 		if (title == null || title.equals("")){
@@ -88,4 +89,11 @@ abstract class Task implements Comparable<Task>, Cloneable{;
 	public abstract String toSummary();
 	public abstract String toDetail();
 	public abstract Component toComponent();
+	public abstract boolean checkPeriod(Date[] time);
+	public boolean checkAlert() {
+		Date[] time = new Date[2];
+		time[0] = new Date();
+		time[1] = new Date(time[0].getTime() + DAY_IN_MILLIS);
+		return this.checkPeriod(time);
+	}
 }

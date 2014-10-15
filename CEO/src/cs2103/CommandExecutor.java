@@ -14,7 +14,6 @@ class CommandExecutor {
 	private ArrayList<Task> taskList;
 	private Stack<TaskBackup> undoStack;
 	private Stack<TaskBackup> redoStack;
-	private static final long DAY_IN_MILLIS = 86400000L;
 	
 	private static enum ActionType {
 		ADD, DELETE, UPDATE;
@@ -85,10 +84,8 @@ class CommandExecutor {
 	public ArrayList<DeadlineTask> getAlertDeadlineList(){
 		ArrayList<DeadlineTask> taskList = getDeadlineList();
 		ArrayList<DeadlineTask> alertList = new ArrayList<DeadlineTask>();
-		long timeNow = System.currentTimeMillis();
 		for (DeadlineTask task:taskList){
-			long timeDifference = task.getDueTime().getTime() - timeNow;
-			if (timeDifference >= 0 && timeDifference < DAY_IN_MILLIS){
+			if (task.checkAlert()){
 				alertList.add(task);
 			}
 		}
@@ -98,10 +95,8 @@ class CommandExecutor {
 	public ArrayList<PeriodicTask> getAlertPeriodicList(){
 		ArrayList<PeriodicTask> taskList = getPeriodicList();
 		ArrayList<PeriodicTask> alertList = new ArrayList<PeriodicTask>();
-		long timeNow = System.currentTimeMillis();
 		for (PeriodicTask task:taskList){
-			long timeDifference = task.getStartTime().getTime() - timeNow;
-			if (timeDifference >= 0 && timeDifference < DAY_IN_MILLIS){
+			if (task.checkAlert()){
 				alertList.add(task);
 			}
 		}
