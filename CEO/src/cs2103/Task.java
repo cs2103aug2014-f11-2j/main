@@ -20,15 +20,11 @@ abstract class Task implements Comparable<Task>, Cloneable{;
 	protected static final long DAY_IN_MILLIS = 86400000L;
 	
 	public Task(Uid taskUID, String title) throws HandledException{
-		if (title == null || title.equals("")){
-			throw new HandledException(HandledException.ExceptionType.NO_TITLE);
+		this.updateTitle(title);
+		if (taskUID == null){
+			this.taskUID = generateUid();
 		} else {
-			if (taskUID == null){
-				taskUID = generateUid();
-			} else {
-				this.taskUID=taskUID;
-			}
-			this.title=title;
+			this.taskUID = taskUID;
 		}
 	}
 	
@@ -52,8 +48,12 @@ abstract class Task implements Comparable<Task>, Cloneable{;
 		this.taskID=id;
 	}
 	
-	public void updateTitle(String title){
-		this.title=title;
+	public void updateTitle(String title) throws HandledException{
+		if (title == null || title.equals("")){
+			throw new HandledException(HandledException.ExceptionType.NO_TITLE);
+		} else {
+			this.title=title;
+		}
 	}
 	
 	public void updateDescription(String description){
