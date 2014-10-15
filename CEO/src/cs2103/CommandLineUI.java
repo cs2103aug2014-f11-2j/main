@@ -121,14 +121,14 @@ public class CommandLineUI {
 	private String add(Queue<String> parameterList){
 		try{
 			Map<String, String> parameterMap = CommandParser.separateParameters(parameterList);
-			String title = CommandParser.getTitle(parameterMap);
+			String title = CommandParser.getParameterString(parameterMap, CommandParser.allowedTitleLiteral);
 			if (title==null || title.equals("")){
 				throw new HandledException(HandledException.ExceptionType.NO_TITLE);
 			}
-			String description = CommandParser.getDescription(parameterMap);
-			String location = CommandParser.getLocation(parameterMap);
-			String timeString = CommandParser.getTimeString(parameterMap);
-			String recurString = CommandParser.getRecurString(parameterMap);
+			String description = CommandParser.getParameterString(parameterMap, CommandParser.allowedDescriptionLiteral);
+			String location = CommandParser.getParameterString(parameterMap, CommandParser.allowedLocationLiteral);
+			String timeString = CommandParser.getParameterString(parameterMap, CommandParser.allowedTimeLiteral);
+			String recurString = CommandParser.getParameterString(parameterMap, CommandParser.allowedRecurrenceLiteral);
 			Date[] time = CommandParser.getTime(timeString);
 			executor.addTask(title, description, location, time[0], time[1], CommandParser.stringToRecur(recurString));
 			return ResponseParser.parseAddResponse(true);
@@ -187,12 +187,12 @@ public class CommandLineUI {
 		try{
 			taskID = CommandParser.parseIntegerParameter(taskIDString);
 			Map<String, String> parameterMap = CommandParser.separateParameters(parameterList);
-			String title = CommandParser.getTitle(parameterMap);
-			String description = CommandParser.getDescription(parameterMap);
-			String location = CommandParser.getLocation(parameterMap);
-			String completeString = CommandParser.getComplete(parameterMap);
-			String timeString = CommandParser.getTimeString(parameterMap);
-			String recurString = CommandParser.getRecurString(parameterMap);
+			String title = CommandParser.getParameterString(parameterMap, CommandParser.allowedTitleLiteral);
+			String description = CommandParser.getParameterString(parameterMap, CommandParser.allowedDescriptionLiteral);
+			String location = CommandParser.getParameterString(parameterMap, CommandParser.allowedLocationLiteral);
+			String completeString = CommandParser.getParameterString(parameterMap, CommandParser.allowedCompleteLiteral);
+			String timeString = CommandParser.getParameterString(parameterMap, CommandParser.allowedTimeLiteral);
+			String recurString = CommandParser.getParameterString(parameterMap, CommandParser.allowedRecurrenceLiteral);
 			Date[] time = CommandParser.getTime(timeString);
 			Recur recur = CommandParser.stringToRecur(recurString);
 			boolean complete = CommandParser.parseComplete(completeString);
@@ -319,18 +319,16 @@ public class CommandLineUI {
 				searchList = executor.getAllList();
 			}
 			Map<String, String> parameterMap = CommandParser.separateParameters(parameterList);
-			String timeString = CommandParser.getTimeString(parameterMap);
-			if (timeString == null){
-				searchList = executor.getAllList();
-			} else {
+			String timeString = CommandParser.getParameterString(parameterMap, CommandParser.allowedTimeLiteral);
+			if (timeString != null){
 				Date[] time = CommandParser.getTime(timeString);
 				searchList = executor.filterTime(searchList, time);
 			}
-			String completeString = CommandParser.getComplete(parameterMap);
+			String completeString = CommandParser.getParameterString(parameterMap, CommandParser.allowedCompleteLiteral);
 			if (completeString != null){
 				searchList = executor.filterComplete(searchList, CommandParser.parseComplete(completeString));
 			}
-			String keywordString = CommandParser.getKeyword(parameterMap);
+			String keywordString = CommandParser.getParameterString(parameterMap, CommandParser.allowedKeywordLiteral);
 			if (keywordString != null){
 				searchList = executor.filterKeyword(searchList, keywordString);
 			}

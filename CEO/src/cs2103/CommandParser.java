@@ -22,8 +22,15 @@ class CommandParser {
 		ALL, FLOATING, DEADLINE, PERIODIC, INVALID;
 	}
 	
-	private static String[] multiParameterCommands = {"add", "update", "search", "new", "modify", "find"};
-	private static String[] allowedSeparateLiteral = {"\\s+-", "\\s+/", ";"};
+	public static final String[] allowedTitleLiteral = {"S", "title", "summary"};
+	public static final String[] allowedDescriptionLiteral = {"D", "description", "detail"};
+	public static final String[] allowedLocationLiteral = {"L", "location", "place"};
+	public static final String[] allowedCompleteLiteral = {"C", "complete", "status"};
+	public static final String[] allowedTimeLiteral = {"T", "time", "from", "by"};
+	public static final String[] allowedRecurrenceLiteral = {"R", "reccuring", "recur"};
+	public static final String[] allowedKeywordLiteral = {"K", "keyword"};
+	private static final String[] multiParameterCommands = {"add", "update", "search", "new", "modify", "find"};
+	private static final String[] allowedSeparateLiteral = {"\\s+-", "\\s+/", ";"};
 	
 	public static Queue<String> separateCommand(String userInput) throws HandledException{
 		checkNullString(userInput, HandledException.ExceptionType.INVALID_CMD);
@@ -116,7 +123,15 @@ class CommandParser {
 		return parameterMap;
 	}
 	
-	public static String getParameter(String parameterType, Map<String, String> parameterMap){
+	public static String getParameterString(Map<String, String> parameterMap, String[] allowedLiteral){
+		for (String s:allowedLiteral){
+			String result = getParameterFromMap(parameterMap, s);
+			if (result != null) return result;
+		}
+		return null;
+	}
+	
+	private static String getParameterFromMap(Map<String, String> parameterMap, String parameterType){
 		if (parameterMap.containsKey(parameterType)){
 			String value=parameterMap.get(parameterType);
 			if (value == null){
@@ -127,78 +142,6 @@ class CommandParser {
 		}else{
 			return null;
 		}
-	}
-	
-	public static String getTitle(Map<String, String> parameterMap){
-		Queue<String> keywordQueue = new LinkedList<String>();
-		keywordQueue.add("S");
-		keywordQueue.add("title");
-		keywordQueue.add("summary");
-		String result = null;
-		while(result == null && !keywordQueue.isEmpty()){
-			result = getParameter(keywordQueue.poll(), parameterMap);
-		}
-		return result;
-	}
-	
-	public static String getDescription(Map<String, String> parameterMap){
-		Queue<String> keywordQueue = new LinkedList<String>();
-		keywordQueue.add("D");
-		keywordQueue.add("description");
-		keywordQueue.add("detail");
-		String result = null;
-		while(result == null && !keywordQueue.isEmpty()){
-			result = getParameter(keywordQueue.poll(), parameterMap);
-		}
-		return result;
-	}
-	
-	public static String getLocation(Map<String, String> parameterMap){
-		Queue<String> keywordQueue = new LinkedList<String>();
-		keywordQueue.add("L");
-		keywordQueue.add("location");
-		keywordQueue.add("place");
-		String result = null;
-		while(result == null && !keywordQueue.isEmpty()){
-			result = getParameter(keywordQueue.poll(), parameterMap);
-		}
-		return result;
-	}
-	
-	public static String getComplete(Map<String, String> parameterMap){
-		Queue<String> keywordQueue = new LinkedList<String>();
-		keywordQueue.add("C");
-		keywordQueue.add("complete");
-		keywordQueue.add("done");
-		String result = null;
-		while(result == null && !keywordQueue.isEmpty()){
-			result = getParameter(keywordQueue.poll(), parameterMap);
-		}
-		return result;
-	}
-	
-	public static String getTimeString(Map<String, String> parameterMap){
-		Queue<String> keywordQueue = new LinkedList<String>();
-		keywordQueue.add("T");
-		keywordQueue.add("time");
-		keywordQueue.add("by");
-		keywordQueue.add("from");
-		String result = null;
-		while(result == null && !keywordQueue.isEmpty()){
-			result = getParameter(keywordQueue.poll(), parameterMap);
-		}
-		return result;
-	}
-	
-	public static String getKeyword(Map<String, String> parameterMap){
-		Queue<String> keywordQueue = new LinkedList<String>();
-		keywordQueue.add("K");
-		keywordQueue.add("keyword");
-		String result = null;
-		while(result == null && !keywordQueue.isEmpty()){
-			result = getParameter(keywordQueue.poll(), parameterMap);
-		}
-		return result;
 	}
 	
 	public static Date[] getTime(String timeString) throws HandledException{
@@ -214,17 +157,6 @@ class CommandParser {
 			}
 		}
 		return time;
-	}
-	
-	public static String getRecurString(Map<String, String> parameterMap){
-		Queue<String> keywordQueue = new LinkedList<String>();
-		keywordQueue.add("R");
-		keywordQueue.add("recurrence");
-		String result = null;
-		while(result == null && !keywordQueue.isEmpty()){
-			result = getParameter(keywordQueue.poll(), parameterMap);
-		}
-		return result;
 	}
 	
 	public static boolean parseComplete(String complete) throws HandledException {
