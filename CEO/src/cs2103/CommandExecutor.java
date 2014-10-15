@@ -193,38 +193,6 @@ class CommandExecutor {
 		return returnList;
 	}
 	
-	public ArrayList<Task> filterTitle(ArrayList<Task> searchList, String titleKeyword){
-		ArrayList<Task> returnList = new ArrayList<Task>();
-		for(Task task:searchList) {
-			if((task.getTitle()).equals(titleKeyword)) {
-				returnList.add(task);
-			}
-		}
-		return returnList;
-	}
-	
-	public ArrayList<Task> filterDescription(ArrayList<Task> searchList, String descriptionKeyword){
-		ArrayList<Task> returnList = new ArrayList<Task>();
-		for(Task task:searchList) {
-			if((task.getDescription()).equals(descriptionKeyword)) {
-				returnList.add(task);
-			}
-		}
-		return returnList;
-	}
-	
-	public ArrayList<Task> filterLocation(ArrayList<Task> searchList, String locationKeyword){
-		ArrayList<Task> returnList = new ArrayList<Task>();
-		for(Task task:searchList) {
-			if(task instanceof PeriodicTask) {
-				if((((PeriodicTask) task).getLocation()).contains(locationKeyword)) {
-					returnList.add(task);
-				}
-			}
-		}
-		return returnList;
-	}
-	
 	public ArrayList<Task> filterComplete(ArrayList<Task> searchList, boolean complete){
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for(Task task:searchList) {
