@@ -193,4 +193,17 @@ public class PeriodicTask extends Task {
 			return this.getStartTime().after(time[0]) && this.getStartTime().before(time[1]);
 		}
 	}
+	
+	@Override
+	public boolean matches(String keyword) {
+		if (keyword == null || keyword.equals("")){
+			return true;
+		} else {
+			if (this.getTitle().contains(keyword) || this.getDescription().contains(keyword) || this.getLocation().contains(keyword)){
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
 }

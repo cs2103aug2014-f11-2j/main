@@ -173,9 +173,19 @@ class CommandExecutor {
 		return i;
 	}
 	
-	public ArrayList<Task> filterTime(Date[] time){
+	public <T extends Task> ArrayList<Task> filterType(Class<T> type){
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for (Task task:this.taskList){
+			if (task.getClass() == type){
+				returnList.add(task);
+			}
+		}
+		return returnList;
+	}
+	
+	public ArrayList<Task> filterTime(ArrayList<Task> searchList, Date[] time){
+		ArrayList<Task> returnList = new ArrayList<Task>();
+		for (Task task:searchList){
 			if (task.checkPeriod(time)){
 				returnList.add(task);
 			}
@@ -208,6 +218,17 @@ class CommandExecutor {
 		//TODO @Han
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		//Go through each Task object in searchList, if the Task is an instance of FloatingTask or DeadlineTask and Task.getComplete() matches the boolean complete, add into returnList
+		return returnList;
+	}
+	
+
+	public ArrayList<Task> filterKeyword(ArrayList<Task> searchList, String keywordString) {
+		ArrayList<Task> returnList = new ArrayList<Task>();
+		for (Task task:searchList){
+			if (task.matches(keywordString)){
+				returnList.add(task);
+			}
+		}
 		return returnList;
 	}
 	

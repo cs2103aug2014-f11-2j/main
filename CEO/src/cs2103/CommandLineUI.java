@@ -304,30 +304,35 @@ public class CommandLineUI {
 	
 	private String search(Queue<String> parameterList){
 		try {
+			CommandParser.TaskType taskType = CommandParser.determineTaskType(parameterList.peek());
+			ArrayList<Task> searchList;
+			switch (taskType){
+			case FLOATING:
+				searchList = executor.filterType(FloatingTask.class);
+			case DEADLINE:
+				searchList = executor.filterType(DeadlineTask.class);
+			case PERIODIC:
+				searchList = executor.filterType(PeriodicTask.class);
+			case ALL:
+			case INVALID:
+			default:
+				searchList = executor.getAllList();
+			}
 			Map<String, String> parameterMap = CommandParser.separateParameters(parameterList);
 			String timeString = CommandParser.getTimeString(parameterMap);
-			ArrayList<Task> searchList;
 			if (timeString == null){
 				searchList = executor.getAllList();
 			} else {
 				Date[] time = CommandParser.getTime(timeString);
-				searchList = executor.filterTime(time);
+				searchList = executor.filterTime(searchList, time);
 			}
-			String titleKeyword = CommandParser.getTitle(parameterMap);
-			if (titleKeyword != null){
-				searchList = executor.filterTitle(searchList, titleKeyword);
+			String completeString = CommandParser.getComplete(parameterMap);
+			if (completeString != null){
+				searchList = executor.filterComplete(searchList, CommandParser.parseComplete(completeString));
 			}
-			String descriptionKeyword = CommandParser.getDescription(parameterMap);
-			if (descriptionKeyword != null){
-				searchList = executor.filterDescription(searchList, descriptionKeyword);
-			}
-			String locationKeyword = CommandParser.getLocation(parameterMap);
-			if (locationKeyword != null){
-				searchList = executor.filterLocation(searchList, locationKeyword);
-			}
-			String completeKeyword = CommandParser.getComplete(parameterMap);
-			if (completeKeyword != null){
-				searchList = executor.filterComplete(searchList, CommandParser.parseComplete(completeKeyword));
+			String keywordString = CommandParser.getKeyword(parameterMap);
+			if (keywordString != null){
+				searchList = executor.filterKeyword(searchList, keywordString);
 			}
 			return ResponseParser.parseListResponse(searchList);
 		} catch (HandledException e) {

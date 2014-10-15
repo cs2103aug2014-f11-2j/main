@@ -24,11 +24,11 @@ public class ResponseParser {
 			                                  "  +Update task with corresponding task ID. Enter \"help update\" for more\n\n" +
 			                                  "  undo/redo <number of steps>\n"+
 			                                  "  +Undo/redo some steps. Enter \"help undo\" or \"help redo\" for more\n\n" +
-			                                  "  search ([-S or -title <title>] [-C or -complete {true|false}]\n" +
-				 							  "         [-D or -description <description>]\n" +
-				 							  "         [-L or -location <location>] [-K or -type <location>]\n" +
+			                                  "  search (<floating|deadline|periodic|all>)\n" +
+			                                  "         {([-K or -keyword <keyword String>]\n" +
+			                                  "         [-C or -complete {true|false}]\n" +
 				 							  "         [-T or -time {<blank>|<YYYY/MM/DD hh:mm>|\n" +
-				 							  "         <<YYYY/MM/DD hh:mm> to <YYYY/MM/DD hh:mm>>}]\n" +
+				 							  "         <<YYYY/MM/DD hh:mm> to <YYYY/MM/DD hh:mm>>}]}\n" +
 				 							  "  +Search for tasks. Enter \"help search\" for more\n\n" +
 			                                  "  help\n" + 
 			                                  "  +display this message";
@@ -98,29 +98,28 @@ public class ResponseParser {
 	public static final String HELP_UNDO = "Undo has no extra options\n" +
 			                               "Example:\nundo 1\n";
 	public static final String HELP_SEARCH = "Search usage:\n" +
-			 								 "  search ([-S or -title <title>] [-C or -complete {true|false}]\n" +
-			 								 "         [-D or -description <description>]\n" +
-			 								 "         [-L or -location <location>] [-K or -type <location>]\n" +
-			 								 "         [-T or -time {<blank>|<YYYY/MM/DD hh:mm>|\n" +
-			 								 "         <<YYYY/MM/DD hh:mm> to <YYYY/MM/DD hh:mm>>}]\n" +
+											 "  search (<floating|deadline|periodic|all>)\n" +
+											 "         {([-K or -keyword <keyword String>]\n" +
+											 "         [-C or -complete {true|false}]\n" +
+											 "         [-T or -time {<blank>|<YYYY/MM/DD hh:mm>|\n" +
+											 "         <<YYYY/MM/DD hh:mm> to <YYYY/MM/DD hh:mm>>}]}\n" +
 			 								 "Options:\n" +
-			 								 "  -title <titleKeyword>       Specify title keyword for search\n" +
+			 								 "  <floating|deadline|periodic|all>   Specify the type of tasks to search\n" +
+			 								 "                                     Default to all if not specified" +
+			 								 "  -keyword <Keyword>          Search title, description and location\n" +
+			 								 "                              for the specified keyword\n" +
 			 								 "  -complete <true|false>      Specify the complete status you want to search\n" +
 			 								 "                              Periodic tasks will be excluded\n" +
-			 								 "  -description <description>  Specify description keyword for search\n" +
-			 								 "  -location <location>        Specify location keyword for search\n" +
-			 								 "                              only periodic tasks will be included\n" +
-			 								 "  -type <floating|deadline|periodic|all>         Include specific type of tasks\n" +
 			 								 "  -time <blank>                                  Exclude all floating tasks\n" +
-			 								 "        <yyyy/MM/dd HH:mm>                       Search deadline and periodic tasks\n" +
-			 								 "                                                 that due time or start time\n" +
-			 								 "                                                 is before given time point\n" +
-			 								 "        <yyyy/MM/dd HH:mm to yyyy/MM/dd HH:mm>   Search deadline and periodic tasks\n" +
-			 								 "                                                 that due time or start time\n" +
-			 								 "                                                 is within the given period\n" +
+			 								 "        <yyyy/MM/dd HH:mm>                       Search deadline and periodic\n" +
+			 								 "                                                 tasks that due time or start\n" +
+			 								 "                                                 time is before given time\n" +
+			 								 "        <yyyy/MM/dd HH:mm to yyyy/MM/dd HH:mm>   Search deadline and periodic\n" +
+			 								 "                                                 tasks that due time or start\n" +
+			 								 "                                                 time is within given period\n" +
 			 								 "Example:\n" +
-			 								 "  search -title title keyword -description description keyword -complete true\n\n" +
-			 								 "This will effectively return the tasks which title contains \"task keyword\", description contains \"description keyword\" and is complete\n";
+			 								 "  search all -keyword example keyword -complete true -time\n\n" +
+			 								 "This will effectively return the completed Deadline tasks which title, description or location contains \"example keyword\"\n(when complete parameter is specified, it is implied that all Periodic Tasks will be excluded)\n";
 	
 	private static final String MESSAGE_ADD = "You have successfully added a new task.";
 	private static final String MESSAGE_ADD_ERROR = "Failed to add new task";

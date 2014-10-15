@@ -31,7 +31,7 @@ Basic Command Line Interface Usage
  
  6. Search for tasks:
  
- `search ([-N or --title <title keyword>]|[-C or --complete {true|false}]|[-D or --description <description keyword>]|[-L or --location <location>]| [-T or -time {<blank>|<yyyy/MM/dd HH:mm>|<<yyyy/MM/dd HH:mm> to <yyyy/MM/dd HH:mm>>}])`
+ `search (<floating|deadline|periodic|all>) {[-K or --keyword <title/description/location keyword>] [-C or --complete {true|false}] [-T or -time {<blank>|<yyyy/MM/dd HH:mm>|<<yyyy/MM/dd HH:mm> to <yyyy/MM/dd HH:mm>>}]}`
  
  7. Undo last changes:
  

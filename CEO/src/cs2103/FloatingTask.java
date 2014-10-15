@@ -93,8 +93,11 @@ class FloatingTask extends Task {
 
 	@Override
 	public String toDetail() {
-		// TODO Auto-generated method stub
-		return null;
+		StringBuffer sb = new StringBuffer();
+		sb.append(this.toSummary());
+		sb.append(STRING_DESCRIPTION);
+		sb.append(this.getDescription());
+		return sb.append("\n").toString();
 	}
 	
 	private static String completeToString(boolean complete){
@@ -117,5 +120,18 @@ class FloatingTask extends Task {
 	@Override
 	public boolean checkPeriod(Date[] time) {
 		return false;
+	}
+	
+	@Override
+	public boolean matches(String keyword) {
+		if (keyword == null || keyword.equals("")){
+			return true;
+		} else {
+			if (this.getTitle().contains(keyword) || this.getDescription().contains(keyword)){
+				return true;
+			} else {
+				return false;
+			}
+		}
 	}
 }

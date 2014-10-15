@@ -131,7 +131,7 @@ class CommandParser {
 	
 	public static String getTitle(Map<String, String> parameterMap){
 		Queue<String> keywordQueue = new LinkedList<String>();
-		keywordQueue.add("N");
+		keywordQueue.add("S");
 		keywordQueue.add("title");
 		keywordQueue.add("summary");
 		String result = null;
@@ -183,6 +183,17 @@ class CommandParser {
 		keywordQueue.add("time");
 		keywordQueue.add("by");
 		keywordQueue.add("from");
+		String result = null;
+		while(result == null && !keywordQueue.isEmpty()){
+			result = getParameter(keywordQueue.poll(), parameterMap);
+		}
+		return result;
+	}
+	
+	public static String getKeyword(Map<String, String> parameterMap){
+		Queue<String> keywordQueue = new LinkedList<String>();
+		keywordQueue.add("K");
+		keywordQueue.add("keyword");
 		String result = null;
 		while(result == null && !keywordQueue.isEmpty()){
 			result = getParameter(keywordQueue.poll(), parameterMap);

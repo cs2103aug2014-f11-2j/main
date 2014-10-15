@@ -90,6 +90,7 @@ abstract class Task implements Comparable<Task>, Cloneable{;
 	public abstract String toDetail();
 	public abstract Component toComponent();
 	public abstract boolean checkPeriod(Date[] time);
+	public abstract boolean matches(String keyword);
 	public boolean checkAlert() {
 		Date[] time = new Date[2];
 		time[0] = new Date();

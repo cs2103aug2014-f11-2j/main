@@ -161,4 +161,17 @@ class DeadlineTask extends Task {
 			return this.getDueTime().after(time[0]) && this.getDueTime().before(time[1]);
 		}
 	}
+
+	@Override
+	public boolean matches(String keyword) {
+		if (keyword == null || keyword.equals("")){
+			return true;
+		} else {
+			if (this.getTitle().contains(keyword) || this.getDescription().contains(keyword)){
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
 }
