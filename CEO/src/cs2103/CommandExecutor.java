@@ -175,24 +175,9 @@ class CommandExecutor {
 	
 	public ArrayList<Task> filterTime(Date[] time){
 		ArrayList<Task> returnList = new ArrayList<Task>();
-		if(time[0] == null && time[1] == null){
-			ArrayList<FloatingTask> floatingList = getFloatingList();
-			for (FloatingTask task:floatingList){
+		for (Task task:this.taskList){
+			if (task.checkPeriod(time)){
 				returnList.add(task);
-			}
-		} else if (time[1] == null){
-			ArrayList<DeadlineTask> deadlineList = getDeadlineList();
-			for (DeadlineTask task:deadlineList){
-				if(task.getDueTime().before(time[0])){
-					returnList.add(task);
-				}
-			}
-		} else {
-			ArrayList<PeriodicTask> periodicList = getPeriodicList();
-			for (PeriodicTask task:periodicList){
-				if(task.getStartTime().after(time[0]) && task.getEndTime().before(time[1])){
-					returnList.add((PeriodicTask) task);
-				}
 			}
 		}
 		return returnList;
