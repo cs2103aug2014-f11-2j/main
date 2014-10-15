@@ -309,14 +309,18 @@ public class CommandLineUI {
 			switch (taskType){
 			case FLOATING:
 				searchList = executor.filterType(FloatingTask.class);
+				break;
 			case DEADLINE:
 				searchList = executor.filterType(DeadlineTask.class);
+				break;
 			case PERIODIC:
 				searchList = executor.filterType(PeriodicTask.class);
+				break;
 			case ALL:
 			case INVALID:
 			default:
 				searchList = executor.getAllList();
+				break;
 			}
 			Map<String, String> parameterMap = CommandParser.separateParameters(parameterList);
 			String timeString = CommandParser.getParameterString(parameterMap, CommandParser.allowedTimeLiteral);
