@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class ResponseParser {
 	public static final String HELP_DEFAULT = "CEO Usage:\n" +
-			                                  "  add [-N or --title <title>] ([-D or -description <description>]\n" + 
+			                                  "  add [-S or --title <title>] ([-D or -description <description>]\n" + 
 			                                  "      [-L or -location <location>] [-T or -time {<blank>|<YYYY/MM/DD hh:mm>|\n" +
 			                                  "      <<YYYY/MM/DD hh:mm> to <YYYY/MM/DD hh:mm>>}]\n" +
 			                                  "      [-R or -recurring <number h/d/w/m/y>])\n" +
@@ -15,7 +15,7 @@ public class ResponseParser {
 			                                  "  +Show detail of the task with specified task ID. Enter \"help show\" for more\n\n" +
 			                                  "  delete <task ID>\n" +
 			                                  "  +Delete task with corresponding taskID. Enter \"help delete\" for more\n\n" +
-			                                  "  update <task ID> ([-N or -title <title>] [-C or -complete {true|false}]\n" +
+			                                  "  update <task ID> ([-S or -title <title>] [-C or -complete {true|false}]\n" +
 			                                  "                   [-D or -description <description>]\n" +
 			                                  "                   [-L or -location <location>]\n" +
 			                                  "                   [-T or -time {<blank>|<YYYY/MM/DD hh:mm>|\n" +
@@ -24,10 +24,16 @@ public class ResponseParser {
 			                                  "  +Update task with corresponding task ID. Enter \"help update\" for more\n\n" +
 			                                  "  undo/redo <number of steps>\n"+
 			                                  "  +Undo/redo some steps. Enter \"help undo\" or \"help redo\" for more\n\n" +
+			                                  "  search ([-S or -title <title>] [-C or -complete {true|false}]\n" +
+				 							  "         [-D or -description <description>]\n" +
+				 							  "         [-L or -location <location>] [-K or -type <location>]\n" +
+				 							  "         [-T or -time {<blank>|<YYYY/MM/DD hh:mm>|\n" +
+				 							  "         <<YYYY/MM/DD hh:mm> to <YYYY/MM/DD hh:mm>>}]\n" +
+				 							  "  +Search for tasks. Enter \"help search\" for more\n\n" +
 			                                  "  help\n" + 
 			                                  "  +display this message";
 	public static final String HELP_ADD = "Add usage:\n"+
-										  "  add [-N or --title <title>] ([-D or -description <description>]\n" + 
+										  "  add [-S or --title <title>] ([-D or -description <description>]\n" + 
 										  "      [-L or -location <location>] [-T or -time {<blank>|<YYYY/MM/DD hh:mm>|\n" +
 										  "      <<YYYY/MM/DD hh:mm> to <YYYY/MM/DD hh:mm>>}]\n" +
 										  "      [-R or -recurring <number h/d/w/m/y>])\n" +
@@ -52,7 +58,7 @@ public class ResponseParser {
 	public static final String HELP_DELETE = "Delete has no extra options\n" +
 											 "Example: delete 1\n";
 	public static final String HELP_UPDATE = "Update usage:\n" +
-											 "  update <task ID> ([-N or -title <title>] [-C or -complete {true|false}]\n" +
+											 "  update <task ID> ([-S or -title <title>] [-C or -complete {true|false}]\n" +
 											 "                   [-D or -description <description>]\n" +
 											 "                   [-L or -location <location>]\n" +
 											 "                   [-T or -time {<blank>|<YYYY/MM/DD hh:mm>|\n" +
@@ -92,9 +98,9 @@ public class ResponseParser {
 	public static final String HELP_UNDO = "Undo has no extra options\n" +
 			                               "Example:\nundo 1\n";
 	public static final String HELP_SEARCH = "Search usage:\n" +
-			 								 "  search ([-N or -title <title>] [-C or -complete {true|false}]\n" +
+			 								 "  search ([-S or -title <title>] [-C or -complete {true|false}]\n" +
 			 								 "         [-D or -description <description>]\n" +
-			 								 "         [-L or -location <location>]\n" +
+			 								 "         [-L or -location <location>] [-K or -type <location>]\n" +
 			 								 "         [-T or -time {<blank>|<YYYY/MM/DD hh:mm>|\n" +
 			 								 "         <<YYYY/MM/DD hh:mm> to <YYYY/MM/DD hh:mm>>}]\n" +
 			 								 "Options:\n" +
@@ -104,6 +110,7 @@ public class ResponseParser {
 			 								 "  -description <description>  Specify description keyword for search\n" +
 			 								 "  -location <location>        Specify location keyword for search\n" +
 			 								 "                              only periodic tasks will be included\n" +
+			 								 "  -type <floating|deadline|periodic|all>         Include specific type of tasks\n" +
 			 								 "  -time <blank>                                  Exclude all floating tasks\n" +
 			 								 "        <yyyy/MM/dd HH:mm>                       Search deadline and periodic tasks\n" +
 			 								 "                                                 that due time or start time\n" +

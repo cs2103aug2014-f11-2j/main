@@ -40,9 +40,7 @@ class CommandParser {
 		} else {
 			String[] command = splitFirstWord(userInput);
 			for (String s:command){
-				if (s != null){
-					result.add(s.trim());
-				}
+				if (s != null) result.add(s.trim());
 			}
 		}
 		return result;
