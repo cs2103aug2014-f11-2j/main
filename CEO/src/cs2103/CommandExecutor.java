@@ -194,30 +194,51 @@ class CommandExecutor {
 	}
 	
 	public ArrayList<Task> filterTitle(ArrayList<Task> searchList, String titleKeyword){
-		//TODO @Han
 		ArrayList<Task> returnList = new ArrayList<Task>();
-		//Go through each Task object in searchList, if the Task.getTitle() contains the titleKeyword, add into returnList
+		for(Task task:searchList) {
+			if((task.getTitle()).equals(titleKeyword)) {
+				returnList.add(task);
+			}
+		}
 		return returnList;
 	}
 	
 	public ArrayList<Task> filterDescription(ArrayList<Task> searchList, String descriptionKeyword){
-		//TODO @Han
 		ArrayList<Task> returnList = new ArrayList<Task>();
-		//Go through each Task object in searchList, if the Task.getDescription() contains the descriptionKeyword, add into returnList
+		for(Task task:searchList) {
+			if((task.getDescription()).equals(descriptionKeyword)) {
+				returnList.add(task);
+			}
+		}
 		return returnList;
 	}
 	
 	public ArrayList<Task> filterLocation(ArrayList<Task> searchList, String locationKeyword){
-		//TODO @Han
 		ArrayList<Task> returnList = new ArrayList<Task>();
-		//Go through each Task object in searchList, if the Task is an instance of PeriodicTask and Task.getLocation() contains the locationKeyword, add into returnList
+		for(Task task:searchList) {
+			if(task instanceof PeriodicTask) {
+				if((((PeriodicTask) task).getLocation()).contains(locationKeyword)) {
+					returnList.add(task);
+				}
+			}
+		}
 		return returnList;
 	}
 	
 	public ArrayList<Task> filterComplete(ArrayList<Task> searchList, boolean complete){
-		//TODO @Han
 		ArrayList<Task> returnList = new ArrayList<Task>();
-		//Go through each Task object in searchList, if the Task is an instance of FloatingTask or DeadlineTask and Task.getComplete() matches the boolean complete, add into returnList
+		for(Task task:searchList) {
+			if(task instanceof FloatingTask) {
+				if((((FloatingTask)task).getComplete())==complete) {
+					returnList.add(task);
+				}
+			}
+			if(task instanceof DeadlineTask) {
+				if((((DeadlineTask)task).getComplete())==complete) {
+					returnList.add(task);
+				}
+			}
+		}
 		return returnList;
 	}
 	
