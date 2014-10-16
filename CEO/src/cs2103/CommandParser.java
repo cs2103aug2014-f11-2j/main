@@ -28,7 +28,7 @@ class CommandParser {
 	public static final String[] allowedCompleteLiteral = {"C", "complete", "status"};
 	public static final String[] allowedRecurrenceLiteral = {"R", "reccuring", "recur"};
 	public static final String[] allowedKeywordLiteral = {"K", "keyword"};
-	private static final String[] multiParameterCommands = {"add", "update", "search", "new", "modify", "find"};
+	private static final String[] multiParameterCommands = {"add", "update", "search", "new", "modify", "find", "create"};
 	private static final String[] allowedTimeLiteral = {"T", "time", "from", "by"};
 	private static final String[] allowedSeparateLiteral = {"\\s+-", "\\s+/", ";"};
 	
@@ -63,7 +63,7 @@ class CommandParser {
 			return CommandType.UPDATE;
 		} else if (command.equalsIgnoreCase("exit") || command.equalsIgnoreCase("bye")){
 			return CommandType.EXIT;
-		} else if (command.equalsIgnoreCase("add") || command.equalsIgnoreCase("new")){
+		} else if (command.equalsIgnoreCase("add") || command.equalsIgnoreCase("new") || command.equalsIgnoreCase("create")){
 			return CommandType.ADD;
 		} else if (command.equalsIgnoreCase("delete") || command.equalsIgnoreCase("remove") || command.equalsIgnoreCase("del")){
 			return CommandType.DELETE;
@@ -218,15 +218,17 @@ class CommandParser {
 	
 	private static String[] splitFirstWord(String parameterString) throws HandledException{
 		checkNullString(parameterString, HandledException.ExceptionType.INVALID_PARA);
-		String[] result = new String[2];;
+		String[] result = new String[2];
+		int colonIndex = parameterString.indexOf(':');
 		int spaceIndex = parameterString.indexOf(' ');
-		if (spaceIndex == -1){
+		int splitIndex = colonIndex < spaceIndex?colonIndex:spaceIndex;
+		if (splitIndex == -1){
 			result[0] = parameterString;
 			result[1] = null;
 			return result;
 		}else{
-			result[0] = parameterString.substring(0, spaceIndex).trim();
-			result[1] = parameterString.substring(spaceIndex).trim();
+			result[0] = parameterString.substring(0, splitIndex).trim();
+			result[1] = parameterString.substring(splitIndex+1).trim();
 			return result;
 		}
 	}
