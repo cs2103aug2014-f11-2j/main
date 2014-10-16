@@ -234,9 +234,7 @@ class CommandParser {
 	}
 	
 	private static Date stringToDate(String timeString) throws HandledException{
-		if (timeString == null){
-			return null;
-		}
+		checkNullString(timeString, HandledException.ExceptionType.INVALID_TIME);
 		try {
 			TimeZone tz=TimeZone.getDefault();
 			SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd HH:mm");
