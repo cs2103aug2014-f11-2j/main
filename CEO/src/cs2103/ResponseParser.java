@@ -136,6 +136,7 @@ public class ResponseParser {
 	private static final String MESSAGE_UNDO_FORMAT = "Successfully undo %1$d tasks";
 	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d tasks";
 	private static final String MESSAGE_UPDATE_RECUR_TIME_FORMAT = "Successfully updated %1$d recurring tasks";
+	private static final String MESSAGE_SEARCH_ERROR = "Unable to search for specified search criteria";
 	
 	public static <T extends Task> String parseListResponse(ArrayList<T> taskList){
 		if (taskList == null || taskList.size() == 0){
@@ -216,8 +217,7 @@ public class ResponseParser {
 	
 
 	public static String parseSearchErrorResponse() {
-		// TODO Auto-generated method stub
-		return null;
+		return MESSAGE_SEARCH_ERROR;
 	}
 	
 	private static String deleteLastChar(StringBuffer sb){
