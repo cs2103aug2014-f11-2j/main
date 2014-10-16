@@ -5,26 +5,38 @@ import java.net.UnknownHostException;
 import java.util.Date;
 
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.property.Created;
+import net.fortuna.ical4j.model.property.Description;
+import net.fortuna.ical4j.model.property.LastModified;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.util.SimpleHostInfo;
 import net.fortuna.ical4j.util.UidGenerator;
 
 abstract class Task implements Comparable<Task>, Cloneable{;
 	private int taskID;
-	private Uid taskUID;
+	private final Uid taskUID;
 	private String title;
 	private String description;
+	private Date created;
+	private Date lastModified;
 	protected static final String STRING_TYPE = "Type: ";
 	protected static final String STRING_DESCRIPTION = "Description: ";
 	protected static final long DAY_IN_MILLIS = 86400000L;
 	
-	public Task(Uid taskUID, String title) throws HandledException{
+	public Task(Uid taskUID, Date created, String title) throws HandledException{
+		if (title == null) throw new HandledException(HandledException.ExceptionType.NO_TITLE);
 		this.updateTitle(title);
 		if (taskUID == null){
 			this.taskUID = generateUid();
 		} else {
 			this.taskUID = taskUID;
+		}
+		if (created == null){
+			this.created = new Date();
+		} else {
+			this.created = created;
 		}
 	}
 	
@@ -44,15 +56,25 @@ abstract class Task implements Comparable<Task>, Cloneable{;
 		return this.description;
 	}
 	
+	public Date getCreated(){
+		return this.created;
+	}
+	
+	public Date getLastModified(){
+		return this.lastModified;
+	}
+	
 	public void updateTaskID(int id){
 		this.taskID=id;
 	}
 	
 	public void updateTitle(String title) throws HandledException{
-		if (title == null || title.equals("")){
-			throw new HandledException(HandledException.ExceptionType.NO_TITLE);
-		} else {
-			this.title=title;
+		if (title != null){
+			if (title.equals("")){
+				throw new HandledException(HandledException.ExceptionType.NO_TITLE);
+			} else {
+				this.title=title;
+			}
 		}
 	}
 	
@@ -61,14 +83,25 @@ abstract class Task implements Comparable<Task>, Cloneable{;
 			this.description=description;
 		}
 	}
-
+	
+	public void updateLastModified(Date date){
+		if (date == null){
+			this.lastModified = new Date();
+		} else {
+			this.lastModified = date;
+		}
+	}
+	
 	@Override
 	public int compareTo(Task o) {
-		if (this.taskUID == null){
-			return -1;
-		}else{
-			return this.taskUID.getValue().compareTo(o.taskUID.getValue());
-		}
+		return this.getCreated().compareTo(o.getCreated());
+	}
+	
+	protected void addCommonProperty(Component component){
+		component.getProperties().add(this.getTaskUID());
+		component.getProperties().add(new Created(new DateTime(this.getCreated())));
+		component.getProperties().add(new LastModified(new DateTime()));
+		component.getProperties().add(new Description(this.getDescription()));
 	}
 	
 	private static Uid generateUid() throws HandledException{

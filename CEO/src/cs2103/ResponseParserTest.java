@@ -21,9 +21,9 @@ public class ResponseParserTest {
 	@Test
 	public void testParseAllListResponseWithTasks() throws ParseException, HandledException {
 		ArrayList<Task> taskList = new ArrayList<Task>();
-		taskList.add(new FloatingTask(null, "Eating", false));
-		taskList.add(new DeadlineTask(null, "Pooping", stringToDate("2014/09/28/23:59"), false));
-		taskList.add(new PeriodicTask(null, "Drinking", null, stringToDate("2014/09/28/23:59"),
+		taskList.add(new FloatingTask(null, null, "Eating", false));
+		taskList.add(new DeadlineTask(null, null, "Pooping", stringToDate("2014/09/28/23:59"), false));
+		taskList.add(new PeriodicTask(null, null, "Drinking", null, stringToDate("2014/09/28/23:59"),
 				stringToDate("2014/10/28/23:59"), null));
 		assertEquals(//"Here shows task list for type ALL\n"
 				 "1. Eating\nType: Floating\t\tStatus: Needs Action\n"
@@ -36,7 +36,7 @@ public class ResponseParserTest {
 	@Test
 	public void testParseListResponseThreeTasks() throws ParseException, HandledException {
 		ArrayList<Task> taskList = new ArrayList<Task>();
-		taskList.add(new FloatingTask(null, "Eating", false));
+		taskList.add(new FloatingTask(null, null, "Eating", false));
 		assertEquals("Here shows task list for type ALL\n"
 				+ "0. Eating\nType: Floating\t\t\t\t\tStatus: Needs Action\n\n"
 				+ "0. Pooping\nType: Deadline\t\t\t\t\tStatus: Needs Action	Due At: Sep 28, 2014 11:59:00 PM\n\n"
@@ -64,7 +64,7 @@ public class ResponseParserTest {
 	
 	@Test 
 	public void testParseShowDetailResponseTaskWithNoDetails() throws HandledException{
-		Task task = new FloatingTask(null, "Eating", false);
+		Task task = new FloatingTask(null, null, "Eating", false);
 		assertEquals("The details for Task 1:\n"
 				+ "1. Eating\nType: Floating\t\tStatus: Needs Action\n"
 				+ "Location: null\n"
@@ -74,7 +74,7 @@ public class ResponseParserTest {
 	
 	@Test 
 	public void testParseShowDetailResponseTaskWithDetails() throws HandledException {
-		Task task = new FloatingTask(null, "Eating", false);
+		Task task = new FloatingTask(null, null, "Eating", false);
 		task.updateDescription("Eating Chicken Rice");
 		assertEquals("The details for Task 1:\n"
 				+ "1. Eating\nType: Floating\t\tStatus: Needs Action\n"

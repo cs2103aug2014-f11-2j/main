@@ -6,7 +6,6 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VToDo;
-import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Uid;
 
@@ -14,8 +13,8 @@ class FloatingTask extends Task {
 	private boolean complete;
 	private static final String TYPE_FLOATING = "Floating";
 	
-	public FloatingTask(Uid taskUID, String title, boolean complete) throws HandledException{
-		super(taskUID, title);
+	public FloatingTask(Uid taskUID, Date created, String title, boolean complete) throws HandledException{
+		super(taskUID, created, title);
 		this.updateComplete(complete);
 	}
 	
@@ -48,13 +47,13 @@ class FloatingTask extends Task {
 	}
 
 	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
-		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getTitle(), dueTime, this.getComplete());
+		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getCreated(), this.getTitle(), dueTime, this.getComplete());
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
 
 	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
-		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getTitle(), null, startTime, endTime, null);
+		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getCreated(), this.getTitle(), null, startTime, endTime, null);
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
@@ -62,7 +61,7 @@ class FloatingTask extends Task {
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		try {
-			FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getTitle(), this.getComplete());
+			FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getTitle(), this.getComplete());
 			newTask.updateDescription(this.getDescription());
 			return newTask;
 		} catch (HandledException e) {
@@ -107,8 +106,7 @@ class FloatingTask extends Task {
 	@Override
 	public Component toComponent() {
 		VToDo component = new VToDo(new DateTime(new Date()), this.getTitle());
-		component.getProperties().add(this.getTaskUID());
-		component.getProperties().add(new Description(this.getDescription()));
+		this.addCommonProperty(component);
 		component.getProperties().add(completeToStatus(this.getComplete()));
 		return component;
 	}

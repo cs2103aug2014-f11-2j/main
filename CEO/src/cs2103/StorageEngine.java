@@ -132,10 +132,11 @@ class StorageEngine {
 	private Task parseVEvent(VEvent component) throws ParseException, FatalException, HandledException{
 		Task task;
 		Uid componentUID = component.getUid();
+		Date componentCreated = component.getCreated() == null? new Date():component.getCreated().getDateTime();
 		String componentTitle = readTitle(component);
 		Date componentStartTime;
 		Date componentEndTime;
-		if (component.getStartDate() == null||component.getEndDate() == null){
+		if (component.getStartDate() == null || component.getEndDate() == null){
 			throw new FatalException(FatalException.ExceptionType.ILLEGAL_FILE);
 		}else{
 			componentStartTime=component.getStartDate().getDate();
@@ -143,29 +144,32 @@ class StorageEngine {
 		}
 		String componentLocation = readLocation(component);
 		Recur componentRecurrence = readRecur(component);
-		task = new PeriodicTask(componentUID, componentTitle, componentLocation, componentStartTime, componentEndTime, componentRecurrence);
+		task = new PeriodicTask(componentUID, componentCreated, componentTitle, componentLocation, componentStartTime, componentEndTime, componentRecurrence);
 		task.updateDescription(readDescription(component));
+		task.updateLastModified(component.getLastModified() == null? new Date():component.getLastModified().getDateTime());
 		return task;
 	}
 	
 	private Task parseVToDo(VToDo component) throws ParseException, HandledException, FatalException{
 		Task task;
 		Uid componentUID = component.getUid();
+		Date componentCreated = component.getCreated() == null? new Date():component.getCreated().getDateTime();
 		String componentTitle = readTitle(component);
 		if (component.getDue() == null){
-			task = new FloatingTask(componentUID, componentTitle, readStatusToComplete(component));
+			task = new FloatingTask(componentUID, componentCreated, componentTitle, readStatusToComplete(component));
 		}else{
-			task = new DeadlineTask(componentUID, componentTitle, component.getDue().getDate(),readStatusToComplete(component));
+			task = new DeadlineTask(componentUID, componentCreated, componentTitle, component.getDue().getDate(),readStatusToComplete(component));
 		}
 		task.updateDescription(readDescription(component));
+		task.updateLastModified(component.getLastModified() == null? new Date():component.getLastModified().getDateTime());
 		return task;
 	}
 	
 	private String readTitle(Component component) throws FatalException{
-		if (component.getProperty(Property.SUMMARY) != null){
-			return component.getProperty(Property.SUMMARY).getValue();
-		}else{
+		if (component.getProperty(Property.SUMMARY) == null){
 			throw new FatalException(FatalException.ExceptionType.ILLEGAL_FILE);
+		}else{
+			return component.getProperty(Property.SUMMARY).getValue();
 		}
 	}
 	

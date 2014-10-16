@@ -82,7 +82,7 @@ public class CommandLineUI {
 			assert(userInput != null);
 			Queue<String> separateResult = CommandParser.separateCommand(userInput);
 			String commandTypeString = separateResult.poll();
-			if (commandTypeString==null || commandTypeString.equals("")){
+			if (commandTypeString == null || commandTypeString.equals("")){
 				return MESSAGE_COMMAND_ERROR;
 			} else {
 				CommandParser.CommandType commandType = CommandParser.determineCommandType(commandTypeString);

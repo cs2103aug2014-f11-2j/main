@@ -34,11 +34,11 @@ class CommandExecutor {
 	public void addTask(String title, String description, String location, Date startTime, Date endTime, Recur recurrence) throws HandledException, FatalException{
 		Task task;
 		if (startTime == null && endTime == null){
-			task = new FloatingTask(null, title, false);
+			task = new FloatingTask(null, null, title, false);
 		} else if (endTime == null){
-			task = new DeadlineTask(null, title, startTime, false);
+			task = new DeadlineTask(null, null, title, startTime, false);
 		} else {
-			task = new PeriodicTask(null, title, location, startTime, endTime, recurrence);
+			task = new PeriodicTask(null, null, title, location, startTime, endTime, recurrence);
 		}
 		task.updateDescription(description);
 		backupTask(ActionType.ADD, task);
@@ -117,15 +117,9 @@ class CommandExecutor {
 		} else {
 			newTask = cloneTask(task);
 		}
-		if (title != null){
-			newTask.updateTitle(title);
-		}
-		if (description != null){
-			newTask.updateDescription(description);
-		}
-		if (location != null){
-			newTask.updateLocation(location);
-		}
+		newTask.updateTitle(title);
+		newTask.updateDescription(description);
+		newTask.updateLocation(location);
 		if (completeFlag){
 			newTask.updateComplete(complete);
 		}

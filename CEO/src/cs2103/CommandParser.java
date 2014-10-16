@@ -217,11 +217,11 @@ class CommandParser {
 	}
 	
 	private static String[] splitFirstWord(String parameterString) throws HandledException{
-		checkNullString(parameterString, HandledException.ExceptionType.INVALID_PARA);
+		checkNullString(parameterString, HandledException.ExceptionType.INVALID_CMD);
 		String[] result = new String[2];
+		int splitIndex = parameterString.indexOf(' ');
 		int colonIndex = parameterString.indexOf(':');
-		int spaceIndex = parameterString.indexOf(' ');
-		int splitIndex = colonIndex < spaceIndex?colonIndex:spaceIndex;
+		if (colonIndex > 0 && colonIndex < splitIndex) splitIndex = colonIndex;
 		if (splitIndex == -1){
 			result[0] = parameterString;
 			result[1] = null;
