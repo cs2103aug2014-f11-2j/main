@@ -30,7 +30,7 @@ class CommandParser {
 	public static final String[] allowedTimeLiteral = {"T", "time"};
 	public static final String[] allowedKeywordLiteral = {"K", "keyword"};
 	private static final String[] multiParameterCommands = {"add", "update", "search", "new", "modify", "find", "create"};
-	private static final String[] allowedSeparateLiteral = {"\\s+-", "\\s+/", ";"};
+	private static final String[] allowedSeparateLiteral = {"\\s+-", "\\s+/"};
 	
 	public static Queue<String> separateCommand(String userInput) throws HandledException{
 		checkNullString(userInput, HandledException.ExceptionType.INVALID_CMD);
@@ -77,8 +77,6 @@ class CommandParser {
 			return CommandType.HELP;
 		} else if (command.equalsIgnoreCase("search") || command.equalsIgnoreCase("find")){
 			return CommandType.SEARCH;
-		} else if (command.equalsIgnoreCase("quick") || command.equalsIgnoreCase("q")){
-			return CommandType.QUICK;
 		} else {
 			return CommandType.INVALID;
 		}
@@ -208,15 +206,13 @@ class CommandParser {
 		checkNullString(parameterString, HandledException.ExceptionType.INVALID_CMD);
 		String[] result = new String[2];
 		int splitIndex = parameterString.indexOf(' ');
-		int colonIndex = parameterString.indexOf(':');
-		if (colonIndex > 0 && colonIndex < splitIndex) splitIndex = colonIndex;
 		if (splitIndex == -1){
 			result[0] = parameterString;
 			result[1] = null;
 			return result;
 		}else{
 			result[0] = parameterString.substring(0, splitIndex).trim();
-			result[1] = parameterString.substring(splitIndex+1).trim();
+			result[1] = parameterString.substring(splitIndex).trim();
 			return result;
 		}
 	}

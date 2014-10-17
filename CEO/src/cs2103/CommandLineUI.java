@@ -107,8 +107,6 @@ public class CommandLineUI {
 					return getHelp(separateResult.poll());
 				case SEARCH:
 					return search(separateResult);
-				case QUICK:
-					return quickAdd(separateResult.poll());
 				case INVALID:
 				default:
 					return MESSAGE_COMMAND_ERROR;
@@ -341,11 +339,6 @@ public class CommandLineUI {
 		} catch (HandledException e) {
 			return ResponseParser.parseSearchErrorResponse();
 		}
-	}
-	
-	private String quickAdd(String quickAddString){
-		//TODO DO NOT IMPLEMENT FOR NOW
-		return null;
 	}
 	
 	public String testCommand(String testCommandInput){
