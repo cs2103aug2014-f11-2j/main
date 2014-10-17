@@ -1,9 +1,7 @@
 package cs2103;
 
-import java.text.DateFormat;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Locale;
 
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
@@ -114,12 +112,6 @@ class DeadlineTask extends Task {
 		sb.append(STRING_DESCRIPTION);
 		sb.append(this.getDescription());
 		return sb.append("\n").toString();
-	}
-	
-	private static String dateToString(Date date){
-		DateFormat dateFormat;
-		dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.UK);
-		return dateFormat.format(date);
 	}
 	
 	private static String completeToString(boolean complete){

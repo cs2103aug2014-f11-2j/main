@@ -27,9 +27,9 @@ class CommandParser {
 	public static final String[] allowedLocationLiteral = {"L", "location", "place"};
 	public static final String[] allowedCompleteLiteral = {"C", "complete", "status"};
 	public static final String[] allowedRecurrenceLiteral = {"R", "reccuring", "recur"};
+	public static final String[] allowedTimeLiteral = {"T", "time"};
 	public static final String[] allowedKeywordLiteral = {"K", "keyword"};
 	private static final String[] multiParameterCommands = {"add", "update", "search", "new", "modify", "find", "create"};
-	private static final String[] allowedTimeLiteral = {"T", "time", "from", "by"};
 	private static final String[] allowedSeparateLiteral = {"\\s+-", "\\s+/", ";"};
 	
 	public static Queue<String> separateCommand(String userInput) throws HandledException{
@@ -144,18 +144,6 @@ class CommandParser {
 		}
 	}
 	
-	public static String getTimeString(Map<String, String> parameterMap){
-		for (String s:allowedTimeLiteral){
-			String result = getParameterFromMap(parameterMap, s);
-			if (result != null){
-				StringBuffer sb = new StringBuffer();
-				sb.append(s).append(' ').append(result);
-				return sb.toString();
-			}
-		}
-		return null;
-	}
-	
 	public static Date[] getTime(String timeString) throws HandledException{
 		Date[] time = new Date[2];
 		time[0] = null; time[1] = null;
@@ -234,7 +222,7 @@ class CommandParser {
 	}
 	
 	private static Date stringToDate(String timeString) throws HandledException{
-		checkNullString(timeString, HandledException.ExceptionType.INVALID_TIME);
+		if (timeString == null) return null;
 		try {
 			TimeZone tz=TimeZone.getDefault();
 			SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd HH:mm");
@@ -246,9 +234,7 @@ class CommandParser {
 	}
 	
 	public static Recur stringToRecur(String recurrence) throws HandledException{
-		if (recurrence == null || recurrence.equals("")){
-			return null;
-		}
+		checkNullString(recurrence, HandledException.ExceptionType.INVALID_RECUR);
 		Pattern p = Pattern.compile("([0-9]+)([hdwmy])");
 		Matcher m = p.matcher(recurrence);
 		if (m.find()){

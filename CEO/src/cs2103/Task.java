@@ -2,7 +2,9 @@ package cs2103;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.DateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
@@ -102,6 +104,12 @@ abstract class Task implements Comparable<Task>, Cloneable{;
 		component.getProperties().add(new Created(new DateTime(this.getCreated())));
 		component.getProperties().add(new LastModified(new DateTime()));
 		component.getProperties().add(new Description(this.getDescription()));
+	}
+	
+	protected static String dateToString(Date date){
+		DateFormat dateFormat;
+		dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.UK);
+		return dateFormat.format(date);
 	}
 	
 	private static Uid generateUid() throws HandledException{

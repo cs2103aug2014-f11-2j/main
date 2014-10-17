@@ -129,7 +129,7 @@ public class CommandLineUI {
 			String description = CommandParser.getParameterString(parameterMap, CommandParser.allowedDescriptionLiteral);
 			String location = CommandParser.getParameterString(parameterMap, CommandParser.allowedLocationLiteral);
 			String recurString = CommandParser.getParameterString(parameterMap, CommandParser.allowedRecurrenceLiteral);
-			String timeString = CommandParser.getTimeString(parameterMap);
+			String timeString = CommandParser.getParameterString(parameterMap, CommandParser.allowedTimeLiteral);
 			Date[] time = CommandParser.getTime(timeString);
 			executor.addTask(title, description, location, time[0], time[1], CommandParser.stringToRecur(recurString));
 			return ResponseParser.parseAddResponse(true);
@@ -193,7 +193,7 @@ public class CommandLineUI {
 			String location = CommandParser.getParameterString(parameterMap, CommandParser.allowedLocationLiteral);
 			String completeString = CommandParser.getParameterString(parameterMap, CommandParser.allowedCompleteLiteral);
 			String recurString = CommandParser.getParameterString(parameterMap, CommandParser.allowedRecurrenceLiteral);
-			String timeString = CommandParser.getTimeString(parameterMap);
+			String timeString = CommandParser.getParameterString(parameterMap, CommandParser.allowedTimeLiteral);
 			Date[] time = CommandParser.getTime(timeString);
 			Recur recur = CommandParser.stringToRecur(recurString);
 			boolean complete = CommandParser.parseComplete(completeString);
@@ -324,7 +324,7 @@ public class CommandLineUI {
 				break;
 			}
 			Map<String, String> parameterMap = CommandParser.separateParameters(parameterList);
-			String timeString = CommandParser.getTimeString(parameterMap);
+			String timeString = CommandParser.getParameterString(parameterMap, CommandParser.allowedTimeLiteral);
 			if (timeString != null){
 				Date[] time = CommandParser.getTime(timeString);
 				searchList = executor.filterTime(searchList, time);
