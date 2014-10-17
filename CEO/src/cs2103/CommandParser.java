@@ -2,6 +2,7 @@ package cs2103;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -11,6 +12,7 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cs2103.parameters.Parameter;
 import net.fortuna.ical4j.model.Recur;
 
 class CommandParser {
@@ -107,6 +109,10 @@ class CommandParser {
 		} else {
 			return -1;
 		}
+	}
+	
+	public static ArrayList<Parameter> parseQuickAdd(String quickAddString){
+		return null;
 	}
 	
 	public static Map<String,String> separateParameters(Queue<String> parameterList) throws HandledException{
