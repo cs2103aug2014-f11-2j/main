@@ -191,7 +191,7 @@ public class PeriodicTask extends Task {
 	
 	@Override
 	public boolean matches(String keyword) {
-		if (keyword == null || keyword.equals("")){
+		if (keyword == null || keyword.isEmpty()){
 			return true;
 		} else {
 			if (this.getTitle().contains(keyword) || this.getDescription().contains(keyword) || this.getLocation().contains(keyword)){

@@ -45,7 +45,7 @@ public class StorageEngine {
 	
 	private StorageEngine(String dataFile) throws HandledException, FatalException{
 		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION,true);
-		if (dataFile == null){
+		if (dataFile == null || dataFile.isEmpty()){
 			dataFile = "default.ics";
 		}
 		this.file = new File(dataFile);

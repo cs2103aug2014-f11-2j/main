@@ -11,22 +11,9 @@ import cs2103.task.Task;
 public class Mark extends InfluentialCommand {
 	private static final String MESSAGE_MARK_FORMAT = "Successfully marked %1$d as completed";
 	private static final String MESSAGE_MARK_FAILED = "The task you specified does not contain status information";
-	Task undoBackup;
-	Task redoBackup;
 	
 	public Mark(String command) throws HandledException{
 		this.parameterList.addParameter(TaskID.parse(command));
-	}
-	@Override
-	public InfluentialCommand undo() throws HandledException, FatalException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public InfluentialCommand redo() throws HandledException, FatalException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
@@ -51,6 +38,27 @@ public class Mark extends InfluentialCommand {
 			return newTask;
 		} catch (CloneNotSupportedException e) {
 			throw new HandledException(HandledException.ExceptionType.CLONE_FAILED);
+		}
+	}
+	
+
+	@Override
+	public InfluentialCommand undo() throws HandledException, FatalException {
+		if (this.undoBackup == null){
+			return null;
+		} else {
+			StorageEngine.getInstance().updateTask(this.undoBackup);
+			return this;
+		}
+	}
+	
+	@Override
+	public InfluentialCommand redo() throws HandledException, FatalException {
+		if (this.redoBackup == null){
+			return null;
+		} else {
+			StorageEngine.getInstance().updateTask(this.redoBackup);
+			return this;
 		}
 	}
 }

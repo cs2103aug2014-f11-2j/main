@@ -66,7 +66,7 @@ public class CommandLineUI {
 			String command = takeUserInput();
 			if (command != null && !command.isEmpty()){
 				String feedback=processUserInput(command);
-				if (feedback != null && !feedback.equals("")){
+				if (feedback != null && !feedback.isEmpty()){
 					if (feedback.equalsIgnoreCase("EXIT")){
 						print(MESSAGE_EXIT);
 						break;
