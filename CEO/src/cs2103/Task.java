@@ -16,7 +16,7 @@ import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.util.SimpleHostInfo;
 import net.fortuna.ical4j.util.UidGenerator;
 
-abstract class Task implements Comparable<Task>, Cloneable{;
+public abstract class Task implements Comparable<Task>, Cloneable{;
 	private int taskID;
 	private final Uid taskUID;
 	private String title;
@@ -72,17 +72,19 @@ abstract class Task implements Comparable<Task>, Cloneable{;
 	
 	public void updateTitle(String title) throws HandledException{
 		if (title != null){
-			if (title.equals("")){
+			if (title.isEmpty()){
 				throw new HandledException(HandledException.ExceptionType.NO_TITLE);
 			} else {
-				this.title=title;
+				this.title = title;
 			}
 		}
 	}
 	
 	public void updateDescription(String description){
-		if (description != null){
-			this.description=description;
+		if (description == null){
+			this.description = "";
+		} else {
+			this.description = description;
 		}
 	}
 	

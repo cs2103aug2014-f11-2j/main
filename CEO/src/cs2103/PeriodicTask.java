@@ -54,8 +54,10 @@ public class PeriodicTask extends Task {
 	
 	
 	public void updateLocation(String location){
-		if (location != null){
-			this.location=location;
+		if (location == null){
+			this.location = "";
+		} else {
+			this.location = location;
 		}
 	}
 
@@ -197,5 +199,18 @@ public class PeriodicTask extends Task {
 				return false;
 			}
 		}
+	}
+	
+	public PeriodicTask updateTimeFromRecur() throws HandledException{
+		DateTime now = new DateTime();
+		if (this.getRecurrence() != null){
+			if (this.getEndTime().before(now)){
+				Date startTime = (this.getRecurrence().getNextDate(new DateTime(this.getStartTime()), now));
+				Date endTime = new Date(this.getEndTime().getTime() - this.getStartTime().getTime() + startTime.getTime());
+				this.updateTime(startTime, endTime);
+				return this;
+			}
+		}
+		return null;
 	}
 }

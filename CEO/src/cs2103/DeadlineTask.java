@@ -10,7 +10,7 @@ import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Uid;
 
-class DeadlineTask extends Task {
+public class DeadlineTask extends Task {
 	private Date dueTime;
 	private boolean complete;
 	private static final String TYPE_DEADLINE = "Deadline";

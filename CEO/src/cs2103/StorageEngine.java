@@ -30,11 +30,12 @@ import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.util.CompatibilityHints;
 
-class StorageEngine {
+public class StorageEngine {
 	private static StorageEngine storage;
 	private net.fortuna.ical4j.model.Calendar calendar;
 	private IndexedComponentList indexedComponents;
 	private final File file;
+	private ArrayList<Task> taskList;
 	
 	private StorageEngine(String dataFile) throws HandledException, FatalException{
 		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION,true);
@@ -45,17 +46,34 @@ class StorageEngine {
 		if (!file.exists() || file.length()==0){
 			createNewFile();
 		}
+		this.taskList = readFromFile();
+		storage = this;
 	}
 	
-	public static StorageEngine getInstance(String dataFile) throws HandledException, FatalException{
+	public void validate() throws FatalException{
+		try {
+			calendar.validate();
+		} catch (ValidationException e) {
+			throw new FatalException(FatalException.ExceptionType.ILLEGAL_FILE);
+		}
+	}
+	
+	public static StorageEngine getInstance() throws HandledException, FatalException{
+		if (storage == null){
+			throw new FatalException(FatalException.ExceptionType.NOT_INITIALIZED);
+		} else {
+			return storage;
+		}
+	}
+	
+	public static void initialize(String dataFile) throws HandledException, FatalException{
 		if (storage == null){
 			storage = new StorageEngine(dataFile);
 		}
-		return storage;
 	}
 	
-	public ArrayList<Task> getTaskList() throws HandledException, FatalException{
-		return readFromFile();
+	public ArrayList<Task> getTaskList(){
+		return this.taskList;
 	}
 	
 	private void createNewFile() throws HandledException, FatalException{
@@ -95,7 +113,7 @@ class StorageEngine {
 
 	private void writeToFile() throws HandledException, FatalException{
 		try {
-			calendar.validate();
+			this.validate();
 			FileOutputStream fout;
 			fout = new FileOutputStream(file);
 			CalendarOutputter outputter = new CalendarOutputter();
@@ -115,6 +133,7 @@ class StorageEngine {
 			calendar.getComponents().add(updating);
 		}
 		writeToFile();
+		this.taskList = readFromFile();
 		return readFromFile();
 	}
 	
@@ -126,6 +145,7 @@ class StorageEngine {
 			calendar.getComponents().remove(existing);
 		}
 		writeToFile();
+		this.taskList = readFromFile();
 		return readFromFile();
 	}
 	

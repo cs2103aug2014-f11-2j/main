@@ -1,12 +1,10 @@
 package cs2103;
 
-import java.util.Map;
-import java.util.Queue;
 import java.util.Scanner;
-import java.util.Date;
-import java.util.ArrayList;
+import java.util.Stack;
 
-import net.fortuna.ical4j.model.Recur;
+import cs2103.command.*;
+import cs2103.parameters.CommandType;
 
 public class CommandLineUI {
 	private static final String MESSAGE_WELCOME_FORMAT = "Welcome to the CEO. %1$s is ready for use.";
@@ -16,13 +14,21 @@ public class CommandLineUI {
 	private static final String MESSAGE_FATAL_ERR = "A fatal error has occurred, program will now exit. Check log for detail";
 	private static final String MESSAGE_INCORRECT_ARG = "Incorrect Argument\n";
 	private static final String MESSAGE_INITIALIZATION_ERROR = "Failed to initialize CEO, program will now exit";
+	private static final String MESSAGE_UNDO_FORMAT = "Successfully undo %1$d tasks";
+	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d tasks";
 	
 	private static CommandLineUI commandLine;
-	private final CommandExecutor executor;
+	private final StorageEngine storage;
+	private Stack<WriteCommand> undoStack;
+	private Stack<WriteCommand> redoStack;
 	private Scanner scanner = new Scanner(System.in);
 	
 	private CommandLineUI(String dataFile) throws HandledException, FatalException{
-		this.executor = CommandExecutor.getInstance(dataFile);
+		StorageEngine.initialize(dataFile);
+		this.storage = StorageEngine.getInstance();
+		this.storage.validate();
+		undoStack = new Stack<WriteCommand>();
+		redoStack = new Stack<WriteCommand>();
 		print(String.format(MESSAGE_WELCOME_FORMAT, dataFile));
 	}
 	
@@ -50,13 +56,13 @@ public class CommandLineUI {
 		}
 	}
 	
-	private void userLoop() {
-		updateTimeFromRecur();
-		alertTask();
+	private void userLoop() throws HandledException, FatalException {
+		print(new UpdateTimeFromRecur().execute());
+		print(new Alert().execute());
 		while (true) {
 			printPrompt(MESSAGE_USER_PROMPT);
 			String command = takeUserInput();
-			if (command != null){
+			if (command != null && !command.isEmpty()){
 				String feedback=processUserInput(command);
 				if (feedback != null && !feedback.equals("")){
 					if (feedback.equalsIgnoreCase("EXIT")){
@@ -80,163 +86,99 @@ public class CommandLineUI {
 	private String processUserInput(String userInput) {
 		try {
 			assert(userInput != null);
-			Queue<String> separateResult = CommandParser.separateCommand(userInput);
-			String commandTypeString = separateResult.poll();
-			if (commandTypeString == null || commandTypeString.equals("")){
+			String command[] = CommonUtil.splitFirstWord(userInput);
+			CommandType commandType = CommandType.parse(command[0]);
+			Command commandObject;
+			switch (commandType.getValue()){
+			case LIST:
+				commandObject = new List(command[1]);
+				break;
+			case UPDATE:
+				commandObject = new Update(command[1]);
+				break;
+			case EXIT:
+				return "EXIT";
+			case ADD:
+				commandObject = new Add(command[1]);
+				break;
+			case DELETE:
+				commandObject = new Delete(command[1]);
+				break;
+			case SHOW:
+				commandObject = new Show(command[1]);
+				break;
+			case UNDO:
+				return undo(command[1]);
+			case REDO:
+				return redo(command[1]);
+			case HELP:
+				commandObject = new Help(command[1]);
+				break;
+			case SEARCH:
+				commandObject = new Search(command[1]);
+				break;
+			case INVALID:
+			default:
 				return MESSAGE_COMMAND_ERROR;
-			} else {
-				CommandParser.CommandType commandType = CommandParser.determineCommandType(commandTypeString);
-				switch (commandType){
-				case LIST:
-					return list(separateResult.poll());
-				case UPDATE:
-					return update(separateResult);
-				case EXIT:
-					return "EXIT";
-				case ADD:
-					return add(separateResult);
-				case DELETE:
-					return delete(separateResult.poll());
-				case SHOWDETAIL:
-					return show(separateResult.poll());
-				case UNDO:
-					return undo(separateResult.poll());
-				case REDO:
-					return redo(separateResult.poll());
-				case HELP:
-					return getHelp(separateResult.poll());
-				case SEARCH:
-					return search(separateResult);
-				case INVALID:
-				default:
-					return MESSAGE_COMMAND_ERROR;
-				}
 			}
+			if (commandObject instanceof WriteCommand){
+				this.undoStack.push((WriteCommand) commandObject);
+			}
+			return commandObject.execute();
 		} catch (HandledException e) {
 			return MESSAGE_COMMAND_ERROR;
-		}
-	}
-	
-	private String add(Queue<String> parameterList){
-		try{
-			Map<String, String> parameterMap = CommandParser.separateParameters(parameterList);
-			String title = CommandParser.getParameterString(parameterMap, CommandParser.allowedTitleLiteral);
-			if (title==null || title.equals("")){
-				throw new HandledException(HandledException.ExceptionType.NO_TITLE);
-			}
-			String description = CommandParser.getParameterString(parameterMap, CommandParser.allowedDescriptionLiteral);
-			String location = CommandParser.getParameterString(parameterMap, CommandParser.allowedLocationLiteral);
-			String recurString = CommandParser.getParameterString(parameterMap, CommandParser.allowedRecurrenceLiteral);
-			String timeString = CommandParser.getParameterString(parameterMap, CommandParser.allowedTimeLiteral);
-			Date[] time = CommandParser.getTime(timeString);
-			executor.addTask(title, description, location, time[0], time[1], CommandParser.stringToRecur(recurString));
-			return ResponseParser.parseAddResponse(true);
-		} catch (HandledException e){
-			return ResponseParser.parseAddResponse(false);
 		} catch (FatalException e) {
 			printErrorAndExit();
-			return "";
+			return null;
 		}
 	}
 	
-	private String list(String parameter) {
-		CommandParser.TaskType taskType = CommandParser.determineTaskType(parameter);
-		switch (taskType){
-		case ALL:
-			return ResponseParser.parseListResponse(executor.getAllList());
-		case FLOATING:
-			return ResponseParser.parseListResponse(executor.getFloatingList());
-		case DEADLINE:
-			return ResponseParser.parseListResponse(executor.getDeadlineList());
-		case PERIODIC:
-			return ResponseParser.parseListResponse(executor.getPeriodicList());
-		case INVALID:
-		default:
-			print(ResponseParser.parseListErrorResponse(parameter));
-			return ResponseParser.parseListResponse(executor.getAllList());
+	private String undo(String steps) throws HandledException, FatalException {
+		int result;
+		if (steps == null || steps.isEmpty()){
+			result = executeUndo(1);
+		} else {
+			result = executeUndo(CommonUtil.parseIntegerParameter(steps));
 		}
+		return String.format(MESSAGE_UNDO_FORMAT, result);
 	}
 	
-	private String show(String parameter) {
-		try {
-			int taskID=CommandParser.parseIntegerParameter(parameter);
-			String result = ResponseParser.parseShowDetailResponse(executor.getTaskByID(taskID));
-			return result;
-		} catch (HandledException e) {
-			return ResponseParser.parseShowErrorResponse(parameter);
-		}
-	}
-
-	private String delete(String parameter) {
-		try {
-			int taskID=CommandParser.parseIntegerParameter(parameter);
-			executor.deleteTask(taskID);
-			return ResponseParser.parseDeleteResponse(parameter, true);
-		} catch (HandledException e) {
-			return ResponseParser.parseDeleteResponse(parameter, false);
-		} catch (FatalException e) {
-			printErrorAndExit();
-			return "";
-		}
-	}
-
-	private String update(Queue<String> parameterList) {
-		String taskIDString = parameterList.poll();
-		int taskID=0;
-		try{
-			taskID = CommandParser.parseIntegerParameter(taskIDString);
-			Map<String, String> parameterMap = CommandParser.separateParameters(parameterList);
-			String title = CommandParser.getParameterString(parameterMap, CommandParser.allowedTitleLiteral);
-			String description = CommandParser.getParameterString(parameterMap, CommandParser.allowedDescriptionLiteral);
-			String location = CommandParser.getParameterString(parameterMap, CommandParser.allowedLocationLiteral);
-			String completeString = CommandParser.getParameterString(parameterMap, CommandParser.allowedCompleteLiteral);
-			String recurString = CommandParser.getParameterString(parameterMap, CommandParser.allowedRecurrenceLiteral);
-			String timeString = CommandParser.getParameterString(parameterMap, CommandParser.allowedTimeLiteral);
-			Date[] time = CommandParser.getTime(timeString);
-			Recur recur = CommandParser.stringToRecur(recurString);
-			boolean complete = CommandParser.parseComplete(completeString);
-			if (title == null && description == null && location == null && completeString == null && timeString == null && recurString == null){
-				throw new HandledException(HandledException.ExceptionType.LESS_THAN_ONE_PARA);
-			}else{
-				executor.updateTask(taskID, title, description, location, complete, completeString != null, time, timeString != null, recur, recurString != null);
-			}
-			return ResponseParser.parseUpdateResponse(taskIDString, true);
-		} catch (HandledException e){
-			return ResponseParser.parseUpdateResponse(taskIDString, false);
-		} catch (FatalException e) {
-			printErrorAndExit();
-			return "";
-		}
-	}
-	
-	private String undo(String parameter) {
+	private int executeUndo(int steps) throws HandledException, FatalException{
 		int result = 0;
-		try {
-			int count = CommandParser.parseIntegerParameter(parameter);
-			result = executor.undoTasks(count);
-		} catch (HandledException e) {
-			e.printStackTrace();
-		} catch (FatalException e) {
-			e.printStackTrace();
+		while(result < this.undoStack.size() && result < steps){
+			WriteCommand undoCommand = undoStack.pop().undo();
+			if (undoCommand != null){
+				result++;
+				this.redoStack.push(undoCommand);
+			}
 		}
-		return ResponseParser.parseUndoResponse(result);
+		return result;
 	}
 	
-	private String redo(String parameter) {
-		int result = 0;
-		try {
-			int count = CommandParser.parseIntegerParameter(parameter);
-			result = executor.redoTasks(count);
-		} catch (HandledException e) {
-			e.printStackTrace();
-		} catch (FatalException e) {
-			e.printStackTrace();
+	private String redo(String steps) throws HandledException, FatalException {
+		int result;
+		if (steps == null || steps.isEmpty()){
+			result = executeRedo(1);
+		} else {
+			result = executeRedo(CommonUtil.parseIntegerParameter(steps));
 		}
-		return ResponseParser.parseRedoResponse(result);
+		return String.format(MESSAGE_REDO_FORMAT, result);
+	}
+	
+	private int executeRedo(int steps) throws HandledException, FatalException{
+		int result = 0;
+		while(result < this.redoStack.size() && result < steps){
+			WriteCommand undoCommand = redoStack.pop().redo();
+			if (undoCommand != null){
+				result++;
+				this.undoStack.push(undoCommand);
+			}
+		}
+		return result;
 	}
 	
 	private static void print(String feedback) {
-		if (feedback != null){
+		if (feedback != null && !feedback.isEmpty()){
 			System.out.println(feedback);
 		}
 	}
@@ -250,95 +192,6 @@ public class CommandLineUI {
 	private static void printErrorAndExit(){
 		System.err.print(MESSAGE_FATAL_ERR);
 		System.exit(-1);
-	}
-	
-	private void alertTask() {
-		ArrayList<DeadlineTask> deadlineAlertList = executor.getAlertDeadlineList();
-		print(ResponseParser.alertDeadline(deadlineAlertList));
-		ArrayList<PeriodicTask> periodicAlertList = executor.getAlertPeriodicList();
-		print(ResponseParser.alertPeriodic(periodicAlertList));
-	}
-	
-	private void updateTimeFromRecur() {
-		int count = 0;
-		try {
-			ArrayList<PeriodicTask> periodicList = executor.getPeriodicList();
-			for (PeriodicTask task:periodicList){
-				if (executor.updateTimeFromRecur(task)){
-					count++;
-				}
-			}
-			print(ResponseParser.parseUpdateTimeFromRecurResponse(count));
-		} catch (HandledException e) {
-			print(ResponseParser.parseUpdateTimeFromRecurResponse(count));
-		} catch (FatalException e) {
-			printErrorAndExit();
-		}
-	}
-	
-	private String getHelp(String parameter){
-		CommandParser.CommandType commandType = CommandParser.determineCommandType(parameter);
-		switch (commandType){
-		case LIST:
-			return ResponseParser.HELP_LIST;
-		case UPDATE:
-			return ResponseParser.HELP_UPDATE;
-		case ADD:
-			return ResponseParser.HELP_ADD;
-		case DELETE:
-			return ResponseParser.HELP_DELETE;
-		case SHOWDETAIL:
-			return ResponseParser.HELP_SHOW;
-		case UNDO:
-			return ResponseParser.HELP_UNDO;
-		case REDO:
-			return ResponseParser.HELP_REDO;
-		case SEARCH:
-			return ResponseParser.HELP_SEARCH;
-		case INVALID:
-		default:
-			return ResponseParser.HELP_DEFAULT;
-		}
-	}
-	
-	private String search(Queue<String> parameterList){
-		try {
-			CommandParser.TaskType taskType = CommandParser.determineTaskType(parameterList.peek());
-			ArrayList<Task> searchList;
-			switch (taskType){
-			case FLOATING:
-				searchList = executor.filterType(FloatingTask.class);
-				break;
-			case DEADLINE:
-				searchList = executor.filterType(DeadlineTask.class);
-				break;
-			case PERIODIC:
-				searchList = executor.filterType(PeriodicTask.class);
-				break;
-			case ALL:
-			case INVALID:
-			default:
-				searchList = executor.getAllList();
-				break;
-			}
-			Map<String, String> parameterMap = CommandParser.separateParameters(parameterList);
-			String timeString = CommandParser.getParameterString(parameterMap, CommandParser.allowedTimeLiteral);
-			if (timeString != null){
-				Date[] time = CommandParser.getTime(timeString);
-				searchList = executor.filterTime(searchList, time);
-			}
-			String completeString = CommandParser.getParameterString(parameterMap, CommandParser.allowedCompleteLiteral);
-			if (completeString != null){
-				searchList = executor.filterComplete(searchList, CommandParser.parseComplete(completeString));
-			}
-			String keywordString = CommandParser.getParameterString(parameterMap, CommandParser.allowedKeywordLiteral);
-			if (keywordString != null){
-				searchList = executor.filterKeyword(searchList, keywordString);
-			}
-			return ResponseParser.parseListResponse(searchList);
-		} catch (HandledException e) {
-			return ResponseParser.parseSearchErrorResponse();
-		}
 	}
 	
 	public String testCommand(String testCommandInput){

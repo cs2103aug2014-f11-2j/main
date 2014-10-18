@@ -1,11 +1,9 @@
 package cs2103.parameters;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.fortuna.ical4j.model.Recur;
 import cs2103.HandledException;
 
 public class ParameterList {
@@ -15,9 +13,15 @@ public class ParameterList {
 		parameterMap = new HashMap<String, Parameter>();
 	}
 	
-	public Parameter getParameter(String type){
-		if (this.parameterMap.containsKey(type)){
-			return this.parameterMap.get(type);
+	public <T extends Parameter> T getParameter(String typeString, Class<T> type) throws HandledException{
+		if (this.parameterMap.containsKey(typeString)){
+			Parameter parameter = this.parameterMap.get(typeString);
+			assert(parameter != null);
+			if (parameter.getClass() == type){
+				return type.cast(parameter);
+			} else {
+				throw new HandledException(HandledException.ExceptionType.INVALID_PARA);
+			}
 		} else {
 			return null;
 		}
@@ -29,72 +33,51 @@ public class ParameterList {
 		}
 	}
 	
-	public void addAllParameter(ArrayList<Parameter> parameterList){
-		for (Parameter parameter:parameterList){
-			this.addParameter(parameter);
+	public void addAllParameters(ArrayList<Parameter> parameterList){
+		if (parameterList != null){
+			for (Parameter parameter:parameterList){
+				this.addParameter(parameter);
+			}
 		}
 	}
 	
-	public String getTitle() throws HandledException{
-		Parameter parameter = this.parameterMap.get(Title.type);
-		if (parameter instanceof Title){
-			return ((Title) parameter).getTitle();
-		} else {
-			throw new HandledException(HandledException.ExceptionType.INVALID_PARA);
-		}
+	public Title getTitle() throws HandledException{
+		return this.getParameter(Title.type, Title.class);
 	}
 	
-	public String getDescription() throws HandledException{
-		Parameter parameter = this.parameterMap.get(Description.type);
-		if (parameter instanceof Description){
-			return ((Description) parameter).getDescription();
-		} else {
-			throw new HandledException(HandledException.ExceptionType.INVALID_PARA);
-		}
+	public Description getDescription() throws HandledException{
+		return this.getParameter(Description.type, Description.class);
 	}
 	
-	public String getLocation() throws HandledException{
-		Parameter parameter = this.parameterMap.get(Location.type);
-		if (parameter instanceof Location){
-			return ((Location) parameter).getLocation();
-		} else {
-			throw new HandledException(HandledException.ExceptionType.INVALID_PARA);
-		}
+	public Location getLocation() throws HandledException{
+		return this.getParameter(Location.type, Location.class);
 	}
 	
-	public Date[] getTime() throws HandledException{
-		Parameter parameter = this.parameterMap.get(Time.type);
-		if (parameter instanceof Time){
-			return ((Time) parameter).getTime();
-		} else {
-			throw new HandledException(HandledException.ExceptionType.INVALID_PARA);
-		}
+	public Time getTime() throws HandledException{
+		return this.getParameter(Time.type, Time.class);
 	}
 	
-	public boolean getComplete() throws HandledException{
-		Parameter parameter = this.parameterMap.get(Complete.type);
-		if (parameter instanceof Complete){
-			return ((Complete) parameter).getComplete();
-		} else {
-			throw new HandledException(HandledException.ExceptionType.INVALID_PARA);
-		}
+	public Complete getComplete() throws HandledException{
+		return this.getParameter(Complete.type, Complete.class);
 	}
 	
-	public Recur getRecurrence() throws HandledException{
-		Parameter parameter = this.parameterMap.get(Recurrence.type);
-		if (parameter instanceof Recurrence){
-			return ((Recurrence) parameter).getRecurrence();
-		} else {
-			throw new HandledException(HandledException.ExceptionType.INVALID_PARA);
-		}
+	public Recurrence getRecurrence() throws HandledException{
+		return this.getParameter(Recurrence.type, Recurrence.class);
 	}
 	
-	public int getTaskID() throws HandledException{
-		Parameter parameter = this.parameterMap.get(TaskID.type);
-		if (parameter instanceof TaskID){
-			return ((TaskID) parameter).getTaskID();
-		} else {
-			throw new HandledException(HandledException.ExceptionType.INVALID_PARA);
-		}
+	public TaskID getTaskID() throws HandledException{
+		return this.getParameter(TaskID.type, TaskID.class);
+	}
+	
+	public TaskType getTaskType() throws HandledException{
+		return this.getParameter(TaskType.type, TaskType.class);
+	}
+	
+	public CommandType getCommandType() throws HandledException{
+		return this.getParameter(CommandType.type, CommandType.class);
+	}
+	
+	public Keyword getKeyword() throws HandledException{
+		return this.getParameter(Keyword.type, Keyword.class);
 	}
 }

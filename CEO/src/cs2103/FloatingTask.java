@@ -9,7 +9,7 @@ import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Uid;
 
-class FloatingTask extends Task {
+public class FloatingTask extends Task {
 	private boolean complete;
 	private static final String TYPE_FLOATING = "Floating";
 	

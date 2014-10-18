@@ -1,0 +1,26 @@
+Sat Oct 18 13:39:08 CST 2014
+Your input parameters are not valid, please check your input and try again!
+cs2103.HandledException
+	at cs2103.CommonUtil.checkNullString(CommonUtil.java:5)
+	at cs2103.CommonUtil.parseIntegerParameter(CommonUtil.java:23)
+	at cs2103.parameters.TaskID.parse(TaskID.java:24)
+	at cs2103.command.Show.<init>(Show.java:10)
+	at cs2103.CommandLineUI.processUserInput(CommandLineUI.java:105)
+	at cs2103.CommandLineUI.userLoop(CommandLineUI.java:62)
+	at cs2103.CommandLineUI.main(CommandLineUI.java:49)
+Sat Oct 18 14:31:28 CST 2014
+You need to specify at least one parameter
+cs2103.HandledException
+	at cs2103.CommandParser.splitMultiParameter(CommandParser.java:199)
+	at cs2103.CommandParser.separateCommand(CommandParser.java:41)
+	at cs2103.CommandLineUI.processUserInput(CommandLineUI.java:85)
+	at cs2103.CommandLineUI.userLoop(CommandLineUI.java:62)
+	at cs2103.CommandLineUI.main(CommandLineUI.java:49)
+Sat Oct 18 14:35:17 CST 2014
+You need to specify at least one parameter
+cs2103.HandledException
+	at cs2103.CommandParser.splitMultiParameter(CommandParser.java:199)
+	at cs2103.CommandParser.separateCommand(CommandParser.java:41)
+	at cs2103.CommandLineUI.processUserInput(CommandLineUI.java:85)
+	at cs2103.CommandLineUI.userLoop(CommandLineUI.java:62)
+	at cs2103.CommandLineUI.main(CommandLineUI.java:49)
