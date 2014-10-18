@@ -8,7 +8,7 @@ import cs2103.StorageEngine;
 import cs2103.Task;
 import cs2103.parameters.TaskID;
 
-public class Mark extends WriteCommand {
+public class Mark extends InfluentialCommand {
 	private static final String MESSAGE_MARK_FORMAT = "Successfully marked %1$d as completed";
 	private static final String MESSAGE_MARK_FAILED = "The task you specified does not contain status information";
 	Task undoBackup;
@@ -18,13 +18,13 @@ public class Mark extends WriteCommand {
 		this.parameterList.addParameter(TaskID.parse(command));
 	}
 	@Override
-	public WriteCommand undo() throws HandledException, FatalException {
+	public InfluentialCommand undo() throws HandledException, FatalException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public WriteCommand redo() throws HandledException, FatalException {
+	public InfluentialCommand redo() throws HandledException, FatalException {
 		// TODO Auto-generated method stub
 		return null;
 	}

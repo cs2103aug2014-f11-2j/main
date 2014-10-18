@@ -7,7 +7,7 @@ import cs2103.StorageEngine;
 import cs2103.Task;
 import cs2103.parameters.TaskID;
 
-public class Delete extends WriteCommand {
+public class Delete extends InfluentialCommand {
 	private static final String MESSAGE_DELETE_FORMAT = "You have deleted task with ID %1$d";
 	
 	public Delete(String command) throws HandledException{
@@ -25,7 +25,7 @@ public class Delete extends WriteCommand {
 	}
 
 	@Override
-	public WriteCommand undo() throws HandledException, FatalException {
+	public InfluentialCommand undo() throws HandledException, FatalException {
 		if (this.undoBackup == null){
 			return null;
 		} else {
@@ -35,7 +35,7 @@ public class Delete extends WriteCommand {
 	}
 
 	@Override
-	public WriteCommand redo() throws HandledException, FatalException {
+	public InfluentialCommand redo() throws HandledException, FatalException {
 		if (this.redoBackup == null){
 			return null;
 		} else {

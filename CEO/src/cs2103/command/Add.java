@@ -24,7 +24,7 @@ import cs2103.parameters.Recurrence;
 import cs2103.parameters.Time;
 import cs2103.parameters.Title;
 
-public class Add extends WriteCommand {
+public class Add extends InfluentialCommand {
 	private static final String MESSAGE_ADD = "You have successfully added a new task.";
 	private static final String[] allowedQuickTimeLiteral = {"from", "by", "on", "in"};
 	
@@ -130,7 +130,7 @@ public class Add extends WriteCommand {
 	}
 
 	@Override
-	public WriteCommand undo() throws HandledException, FatalException {
+	public InfluentialCommand undo() throws HandledException, FatalException {
 		if (this.undoBackup == null){
 			return null;
 		} else {
@@ -140,7 +140,7 @@ public class Add extends WriteCommand {
 	}
 
 	@Override
-	public WriteCommand redo() throws HandledException, FatalException {
+	public InfluentialCommand redo() throws HandledException, FatalException {
 		if (this.redoBackup == null){
 			return null;
 		} else {

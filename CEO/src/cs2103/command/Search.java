@@ -17,7 +17,7 @@ import cs2103.parameters.Keyword;
 import cs2103.parameters.TaskType;
 import cs2103.parameters.Time;
 
-public class Search extends ReadCommand {
+public class Search extends QueryCommand {
 	
 	public Search(String command) throws HandledException{
 		CommonUtil.checkNullString(command, HandledException.ExceptionType.INVALID_CMD);

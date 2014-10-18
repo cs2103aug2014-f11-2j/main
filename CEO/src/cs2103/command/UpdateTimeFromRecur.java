@@ -8,7 +8,7 @@ import cs2103.PeriodicTask;
 import cs2103.StorageEngine;
 import cs2103.Task;
 
-public class UpdateTimeFromRecur extends WriteCommand {
+public class UpdateTimeFromRecur extends InfluentialCommand {
 	private static final String MESSAGE_UPDATE_RECUR_TIME_FORMAT = "Successfully updated %1$d recurring tasks";
 	
 	@Override
@@ -26,13 +26,13 @@ public class UpdateTimeFromRecur extends WriteCommand {
 	}
 
 	@Override
-	public WriteCommand undo() {
+	public InfluentialCommand undo() {
 		//not required for this type of command
 		return null;
 	}
 
 	@Override
-	public WriteCommand redo() {
+	public InfluentialCommand redo() {
 		//not required for this type of command
 		return null;
 	}

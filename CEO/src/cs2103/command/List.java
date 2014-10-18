@@ -5,7 +5,7 @@ import cs2103.FatalException;
 import cs2103.HandledException;
 import cs2103.parameters.TaskType;
 
-public class List extends ReadCommand {
+public class List extends QueryCommand {
 	
 	public List(String command){
 		this.parameterList.addParameter(TaskType.parse(command));

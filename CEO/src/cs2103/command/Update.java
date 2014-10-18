@@ -16,7 +16,7 @@ import cs2103.parameters.TaskID;
 import cs2103.parameters.Time;
 import cs2103.parameters.Title;
 
-public class Update extends WriteCommand {
+public class Update extends InfluentialCommand {
 	private static final String MESSAGE_UPDATE_FORMAT = "You have updated task with ID %1$d";
 	
 	public Update(String command) throws HandledException{
@@ -76,7 +76,7 @@ public class Update extends WriteCommand {
 	}
 	
 	@Override
-	public WriteCommand undo() throws HandledException, FatalException {
+	public InfluentialCommand undo() throws HandledException, FatalException {
 		if (this.undoBackup == null){
 			return null;
 		} else {
@@ -86,7 +86,7 @@ public class Update extends WriteCommand {
 	}
 	
 	@Override
-	public WriteCommand redo() throws HandledException, FatalException {
+	public InfluentialCommand redo() throws HandledException, FatalException {
 		if (this.redoBackup == null){
 			return null;
 		} else {

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import cs2103.CommonUtil;
 import cs2103.Task;
 
-public abstract class ReadCommand extends Command {
+public abstract class QueryCommand extends Command {
 	private static final String MESSAGE_EMPTY_LIST = "The task list is empty";
 	
 	protected static <T extends Task> String parseListResponse(ArrayList<T> taskList){

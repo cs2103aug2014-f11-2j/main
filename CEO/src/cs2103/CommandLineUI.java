@@ -19,16 +19,16 @@ public class CommandLineUI {
 	
 	private static CommandLineUI commandLine;
 	private final StorageEngine storage;
-	private Stack<WriteCommand> undoStack;
-	private Stack<WriteCommand> redoStack;
+	private Stack<InfluentialCommand> undoStack;
+	private Stack<InfluentialCommand> redoStack;
 	private Scanner scanner = new Scanner(System.in);
 	
 	private CommandLineUI(String dataFile) throws HandledException, FatalException{
 		StorageEngine.initialize(dataFile);
 		this.storage = StorageEngine.getInstance();
 		this.storage.validate();
-		undoStack = new Stack<WriteCommand>();
-		redoStack = new Stack<WriteCommand>();
+		undoStack = new Stack<InfluentialCommand>();
+		redoStack = new Stack<InfluentialCommand>();
 		print(String.format(MESSAGE_WELCOME_FORMAT, dataFile));
 	}
 	
@@ -127,8 +127,8 @@ public class CommandLineUI {
 			default:
 				return MESSAGE_COMMAND_ERROR;
 			}
-			if (commandObject instanceof WriteCommand){
-				this.undoStack.push((WriteCommand) commandObject);
+			if (commandObject instanceof InfluentialCommand){
+				this.undoStack.push((InfluentialCommand) commandObject);
 			}
 			return commandObject.execute();
 		} catch (HandledException e) {
@@ -152,7 +152,7 @@ public class CommandLineUI {
 	private int executeUndo(int steps) throws HandledException, FatalException{
 		int result = 0;
 		while(result < this.undoStack.size() && result < steps){
-			WriteCommand undoCommand = undoStack.pop().undo();
+			InfluentialCommand undoCommand = undoStack.pop().undo();
 			if (undoCommand != null){
 				result++;
 				this.redoStack.push(undoCommand);
@@ -174,7 +174,7 @@ public class CommandLineUI {
 	private int executeRedo(int steps) throws HandledException, FatalException{
 		int result = 0;
 		while(result < this.redoStack.size() && result < steps){
-			WriteCommand undoCommand = redoStack.pop().redo();
+			InfluentialCommand undoCommand = redoStack.pop().redo();
 			if (undoCommand != null){
 				result++;
 				this.undoStack.push(undoCommand);

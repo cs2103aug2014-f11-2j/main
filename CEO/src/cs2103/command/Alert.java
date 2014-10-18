@@ -8,7 +8,7 @@ import cs2103.FatalException;
 import cs2103.HandledException;
 import cs2103.PeriodicTask;
 
-public class Alert extends ReadCommand {
+public class Alert extends QueryCommand {
 	private static final String MESSAGE_TASKS_DUE = "Tasks due within one day:\n";
 	private static final String MESSAGE_TASKS_STARTING = "Tasks start within one day:\n";
 	

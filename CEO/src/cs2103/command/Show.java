@@ -6,7 +6,7 @@ import cs2103.HandledException;
 import cs2103.Task;
 import cs2103.parameters.TaskID;
 
-public class Show extends ReadCommand {
+public class Show extends QueryCommand {
 	private static final String MESSAGE_SHOW_FORMAT = "The details for Task %1$d:\n";
 	
 	public Show(String command) throws HandledException{

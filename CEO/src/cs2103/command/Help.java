@@ -4,7 +4,7 @@ import cs2103.CommonUtil;
 import cs2103.HandledException;
 import cs2103.parameters.CommandType;
 
-public class Help extends ReadCommand {
+public class Help extends QueryCommand {
 	public static final String HELP_DEFAULT = "CEO Usage:\n" +
             								  "  add [-S or --title <title>] ([-D or -description <description>]\n" + 
             								  "      [-L or -location <location>] [-T or -time {<blank>|<YYYY/MM/DD hh:mm>|\n" +
