@@ -33,23 +33,8 @@ public class Recurrence implements Parameter {
 		}
 	}
 	
-	public static Recurrence parse(long recurrenceInterval) throws HandledException{
-		if (recurrenceInterval < divisor[4]){
-			return new Recurrence(null);
-		} else {
-			long ratio = 0L;
-			long div = 0L;
-			int i = 0;
-			while (i < divisor.length && ratio == 0L){
-				div = divisor[i];
-				ratio = recurrenceInterval/div;
-				i++;
-			}
-			Recur recur=new Recur();
-			recur.setFrequency(parseFrequency(div));
-			recur.setInterval(parseInterval(ratio));
-			return new Recurrence(recur);
-		}
+	public static Recurrence parse(long recurrenceLong) throws HandledException{
+		return new Recurrence(longToRecur(recurrenceLong));
 	}
 	
 	private static Recur stringToRecur(String recurrenceString) throws HandledException{
@@ -64,6 +49,25 @@ public class Recurrence implements Parameter {
 			Recur recur=new Recur();
 			recur.setFrequency(frequency);
 			recur.setInterval(interval);
+			return recur;
+		}
+	}
+	
+	private static Recur longToRecur(long recurrenceLong) throws HandledException{
+		if (recurrenceLong < divisor[4]){
+			return null;
+		} else {
+			long ratio = 0L;
+			long div = 0L;
+			int i = 0;
+			while (i < divisor.length && ratio == 0L){
+				div = divisor[i];
+				ratio = recurrenceLong/div;
+				i++;
+			}
+			Recur recur=new Recur();
+			recur.setFrequency(parseFrequency(div));
+			recur.setInterval(parseInterval(ratio));
 			return recur;
 		}
 	}

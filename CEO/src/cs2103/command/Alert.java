@@ -2,6 +2,7 @@ package cs2103.command;
 
 import java.util.ArrayList;
 
+import cs2103.CommonUtil;
 import cs2103.DeadlineTask;
 import cs2103.FatalException;
 import cs2103.HandledException;
@@ -35,7 +36,7 @@ public class Alert extends ReadCommand {
 				sb.append(task.toSummary());
 			}
 		}
-		return sb.toString();
+		return CommonUtil.deleteLastChar(sb);
 	}
 
 	private static String alertPeriodic() throws HandledException, FatalException{
@@ -46,7 +47,7 @@ public class Alert extends ReadCommand {
 				sb.append(task.toSummary());
 			}
 		}
-		return sb.toString();
+		return CommonUtil.deleteLastChar(sb);
 	}
 
 }
