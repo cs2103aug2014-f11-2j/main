@@ -3,7 +3,7 @@ package cs2103.parameters;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cs2103.HandledException;
+import cs2103.exception.HandledException;
 import net.fortuna.ical4j.model.Recur;
 
 public class Recurrence implements Parameter {

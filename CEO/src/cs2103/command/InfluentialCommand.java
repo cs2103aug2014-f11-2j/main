@@ -1,8 +1,8 @@
 package cs2103.command;
 
-import cs2103.FatalException;
-import cs2103.HandledException;
-import cs2103.Task;
+import cs2103.exception.FatalException;
+import cs2103.exception.HandledException;
+import cs2103.task.Task;
 
 public abstract class InfluentialCommand extends Command{
 	protected Task undoBackup;

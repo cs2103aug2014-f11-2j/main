@@ -3,7 +3,7 @@ package cs2103.command;
 import java.util.ArrayList;
 
 import cs2103.CommonUtil;
-import cs2103.Task;
+import cs2103.task.Task;
 
 public abstract class QueryCommand extends Command {
 	private static final String MESSAGE_EMPTY_LIST = "The task list is empty";

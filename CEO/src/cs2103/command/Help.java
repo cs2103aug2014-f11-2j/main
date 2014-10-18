@@ -1,7 +1,7 @@
 package cs2103.command;
 
 import cs2103.CommonUtil;
-import cs2103.HandledException;
+import cs2103.exception.HandledException;
 import cs2103.parameters.CommandType;
 
 public class Help extends QueryCommand {

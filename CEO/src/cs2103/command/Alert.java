@@ -3,10 +3,10 @@ package cs2103.command;
 import java.util.ArrayList;
 
 import cs2103.CommonUtil;
-import cs2103.DeadlineTask;
-import cs2103.FatalException;
-import cs2103.HandledException;
-import cs2103.PeriodicTask;
+import cs2103.exception.FatalException;
+import cs2103.exception.HandledException;
+import cs2103.task.DeadlineTask;
+import cs2103.task.PeriodicTask;
 
 public class Alert extends QueryCommand {
 	private static final String MESSAGE_TASKS_DUE = "Tasks due within one day:\n";

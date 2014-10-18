@@ -7,7 +7,7 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cs2103.HandledException;
+import cs2103.exception.HandledException;
 
 public class Time implements Parameter {
 	public static final String[] allowedLiteral = {"T", "time"};

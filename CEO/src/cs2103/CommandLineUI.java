@@ -4,6 +4,8 @@ import java.util.Scanner;
 import java.util.Stack;
 
 import cs2103.command.*;
+import cs2103.exception.FatalException;
+import cs2103.exception.HandledException;
 import cs2103.parameters.CommandType;
 
 public class CommandLineUI {

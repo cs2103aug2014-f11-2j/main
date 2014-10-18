@@ -1,4 +1,5 @@
-package cs2103;
+package cs2103.exception;
+
 
 public class HandledException extends Exception {
 	private static final long serialVersionUID = -6882947317576882981L;

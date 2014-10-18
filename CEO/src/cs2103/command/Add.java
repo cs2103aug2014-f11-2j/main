@@ -10,19 +10,19 @@ import org.ocpsoft.prettytime.nlp.parse.DateGroup;
 
 import net.fortuna.ical4j.model.Recur;
 import cs2103.CommonUtil;
-import cs2103.DeadlineTask;
-import cs2103.FatalException;
-import cs2103.FloatingTask;
-import cs2103.HandledException;
-import cs2103.PeriodicTask;
 import cs2103.StorageEngine;
-import cs2103.Task;
+import cs2103.exception.FatalException;
+import cs2103.exception.HandledException;
 import cs2103.parameters.Description;
 import cs2103.parameters.Location;
 import cs2103.parameters.Parameter;
 import cs2103.parameters.Recurrence;
 import cs2103.parameters.Time;
 import cs2103.parameters.Title;
+import cs2103.task.DeadlineTask;
+import cs2103.task.FloatingTask;
+import cs2103.task.PeriodicTask;
+import cs2103.task.Task;
 
 public class Add extends InfluentialCommand {
 	private static final String MESSAGE_ADD = "You have successfully added a new task.";

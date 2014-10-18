@@ -1,11 +1,11 @@
 package cs2103.command;
 
 import cs2103.CommonUtil;
-import cs2103.FatalException;
-import cs2103.HandledException;
 import cs2103.StorageEngine;
-import cs2103.Task;
+import cs2103.exception.FatalException;
+import cs2103.exception.HandledException;
 import cs2103.parameters.TaskID;
+import cs2103.task.Task;
 
 public class Delete extends InfluentialCommand {
 	private static final String MESSAGE_DELETE_FORMAT = "You have deleted task with ID %1$d";

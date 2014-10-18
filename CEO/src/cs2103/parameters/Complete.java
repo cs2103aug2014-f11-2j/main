@@ -1,6 +1,6 @@
 package cs2103.parameters;
 
-import cs2103.HandledException;
+import cs2103.exception.HandledException;
 
 public class Complete implements Parameter {
 	public static final String type = "COMPLETE";

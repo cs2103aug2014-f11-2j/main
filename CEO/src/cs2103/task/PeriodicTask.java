@@ -1,8 +1,9 @@
-package cs2103;
+package cs2103.task;
 
 import java.util.Comparator;
 import java.util.Date;
 
+import cs2103.exception.HandledException;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;

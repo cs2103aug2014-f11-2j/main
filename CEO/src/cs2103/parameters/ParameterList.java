@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import cs2103.HandledException;
+import cs2103.exception.HandledException;
 
 public class ParameterList {
 	private Map<String, Parameter> parameterMap;

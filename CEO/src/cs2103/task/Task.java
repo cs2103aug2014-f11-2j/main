@@ -1,4 +1,4 @@
-package cs2103; 
+package cs2103.task; 
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import cs2103.exception.HandledException;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;

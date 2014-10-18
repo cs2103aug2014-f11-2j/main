@@ -1,4 +1,5 @@
-package cs2103;
+package cs2103.exception;
+
 
 public class FatalException extends Exception {
 	private static final long serialVersionUID = 2812393341801137882L;

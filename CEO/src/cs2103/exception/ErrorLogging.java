@@ -1,4 +1,4 @@
-package cs2103;
+package cs2103.exception;
 
 import java.io.BufferedWriter;
 import java.io.File;

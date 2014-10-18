@@ -1,5 +1,6 @@
 package cs2103;
 
+import cs2103.exception.HandledException;
 import cs2103.parameters.Parameter;
 
 public class CommonUtil {

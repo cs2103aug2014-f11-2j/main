@@ -7,14 +7,14 @@ import java.util.Map;
 import java.util.Queue;
 
 import cs2103.CommonUtil;
-import cs2103.DeadlineTask;
-import cs2103.FatalException;
-import cs2103.FloatingTask;
-import cs2103.HandledException;
-import cs2103.PeriodicTask;
 import cs2103.StorageEngine;
-import cs2103.Task;
+import cs2103.exception.FatalException;
+import cs2103.exception.HandledException;
 import cs2103.parameters.ParameterList;
+import cs2103.task.DeadlineTask;
+import cs2103.task.FloatingTask;
+import cs2103.task.PeriodicTask;
+import cs2103.task.Task;
 import edu.emory.mathcs.backport.java.util.Collections;
 
 public abstract class Command {
