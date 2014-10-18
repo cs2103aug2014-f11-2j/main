@@ -17,11 +17,11 @@ public class Alert extends ReadCommand {
 		StringBuffer sb = new StringBuffer();
 		String deadlineAlert = alertDeadline();
 		String periodicAlert = alertPeriodic();
-		if (!deadlineAlert.isEmpty()){
+		if (deadlineAlert != null){
 			sb.append(MESSAGE_TASKS_DUE);
 			sb.append(deadlineAlert);
 		}
-		if (!periodicAlert.isEmpty()){
+		if (periodicAlert != null){
 			sb.append(MESSAGE_TASKS_STARTING);
 			sb.append(periodicAlert);
 		}

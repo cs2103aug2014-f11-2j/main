@@ -32,6 +32,10 @@ public class Help extends ReadCommand {
             								  "         [-T or -time {<blank>|<YYYY/MM/DD hh:mm>|\n" +
             								  "         <<YYYY/MM/DD hh:mm> to <YYYY/MM/DD hh:mm>>}]}\n" +
             								  "  +Search for tasks. Enter \"help search\" for more\n\n" +
+            								  "  mark <task ID>\n" +
+            								  "  Mark a task as completed. Enter \"help mark\" for more\n\n" +
+            								  "  alert\n" +
+            								  "  +display approaching deadlines and start times\n\n" +
             								  "  help\n" + 
             								  "  +display this message";
 	public static final String HELP_ADD = "Add usage:\n"+
@@ -122,6 +126,8 @@ public class Help extends ReadCommand {
 			 								 "Example:\n" +
 			 								 "  search all -keyword example keyword -complete true -time\n\n" +
 			 								 "This will effectively return the completed Deadline tasks which title, description or location contains \"example keyword\"\n(when complete parameter is specified, it is implied that all Periodic Tasks will be excluded)\n";
+	public static final String HELP_MARK = "Mark has no extra options\n" +
+			 							   "Example: mark 2\n";
 	
 	public Help(String command){
 		this.parameterList.addParameter(CommandType.parse(command));
@@ -147,6 +153,8 @@ public class Help extends ReadCommand {
 			return HELP_REDO;
 		case SEARCH:
 			return HELP_SEARCH;
+		case MARK:
+			return HELP_MARK;
 		case INVALID:
 		default:
 			return HELP_DEFAULT;

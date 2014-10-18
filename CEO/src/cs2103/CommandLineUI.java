@@ -117,6 +117,12 @@ public class CommandLineUI {
 			case SEARCH:
 				commandObject = new Search(command[1]);
 				break;
+			case ALERT:
+				commandObject = new Alert();
+				break;
+			case MARK:
+				commandObject = new Mark(command[1]);
+				break;
 			case INVALID:
 			default:
 				return MESSAGE_COMMAND_ERROR;

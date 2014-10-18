@@ -5,7 +5,7 @@ public class CommandType implements Parameter {
 	private final Value value;
 	
 	public static enum Value {
-		ADD, LIST, SHOW, DELETE, UPDATE, EXIT, UNDO, REDO, HELP, SEARCH, QUICK, INVALID;
+		ADD, LIST, SHOW, DELETE, UPDATE, EXIT, UNDO, REDO, HELP, SEARCH, QUICK, ALERT, MARK, INVALID;
 	}
 	
 	public CommandType(Value value){
@@ -49,6 +49,10 @@ public class CommandType implements Parameter {
 			return Value.HELP;
 		} else if (commandTypeString.equalsIgnoreCase("search") || commandTypeString.equalsIgnoreCase("find")){
 			return Value.SEARCH;
+		} else if (commandTypeString.equalsIgnoreCase("mark") || commandTypeString.equalsIgnoreCase("complete") || commandTypeString.equalsIgnoreCase("finish")){
+			return Value.MARK;
+		} else if (commandTypeString.equalsIgnoreCase("alert")){
+			return Value.ALERT;
 		} else {
 			return Value.INVALID;
 		}
