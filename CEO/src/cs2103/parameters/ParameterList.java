@@ -36,7 +36,9 @@ public class ParameterList {
 	public void addAllParameters(ArrayList<Parameter> parameterList){
 		if (parameterList != null){
 			for (Parameter parameter:parameterList){
-				this.addParameter(parameter);
+				if (parameter != null){
+					this.addParameter(parameter);
+				}
 			}
 		}
 	}

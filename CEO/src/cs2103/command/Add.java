@@ -5,6 +5,9 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Queue;
 
+import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
+import org.ocpsoft.prettytime.nlp.parse.DateGroup;
+
 import net.fortuna.ical4j.model.Recur;
 import cs2103.CommonUtil;
 import cs2103.DeadlineTask;
@@ -23,6 +26,7 @@ import cs2103.parameters.Title;
 
 public class Add extends WriteCommand {
 	private static final String MESSAGE_ADD = "You have successfully added a new task.";
+	private static final String[] allowedQuickTimeLiteral = {"from", "by", "on", "in"};
 	
 	public Add(String command) throws HandledException{
 		CommonUtil.checkNullString(command, HandledException.ExceptionType.INVALID_CMD);
@@ -60,8 +64,60 @@ public class Add extends WriteCommand {
 		return MESSAGE_ADD;
 	}
 	
-	private static ArrayList<Parameter> parseQuickAdd(String quickAddString){
-		return null;
+	private static ArrayList<Parameter> parseQuickAdd(String quickAddString) throws HandledException{
+		ArrayList<Parameter> parameterList = new ArrayList<Parameter>();
+		int timeIndex = -1;
+		for (String s:allowedQuickTimeLiteral){
+			timeIndex = quickAddString.lastIndexOf(s);
+			if (timeIndex > 0) break;
+		}
+		int everyIndex = quickAddString.lastIndexOf("every");
+		if (everyIndex <= 0 && timeIndex <= 0){
+			parameterList.add(Title.parse(quickAddString));
+		} if (timeIndex > 0 && everyIndex < timeIndex){
+			Time time = parseQuickTime(quickAddString.substring(timeIndex));
+			if (time == null){
+				parameterList.add(Title.parse(quickAddString));
+			} else {
+				parameterList.add(Title.parse(quickAddString.substring(0, timeIndex)));
+				parameterList.add(time);
+			}
+		} else if (timeIndex > 0 && everyIndex > timeIndex){
+			Time time = parseQuickTime(quickAddString.substring(timeIndex, everyIndex));
+			if (time == null){
+				parameterList.add(Title.parse(quickAddString));
+			} else {
+				parameterList.add(Title.parse(quickAddString.substring(0, timeIndex)));
+				parameterList.add(time);
+				parameterList.add(parseQuickRecurrence(quickAddString.substring(everyIndex)));
+			}
+		} else {
+			parameterList.add(Title.parse(quickAddString));
+		}
+		return parameterList;
+	}
+	
+	private static Recurrence parseQuickRecurrence(String everyString) throws HandledException{
+		java.util.List<DateGroup> parse = new PrettyTimeParser().parseSyntax(everyString);
+		if (!parse.isEmpty()){
+			return Recurrence.parse(parse.get(0).getRecurInterval());
+		} else {
+			System.out.println(everyString);
+			return null;
+		}
+	}
+	
+	private static Time parseQuickTime(String timeString){
+		java.util.List<Date> dates = new PrettyTimeParser().parse(timeString);
+		if (!dates.isEmpty()){
+			Date[] time = new Date[2];
+			for (int i = 0;i < dates.size() && i < 2;i++){
+				time[i] = dates.get(i);
+			}
+			return new Time(time);
+		} else {
+			return null;
+		}
 	}
 	
 	private static Date[] getTime(Time timeParameter){
