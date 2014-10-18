@@ -5,6 +5,7 @@ import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.TaskID;
 import cs2103.task.Task;
+import cs2103.task.TaskList;
 
 public class Show extends QueryCommand {
 	private static final String MESSAGE_SHOW_FORMAT = "The details for Task %1$d:\n";
@@ -16,7 +17,7 @@ public class Show extends QueryCommand {
 	@Override
 	public String execute() throws HandledException, FatalException {
 		CommonUtil.checkNullParameter(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_CMD);
-		return formatShowDetail(getTaskByID(parameterList.getTaskID().getValue()));
+		return formatShowDetail(TaskList.getInstance().getTaskByID(parameterList.getTaskID().getValue()));
 	}
 	
 	private static String formatShowDetail(Task task) throws HandledException{

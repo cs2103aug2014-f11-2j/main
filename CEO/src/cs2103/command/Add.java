@@ -10,7 +10,6 @@ import org.ocpsoft.prettytime.nlp.parse.DateGroup;
 
 import net.fortuna.ical4j.model.Recur;
 import cs2103.CommonUtil;
-import cs2103.StorageEngine;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Description;
@@ -19,10 +18,7 @@ import cs2103.parameters.Parameter;
 import cs2103.parameters.Recurrence;
 import cs2103.parameters.Time;
 import cs2103.parameters.Title;
-import cs2103.task.DeadlineTask;
-import cs2103.task.FloatingTask;
-import cs2103.task.PeriodicTask;
-import cs2103.task.Task;
+import cs2103.task.*;
 
 public class Add extends InfluentialCommand {
 	private static final String MESSAGE_ADD = "You have successfully added a new task.";
@@ -58,7 +54,7 @@ public class Add extends InfluentialCommand {
 			task = new PeriodicTask(null, null, title, location, time[0], time[1], recurrence);
 		}
 		task.updateDescription(description);
-		StorageEngine.getInstance().updateTask(task);
+		TaskList.getInstance().addTask(task);
 		this.undoBackup = task;
 		this.redoBackup = task;
 		return MESSAGE_ADD;
@@ -134,7 +130,7 @@ public class Add extends InfluentialCommand {
 		if (this.undoBackup == null){
 			return null;
 		} else {
-			StorageEngine.getInstance().deleteTask(this.undoBackup);
+			TaskList.getInstance().deleteTask(this.undoBackup);
 			return this;
 		}
 	}
@@ -144,7 +140,7 @@ public class Add extends InfluentialCommand {
 		if (this.redoBackup == null){
 			return null;
 		} else {
-			StorageEngine.getInstance().updateTask(this.redoBackup);
+			TaskList.getInstance().addTask(this.redoBackup);
 			return this;
 		}
 	}

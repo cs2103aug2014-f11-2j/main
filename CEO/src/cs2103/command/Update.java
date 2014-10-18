@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Queue;
 
 import cs2103.CommonUtil;
-import cs2103.StorageEngine;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Complete;
@@ -15,6 +14,7 @@ import cs2103.parameters.TaskID;
 import cs2103.parameters.Time;
 import cs2103.parameters.Title;
 import cs2103.task.Task;
+import cs2103.task.TaskList;
 
 public class Update extends InfluentialCommand {
 	private static final String MESSAGE_UPDATE_FORMAT = "You have updated task with ID %1$d";
@@ -37,7 +37,7 @@ public class Update extends InfluentialCommand {
 		if (this.parameterList.getTaskID() == null){
 			throw new HandledException(HandledException.ExceptionType.INVALID_TASKID);
 		} else {
-			Task task = getTaskByID(this.parameterList.getTaskID().getValue());
+			Task task = TaskList.getInstance().getTaskByID(this.parameterList.getTaskID().getValue());
 			Task newTask;
 			if (this.parameterList.getTime() == null){
 				newTask = cloneTask(task);
@@ -59,7 +59,7 @@ public class Update extends InfluentialCommand {
 			if (this.parameterList.getRecurrence() != null){
 				newTask.updateRecurrence(this.parameterList.getRecurrence().getValue());
 			}
-			StorageEngine.getInstance().updateTask(newTask);
+			TaskList.getInstance().updateTask(newTask);
 			this.undoBackup = task;
 			this.redoBackup = newTask;
 			return String.format(MESSAGE_UPDATE_FORMAT, this.parameterList.getTaskID().getValue());
@@ -80,7 +80,7 @@ public class Update extends InfluentialCommand {
 		if (this.undoBackup == null){
 			return null;
 		} else {
-			StorageEngine.getInstance().updateTask(this.undoBackup);
+			TaskList.getInstance().updateTask(this.undoBackup);
 			return this;
 		}
 	}
@@ -90,7 +90,7 @@ public class Update extends InfluentialCommand {
 		if (this.redoBackup == null){
 			return null;
 		} else {
-			StorageEngine.getInstance().updateTask(this.redoBackup);
+			TaskList.getInstance().updateTask(this.redoBackup);
 			return this;
 		}
 	}

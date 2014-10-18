@@ -4,6 +4,7 @@ import cs2103.CommonUtil;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.TaskType;
+import cs2103.task.TaskList;
 
 public class List extends QueryCommand {
 	
@@ -16,15 +17,15 @@ public class List extends QueryCommand {
 		CommonUtil.checkNullParameter(this.parameterList.getTaskType(), HandledException.ExceptionType.INVALID_CMD);
 		switch (this.parameterList.getTaskType().getValue()){
 		case FLOATING:
-			return parseListResponse(getFloatingList());
+			return parseListResponse(TaskList.getInstance().getFloatingList());
 		case DEADLINE:
-			return parseListResponse(getDeadlineList());
+			return parseListResponse(TaskList.getInstance().getDeadlineList());
 		case PERIODIC:
-			return parseListResponse(getPeriodicList());
+			return parseListResponse(TaskList.getInstance().getPeriodicList());
 		case ALL:
 		case INVALID:
 		default:
-			return parseListResponse(getAllList());
+			return parseListResponse(TaskList.getInstance().getAllList());
 		}
 	}
 

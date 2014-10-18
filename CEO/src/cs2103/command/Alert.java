@@ -7,6 +7,7 @@ import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.task.DeadlineTask;
 import cs2103.task.PeriodicTask;
+import cs2103.task.TaskList;
 
 public class Alert extends QueryCommand {
 	private static final String MESSAGE_TASKS_DUE = "Tasks due within one day:\n";
@@ -29,7 +30,7 @@ public class Alert extends QueryCommand {
 	}
 	
 	private static String alertDeadline() throws HandledException, FatalException{
-		ArrayList<DeadlineTask> taskList = getDeadlineList();
+		ArrayList<DeadlineTask> taskList = TaskList.getInstance().getDeadlineList();
 		StringBuffer sb = new StringBuffer();
 		for (DeadlineTask task:taskList){
 			if (task.checkAlert()){
@@ -40,7 +41,7 @@ public class Alert extends QueryCommand {
 	}
 
 	private static String alertPeriodic() throws HandledException, FatalException{
-		ArrayList<PeriodicTask> taskList = getPeriodicList();
+		ArrayList<PeriodicTask> taskList = TaskList.getInstance().getPeriodicList();
 		StringBuffer sb = new StringBuffer();
 		for (PeriodicTask task:taskList){
 			if (task.checkAlert()){

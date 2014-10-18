@@ -14,7 +14,7 @@ import cs2103.task.DeadlineTask;
 import cs2103.task.FloatingTask;
 import cs2103.task.PeriodicTask;
 import cs2103.task.Task;
-import edu.emory.mathcs.backport.java.util.Collections;
+import java.util.Collections;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;
@@ -41,7 +41,6 @@ public class StorageEngine {
 	private net.fortuna.ical4j.model.Calendar calendar;
 	private IndexedComponentList indexedComponents;
 	private final File file;
-	private ArrayList<Task> taskList;
 	
 	private StorageEngine(String dataFile) throws HandledException, FatalException{
 		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION,true);
@@ -52,34 +51,17 @@ public class StorageEngine {
 		if (!file.exists() || file.length()==0){
 			createNewFile();
 		}
-		this.taskList = readFromFile();
-		storage = this;
 	}
 	
-	public void validate() throws FatalException{
-		try {
-			calendar.validate();
-		} catch (ValidationException e) {
-			throw new FatalException(FatalException.ExceptionType.ILLEGAL_FILE);
-		}
-	}
-	
-	public static StorageEngine getInstance() throws HandledException, FatalException{
-		if (storage == null){
-			throw new FatalException(FatalException.ExceptionType.NOT_INITIALIZED);
-		} else {
-			return storage;
-		}
-	}
-	
-	public static void initialize(String dataFile) throws HandledException, FatalException{
+	public static StorageEngine getInstance(String dataFile) throws HandledException, FatalException{
 		if (storage == null){
 			storage = new StorageEngine(dataFile);
 		}
+		return storage;
 	}
 	
-	public ArrayList<Task> getTaskList(){
-		return this.taskList;
+	public ArrayList<Task> getTaskList() throws FatalException, HandledException{
+		return this.readFromFile();
 	}
 	
 	private void createNewFile() throws HandledException, FatalException{
@@ -119,7 +101,7 @@ public class StorageEngine {
 
 	private void writeToFile() throws HandledException, FatalException{
 		try {
-			this.validate();
+			calendar.validate();
 			FileOutputStream fout;
 			fout = new FileOutputStream(file);
 			CalendarOutputter outputter = new CalendarOutputter();
@@ -129,7 +111,7 @@ public class StorageEngine {
 		}
 	}
 	
-	public ArrayList<Task> updateTask(Task task) throws HandledException, FatalException{
+	public void updateTask(Task task) throws HandledException, FatalException{
 		Component updating = task.toComponent();
 		Component existing = this.indexedComponents.getComponent(task.getTaskUID().getValue());
 		if (existing == null){
@@ -139,11 +121,9 @@ public class StorageEngine {
 			calendar.getComponents().add(updating);
 		}
 		writeToFile();
-		this.taskList = readFromFile();
-		return readFromFile();
 	}
 	
-	public ArrayList<Task> deleteTask(Task task) throws HandledException, FatalException{
+	public void deleteTask(Task task) throws HandledException, FatalException{
 		Component existing = this.indexedComponents.getComponent(task.getTaskUID().getValue());
 		if (existing == null){
 			throw new HandledException(HandledException.ExceptionType.TASK_NOT_EXIST);
@@ -151,8 +131,6 @@ public class StorageEngine {
 			calendar.getComponents().remove(existing);
 		}
 		writeToFile();
-		this.taskList = readFromFile();
-		return readFromFile();
 	}
 	
 	private Task parseVEvent(VEvent component) throws ParseException, FatalException, HandledException{

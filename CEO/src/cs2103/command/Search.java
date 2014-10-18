@@ -16,6 +16,7 @@ import cs2103.task.DeadlineTask;
 import cs2103.task.FloatingTask;
 import cs2103.task.PeriodicTask;
 import cs2103.task.Task;
+import cs2103.task.TaskList;
 
 public class Search extends QueryCommand {
 	
@@ -47,7 +48,7 @@ public class Search extends QueryCommand {
 	}
 	
 	private static ArrayList<Task> getInitialList(TaskType taskType) throws HandledException, FatalException{
-		ArrayList<Task> searchList = getAllList();
+		ArrayList<Task> searchList = TaskList.getInstance().getAllList();
 		if (taskType == null){
 			return searchList;
 		} else {
@@ -55,9 +56,9 @@ public class Search extends QueryCommand {
 			case FLOATING:
 				return filterType(searchList, FloatingTask.class);
 			case DEADLINE:
-				return filterType(searchList,DeadlineTask.class);
+				return filterType(searchList, DeadlineTask.class);
 			case PERIODIC:
-				return filterType(searchList,PeriodicTask.class);
+				return filterType(searchList, PeriodicTask.class);
 			case ALL:
 			case INVALID:
 			default:

@@ -1,21 +1,14 @@
 package cs2103.command;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
 import cs2103.CommonUtil;
-import cs2103.StorageEngine;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.ParameterList;
-import cs2103.task.DeadlineTask;
-import cs2103.task.FloatingTask;
-import cs2103.task.PeriodicTask;
-import cs2103.task.Task;
-import edu.emory.mathcs.backport.java.util.Collections;
 
 public abstract class Command {
 	protected ParameterList parameterList = new ParameterList();
@@ -52,53 +45,6 @@ public abstract class Command {
 		}
 	}
 	
-	protected static ArrayList<PeriodicTask> getPeriodicList() throws HandledException, FatalException{
-		ArrayList<Task> allList = getAllList();
-		ArrayList<PeriodicTask> returnList = new ArrayList<PeriodicTask>();
-		for (Task task:allList){
-			if (task instanceof PeriodicTask){
-				returnList.add((PeriodicTask) task);
-			}
-		}
-		Collections.sort(returnList, PeriodicTask.getComparator());
-		return returnList;
-	}
-	
-	protected static ArrayList<DeadlineTask> getDeadlineList() throws HandledException, FatalException{
-		ArrayList<Task> allList = getAllList();
-		ArrayList<DeadlineTask> returnList = new ArrayList<DeadlineTask>();
-		for (Task task:allList){
-			if (task instanceof DeadlineTask){
-				returnList.add((DeadlineTask) task);
-			}
-		}
-		Collections.sort(returnList, DeadlineTask.getComparator());
-		return returnList;
-	}
-	
-	protected static ArrayList<FloatingTask> getFloatingList() throws HandledException, FatalException{
-		ArrayList<Task> allList = getAllList();
-		ArrayList<FloatingTask> returnList = new ArrayList<FloatingTask>();
-		for (Task task:allList){
-			if (task instanceof FloatingTask){
-				returnList.add((FloatingTask) task);
-			}
-		}
-		return returnList;
-	}
-	
-	protected static ArrayList<Task> getAllList() throws HandledException, FatalException{
-		return StorageEngine.getInstance().getTaskList();
-	}
-	
-	protected static Task getTaskByID(int taskID) throws HandledException, FatalException{
-		ArrayList<Task> allList = getAllList();
-		if (taskID > allList.size() || taskID < 1){
-			throw new HandledException(HandledException.ExceptionType.INVALID_TASKID);
-		} else {
-			return allList.get(taskID-1);
-		}
-	}
 	
 	protected static String getParameterString(Map<String, String> parameterMap, String[] allowedLiteral){
 		for (String s:allowedLiteral){
