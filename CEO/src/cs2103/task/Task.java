@@ -124,6 +124,16 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		}
 	}
 	
+	@Override
+	public boolean equals(Object o){
+		if (o == null) return false;
+		if (o instanceof Task){
+			return this.getTaskUID().getValue().equals(((Task) o).getTaskUID().getValue());
+		} else {
+			return false;
+		}
+	}
+	
 	public abstract void updateComplete(boolean complete);
 	public abstract void updateLocation(String location);
 	public abstract void updateRecurrence(Recur recurrence);

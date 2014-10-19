@@ -66,9 +66,7 @@ public class Add extends InfluentialCommand {
 			if (timeIndex > 0) break;
 		}
 		int everyIndex = quickAddString.lastIndexOf("every");
-		if (everyIndex <= 0 && timeIndex <= 0){
-			parameterList.add(Title.parse(quickAddString));
-		} if (timeIndex > 0 && everyIndex < timeIndex){
+		if (timeIndex > 0 && everyIndex < timeIndex){
 			Time time = parseQuickTime(quickAddString.substring(timeIndex));
 			if (time == null){
 				parameterList.add(Title.parse(quickAddString));

@@ -19,6 +19,7 @@ public class HandledException extends Exception {
 	private static final String CLONE_FAILED = "Failed to clone task object";
 	private static final String NETWORK_ERR = "Error occured in your network stack";
 	private static final String UNEXPECTED_ERR = "An unexpected error occurred, operation failed";
+	private final String errorMsg;
 	
 	public static enum ExceptionType{
 		INVALID_TASKID, INVALID_TASK_OBJ, INVALID_TASK_TYPE, INVALID_TIME, END_BEFORE_START, NO_TITLE, TASK_NOT_EXIST, INVALID_PARA, 
@@ -26,10 +27,13 @@ public class HandledException extends Exception {
 	}
 	
 	public HandledException(ExceptionType exceptionType){
-		String errorMsg = getErrorMsg(exceptionType);
+		this.errorMsg = getErrorMsg(exceptionType);
 		ErrorLogging log = ErrorLogging.getInstance();
-		log.printErrorMsg(errorMsg);
-		log.writeToLog(errorMsg, this);
+		log.writeToLog(this.errorMsg, this);
+	}
+	
+	public String printErrorMsg(){
+		return this.errorMsg;
 	}
 	
 	private String getErrorMsg(ExceptionType exceptionType){

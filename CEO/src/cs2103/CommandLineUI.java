@@ -20,22 +20,22 @@ public class CommandLineUI {
 	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d tasks";
 	
 	private static CommandLineUI commandLine;
-	private final TaskList taskList;
+	private TaskList taskList;
 	private Stack<InfluentialCommand> undoStack;
 	private Stack<InfluentialCommand> redoStack;
 	private Scanner scanner = new Scanner(System.in);
 	
-	private CommandLineUI(String dataFile) throws HandledException, FatalException{
-		this.taskList = TaskList.getInstance(dataFile);
-		assert(this.taskList.checkInitialized());
+	private CommandLineUI(String dataFile, boolean writeToFile) throws HandledException, FatalException{
 		undoStack = new Stack<InfluentialCommand>();
 		redoStack = new Stack<InfluentialCommand>();
+		this.taskList = TaskList.getInstance(dataFile, writeToFile);
 		print(String.format(MESSAGE_WELCOME_FORMAT, dataFile));
 	}
 	
-	private static CommandLineUI getInstance(String dataFile) throws HandledException, FatalException{
+	private static CommandLineUI getInstance(String dataFile, boolean writeToFile) throws HandledException, FatalException{
 		if (commandLine == null){
-			commandLine = new CommandLineUI(dataFile);
+			commandLine = new CommandLineUI(dataFile, writeToFile);
+			assert(commandLine.taskList.getAllList() != null);
 		}
 		return commandLine;
 	}
@@ -45,11 +45,11 @@ public class CommandLineUI {
 		try{
 			if (args.length > 1){
 				print(MESSAGE_INCORRECT_ARG);
-				main = CommandLineUI.getInstance(args[0]);
+				main = CommandLineUI.getInstance(args[0], true);
 			}else if (args.length == 1){
-				main = CommandLineUI.getInstance(args[0]);
+				main = CommandLineUI.getInstance(args[0], true);
 			}else{
-				main = CommandLineUI.getInstance("default.ics");
+				main = CommandLineUI.getInstance("default.ics", true);
 			}
 		main.userLoop();
 		} catch (HandledException | FatalException e){
@@ -133,7 +133,7 @@ public class CommandLineUI {
 			}
 			return commandObject.execute();
 		} catch (HandledException e) {
-			return MESSAGE_COMMAND_ERROR;
+			return e.printErrorMsg();
 		} catch (FatalException e) {
 			printErrorAndExit();
 			return null;

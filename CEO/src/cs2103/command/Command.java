@@ -66,4 +66,8 @@ public abstract class Command {
 			return null;
 		}
 	}
+	
+	public ParameterList getParameterList(){
+		return this.parameterList;
+	}
 }

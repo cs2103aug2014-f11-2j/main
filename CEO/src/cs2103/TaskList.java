@@ -13,17 +13,22 @@ import java.util.Collections;
 
 public class TaskList {
 	private static TaskList taskList;
-	private final StorageEngine storage;
+	private StorageEngine storage;
 	private ArrayList<Task> tasks;
 	
-	private TaskList(String dataFile) throws HandledException, FatalException{
-		this.storage = StorageEngine.getInstance(dataFile);
+	private TaskList(String dataFile, boolean writeToFile) throws FatalException, HandledException{
+		if (writeToFile){
+			this.storage = StorageEngine.getInstance(dataFile);
+		} else {
+			this.storage = StorageStub.getInstance();
+		}
 		this.tasks = this.storage.getTaskList();
 	}
 	
-	public static TaskList getInstance(String dataFile) throws HandledException, FatalException{
+	public static TaskList getInstance(String dataFile, boolean writeToFile) throws HandledException, FatalException{
 		if (taskList == null){
-			taskList = new TaskList(dataFile);
+			taskList = new TaskList(dataFile, writeToFile);
+			
 		}
 		return taskList;
 	}
@@ -34,10 +39,6 @@ public class TaskList {
 		} else {
 			return taskList;
 		}
-	}
-	
-	public boolean checkInitialized(){
-		return this.tasks != null;
 	}
 	
 	public ArrayList<PeriodicTask> getPeriodicList() throws HandledException, FatalException{

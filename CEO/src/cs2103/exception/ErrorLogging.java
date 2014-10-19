@@ -35,8 +35,4 @@ class ErrorLogging {
 			if (pw != null) pw.close();
 		}
 	}
-	
-	public void printErrorMsg(String errorMsg){
-		if (errorMsg != null) System.err.println(errorMsg);
-	}
 }

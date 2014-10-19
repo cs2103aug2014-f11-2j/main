@@ -42,6 +42,10 @@ public class StorageEngine {
 	private IndexedComponentList indexedComponents;
 	private final File file;
 	
+	public StorageEngine(){
+		this.file = null;
+	}
+	
 	private StorageEngine(String dataFile) throws HandledException, FatalException{
 		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION,true);
 		if (dataFile == null || dataFile.isEmpty()){
