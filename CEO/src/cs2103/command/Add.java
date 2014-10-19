@@ -5,9 +5,6 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Queue;
 
-import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
-import org.ocpsoft.prettytime.nlp.parse.DateGroup;
-
 import net.fortuna.ical4j.model.Recur;
 import cs2103.CommonUtil;
 import cs2103.TaskList;
@@ -86,22 +83,12 @@ public class Add extends InfluentialCommand {
 			} else {
 				parameterList.add(Title.parse(quickAddString.substring(0, timeIndex)));
 				parameterList.add(time);
-				parameterList.add(parseQuickRecurrence(quickAddString.substring(everyIndex)));
+				parameterList.add(Recurrence.parse(quickAddString.substring(everyIndex)));
 			}
 		} else {
 			parameterList.add(Title.parse(quickAddString));
 		}
 		return parameterList;
-	}
-	
-	private static Recurrence parseQuickRecurrence(String everyString) throws HandledException{
-		java.util.List<DateGroup> parse = new PrettyTimeParser().parseSyntax(everyString);
-		if (!parse.isEmpty()){
-			return Recurrence.parse(parse.get(0).getRecurInterval());
-		} else {
-			System.out.println(everyString);
-			return null;
-		}
 	}
 	
 	private static Time parseQuickTime(String timeString){

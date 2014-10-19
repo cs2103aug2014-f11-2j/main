@@ -3,13 +3,13 @@ package cs2103.parameters;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cs2103.CommonUtil;
 import cs2103.exception.HandledException;
 import net.fortuna.ical4j.model.Recur;
 
 public class Recurrence implements Parameter {
 	public static final String[] allowedLiteral = {"R", "reccuring", "recur"};
 	public static final String type = "RECURRENCE";
-	private static final long[] divisor = {31556951000L, 2591999000L, 604799000L, 86399000L, 3599000L};
 	private final Recur recur;
 	
 	public Recurrence(Recur recur){
@@ -33,58 +33,31 @@ public class Recurrence implements Parameter {
 		}
 	}
 	
-	public static Recurrence parse(long recurrenceLong) throws HandledException{
-		return new Recurrence(longToRecur(recurrenceLong));
-	}
-	
 	private static Recur stringToRecur(String recurrenceString) throws HandledException{
-		System.out.println(recurrenceString);
-		int interval = parseInterval(recurrenceString);
-		if (interval < 0){
-			throw new HandledException(HandledException.ExceptionType.INVALID_RECUR);
-		} else if(interval == 0) {
-			return null;
-		} else {
-			String frequency = parseFrequency(recurrenceString);
-			Recur recur=new Recur();
-			recur.setFrequency(frequency);
-			recur.setInterval(interval);
-			return recur;
-		}
-	}
-	
-	private static Recur longToRecur(long recurrenceLong) throws HandledException{
-		if (recurrenceLong < divisor[4]){
-			return null;
-		} else {
-			long ratio = 0L;
-			long div = 0L;
-			int i = 0;
-			while (i < divisor.length && ratio == 0L){
-				div = divisor[i];
-				ratio = recurrenceLong/div;
-				i++;
-			}
-			Recur recur=new Recur();
-			recur.setFrequency(parseFrequency(div));
-			recur.setInterval(parseInterval(ratio));
-			return recur;
-		}
-	}
-	
-	private static int parseInterval(String recurrenceString){
+		int interval;
 		Pattern p = Pattern.compile("([0-9]+)");
 		Matcher m = p.matcher(recurrenceString);
 		if (m.find()){
-			String interval = m.group(0);
-			return Integer.parseInt(interval);
+			recurrenceString = recurrenceString.substring(m.start()).trim();
+			interval = CommonUtil.parseIntegerParameter(m.group(0));
 		} else {
-			return -1;
+			interval = 1;
 		}
-	}
-	
-	private static int parseInterval(long ratio){
-		return (int) ratio;
+		if (interval < 0){
+			throw new HandledException(HandledException.ExceptionType.INVALID_RECUR);
+		} else if (interval == 0) {
+			return null;
+		} else {
+			String frequency = parseFrequency(recurrenceString);
+			if (frequency == null){
+				return null;
+			} else {
+				Recur recur=new Recur();
+				recur.setFrequency(frequency);
+				recur.setInterval(interval);
+				return recur;
+			}
+		}
 	}
 	
 	private static String parseFrequency(String recurrenceString) throws HandledException{
@@ -103,26 +76,10 @@ public class Recurrence implements Parameter {
 			} else if (found.equalsIgnoreCase("y") || found.equalsIgnoreCase("year") || found.equalsIgnoreCase("years") || found.equalsIgnoreCase("yearly")){
 				return Recur.YEARLY;
 			} else {
-				throw new HandledException(HandledException.ExceptionType.INVALID_RECUR);
+				return null;
 			}
 		} else {
-			throw new HandledException(HandledException.ExceptionType.INVALID_RECUR);
-		}
-	}
-	
-	private static String parseFrequency(long div) throws HandledException{
-		if (div == divisor[0]){
-			return Recur.YEARLY;
-		} else if (div == divisor[1]){
-			return Recur.MONTHLY;
-		} else if (div == divisor[2]){
-			return Recur.WEEKLY;
-		} else if (div == divisor[3]){
-			return Recur.DAILY;
-		} else if (div == divisor[4]){
-			return Recur.HOURLY;
-		} else {
-			throw new HandledException(HandledException.ExceptionType.INVALID_RECUR);
+			return null;
 		}
 	}
 }
