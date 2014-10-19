@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Queue;
 
 import cs2103.CommonUtil;
+import cs2103.TaskList;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Complete;
@@ -16,7 +17,6 @@ import cs2103.task.DeadlineTask;
 import cs2103.task.FloatingTask;
 import cs2103.task.PeriodicTask;
 import cs2103.task.Task;
-import cs2103.task.TaskList;
 
 public class Search extends QueryCommand {
 	

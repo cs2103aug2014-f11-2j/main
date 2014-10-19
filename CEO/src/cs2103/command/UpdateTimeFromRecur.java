@@ -2,11 +2,11 @@ package cs2103.command;
 
 import java.util.ArrayList;
 
+import cs2103.TaskList;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.task.PeriodicTask;
 import cs2103.task.Task;
-import cs2103.task.TaskList;
 
 public class UpdateTimeFromRecur extends InfluentialCommand {
 	private static final String MESSAGE_UPDATE_RECUR_TIME_FORMAT = "Successfully updated %1$d recurring tasks";

@@ -1,10 +1,14 @@
-package cs2103.task;
+package cs2103;
 
 import java.util.ArrayList;
 
-import cs2103.StorageEngine;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
+import cs2103.task.DeadlineTask;
+import cs2103.task.FloatingTask;
+import cs2103.task.PeriodicTask;
+import cs2103.task.Task;
+
 import java.util.Collections;
 
 public class TaskList {

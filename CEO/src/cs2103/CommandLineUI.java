@@ -7,7 +7,6 @@ import cs2103.command.*;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.CommandType;
-import cs2103.task.TaskList;
 
 public class CommandLineUI {
 	private static final String MESSAGE_WELCOME_FORMAT = "Welcome to the CEO. %1$s is ready for use.";

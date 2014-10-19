@@ -10,6 +10,7 @@ import org.ocpsoft.prettytime.nlp.parse.DateGroup;
 
 import net.fortuna.ical4j.model.Recur;
 import cs2103.CommonUtil;
+import cs2103.TaskList;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Description;
@@ -104,15 +105,12 @@ public class Add extends InfluentialCommand {
 	}
 	
 	private static Time parseQuickTime(String timeString){
-		java.util.List<Date> dates = new PrettyTimeParser().parse(timeString);
-		if (!dates.isEmpty()){
-			Date[] time = new Date[2];
-			for (int i = 0;i < dates.size() && i < 2;i++){
-				time[i] = dates.get(i);
-			}
-			return new Time(time);
-		} else {
+		Time time = Time.parse(timeString);
+		Date[] timeArray = getTime(time);
+		if (timeArray[0] == null && timeArray[1] == null){
 			return null;
+		} else {
+			return time;
 		}
 	}
 	
