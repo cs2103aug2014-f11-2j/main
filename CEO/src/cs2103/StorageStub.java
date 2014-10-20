@@ -37,6 +37,11 @@ public class StorageStub extends StorageEngine {
 		sortTasks();
 	}
 	
+	@Override
+	public ArrayList<Task> getTaskList(){
+		return this.tasks;
+	}
+	
 	private void sortTasks(){
 		Collections.sort(this.tasks);
 		int count=0;
