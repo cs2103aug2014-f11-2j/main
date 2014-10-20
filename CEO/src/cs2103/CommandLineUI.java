@@ -32,7 +32,7 @@ public class CommandLineUI {
 		print(String.format(MESSAGE_WELCOME_FORMAT, dataFile));
 	}
 	
-	private static CommandLineUI getInstance(String dataFile, boolean writeToFile) throws HandledException, FatalException{
+	public static CommandLineUI getInstance(String dataFile, boolean writeToFile) throws HandledException, FatalException{
 		if (commandLine == null){
 			commandLine = new CommandLineUI(dataFile, writeToFile);
 			assert(commandLine.taskList.getAllList() != null);

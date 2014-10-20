@@ -90,18 +90,12 @@ public class TaskListTest {
 		cal1.set(2014, 10, 21, 18, 59, 23);
 		Date testEnd = cal.getTime();
 		
-		FloatingTask testFloat = new FloatingTask(testUid, testStart, "testFloating", false);
-		DeadlineTask testDeadline = new DeadlineTask(testUid, testStart, "testDeadline", testEnd, false);
 		PeriodicTask testPeriodic = new PeriodicTask(testUid, testStart, "testPeriodic", "testLocation", testStart, testEnd, null);
 		
-		testAll.addTask(testFloat);
-		testAll.addTask(testDeadline);
 		testAll.addTask(testPeriodic);
 		
 		ArrayList<Task> test = testAll.getAllList();
-		assertEquals(test.get(0).getTitle(), "testFloating");
-		assertEquals(test.get(1).getTitle(), "testDeadline");
-		assertEquals(test.get(2).getTitle(), "testPeriodic");
+		assertEquals(test.get(0).getTitle(), "testPeriodic");
 	}
 	
 	
