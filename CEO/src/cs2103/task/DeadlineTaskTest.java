@@ -2,7 +2,9 @@ package cs2103.task;
 
 import static org.junit.Assert.*;
 
+import java.text.DateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import net.fortuna.ical4j.model.property.Uid;
 
@@ -15,31 +17,26 @@ import org.junit.Test;
 import cs2103.exception.HandledException;
 
 public class DeadlineTaskTest {
-	DeadlineTask dlt;
+	static DeadlineTask dlt;
 	Uid taskUID;
 	Date created; 
 	String title;
 	Date dueTime;
 	boolean complete;
-
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
+	static Date testDate=new Date(2014,10,10);
 
 	@Before
 	public void setUp() throws Exception {
+		dlt=new DeadlineTask(null,null," ",testDate,false);
 	}
 	
 	@After
 	public void tearDown() throws Exception {
 		
 	}
+	
 	@Test 
-	public void testDeadlineTaskConstruction(){
+	public void testDeadlineTaskConstructor(){
 		testDeadlineTaskConstructionOne();
 		testDeadlineTaskConstructionTwo();
 		testDeadlineTaskConstructionThree();
@@ -54,7 +51,6 @@ public class DeadlineTaskTest {
 		}
 	}
 	
-	
 	public void testDeadlineTaskConstructionTwo() {
 		try{
 			dlt=new DeadlineTask(null,null," ",null,false);
@@ -67,26 +63,91 @@ public class DeadlineTaskTest {
 	@SuppressWarnings("deprecation")
 	public void testDeadlineTaskConstructionThree() {
 		try{
-			dlt=new DeadlineTask(null,null," ",new Date(2014,10,10),false);
+			dlt=new DeadlineTask(null,null," ",testDate,false);
 			assertTrue(true);
 		} catch(HandledException e){
-			fail("Expected- Succesful Creation");
+			fail("Expected- Successful Creation");
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testDeadlineTaskOne() throws HandledException{
-		dlt=new DeadlineTask(null,null,null,null,false);
-		testAllMethods(dlt);
+		testAllMethods();
 	}
 	
-	public void testAllMethods(DeadlineTask dltToTest){
-		
+	public void testAllMethods() throws HandledException{
+		testUpdateAndGetComplete();
+		testUpdateAndGetDueTimeOne();
+		testUpdateAndGetDueTimeTwo();
+		testConvert();
 	}
 	
 	@Test
-	public void testUpdateComplete() {
-		fail("Not yet implemented");
+	public void testUpdateAndGetComplete() {
+		dlt.updateComplete(true);
+		assertEquals(true,dlt.getComplete());
+		dlt.updateComplete(false);
+		assertEquals(false,dlt.getComplete());
+	}
+
+	@Test
+	public void testUpdateAndGetDueTimeOne() throws HandledException{
+		@SuppressWarnings("deprecation")
+		Date newDate=new Date(2014,10,11);
+		try {
+			dlt.updateDueTime(newDate);
+		} catch (HandledException e){
+			fail("Expected- Successful Update");
+		}
+		assertTrue(dlt.getDueTime().compareTo(newDate)==0);
+	}
+
+	@Test
+	public void testUpdateAndGetDueTimeTwo() throws HandledException{
+		try {
+			dlt.updateDueTime(null);
+			fail("Expected- Handled Exception");
+		} catch (HandledException e){
+		}
+		assertTrue(dlt.getDueTime().compareTo(testDate)==0);
+	}
+	
+	@Test
+	public void testConvert() throws HandledException {
+		Date[] time=null;
+		try{
+			dlt.convert(time);
+			fail("Expected- Handled Exception");
+		} catch(HandledException e){
+			assertEquals(e.printErrorMsg(),"Your input time cannot be parsed, please check your input and try again!");
+		}
+		time= new Date[2];
+		time[0]=null;
+		time[1]=null;
+		Task task = dlt.convert(time);
+		assertTrue(task instanceof FloatingTask);
+		task= dlt.convert(time);
+		Task taskExpected = new FloatingTask((dlt).getTaskUID(),dlt.getCreated(), 
+				dlt.getTitle(), false);
+		taskExpected.updateDescription(dlt.getDescription());
+		assertTrue(compareFloatingTasks((FloatingTask) task,(FloatingTask) taskExpected));
+		
+		time[0]= new Date(2014,1,1);
+		task =dlt.convert(time);
+		assertTrue(task instanceof DeadlineTask);
+		taskExpected = new DeadlineTask(dlt.getTaskUID(), dlt.getCreated(), 
+				dlt.getTitle(), time[0], dlt.getComplete());
+		taskExpected.updateDescription(dlt.getDescription());
+		assertTrue(compareDeadlineTasks((DeadlineTask) task,(DeadlineTask) taskExpected));
+		
+		time[1]= new Date(2014,2,1);
+		task=dlt.convert(time);
+		assertTrue(task instanceof PeriodicTask);
+		taskExpected= new PeriodicTask(dlt.getTaskUID(), dlt.getCreated(), 
+				dlt.getTitle(), null, time[0], time[1], null);
+		taskExpected.updateDescription(dlt.getDescription());
+		
 	}
 
 	@Test
@@ -96,11 +157,6 @@ public class DeadlineTaskTest {
 
 	@Test
 	public void testUpdateRecurrence() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testConvert() {
 		fail("Not yet implemented");
 	}
 
@@ -136,21 +192,6 @@ public class DeadlineTaskTest {
 
 	@Test
 	public void testDeadlineTask() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetComplete() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetDueTime() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testUpdateDueTime() {
 		fail("Not yet implemented");
 	}
 
@@ -238,5 +279,61 @@ public class DeadlineTaskTest {
 	public void testCheckAlert() {
 		fail("Not yet implemented");
 	}
+	
+	private boolean compareFloatingTasks(FloatingTask dlt1, FloatingTask dlt2){
+		if (dlt1.getComplete()!=dlt2.getComplete()) {
+			return false;
+		} else if (dlt1.getCreated()!=dlt2.getCreated()) {
+			return false;
+		} else if (dlt1.getDescription()!=dlt2.getDescription()) {
+			return false;
+		} else if (dlt1.getTitle()!=dlt2.getTitle()) {
+			return false;
+		} else if (dlt1.getLastModified()!=dlt2.getLastModified()){
+			return false;
+ 		} else if (dlt1.getTaskID()!=dlt1.getTaskID()) {
+ 			return false;
+ 		} 
+		return true;
+	}
+	
+	private boolean compareDeadlineTasks(DeadlineTask dlt1, DeadlineTask dlt2){
+		if (dlt1.getComplete()!=dlt2.getComplete()) {
+			return false;
+		} else if (dlt1.getCreated()!=dlt2.getCreated()) {
+			return false;
+		} else if (dlt1.getDescription()!=dlt2.getDescription()) {
+			return false;
+		} else if (dlt1.getTitle()!=dlt2.getTitle()) {
+			return false;
+		} else if (dlt1.getDueTime()!=dlt2.getDueTime()){
+			return false;
+		} else if (dlt1.getLastModified()!=dlt2.getLastModified()){
+			return false;
+ 		} else if (dlt1.getTaskID()!=dlt1.getTaskID()) {
+ 			return false;
+ 		} 
+		return true;
+	}
+	
+	private boolean comparePeriodicTasks(PeriodicTask dlt1,PeriodicTask dlt2){
 
+		if (dlt1.getComplete()!=dlt2.getComplete()) {
+			return false;
+		} else if (dlt1.getCreated()!=dlt2.getCreated()) {
+			return false;
+		} else if (dlt1.getDescription()!=dlt2.getDescription()) {
+			return false;
+		} else if (dlt1.getTitle()!=dlt2.getTitle()) {
+			return false;
+		} else if (dlt1.getDueTime()!=dlt2.getDueTime()){
+			return false;
+		} else if (dlt1.getLastModified()!=dlt2.getLastModified()){
+			return false;
+ 		} else if (dlt1.getTaskID()!=dlt1.getTaskID()) {
+ 			return false;
+ 		} 
+		return true
+	}
+	
 }
