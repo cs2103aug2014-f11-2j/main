@@ -19,7 +19,7 @@ public abstract class Command {
 		Queue<String> result = new LinkedList<String>();
 		String[] parameters = userInput.trim().split("\\s+-");
 		for (String s:parameters){
-			result.add(removeDash(s.trim()));
+			result.add(CommonUtil.removeDash(s.trim()));
 		}
 		return result;
 	}
@@ -35,16 +35,6 @@ public abstract class Command {
 		}
 		return parameterMap;
 	}
-	
-	private static String removeDash(String parameterString) throws HandledException{
-		CommonUtil.checkNullString(parameterString, HandledException.ExceptionType.INVALID_PARA);
-		if (parameterString.startsWith("-")){
-			return parameterString.substring(1);
-		}else{
-			return parameterString;
-		}
-	}
-	
 	
 	protected static String getParameterString(Map<String, String> parameterMap, String[] allowedLiteral){
 		for (String s:allowedLiteral){

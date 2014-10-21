@@ -65,13 +65,11 @@ public class CommandLineUI {
 			String command = takeUserInput();
 			if (command != null && !command.isEmpty()){
 				String feedback=processUserInput(command);
-				if (feedback != null && !feedback.isEmpty()){
-					if (feedback.equalsIgnoreCase("EXIT")){
-						print(MESSAGE_EXIT);
-						break;
-					}
-					print(feedback);
+				if (feedback != null && feedback.equalsIgnoreCase("EXIT")){
+					print(MESSAGE_EXIT);
+					break;
 				}
+				print(feedback);
 			}
 		}
 	}
@@ -133,7 +131,7 @@ public class CommandLineUI {
 			}
 			return commandObject.execute();
 		} catch (HandledException e) {
-			return e.printErrorMsg();
+			return e.getErrorMsg();
 		} catch (FatalException e) {
 			printErrorAndExit();
 			return null;

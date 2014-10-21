@@ -41,6 +41,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		} else {
 			this.created = created;
 		}
+		this.description = "";
 	}
 	
 	public int getTaskID(){
