@@ -31,7 +31,7 @@ public class HandledException extends Exception {
 		log.writeToLog(this.errorMsg, this);
 	}
 	
-	public String printErrorMsg(){
+	public String getErrorMsg(){
 		return this.errorMsg;
 	}
 	
