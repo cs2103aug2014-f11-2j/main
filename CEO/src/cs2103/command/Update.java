@@ -30,6 +30,7 @@ public class Update extends InfluentialCommand {
 		this.parameterList.addParameter(Location.parse(getParameterString(parameterMap, Location.allowedLiteral)));
 		this.parameterList.addParameter(Recurrence.parse(getParameterString(parameterMap, Recurrence.allowedLiteral)));
 		this.parameterList.addParameter(Complete.parse(getParameterString(parameterMap, Complete.allowedLiteral)));
+		if (this.parameterList.getParameterCount() <= 1) throw new HandledException(HandledException.ExceptionType.LESS_THAN_ONE_PARA);
 	}
 	
 	@Override
@@ -59,6 +60,7 @@ public class Update extends InfluentialCommand {
 			if (this.parameterList.getRecurrence() != null){
 				newTask.updateRecurrence(this.parameterList.getRecurrence().getValue());
 			}
+			newTask.updateLastModified(null);
 			TaskList.getInstance().updateTask(newTask);
 			this.undoBackup = task;
 			this.redoBackup = newTask;

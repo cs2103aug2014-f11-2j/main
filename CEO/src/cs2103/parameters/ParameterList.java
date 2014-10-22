@@ -43,6 +43,10 @@ public class ParameterList {
 		}
 	}
 	
+	public int getParameterCount(){
+		return this.parameterMap.size();
+	}
+	
 	public Title getTitle() throws HandledException{
 		return this.getParameter(Title.type, Title.class);
 	}
