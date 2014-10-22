@@ -22,22 +22,33 @@ public class MarkTest {
 	
 	@Test
 	public void testMarkFloating() throws HandledException, FatalException {
-		initialise();
+		try{
+			TaskList.getInstance();
+		}catch(FatalException e){
+			initialise();
+		}
 		Mark markFloating = new Mark("1");
 		assertEquals("Successfully marked 1 as completed",markFloating.execute());
 	}
 	
 	@Test
 	public void testMarkPeriodic() throws HandledException, FatalException{
-		TaskList.getInstance();
+		try{
+			TaskList.getInstance();
+		}catch(FatalException e){
+			initialise();
+		}
 		Mark markDeadline = new Mark("3");
 		assertEquals("The task you specified does not contain status information",markDeadline.execute());
 	}
 	
 	@Test
 	public void testMarkDeadline() throws HandledException, FatalException{
-		initialise();
-		//cos for some reason the entire task list is wiped/nulled after testMarkPeriodic
+		try{
+			TaskList.getInstance();
+		}catch(FatalException e){
+			initialise();
+		}
 		Mark markPeriodic = new Mark("2");
 		assertEquals("Successfully marked 2 as completed",markPeriodic.execute());
 	}
