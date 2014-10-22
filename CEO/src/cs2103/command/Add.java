@@ -52,6 +52,7 @@ public class Add extends InfluentialCommand {
 			task = new PeriodicTask(null, null, title, location, time[0], time[1], recurrence);
 		}
 		task.updateDescription(description);
+		task.updateLastModified(null);
 		TaskList.getInstance().addTask(task);
 		this.undoBackup = task;
 		this.redoBackup = task;
