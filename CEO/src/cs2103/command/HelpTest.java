@@ -139,19 +139,48 @@ public static final String HELP_MARK = "Mark has no extra options\n" +
 	
 	@Test
 	public void testAddHelp() throws HandledException{
-		Help addHelp = new Help("help add");
+		Help addHelp = new Help("add");
 		assertEquals(HELP_ADD,addHelp.execute());
 	}
 	
 	@Test
 	public void testDeleteHelp() throws HandledException{
-		Help deleteHelp = new Help("help delete");
+		Help deleteHelp = new Help("delete");
 		assertEquals(HELP_DELETE,deleteHelp.execute());
 	}
 	
 	public void testUpdateHelp() throws HandledException{
-		Help updateHelp = new Help("help update");
+		Help updateHelp = new Help("update");
 		assertEquals(HELP_UPDATE,updateHelp.execute());
 	}
 
+	public void testListHelp() throws HandledException{
+		Help listHelp = new Help("list");
+		assertEquals(HELP_LIST,listHelp.execute());
+	}
+	
+	public void testShowHelp() throws HandledException{
+		Help showHelp = new Help("show");
+		assertEquals(HELP_SHOW,showHelp.execute());
+	}
+	
+	public void testRedoHelp() throws HandledException{
+		Help redoHelp = new Help("redo");
+		assertEquals(HELP_REDO,redoHelp.execute());
+	}
+	
+	public void testUndoHelp() throws HandledException{
+		Help undoHelp = new Help("undo");
+		assertEquals(HELP_UNDO, undoHelp.execute());
+	}
+	
+	public void testSearchHelp() throws HandledException{
+		Help searchHelp = new Help("search");
+		assertEquals(HELP_SEARCH, searchHelp.execute());
+	}
+	
+	public void testMarkHelp() throws HandledException{
+		Help markHelp = new Help("mark");
+		assertEquals(HELP_MARK, markHelp.execute());
+	}
 }
