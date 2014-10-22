@@ -20,7 +20,7 @@ import cs2103.task.*;
 
 public class Add extends InfluentialCommand {
 	private static final String MESSAGE_ADD = "You have successfully added a new task.";
-	private static final String[] allowedQuickTimeLiteral = {"from", "by", "on", "in"};
+	private static final String[] allowedQuickTimeLiteral = {"from", "by", "on", "in", "at"};
 	
 	public Add(String command) throws HandledException{
 		CommonUtil.checkNullString(command, HandledException.ExceptionType.INVALID_CMD);
@@ -52,6 +52,7 @@ public class Add extends InfluentialCommand {
 			task = new PeriodicTask(null, null, title, location, time[0], time[1], recurrence);
 		}
 		task.updateDescription(description);
+		task.updateLastModified(null);
 		TaskList.getInstance().addTask(task);
 		this.undoBackup = task;
 		this.redoBackup = task;

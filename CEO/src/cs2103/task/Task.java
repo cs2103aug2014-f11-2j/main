@@ -56,6 +56,9 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	}
 	
 	public String getDescription(){
+		if (this.description == null){
+			this.description = "";
+		}
 		return this.description;
 	}
 	
@@ -64,6 +67,9 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	}
 	
 	public Date getLastModified(){
+		if (this.lastModified == null){
+			this.lastModified = new Date();
+		}
 		return this.lastModified;
 	}
 	
@@ -105,7 +111,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	protected void addCommonProperty(Component component){
 		component.getProperties().add(this.getTaskUID());
 		component.getProperties().add(new Created(new DateTime(this.getCreated())));
-		component.getProperties().add(new LastModified(new DateTime()));
+		component.getProperties().add(new LastModified(new DateTime(this.getLastModified())));
 		component.getProperties().add(new Description(this.getDescription()));
 	}
 	

@@ -15,7 +15,6 @@ public class HandledException extends Exception {
 	private static final String INVALID_CMD = "Your input command contains error, please check your input and try again!";
 	private static final String INVALID_COMPLETE = "Your input value for complete is invalid, please check your input and try again!";
 	private static final String LESS_THAN_ONE_PARA = "You need to specify at least one parameter";
-	private static final String INVALID_RECUR = "Your input recurrence does not follow required pattern, please check your input and try again!";
 	private static final String CLONE_FAILED = "Failed to clone task object";
 	private static final String NETWORK_ERR = "Error occured in your network stack";
 	private static final String UNEXPECTED_ERR = "An unexpected error occurred, operation failed";
@@ -23,7 +22,7 @@ public class HandledException extends Exception {
 	
 	public static enum ExceptionType{
 		INVALID_TASKID, INVALID_TASK_OBJ, INVALID_TASK_TYPE, INVALID_TIME, END_BEFORE_START, NO_TITLE, TASK_NOT_EXIST, INVALID_PARA, 
-		INVALID_CMD, INVALID_COMPLETE, LESS_THAN_ONE_PARA, INVALID_RECUR, CLONE_FAILED, NETWORK_ERR, UNEXPECTED_ERR;
+		INVALID_CMD, INVALID_COMPLETE, LESS_THAN_ONE_PARA, CLONE_FAILED, NETWORK_ERR, UNEXPECTED_ERR;
 	}
 	
 	public HandledException(ExceptionType exceptionType){
@@ -32,7 +31,7 @@ public class HandledException extends Exception {
 		log.writeToLog(this.errorMsg, this);
 	}
 	
-	public String printErrorMsg(){
+	public String getErrorMsg(){
 		return this.errorMsg;
 	}
 	
@@ -60,8 +59,6 @@ public class HandledException extends Exception {
 			return INVALID_COMPLETE;
 		case LESS_THAN_ONE_PARA:
 			return LESS_THAN_ONE_PARA;
-		case INVALID_RECUR:
-			return INVALID_RECUR;
 		case CLONE_FAILED:
 			return CLONE_FAILED;
 		case NETWORK_ERR:

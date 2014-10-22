@@ -22,23 +22,21 @@ public class StorageStub extends StorageEngine {
 	
 	@Override
 	public void deleteTask(Task task){
-		for (Task existing:this.tasks){
-			if (existing.equals(task)){
-				this.tasks.remove(existing);
-			}
+		Task existing = this.getModifyingTask(task);
+		if (existing != null){
+			this.tasks.remove(existing);
 		}
-		sortTasks();
 	}
 	
 	@Override
 	public void updateTask(Task task){
 		this.deleteTask(task);
 		this.tasks.add(task);
-		sortTasks();
 	}
 	
 	@Override
 	public ArrayList<Task> getTaskList(){
+		sortTasks();
 		return this.tasks;
 	}
 	
@@ -49,5 +47,14 @@ public class StorageStub extends StorageEngine {
 			count++;
 			task.updateTaskID(count);
 		}
+	}
+	
+	private Task getModifyingTask(Task task){
+		for (Task existing:this.tasks){
+			if (existing.equals(task)){
+				return existing;
+			}
+		}
+		return null;
 	}
 }

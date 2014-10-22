@@ -9,9 +9,7 @@ Basic Command Line Interface Usage
 
  1. Add a task:
  
- `add [-N or --title <title>] ([-D or -description <description>] [-L or -location <location>] [-T or -time {<blank>|<yyyy/MM/dd HH:mm>|<<yyyy/MM/dd HH:mm> to <yyyy/MM/dd HH:mm>>}] [-R or -recurring <number h/d/w/m/y>])`
- 
- Note: date+time format: YYYY/MM/DD/hh:mm
+ `add <Quick add string> ([-N or --title <title>] [-D or -description <description>] [-L or -location <location>] [-T or -time {<blank>|<time>|<<time> to <time>>}] [-R or -recurring <number h/d/w/m/y>])`
  
  2. Show tasklist:
  
@@ -23,7 +21,7 @@ Basic Command Line Interface Usage
  
  4. Update a task:
  
- `update <task ID> ([-N or -title <title>] [-C or -complete {true|false}] [-D or -description <description>] [-L or -location <location>]  [-T or -time {<blank>|<yyyy/MM/dd HH:mm>|<<yyyy/MM/dd HH:mm> to <yyyy/MM/dd HH:mm>>}] [-R or -recurring <number h/d/w/m/y>])`
+ `update <task ID> ([-N or -title <title>] [-C or -complete {true|false}] [-D or -description <description>] [-L or -location <location>]  [-T or -time {<blank>|<time>|<<time> to <time>>}] [-R or -recurring <number h/d/w/m/y>])`
  
  5. Delete a task:
  
@@ -31,7 +29,7 @@ Basic Command Line Interface Usage
  
  6. Search for tasks:
  
- `search (<floating|deadline|periodic|all>) {[-K or --keyword <title/description/location keyword>] [-C or --complete {true|false}] [-T or -time {<blank>|<yyyy/MM/dd HH:mm>|<<yyyy/MM/dd HH:mm> to <yyyy/MM/dd HH:mm>>}]}`
+ `search (<floating|deadline|periodic|all>) {[-K or --keyword <title/description/location keyword>] [-C or --complete {true|false}] [-T or -time {<blank>|<time>|<<time> to <time>>}]}`
  
  7. Undo last changes:
  

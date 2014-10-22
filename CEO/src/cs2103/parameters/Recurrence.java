@@ -34,18 +34,8 @@ public class Recurrence implements Parameter {
 	}
 	
 	private static Recur stringToRecur(String recurrenceString) throws HandledException{
-		int interval;
-		Pattern p = Pattern.compile("([0-9]+)");
-		Matcher m = p.matcher(recurrenceString);
-		if (m.find()){
-			recurrenceString = recurrenceString.substring(m.start()).trim();
-			interval = CommonUtil.parseIntegerParameter(m.group(0));
-		} else {
-			interval = 1;
-		}
-		if (interval < 0){
-			throw new HandledException(HandledException.ExceptionType.INVALID_RECUR);
-		} else if (interval == 0) {
+		int interval = parseInterval(recurrenceString);
+		if (interval == 0){
 			return null;
 		} else {
 			String frequency = parseFrequency(recurrenceString);
@@ -60,10 +50,21 @@ public class Recurrence implements Parameter {
 		}
 	}
 	
+	private static int parseInterval(String recurrenceString) throws HandledException{
+		Pattern p = Pattern.compile("([0-9]+)");
+		Matcher m = p.matcher(recurrenceString);
+		if (m.find()){
+			recurrenceString = recurrenceString.substring(m.start()).trim();
+			return CommonUtil.parseIntegerParameter(m.group(0));
+		} else {
+			return 1;
+		}
+	}
+	
 	private static String parseFrequency(String recurrenceString) throws HandledException{
 		Pattern p = Pattern.compile("([A-Za-z]+)");
 		Matcher m = p.matcher(recurrenceString);
-		if (m.find()){
+		while (m.find()){
 			String found=m.group(0);
 			if (found.equalsIgnoreCase("h") || found.equalsIgnoreCase("hour") || found.equalsIgnoreCase("hours") || found.equalsIgnoreCase("hourly")){
 				return Recur.HOURLY;
@@ -75,11 +76,8 @@ public class Recurrence implements Parameter {
 				return Recur.MONTHLY;
 			} else if (found.equalsIgnoreCase("y") || found.equalsIgnoreCase("year") || found.equalsIgnoreCase("years") || found.equalsIgnoreCase("yearly")){
 				return Recur.YEARLY;
-			} else {
-				return null;
 			}
-		} else {
-			return null;
 		}
+		return null;
 	}
 }

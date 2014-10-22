@@ -44,4 +44,13 @@ public class CommonUtil {
 	public static void checkNullParameter(Parameter parameter, HandledException.ExceptionType expectedException) throws HandledException{
 		if (parameter == null) throw new HandledException(expectedException);
 	}
+
+	public static String removeDash(String parameterString) throws HandledException{
+		CommonUtil.checkNullString(parameterString, HandledException.ExceptionType.INVALID_PARA);
+		if (parameterString.startsWith("-")){
+			return parameterString.substring(1);
+		}else{
+			return parameterString;
+		}
+	}
 }
