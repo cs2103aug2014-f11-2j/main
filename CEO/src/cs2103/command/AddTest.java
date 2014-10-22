@@ -44,17 +44,9 @@ public class AddTest {
 	public void testAddCorrectCommand() throws HandledException, FatalException {
 		TaskList.getInstance(null,false);
 		Add addObj;
-		addObj = new Add("add --title hello --description some description");
+		addObj = new Add("-title hello -description some description");
 		assertEquals("You have successfully added a new task.",addObj.execute());
 	
-	}
-	
-	@Test
-	public void testAddIncorrectCommand() throws HandledException, FatalException{
-		TaskList.getInstance(null,false);
-		Add addobj;
-		addobj = new Add("add");
-		assertEquals("You have successfully added a new task.",addobj.execute());
 	}
 
 }
