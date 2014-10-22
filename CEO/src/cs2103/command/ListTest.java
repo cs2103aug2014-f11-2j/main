@@ -10,8 +10,7 @@ import cs2103.exception.HandledException;
 
 public class ListTest {
 
-	@Test
-	public void testAllList() throws HandledException, FatalException {
+	private void initialise() throws HandledException, FatalException{
 		TaskList.getInstance(null, false);
 		Add addObj = new Add("add -title floating");
 		addObj.execute();
@@ -19,8 +18,13 @@ public class ListTest {
 		addObj.execute();
 		addObj = new Add("add -title periodic -time 2014/10/23 20:20 to 2014/10/25 20:20");
 		addObj.execute();
+	}
+	
+	@Test
+	public void testAllList() throws HandledException, FatalException {
+		initialise();
 		
-		List listAll = new List("list all");
+		List listAll = new List("all");
 		assertEquals("1. floating\n" +
 				"Type: Floating	Status: Needs Action\n" +
 				"2. deadline\n" +
@@ -29,6 +33,7 @@ public class ListTest {
 				"Type: Periodic	From: 23-Oct-2014 20:20:00 To 25-Oct-2014 20:20:00",listAll.execute());
 	}
 	
+	@Test
 	public void testDefaultlist() throws FatalException, HandledException{
 		TaskList.getInstance();
 		List listDefault = new List("list");
@@ -40,25 +45,28 @@ public class ListTest {
 				"Type: Periodic	From: 23-Oct-2014 20:20:00 To 25-Oct-2014 20:20:00",listDefault.execute());
 	}
 	
+	@Test
 	public void testPeriodicList() throws FatalException, HandledException{
 		TaskList.getInstance();
-		List listPeriodic = new List("list periodic");
+		List listPeriodic = new List("periodic");
 		assertEquals("3. periodic\n" +
 				"Type: Periodic	From: 23-Oct-2014 20:20:00 To 25-Oct-2014 20:20:00",listPeriodic.execute());
 	}
 	
+	@Test
 	public void testDeadlineList() throws HandledException, FatalException{
 		TaskList.getInstance();
-		List listDeadline = new List("list deadline");
+		List listDeadline = new List("deadline");
 		assertEquals("2. deadline\n" +
-				"Type: Deadline	Status: Needs Action	Due At: 23-Oct-2014 20:20:00\n",listDeadline.execute());
+				"Type: Deadline\tStatus: Needs Action\tDue At: 23-Oct-2014 20:20:00",listDeadline.execute());
 	}
 	
+	@Test
 	public void testFloatingList() throws HandledException, FatalException{
 		TaskList.getInstance();
-		List listFloating = new List("list floating");
+		List listFloating = new List("floating");
 		assertEquals("1. floating\n" +
-				"Type: Floating	Status: Needs Action\n",listFloating.execute());
+				"Type: Floating	Status: Needs Action",listFloating.execute());
 	}
 
 }
