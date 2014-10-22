@@ -83,4 +83,36 @@ public class SearchTest {
 				"3. celebrate 21st :D\n" +
 				"Type: Deadline	Status: Needs Action	Due At: 01-Nov-2014 18:00:00",result);
 	}
+	
+	@Test
+	public void testSearchFloating() throws HandledException, FatalException{
+		try{
+			TaskList.getInstance();
+		}catch(FatalException e){
+			initialise();
+		}
+		Search searchFloating = new Search("floating");
+		String result = searchFloating.execute();
+		assertEquals("4. do cs2105 networking assignment\n" +
+				"Type: Floating	Status: Needs Action\n" +
+				"5. finish essay\n" +
+				"Type: Floating	Status: Needs Action",result);
+	}
+	
+	@Test
+	public void testSearchTime() throws HandledException, FatalException{
+		try{
+			TaskList.getInstance();
+		}catch(FatalException e){
+			initialise();
+		}
+		Search searchTime = new Search("all -time");
+		String result = searchTime.execute();
+		assertEquals("1. Jap homework\n" +
+				"Type: Deadline	Status: Needs Action	Due At: 23-Oct-2014 21:00:00\n" +
+				"2. revise stats homework\n" +
+				"Type: Periodic	From: 24-Oct-2014 20:00:00 To 25-Oct-2014 20:00:00\n" +
+				"3. celebrate 21st :D\n" +
+				"Type: Deadline	Status: Needs Action	Due At: 01-Nov-2014 18:00:00",result);
+	}
 }
