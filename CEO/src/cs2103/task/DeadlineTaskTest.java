@@ -27,12 +27,8 @@ public class DeadlineTaskTest {
 
 	@Before
 	public void setUp() throws Exception {
-		dlt=new DeadlineTask(null,null," ",testDate,false);
-	}
-	
-	@After
-	public void tearDown() throws Exception {
-		
+		dlt=new DeadlineTask(null,null,"Testing",testDate,false);
+		dlt.updateDescription(null);
 	}
 	
 	@Test 
@@ -72,15 +68,20 @@ public class DeadlineTaskTest {
 	
 	@SuppressWarnings("deprecation")
 	@Test
-	public void testDeadlineTaskOne() throws HandledException{
+	public void testDeadlineTask() throws HandledException, CloneNotSupportedException{
 		testAllMethods();
 	}
 	
-	public void testAllMethods() throws HandledException{
+	public void testAllMethods() throws HandledException, CloneNotSupportedException{
 		testUpdateAndGetComplete();
 		testUpdateAndGetDueTimeOne();
 		testUpdateAndGetDueTimeTwo();
 		testConvert();
+		testClone();
+		testToSummary();
+		testToDetail();
+		testCheckPeriod();
+		testMatches();
 	}
 	
 	@Test
@@ -147,193 +148,154 @@ public class DeadlineTaskTest {
 		taskExpected= new PeriodicTask(dlt.getTaskUID(), dlt.getCreated(), 
 				dlt.getTitle(), null, time[0], time[1], null);
 		taskExpected.updateDescription(dlt.getDescription());
-		
+		assertTrue(comparePeriodicTasks((PeriodicTask) task,(PeriodicTask) taskExpected));
 	}
 
 	@Test
-	public void testUpdateLocation() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testUpdateRecurrence() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testClone() {
-		fail("Not yet implemented");
+	public void testClone() throws CloneNotSupportedException {
+		try {
+			DeadlineTask task=(DeadlineTask) dlt.clone();
+			assertTrue(compareDeadlineTasks(task,dlt));
+		} catch (CloneNotSupportedException e){
+			fail("Expected- Successful Clone");
+		}
 	}
 
 	@Test
 	public void testToSummary() {
-		fail("Not yet implemented");
+		assertEquals("0. Testing\nType: Deadline\tStatus: Needs Action\t"
+				+ "Due At: 10-Nov-3914 00:00:00\n",dlt.toSummary());
 	}
 
 	@Test
 	public void testToDetail() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testToComponent() {
-		fail("Not yet implemented");
+		assertEquals("0. Testing\nType: Deadline\tStatus: Needs Action\t"
+				+ "Due At: 10-Nov-3914 00:00:00\nDescription: \n",dlt.toDetail());
+		dlt.updateDescription("Description");
+		assertEquals("0. Testing\nType: Deadline\tStatus: Needs Action\t"
+				+ "Due At: 10-Nov-3914 00:00:00\nDescription: Description\n",dlt.toDetail());
 	}
 
 	@Test
 	public void testCheckPeriod() {
-		fail("Not yet implemented");
+		Date[] time= new Date[2];
+		assertEquals(dlt.checkPeriod(time),true);
+		time[0]=new Date(2011,1,1);
+		assertEquals(dlt.checkPeriod(time),false);
+		time[0]=null;
+		time[1]=new Date(2011,1,1);
+		assertEquals(dlt.checkPeriod(time),false);
 	}
 
 	@Test
 	public void testMatches() {
-		fail("Not yet implemented");
+		String keyword=null;
+		assertEquals(dlt.matches(keyword),true);
+		keyword="";
+		assertEquals(dlt.matches(keyword),true);
+		keyword="Testing";
+		assertEquals(dlt.matches(keyword),true);
+		keyword="Coding";
+		assertEquals(dlt.matches(keyword),false);
+		dlt.updateDescription("Coding");
+		assertEquals(dlt.matches(keyword),true);
 	}
 
 	@Test
-	public void testDeadlineTask() {
-		fail("Not yet implemented");
+	public void testUpdateAndGetTitle() throws HandledException {
+		try {
+			String newTitle="Coding";
+			dlt.updateTitle(newTitle);
+			assertEquals("Coding",dlt.getTitle());
+		} catch (HandledException e) {
+			fail("");
+		}
+		try {
+			String newTitle="";
+			dlt.updateTitle(newTitle);
+			fail("");
+		} catch (HandledException e) {
+			assertEquals("A Non-empty title must be specified!",e.printErrorMsg());
+		}
 	}
 
 	@Test
-	public void testGetComparator() {
-		fail("Not yet implemented");
+	public void testUpdateAndGetDescription() {
+		String description= "New Description";
+		dlt.updateDescription(description);
+		assertEquals(description,dlt.getDescription());
 	}
 
 	@Test
-	public void testTask() {
-		fail("Not yet implemented");
+	public void testUpdateAndGetTaskID() {
+		int taskID=1;
+		dlt.updateTaskID(taskID);
+		assertEquals(dlt.getTaskID(),taskID);
 	}
 
 	@Test
-	public void testGetTaskID() {
-		fail("Not yet implemented");
+	public void testUpdateAndGetLastModified() {
+		assertEquals(null,dlt.getLastModified());
+		Date newDate= new Date(1000,1,1);
+		dlt.updateLastModified(newDate);
+		assertEquals(newDate,dlt.getLastModified());
 	}
 
 	@Test
-	public void testGetTaskUID() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetTitle() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetDescription() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetCreated() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetLastModified() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testUpdateTaskID() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testUpdateTitle() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testUpdateDescription() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testUpdateLastModified() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testCompareTo() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testAddCommonProperty() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testDateToString() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testEqualsObject() {
-		fail("Not yet implemented");
+	public void testCompareTo() throws HandledException {
+		DeadlineTask dlt2=new DeadlineTask(null,null,"Testing",testDate,false);
+		assertEquals(0,dlt.compareTo(dlt2));
 	}
 
 	@Test
 	public void testCheckAlert() {
-		fail("Not yet implemented");
+		assertFalse(dlt.checkAlert());
 	}
 	
 	private boolean compareFloatingTasks(FloatingTask dlt1, FloatingTask dlt2){
 		if (dlt1.getComplete()!=dlt2.getComplete()) {
 			return false;
-		} else if (dlt1.getCreated()!=dlt2.getCreated()) {
-			return false;
-		} else if (dlt1.getDescription()!=dlt2.getDescription()) {
-			return false;
-		} else if (dlt1.getTitle()!=dlt2.getTitle()) {
-			return false;
-		} else if (dlt1.getLastModified()!=dlt2.getLastModified()){
-			return false;
- 		} else if (dlt1.getTaskID()!=dlt1.getTaskID()) {
- 			return false;
- 		} 
-		return true;
+		} 
+		return compareCommonValuesInTasks(dlt1,dlt2);
 	}
 	
 	private boolean compareDeadlineTasks(DeadlineTask dlt1, DeadlineTask dlt2){
 		if (dlt1.getComplete()!=dlt2.getComplete()) {
 			return false;
-		} else if (dlt1.getCreated()!=dlt2.getCreated()) {
-			return false;
-		} else if (dlt1.getDescription()!=dlt2.getDescription()) {
-			return false;
-		} else if (dlt1.getTitle()!=dlt2.getTitle()) {
-			return false;
 		} else if (dlt1.getDueTime()!=dlt2.getDueTime()){
 			return false;
-		} else if (dlt1.getLastModified()!=dlt2.getLastModified()){
-			return false;
- 		} else if (dlt1.getTaskID()!=dlt1.getTaskID()) {
- 			return false;
- 		} 
-		return true;
+		} 
+		return compareCommonValuesInTasks(dlt1,dlt2);
 	}
 	
 	private boolean comparePeriodicTasks(PeriodicTask dlt1,PeriodicTask dlt2){
-
-		if (dlt1.getComplete()!=dlt2.getComplete()) {
+		if (dlt1.getStartTime()!=dlt2.getStartTime()) {
 			return false;
-		} else if (dlt1.getCreated()!=dlt2.getCreated()) {
+		} else if (dlt1.getRecurrence()!=dlt2.getRecurrence()){
+			return false;
+		} else if (dlt1.getLastModified()!=dlt2.getLastModified()){
+			return false;
+ 		} else if (dlt1.getEndTime()!=dlt2.getEndTime()){
+ 			return false;
+ 		} else if (dlt1.getLocation()!=dlt2.getLocation()){
+ 			return false;
+ 		}
+		return compareCommonValuesInTasks(dlt1,dlt2);
+	}
+	
+	private boolean compareCommonValuesInTasks(Task dlt1,Task dlt2){
+		if (dlt1.getLastModified()!=dlt2.getLastModified()){
+			return false;
+ 		} else if (dlt1.getCreated()!=dlt2.getCreated()) {
 			return false;
 		} else if (dlt1.getDescription()!=dlt2.getDescription()) {
 			return false;
 		} else if (dlt1.getTitle()!=dlt2.getTitle()) {
 			return false;
-		} else if (dlt1.getDueTime()!=dlt2.getDueTime()){
-			return false;
-		} else if (dlt1.getLastModified()!=dlt2.getLastModified()){
-			return false;
- 		} else if (dlt1.getTaskID()!=dlt1.getTaskID()) {
+		} else if (dlt1.getTaskID()!=dlt1.getTaskID()) {
  			return false;
  		} 
-		return true
+		return true;
 	}
 	
 }
