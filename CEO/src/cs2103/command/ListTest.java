@@ -39,5 +39,26 @@ public class ListTest {
 				"3. periodic\n" +
 				"Type: Periodic	From: 23-Oct-2014 20:20:00 To 25-Oct-2014 20:20:00",listDefault.execute());
 	}
+	
+	public void testPeriodicList() throws FatalException, HandledException{
+		TaskList.getInstance();
+		List listPeriodic = new List("list periodic");
+		assertEquals("3. periodic\n" +
+				"Type: Periodic	From: 23-Oct-2014 20:20:00 To 25-Oct-2014 20:20:00",listPeriodic.execute());
+	}
+	
+	public void testDeadlineList() throws HandledException, FatalException{
+		TaskList.getInstance();
+		List listDeadline = new List("list deadline");
+		assertEquals("2. deadline\n" +
+				"Type: Deadline	Status: Needs Action	Due At: 23-Oct-2014 20:20:00\n",listDeadline.execute());
+	}
+	
+	public void testFloatingList() throws HandledException, FatalException{
+		TaskList.getInstance();
+		List listFloating = new List("list floating");
+		assertEquals("1. floating\n" +
+				"Type: Floating	Status: Needs Action\n",listFloating.execute());
+	}
 
 }
