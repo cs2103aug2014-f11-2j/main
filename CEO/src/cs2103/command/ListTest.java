@@ -22,51 +22,75 @@ public class ListTest {
 	
 	@Test
 	public void testAllList() throws HandledException, FatalException {
-		initialise();
-		
+		try{
+			TaskList.getInstance();
+		}catch(FatalException e){
+			initialise();
+		}
 		List listAll = new List("all");
+		String result = listAll.execute();
 		assertEquals("1. floating\n" +
 				"Type: Floating	Status: Needs Action\n" +
 				"2. deadline\n" +
 				"Type: Deadline	Status: Needs Action	Due At: 23-Oct-2014 20:20:00\n" +
 				"3. periodic\n" +
-				"Type: Periodic	From: 23-Oct-2014 20:20:00 To 25-Oct-2014 20:20:00",listAll.execute());
+				"Type: Periodic	From: 23-Oct-2014 20:20:00 To 25-Oct-2014 20:20:00",result);
 	}
 	
 	@Test
 	public void testDefaultlist() throws FatalException, HandledException{
-		TaskList.getInstance();
+		try{
+			TaskList.getInstance();
+		}catch(FatalException e){
+			initialise();
+		}
 		List listDefault = new List("list");
+		String result = listDefault.execute();
 		assertEquals("1. floating\n" +
 				"Type: Floating	Status: Needs Action\n" +
 				"2. deadline\n" +
 				"Type: Deadline	Status: Needs Action	Due At: 23-Oct-2014 20:20:00\n" +
 				"3. periodic\n" +
-				"Type: Periodic	From: 23-Oct-2014 20:20:00 To 25-Oct-2014 20:20:00",listDefault.execute());
+				"Type: Periodic	From: 23-Oct-2014 20:20:00 To 25-Oct-2014 20:20:00",result);
 	}
 	
 	@Test
 	public void testPeriodicList() throws FatalException, HandledException{
-		TaskList.getInstance();
+		try{
+			TaskList.getInstance();
+		}catch(FatalException e){
+			initialise();
+		}
 		List listPeriodic = new List("periodic");
+		String result = listPeriodic.execute();
 		assertEquals("3. periodic\n" +
-				"Type: Periodic	From: 23-Oct-2014 20:20:00 To 25-Oct-2014 20:20:00",listPeriodic.execute());
+				"Type: Periodic	From: 23-Oct-2014 20:20:00 To 25-Oct-2014 20:20:00",result);
 	}
 	
 	@Test
 	public void testDeadlineList() throws HandledException, FatalException{
-		TaskList.getInstance();
+		try{
+			TaskList.getInstance();
+		}catch(FatalException e){
+			initialise();
+		}
 		List listDeadline = new List("deadline");
+		String result = listDeadline.execute();
 		assertEquals("2. deadline\n" +
-				"Type: Deadline\tStatus: Needs Action\tDue At: 23-Oct-2014 20:20:00",listDeadline.execute());
+				"Type: Deadline\tStatus: Needs Action\tDue At: 23-Oct-2014 20:20:00",result);
 	}
 	
 	@Test
 	public void testFloatingList() throws HandledException, FatalException{
-		TaskList.getInstance();
+		try{
+			TaskList.getInstance();
+		}catch(FatalException e){
+			initialise();
+		}
 		List listFloating = new List("floating");
+		String result = listFloating.execute();
 		assertEquals("1. floating\n" +
-				"Type: Floating	Status: Needs Action",listFloating.execute());
+				"Type: Floating	Status: Needs Action",result);
 	}
 
 }
