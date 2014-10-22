@@ -32,5 +32,16 @@ public class CommonUtilTest {
 		String test = CommonUtil.deleteLastChar(testBuffer);
 		assertEquals(test, "testin");
 	}
+	
+	@Test
+	public void testRemoveDash() throws HandledException {
+		//test string with dash
+		String test = CommonUtil.removeDash("-testing");
+		assertEquals(test, "testing");
+		
+		//test string without dash
+		String test1 = CommonUtil.removeDash("testing");
+		assertEquals(test1, "testing");
+	}
 
 }
