@@ -8,15 +8,13 @@ import java.util.Locale;
 
 import net.fortuna.ical4j.model.property.Uid;
 
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import cs2103.exception.HandledException;
 
-public class DeadlineTaskTest {
+public class DeadlineTaskTest extends TaskTest{
 	static DeadlineTask dlt;
 	Uid taskUID;
 	Date created; 
@@ -74,8 +72,7 @@ public class DeadlineTaskTest {
 	
 	public void testAllMethods() throws HandledException, CloneNotSupportedException{
 		testUpdateAndGetComplete();
-		testUpdateAndGetDueTimeOne();
-		testUpdateAndGetDueTimeTwo();
+		testUpdateAndGetDueTime();
 		testConvert();
 		testClone();
 		testToSummary();
@@ -93,7 +90,7 @@ public class DeadlineTaskTest {
 	}
 
 	@Test
-	public void testUpdateAndGetDueTimeOne() throws HandledException{
+	public void testUpdateAndGetDueTime() throws HandledException{
 		@SuppressWarnings("deprecation")
 		Date newDate=new Date(2014,10,11);
 		try {
@@ -102,10 +99,6 @@ public class DeadlineTaskTest {
 			fail("Expected- Successful Update");
 		}
 		assertTrue(dlt.getDueTime().compareTo(newDate)==0);
-	}
-
-	@Test
-	public void testUpdateAndGetDueTimeTwo() throws HandledException{
 		try {
 			dlt.updateDueTime(null);
 			fail("Expected- Handled Exception");
@@ -116,39 +109,7 @@ public class DeadlineTaskTest {
 	
 	@Test
 	public void testConvert() throws HandledException {
-		Date[] time=null;
-		try{
-			dlt.convert(time);
-			fail("Expected- Handled Exception");
-		} catch(HandledException e){
-			assertEquals(e.printErrorMsg(),"Your input time cannot be parsed, please check your input and try again!");
-		}
-		time= new Date[2];
-		time[0]=null;
-		time[1]=null;
-		Task task = dlt.convert(time);
-		assertTrue(task instanceof FloatingTask);
-		task= dlt.convert(time);
-		Task taskExpected = new FloatingTask((dlt).getTaskUID(),dlt.getCreated(), 
-				dlt.getTitle(), false);
-		taskExpected.updateDescription(dlt.getDescription());
-		assertTrue(compareFloatingTasks((FloatingTask) task,(FloatingTask) taskExpected));
-		
-		time[0]= new Date(2014,1,1);
-		task =dlt.convert(time);
-		assertTrue(task instanceof DeadlineTask);
-		taskExpected = new DeadlineTask(dlt.getTaskUID(), dlt.getCreated(), 
-				dlt.getTitle(), time[0], dlt.getComplete());
-		taskExpected.updateDescription(dlt.getDescription());
-		assertTrue(compareDeadlineTasks((DeadlineTask) task,(DeadlineTask) taskExpected));
-		
-		time[1]= new Date(2014,2,1);
-		task=dlt.convert(time);
-		assertTrue(task instanceof PeriodicTask);
-		taskExpected= new PeriodicTask(dlt.getTaskUID(), dlt.getCreated(), 
-				dlt.getTitle(), null, time[0], time[1], null);
-		taskExpected.updateDescription(dlt.getDescription());
-		assertTrue(comparePeriodicTasks((PeriodicTask) task,(PeriodicTask) taskExpected));
+		testConvert(dlt);
 	}
 
 	@Test
@@ -200,102 +161,35 @@ public class DeadlineTaskTest {
 		dlt.updateDescription("Coding");
 		assertEquals(dlt.matches(keyword),true);
 	}
-
-	@Test
-	public void testUpdateAndGetTitle() throws HandledException {
-		try {
-			String newTitle="Coding";
-			dlt.updateTitle(newTitle);
-			assertEquals("Coding",dlt.getTitle());
-		} catch (HandledException e) {
-			fail("");
-		}
-		try {
-			String newTitle="";
-			dlt.updateTitle(newTitle);
-			fail("");
-		} catch (HandledException e) {
-			assertEquals("A Non-empty title must be specified!",e.printErrorMsg());
-		}
-	}
-
-	@Test
-	public void testUpdateAndGetDescription() {
-		String description= "New Description";
-		dlt.updateDescription(description);
-		assertEquals(description,dlt.getDescription());
-	}
-
-	@Test
-	public void testUpdateAndGetTaskID() {
-		int taskID=1;
-		dlt.updateTaskID(taskID);
-		assertEquals(dlt.getTaskID(),taskID);
-	}
-
-	@Test
-	public void testUpdateAndGetLastModified() {
-		assertEquals(null,dlt.getLastModified());
-		Date newDate= new Date(1000,1,1);
-		dlt.updateLastModified(newDate);
-		assertEquals(newDate,dlt.getLastModified());
-	}
-
+	
 	@Test
 	public void testCompareTo() throws HandledException {
 		DeadlineTask dlt2=new DeadlineTask(null,null,"Testing",testDate,false);
 		assertEquals(0,dlt.compareTo(dlt2));
 	}
+	@Test
+	public void testUpdateAndGetTitle() throws HandledException {
+		testUpdateAndGetTitle(dlt);
+	}
+
+	@Test
+	public void testUpdateAndGetDescription() {
+		testUpdateAndGetDescription(dlt);
+	}
+
+	@Test
+	public void testUpdateAndGetTaskID() {
+		testUpdateAndGetTaskID(dlt);
+	}
+
+	@Test
+	public void testUpdateAndGetLastModified() {
+		testUpdateAndGetLastModified(dlt);
+	}
 
 	@Test
 	public void testCheckAlert() {
-		assertFalse(dlt.checkAlert());
+		testCheckAlert(dlt);
 	}
-	
-	private boolean compareFloatingTasks(FloatingTask dlt1, FloatingTask dlt2){
-		if (dlt1.getComplete()!=dlt2.getComplete()) {
-			return false;
-		} 
-		return compareCommonValuesInTasks(dlt1,dlt2);
-	}
-	
-	private boolean compareDeadlineTasks(DeadlineTask dlt1, DeadlineTask dlt2){
-		if (dlt1.getComplete()!=dlt2.getComplete()) {
-			return false;
-		} else if (dlt1.getDueTime()!=dlt2.getDueTime()){
-			return false;
-		} 
-		return compareCommonValuesInTasks(dlt1,dlt2);
-	}
-	
-	private boolean comparePeriodicTasks(PeriodicTask dlt1,PeriodicTask dlt2){
-		if (dlt1.getStartTime()!=dlt2.getStartTime()) {
-			return false;
-		} else if (dlt1.getRecurrence()!=dlt2.getRecurrence()){
-			return false;
-		} else if (dlt1.getLastModified()!=dlt2.getLastModified()){
-			return false;
- 		} else if (dlt1.getEndTime()!=dlt2.getEndTime()){
- 			return false;
- 		} else if (dlt1.getLocation()!=dlt2.getLocation()){
- 			return false;
- 		}
-		return compareCommonValuesInTasks(dlt1,dlt2);
-	}
-	
-	private boolean compareCommonValuesInTasks(Task dlt1,Task dlt2){
-		if (dlt1.getLastModified()!=dlt2.getLastModified()){
-			return false;
- 		} else if (dlt1.getCreated()!=dlt2.getCreated()) {
-			return false;
-		} else if (dlt1.getDescription()!=dlt2.getDescription()) {
-			return false;
-		} else if (dlt1.getTitle()!=dlt2.getTitle()) {
-			return false;
-		} else if (dlt1.getTaskID()!=dlt1.getTaskID()) {
- 			return false;
- 		} 
-		return true;
-	}
-	
+
 }
