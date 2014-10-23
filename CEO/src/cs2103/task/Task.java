@@ -37,7 +37,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 			this.taskUID = taskUID;
 		}
 		if (created == null){
-			this.created = new Date();
+			this.created = new Date(System.currentTimeMillis());
 		} else {
 			this.created = created;
 		}
@@ -97,7 +97,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	
 	public void updateLastModified(Date date){
 		if (date == null){
-			this.lastModified = new Date();
+			this.lastModified = new Date(System.currentTimeMillis());
 		} else {
 			this.lastModified = date;
 		}

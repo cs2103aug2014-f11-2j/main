@@ -37,31 +37,24 @@ import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.util.CompatibilityHints;
 
 public class StorageEngine {
-	private static StorageEngine storage;
 	private net.fortuna.ical4j.model.Calendar calendar;
 	private IndexedComponentList indexedComponents;
 	private final File file;
 	
 	public StorageEngine(){
-		this.file = null;
+		file = null;
 	}
 	
-	private StorageEngine(String dataFile) throws HandledException, FatalException{
-		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION, true);
+	public StorageEngine(String dataFile) throws HandledException, FatalException{
 		if (dataFile == null || dataFile.isEmpty()){
-			dataFile = "default.ics";
+			throw new FatalException(FatalException.ExceptionType.ILLEGAL_FILE);
 		}
+		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION, true);
 		this.file = new File(dataFile);
 		if (!file.exists() || file.length()==0){
 			createNewFile();
 		}
-	}
-	
-	public static StorageEngine getInstance(String dataFile) throws HandledException, FatalException{
-		if (storage == null){
-			storage = new StorageEngine(dataFile);
-		}
-		return storage;
+		readFromFile();
 	}
 	
 	public ArrayList<Task> getTaskList() throws FatalException, HandledException{
@@ -81,7 +74,8 @@ public class StorageEngine {
 	
 	@SuppressWarnings("unchecked") 
 	private ArrayList<Task> readFromFile() throws FatalException, HandledException{
-		try{	
+		try{
+			CommonUtil.checkNull(file, FatalException.ExceptionType.ILLEGAL_FILE);
 			FileInputStream fin = new FileInputStream(file);
 			CalendarBuilder builder = new CalendarBuilder();
 			this.calendar = builder.build(fin);
@@ -105,6 +99,7 @@ public class StorageEngine {
 
 	private void writeToFile() throws HandledException, FatalException{
 		try {
+			CommonUtil.checkNull(file, FatalException.ExceptionType.ILLEGAL_FILE);
 			calendar.validate();
 			FileOutputStream fout;
 			fout = new FileOutputStream(file);
@@ -116,6 +111,7 @@ public class StorageEngine {
 	}
 	
 	public void updateTask(Task task) throws HandledException, FatalException{
+		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		Component updating = task.toComponent();
 		Component existing = this.indexedComponents.getComponent(task.getTaskUID().getValue());
 		if (existing == null){
@@ -128,6 +124,7 @@ public class StorageEngine {
 	}
 	
 	public void deleteTask(Task task) throws HandledException, FatalException{
+		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		Component existing = this.indexedComponents.getComponent(task.getTaskUID().getValue());
 		if (existing == null){
 			throw new HandledException(HandledException.ExceptionType.TASK_NOT_EXIST);

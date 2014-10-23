@@ -144,7 +144,9 @@ public class DeadlineTask extends Task {
 
 	@Override
 	public boolean checkPeriod(Date[] time) {
-		if (time[0] == null && time[1] == null){
+		if (time == null){
+			return true;
+		} else if (time[0] == null && time[1] == null){
 			return true;
 		} else if (time[1] == null){
 			return this.getDueTime().before(time[0]);

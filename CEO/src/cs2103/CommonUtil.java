@@ -5,6 +5,7 @@ import java.awt.Desktop.Action;
 import java.io.IOException;
 import java.net.InetAddress;
 
+import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 
 public class CommonUtil {
@@ -44,6 +45,10 @@ public class CommonUtil {
 	
 	public static void checkNull(Object obj, HandledException.ExceptionType expectedException) throws HandledException{
 		if (obj == null) throw new HandledException(expectedException);
+	}
+	
+	public static void checkNull(Object obj, FatalException.ExceptionType expectedException) throws FatalException {
+		if (obj == null) throw new FatalException(expectedException);
 	}
 
 	public static String removeDash(String parameterString) throws HandledException{

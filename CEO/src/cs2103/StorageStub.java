@@ -6,18 +6,10 @@ import java.util.Collections;
 import cs2103.task.Task;
 
 public class StorageStub extends StorageEngine {
-	private static StorageStub storage;
 	private ArrayList<Task> tasks;
 	
-	private StorageStub(){
+	public StorageStub(){
 		this.tasks = new ArrayList<Task>();
-	}
-	
-	public static StorageStub getInstance(){
-		if (storage == null){
-			storage = new StorageStub();
-		}
-		return storage;
 	}
 	
 	@Override

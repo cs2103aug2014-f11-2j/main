@@ -18,9 +18,9 @@ public class TaskList {
 	
 	private TaskList(String dataFile, boolean writeToFile) throws FatalException, HandledException{
 		if (writeToFile){
-			this.storage = StorageEngine.getInstance(dataFile);
+			this.storage = new StorageEngine(dataFile);
 		} else {
-			this.storage = StorageStub.getInstance();
+			this.storage = new StorageStub();
 		}
 		this.tasks = this.storage.getTaskList();
 	}
@@ -28,7 +28,6 @@ public class TaskList {
 	public static TaskList getInstance(String dataFile, boolean writeToFile) throws HandledException, FatalException{
 		if (taskList == null){
 			taskList = new TaskList(dataFile, writeToFile);
-			
 		}
 		return taskList;
 	}
