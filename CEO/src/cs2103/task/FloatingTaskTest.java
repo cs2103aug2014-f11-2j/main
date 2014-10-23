@@ -23,7 +23,7 @@ public class FloatingTaskTest extends TaskTest {
 
 	@Before
 	public void setUp() throws Exception {
-		ft = new FloatingTask(taskUID,created,title,complete);
+		ft = new FloatingTask(taskUID, created, title, complete);
 		ft.updateDescription(null);
 	}
 
@@ -35,16 +35,16 @@ public class FloatingTaskTest extends TaskTest {
 	
 	public void testFloatingTaskConstructionOne() {
 		try{
-			ft = new FloatingTask(taskUID,created,"",complete);
+			ft = new FloatingTask(taskUID, created, "", complete);
 			fail("Expected- Handled Exception");
 		} catch(HandledException e){
-			assertEquals(e.getErrorMsg(),"A Non-empty title must be specified!");
+			assertEquals(e.getErrorMsg(), "A Non-empty title must be specified!");
 		}
 	}
 	
 	public void testFloatingTaskConstructionTwo() {
 		try{
-			ft = new FloatingTask(taskUID,created,title,complete);
+			ft = new FloatingTask(taskUID, created, title, complete);
 			assertTrue(true);
 		} catch(HandledException e){
 			fail("Expected- Successful Creation");
@@ -54,9 +54,9 @@ public class FloatingTaskTest extends TaskTest {
 	@Test
 	public void testUpdateAndGetComplete() {
 		ft.updateComplete(true);
-		assertEquals(true,ft.getComplete());
+		assertEquals(true, ft.getComplete());
 		ft.updateComplete(false);
-		assertEquals(false,ft.getComplete());
+		assertEquals(false, ft.getComplete());
 	}
 	
 	@Test
@@ -68,7 +68,7 @@ public class FloatingTaskTest extends TaskTest {
 	public void testClone() {
 		try {
 			FloatingTask task=(FloatingTask) ft.clone();
-			assertTrue(compareFloatingTasks(task,ft));
+			assertTrue(compareFloatingTasks(task, ft));
 		} catch (CloneNotSupportedException e){
 			fail("Expected- Successful Clone");
 		}
@@ -76,31 +76,31 @@ public class FloatingTaskTest extends TaskTest {
 
 	@Test
 	public void testToSummary() {
-		assertEquals("0. Testing\nType: Floating\tStatus: Needs Action\n",
+		assertEquals("0. Testing\nType: Floating\tStatus: Needs Action\n", 
 				ft.toSummary());
 	}
 
 	@Test
 	public void testToDetail() {
 		assertEquals("0. Testing\nType: Floating\tStatus: Needs Action"
-				+ "\nDescription: \n",ft.toDetail());
+				+ "\nDescription: \n", ft.toDetail());
 		ft.updateDescription("Description");
 		assertEquals("0. Testing\nType: Floating\tStatus: Needs Action"
-				+ "\nDescription: Description\n",ft.toDetail());
+				+ "\nDescription: Description\n", ft.toDetail());
 	}
 
 	@Test
 	public void testMatches() {
 		String keyword=null;
-		assertEquals(ft.matches(keyword),true);
+		assertEquals(ft.matches(keyword), true);
 		keyword="";
-		assertEquals(ft.matches(keyword),true);
+		assertEquals(ft.matches(keyword), true);
 		keyword="Testing";
-		assertEquals(ft.matches(keyword),true);
+		assertEquals(ft.matches(keyword), true);
 		keyword="Coding";
-		assertEquals(ft.matches(keyword),false);
+		assertEquals(ft.matches(keyword), false);
 		ft.updateDescription("Coding");
-		assertEquals(ft.matches(keyword),true);
+		assertEquals(ft.matches(keyword), true);
 	}
 
 	@Test
@@ -130,7 +130,11 @@ public class FloatingTaskTest extends TaskTest {
 
 	@Override
 	public void testCompareTo() throws HandledException {
-		FloatingTask ft2=new FloatingTask(null,null,"Testing",false);
-		assertEquals(0,ft.compareTo(ft2));
+		FloatingTask ft2=new FloatingTask(taskUID, created, title, false);
+		assertEquals(0, ft.compareTo(ft2));
+	}
+	
+	@Test public void testEquals() throws CloneNotSupportedException, HandledException{
+		testEquals(ft);
 	}
 }

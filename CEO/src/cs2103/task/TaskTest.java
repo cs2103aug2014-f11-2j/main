@@ -30,7 +30,7 @@ public abstract class TaskTest {
 	}
 		
 	public void testUpdateAndGetLastModified(Task task) {
-		assertEquals(null,task.getLastModified());
+		assertEquals(new Date(),task.getLastModified());
 		Date newDate= new Date(1000,1,2);
 		task.updateLastModified(newDate);
 		assertEquals(newDate,task.getLastModified());
@@ -112,6 +112,16 @@ public abstract class TaskTest {
 		assertTrue(comparePeriodicTasks((PeriodicTask) dummyTask,(PeriodicTask) taskExpected));
 	}
 	
+	public void testEquals(Task task) throws CloneNotSupportedException, HandledException{
+		Object o = null;
+		assertEquals(false, task.equals(o));
+		o = (String) "Testing";
+		assertEquals(false, task.equals(o));
+		FloatingTask dummyTask = new FloatingTask(null,null,testTitle, false);
+		assertFalse(task.equals(dummyTask));
+		assertTrue(task.equals(task.clone()));
+	}
+	
 	static boolean compareFloatingTasks(FloatingTask dlt1, FloatingTask dlt2){
 		if (dlt1.getComplete()!=dlt2.getComplete()) {
 			return false;
@@ -133,9 +143,7 @@ public abstract class TaskTest {
 			return false;
 		} else if (t1.getRecurrence()!=t2.getRecurrence()){
 			return false;
-		} else if (t1.getLastModified()!=t2.getLastModified()){
-			return false;
- 		} else if (t1.getEndTime()!=t2.getEndTime()){
+		} else if (t1.getEndTime()!=t2.getEndTime()){
  			return false;
  		} else if (t1.getLocation()!=t2.getLocation()){
  			return false;
@@ -144,7 +152,7 @@ public abstract class TaskTest {
 	}
 	
 	static boolean compareCommonValuesInTasks(Task t1,Task t2){
-		if (t1.getLastModified()!=t2.getLastModified()){
+		if (!(t1.getLastModified().equals(t2.getLastModified()))){
 			return false;
  		} else if (t1.getCreated()!=t2.getCreated()) {
 			return false;
@@ -154,7 +162,7 @@ public abstract class TaskTest {
 			return false;
 		} else if (t1.getTaskID()!=t1.getTaskID()) {
  			return false;
- 		} 
+ 		}
 		return true;
 	} 
 }
