@@ -16,16 +16,15 @@ import cs2103.exception.HandledException;
 
 public class DeadlineTaskTest extends TaskTest{
 	static DeadlineTask dlt;
-	Uid taskUID;
-	Date created; 
-	String title;
-	Date dueTime;
-	boolean complete;
-	static Date testDate=new Date(2014,10,10);
+	Uid taskUID = null;
+	Date created = null; 
+	String title = "Testing";
+	boolean complete = false;
+	static Date dueTime=new Date(1000,1,1);
 
 	@Before
 	public void setUp() throws Exception {
-		dlt=new DeadlineTask(null,null,"Testing",testDate,false);
+		dlt=new DeadlineTask(taskUID,created,title,dueTime,complete);
 		dlt.updateDescription(null);
 	}
 	
@@ -38,26 +37,26 @@ public class DeadlineTaskTest extends TaskTest{
 	
 	public void testDeadlineTaskConstructionOne() {
 		try{
-			dlt=new DeadlineTask(null,null,null,null,false);
+			dlt=new DeadlineTask(taskUID,created,null,dueTime,complete);
 			fail("Expected- Handled Exception");
 		} catch(HandledException e){
-			assertEquals(e.printErrorMsg(),"A Non-empty title must be specified!");
+			assertEquals(e.getErrorMsg(),"A Non-empty title must be specified!");
 		}
 	}
 	
 	public void testDeadlineTaskConstructionTwo() {
 		try{
-			dlt=new DeadlineTask(null,null," ",null,false);
+			dlt=new DeadlineTask(taskUID,created," ",null,complete);
 			fail("Expected- Handled Exception");
 		} catch(HandledException e){
-			assertEquals(e.printErrorMsg(),"Your input time cannot be parsed, please check your input and try again!");
+			assertEquals(e.getErrorMsg(),"Your input time cannot be parsed, please check your input and try again!");
 		}
 	}
 	
 	@SuppressWarnings("deprecation")
 	public void testDeadlineTaskConstructionThree() {
 		try{
-			dlt=new DeadlineTask(null,null," ",testDate,false);
+			dlt=new DeadlineTask(taskUID,created," ",dueTime,complete);
 			assertTrue(true);
 		} catch(HandledException e){
 			fail("Expected- Successful Creation");
@@ -92,19 +91,19 @@ public class DeadlineTaskTest extends TaskTest{
 	@Test
 	public void testUpdateAndGetDueTime() throws HandledException{
 		@SuppressWarnings("deprecation")
-		Date newDate=new Date(2014,10,11);
+		Date newDate=new Date(1000,1,2);
 		try {
 			dlt.updateDueTime(newDate);
 		} catch (HandledException e){
 			fail("Expected- Successful Update");
 		}
-		assertTrue(dlt.getDueTime().compareTo(newDate)==0);
+		assertTrue(dlt.getDueTime().compareTo(newDate) == 0);
 		try {
 			dlt.updateDueTime(null);
 			fail("Expected- Handled Exception");
 		} catch (HandledException e){
 		}
-		assertTrue(dlt.getDueTime().compareTo(testDate)==0);
+		assertTrue(dlt.getDueTime().compareTo(newDate) == 0);
 	}
 	
 	@Test
@@ -125,16 +124,16 @@ public class DeadlineTaskTest extends TaskTest{
 	@Test
 	public void testToSummary() {
 		assertEquals("0. Testing\nType: Deadline\tStatus: Needs Action\t"
-				+ "Due At: 10-Nov-3914 00:00:00\n",dlt.toSummary());
+				+ "Due At: 01-Feb-2900 00:00:00\n",dlt.toSummary());
 	}
 
 	@Test
 	public void testToDetail() {
 		assertEquals("0. Testing\nType: Deadline\tStatus: Needs Action\t"
-				+ "Due At: 10-Nov-3914 00:00:00\nDescription: \n",dlt.toDetail());
+				+ "Due At: 01-Feb-2900 00:00:00\nDescription: \n",dlt.toDetail());
 		dlt.updateDescription("Description");
 		assertEquals("0. Testing\nType: Deadline\tStatus: Needs Action\t"
-				+ "Due At: 10-Nov-3914 00:00:00\nDescription: Description\n",dlt.toDetail());
+				+ "Due At: 01-Feb-2900 00:00:00\nDescription: Description\n",dlt.toDetail());
 	}
 
 	@Test
@@ -164,7 +163,7 @@ public class DeadlineTaskTest extends TaskTest{
 	
 	@Test
 	public void testCompareTo() throws HandledException {
-		DeadlineTask dlt2=new DeadlineTask(null,null,"Testing",testDate,false);
+		DeadlineTask dlt2=new DeadlineTask(null,null,"Testing",dueTime,false);
 		assertEquals(0,dlt.compareTo(dlt2));
 	}
 	@Test

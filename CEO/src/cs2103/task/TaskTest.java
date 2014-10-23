@@ -14,9 +14,11 @@ import org.junit.runners.Suite;
 
 import cs2103.exception.HandledException;
 
-
 public abstract class TaskTest {
-
+	private static final String testDescription = "New Description";
+	private static final String testTitle = "New Title";
+	private static final int testTaskID = 1;
+	
 	public abstract void testCompareTo() throws HandledException;
 	public abstract void testMatches();
 	public abstract void testToSummary();
@@ -29,37 +31,35 @@ public abstract class TaskTest {
 		
 	public void testUpdateAndGetLastModified(Task task) {
 		assertEquals(null,task.getLastModified());
-		Date newDate= new Date(1000,1,1);
+		Date newDate= new Date(1000,1,2);
 		task.updateLastModified(newDate);
 		assertEquals(newDate,task.getLastModified());
 	}
 	
 	public void testUpdateAndGetTaskID(Task task) {
-		int taskID=1;
-		task.updateTaskID(taskID);
-		assertEquals(task.getTaskID(),taskID);
+		task.updateTaskID(testTaskID);
+		assertEquals(task.getTaskID(),testTaskID);
 	}
 	
 	public void testUpdateAndGetDescription(Task task) {
-		String description= "New Description";
-		task.updateDescription(description);
-		assertEquals(description,task.getDescription());
+		task.updateDescription(testDescription);
+		assertEquals(testDescription,task.getDescription());
 	}
 	
 	public void testUpdateAndGetTitle(Task task) throws HandledException {
 		try {
-			String newTitle="Coding";
+			String newTitle = testTitle;
 			task.updateTitle(newTitle);
-			assertEquals("Coding",task.getTitle());
+			assertEquals(testTitle,task.getTitle());
 		} catch (HandledException e) {
-			fail("");
+			fail("Expected- Successful Update");
 		}
 		try {
 			String newTitle="";
 			task.updateTitle(newTitle);
-			fail("");
+			fail("Expected- Handled Exception");
 		} catch (HandledException e) {
-			assertEquals("A Non-empty title must be specified!",e.printErrorMsg());
+			assertEquals("A Non-empty title must be specified!", e.getErrorMsg());
 		}
 	}
 	
@@ -69,7 +69,7 @@ public abstract class TaskTest {
 			task.convert(time);
 			fail("Expected- Handled Exception");
 		} catch(HandledException e){
-			assertEquals(e.printErrorMsg(),"Your input time cannot be parsed, please check your input and try again!");
+			assertEquals("Your input time cannot be parsed, please check your input and try again!", e.getErrorMsg());
 		}
 		time= new Date[2];
 		time[0]=null;
@@ -157,5 +157,4 @@ public abstract class TaskTest {
  		} 
 		return true;
 	} 
-
 }

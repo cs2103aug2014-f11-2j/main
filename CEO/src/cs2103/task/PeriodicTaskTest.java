@@ -16,28 +16,24 @@ import org.junit.Test;
 import cs2103.exception.HandledException;
 
 public class PeriodicTaskTest extends TaskTest{
-
 	static PeriodicTask pt;
-	Uid taskUID;
-	Date created; 
-	String title;
+	Uid taskUID = null;
+	Date created = null; 
+	String title = "Testing";
+	String location = "Location";
 	Date dueTime;
 	boolean complete;
-	static Date testStartDate=new Date(1000,10,10);
-	static Date testEndDate=new Date(1000,10,10);
-	Recur recurrence=new Recur();
+	static Date startTime = new Date(1000,10,10);
+	static Date endTime = new Date(1001,10,10);
+	Recur recurrence = null;
 
 	@Before
 	public void setUp() throws Exception {
-		pt=new PeriodicTask(null,null,"Testing","location",testStartDate,testEndDate,null);
+		pt=new PeriodicTask(taskUID,created,title,location,startTime,endTime,recurrence);
 		pt.updateDescription(null);
 		recurrence=new Recur();
 		recurrence.setFrequency("HOURLY");
 		recurrence.setInterval(1);
-	}
-
-	@After
-	public void tearDown() throws Exception {
 	}
 
 	@Test 
@@ -51,19 +47,19 @@ public class PeriodicTaskTest extends TaskTest{
 	
 	public void testPeriodicTaskConstructionOne() {
 		try{
-			pt=new PeriodicTask(null,null,"","location",null,null,null);
+			pt=new PeriodicTask(taskUID,created,"",location,startTime,endTime,recurrence);
 			fail("Expected- Handled Exception");
 		} catch(HandledException e){
-			assertEquals(e.printErrorMsg(),"A Non-empty title must be specified!");
+			assertEquals(e.getErrorMsg(),"A Non-empty title must be specified!");
 		}
 	}
 	
 	public void testPeriodicTaskConstructionTwo() {
 		try{
-			pt=new PeriodicTask(null,null,"Testing","location",null,null,null);
+			pt=new PeriodicTask(taskUID,created,title,location,null,null,recurrence);
 			fail("Expected- Handled Exception");
 		} catch(HandledException e){
-			assertEquals(e.printErrorMsg(),"Your input time cannot be parsed, please check your input and try again!");
+			assertEquals(e.getErrorMsg(),"Your input time cannot be parsed, please check your input and try again!");
 		}
 	}
 	
@@ -72,16 +68,16 @@ public class PeriodicTaskTest extends TaskTest{
 		try{
 			Date startDate=new Date (2000,1,1);
 			Date endDate=new Date(1999,1,1);
-			pt=new PeriodicTask(null,null,"Testing","location",startDate,endDate,null);
+			pt=new PeriodicTask(taskUID,created,title,location,startDate,endDate,recurrence);
 			fail("Expected- Handled Exception");
 		} catch(HandledException e){
-			assertEquals(e.printErrorMsg(),"Your end time is before start time, please check your input and try again");
+			assertEquals(e.getErrorMsg(),"Your end time is before start time, please check your input and try again");
 		}
 	}
 
 	public void testPeriodicTaskConstructionFour() {
 		try{
-			pt=new PeriodicTask(null,null,"Testing","location",testStartDate,testEndDate,null);
+			pt=new PeriodicTask(taskUID,created,title,location,startTime,endTime,null);
 			assertTrue(true);
 		} catch(HandledException e){
 			fail("Expected- Successful Creation");
@@ -91,7 +87,7 @@ public class PeriodicTaskTest extends TaskTest{
 	public void testPeriodicTaskConstructionFive() {
 		try{
 			Recur recur=new Recur();
-			pt=new PeriodicTask(null,null,"Testing","location",testStartDate,testEndDate,recur);
+			pt=new PeriodicTask(null,null,title,location,startTime,endTime,recur);
 			assertTrue(true);
 		} catch(HandledException e){
 			fail("Expected- Successful Creation");
@@ -130,26 +126,26 @@ public class PeriodicTaskTest extends TaskTest{
 	@Test
 	public void testToSummary() {
 		assertEquals("0. Testing\nType: Periodic\t"
-				+ "From: 10-Nov-2900 00:00:00 To 10-Nov-2900 00:00:00\n",pt.toSummary());
+				+ "From: 10-Nov-2900 00:00:00 To 10-Nov-2901 00:00:00\n",pt.toSummary());
 		pt.updateRecurrence(recurrence);
 		assertEquals("0. Testing\nType: Recurring\t"
-				+ "From: 10-Nov-2900 00:00:00 To 10-Nov-2900 00:00:00\n",pt.toSummary());
+				+ "From: 10-Nov-2900 00:00:00 To 10-Nov-2901 00:00:00\n",pt.toSummary());
 	}
 
 	@Test
 	public void testToDetail() {
 		assertEquals("0. Testing\nType: Periodic\t"
-				+ "From: 10-Nov-2900 00:00:00 To 10-Nov-2900 00:00:00\n"
-				+ "Location: location\nDescription: \n",pt.toDetail());
+				+ "From: 10-Nov-2900 00:00:00 To 10-Nov-2901 00:00:00\n"
+				+ "Location: Location\nDescription: \n",pt.toDetail());
 		pt.updateDescription("Description");
 		assertEquals("0. Testing\nType: Periodic\t"
-				+ "From: 10-Nov-2900 00:00:00 To 10-Nov-2900 00:00:00\n"
-				+ "Location: location\nDescription: Description\n",pt.toDetail());
+				+ "From: 10-Nov-2900 00:00:00 To 10-Nov-2901 00:00:00\n"
+				+ "Location: Location\nDescription: Description\n",pt.toDetail());
 		pt.updateRecurrence(recurrence);
 		assertEquals("0. Testing\nType: Recurring\t"
-				+ "From: 10-Nov-2900 00:00:00 To 10-Nov-2900 00:00:00\n"
+				+ "From: 10-Nov-2900 00:00:00 To 10-Nov-2901 00:00:00\n"
 				+ "Recurrence: 1 HOURLY\n"
-				+ "Location: location\nDescription: Description\n",pt.toDetail());
+				+ "Location: Location\nDescription: Description\n",pt.toDetail());
 		
 	}
 
@@ -190,7 +186,7 @@ public class PeriodicTaskTest extends TaskTest{
 			pt.updateTime(date1, date2);
 			fail("Expected- Handled Exception");
 		} catch (HandledException e){
-			assertEquals("Your input time cannot be parsed, please check your input and try again!",e.printErrorMsg());
+			assertEquals("Your input time cannot be parsed, please check your input and try again!",e.getErrorMsg());
 		}
 		date1= new Date(2,1,1);
 		date2= new Date(1,1,1);
@@ -198,7 +194,7 @@ public class PeriodicTaskTest extends TaskTest{
 			pt.updateTime(date1, date2);
 			fail("Expected- Handled Exception");
 		} catch (HandledException e){
-			assertEquals("Your end time is before start time, please check your input and try again",e.printErrorMsg());
+			assertEquals("Your end time is before start time, please check your input and try again",e.getErrorMsg());
 		}
 		date1= new Date(1,1,1);
 		date2= new Date(2,1,1);
@@ -239,10 +235,10 @@ public class PeriodicTaskTest extends TaskTest{
 
 	@Test
 	public void testCompareTo() throws HandledException {
-		PeriodicTask pt2=new PeriodicTask(null,null,"Testing","location",testStartDate,testEndDate,null);
+		PeriodicTask pt2=new PeriodicTask(null,null,"Testing","location",startTime,endTime,null);
 		assertEquals(0,pt.compareTo(pt2));
 		pt.updateRecurrence(recurrence);
-		pt2=new PeriodicTask(null,null,"Testing","location",testStartDate,testEndDate,recurrence);
+		pt2=new PeriodicTask(null,null,"Testing","location",startTime,endTime,recurrence);
 		assertEquals(0,pt.compareTo(pt2));
 	}
 

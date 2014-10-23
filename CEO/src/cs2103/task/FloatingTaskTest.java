@@ -16,30 +16,17 @@ import cs2103.exception.HandledException;
 
 public class FloatingTaskTest extends TaskTest {
 	static FloatingTask ft;
-	Uid taskUID;
-	Date created; 
-	String title;
-	Date dueTime;
-	boolean complete;
-
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
+	Uid taskUID = null;
+	Date created = null; 
+	String title = "Testing";
+	boolean complete = false;
 
 	@Before
 	public void setUp() throws Exception {
-		ft=new FloatingTask(null,null,"Testing",false);
+		ft = new FloatingTask(taskUID,created,title,complete);
 		ft.updateDescription(null);
 	}
 
-	@After
-	public void tearDown() throws Exception {
-	}
-	
 	@Test
 	public void testDeadlineTaskConstructor(){
 		testFloatingTaskConstructionOne();
@@ -48,16 +35,16 @@ public class FloatingTaskTest extends TaskTest {
 	
 	public void testFloatingTaskConstructionOne() {
 		try{
-			ft=new FloatingTask(null,null,"",false);
+			ft = new FloatingTask(taskUID,created,"",complete);
 			fail("Expected- Handled Exception");
 		} catch(HandledException e){
-			assertEquals(e.printErrorMsg(),"A Non-empty title must be specified!");
+			assertEquals(e.getErrorMsg(),"A Non-empty title must be specified!");
 		}
 	}
 	
 	public void testFloatingTaskConstructionTwo() {
 		try{
-			ft=new FloatingTask(null,null,"Testing",false);
+			ft = new FloatingTask(taskUID,created,title,complete);
 			assertTrue(true);
 		} catch(HandledException e){
 			fail("Expected- Successful Creation");
@@ -146,5 +133,4 @@ public class FloatingTaskTest extends TaskTest {
 		FloatingTask ft2=new FloatingTask(null,null,"Testing",false);
 		assertEquals(0,ft.compareTo(ft2));
 	}
-
 }
