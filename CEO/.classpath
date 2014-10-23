@@ -13,7 +13,7 @@
 	<classpathentry kind="lib" path="lib/google-api-client-1.19.0.jar"/>
 	<classpathentry kind="lib" path="lib/google-api-services-calendar-v3-rev87-1.19.0.jar"/>
 	<classpathentry kind="lib" path="lib/google-api-services-tasks-v1-rev38-1.19.0.jar"/>
-	<classpathentry kind="lib" path="lib/google-http-client-1.19.0.jar"/>
+	<classpathentry kind="lib" path="lib/google-http-client-1.19.0.jar" sourcepath="D:/.m2/repository/com/google/http-client/google-http-client/1.19.0/google-http-client-1.19.0-sources.jar"/>
 	<classpathentry kind="lib" path="lib/google-http-client-jackson2-1.19.0.jar"/>
 	<classpathentry kind="lib" path="lib/google-oauth-client-1.19.0.jar"/>
 	<classpathentry kind="lib" path="lib/google-oauth-client-java6-1.19.0.jar"/>
