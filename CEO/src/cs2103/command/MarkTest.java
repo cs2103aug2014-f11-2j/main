@@ -12,11 +12,11 @@ public class MarkTest {
 
 	private void initialise() throws HandledException, FatalException{
 		TaskList.getInstance(null, false);
-		Add addObj = new Add("add -title floating");
+		Add addObj = new Add("-title floating");
 		addObj.execute();
-		addObj = new Add("add -title deadline -time 2014/10/23 20:20");
+		addObj = new Add("-title deadline -time 2014/10/23 20:20");
 		addObj.execute();
-		addObj = new Add("add -title periodic -time 2014/10/23 20:20 to 2014/10/25 20:20");
+		addObj = new Add("-title periodic -time 2014/10/23 20:20 to 2014/10/25 20:20");
 		addObj.execute();
 	}
 	
