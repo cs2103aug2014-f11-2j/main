@@ -95,6 +95,7 @@ public class TaskListTest {
 		testAll.addTask(testPeriodic);
 		
 		ArrayList<Task> test = testAll.getAllList();
+	
 		assertEquals(test.get(0).getTitle(), "testPeriodic");
 	}
 	

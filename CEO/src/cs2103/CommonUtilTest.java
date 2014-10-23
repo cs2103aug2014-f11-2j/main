@@ -15,6 +15,14 @@ public class CommonUtilTest {
 		String[] testing = CommonUtil.splitFirstWord("testing split");
 		assertEquals(Array.get(testing, 0), "testing");
 		assertEquals(Array.get(testing, 1), "split");
+		
+		String[] testing1 = CommonUtil.splitFirstWord("");
+		assertEquals(Array.get(testing1, 0), "");
+		assertNull(Array.get(testing1, 1));
+
+		String[] testing2 = CommonUtil.splitFirstWord("123");
+		assertEquals(Array.get(testing2, 0), "123");
+		assertNull(Array.get(testing2, 1));
 	}
 	
 	//boundary value analysis
@@ -45,6 +53,14 @@ public class CommonUtilTest {
 		StringBuffer testBuffer = new StringBuffer("testing");
 		String test = CommonUtil.deleteLastChar(testBuffer);
 		assertEquals(test, "testin");
+		
+		StringBuffer testEmpty = new StringBuffer("");
+		String test1 = CommonUtil.deleteLastChar(testEmpty);
+		assertNull(test1);
+		
+		StringBuffer testNum = new StringBuffer("123");
+		String test2 = CommonUtil.deleteLastChar(testNum);
+		assertEquals(test2, "12");
 	}
 	
 	@Test
@@ -56,6 +72,14 @@ public class CommonUtilTest {
 		//test string without dash
 		String test1 = CommonUtil.removeDash("testing");
 		assertEquals(test1, "testing");
+		
+		//test empty string
+		String test2 = CommonUtil.removeDash("");
+		assertEquals(test2, "");
+		
+		//test with dash only
+		String test3 = CommonUtil.removeDash("-");
+		assertEquals(test3, "");
 	}
 
 }
