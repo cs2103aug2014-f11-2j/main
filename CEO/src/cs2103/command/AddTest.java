@@ -2,6 +2,8 @@ package cs2103.command;
 
 import static org.junit.Assert.*;
 
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import cs2103.TaskList;
@@ -10,13 +12,26 @@ import cs2103.exception.HandledException;
 
 public class AddTest {
 	
+	@BeforeClass 
+	public static void method() throws HandledException, FatalException{
+		TaskList.getInstance(null,false);
+	}
+	
 	@Test
 	public void testAddCorrectCommand() throws HandledException, FatalException {
-		TaskList.getInstance(null,false);
 		Add addObj;
 		addObj = new Add("-title hello -description some description");
 		assertEquals("You have successfully added a new task.",addObj.execute());
-	
 	}
-
+	
+	@Test(expected = HandledException.class)
+	public void testAddNullCommand() throws HandledException{
+		Add addObj = new Add(null);
+	}
+	
+	@Test(expected = HandledException.class)
+	public void testAddInvalidCommand() throws HandledException, FatalException{
+		Add addObj = new Add("-hello");
+		addObj.execute();
+	}
 }
