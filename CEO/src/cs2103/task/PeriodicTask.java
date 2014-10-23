@@ -13,8 +13,8 @@ import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Uid;
 
 public class PeriodicTask extends Task {
-	private Date startTime;
-	private Date endTime;
+	private DateTime startTime;
+	private DateTime endTime;
 	private String location;
 	private Recur recurrence;
 
@@ -44,8 +44,8 @@ public class PeriodicTask extends Task {
 		} else if (startTime.after(endTime)){
 			throw new HandledException(HandledException.ExceptionType.END_BEFORE_START);
 		} else {
-			this.startTime=startTime;
-			this.endTime=endTime;
+			this.startTime = new DateTime(startTime);
+			this.endTime = new DateTime(endTime);
 		}
 	}
 	

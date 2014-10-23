@@ -12,7 +12,7 @@ import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Uid;
 
 public class DeadlineTask extends Task {
-	private Date dueTime;
+	private DateTime dueTime;
 	private boolean complete;
 	private static final String TYPE_DEADLINE = "Deadline";
 	
@@ -38,7 +38,7 @@ public class DeadlineTask extends Task {
 		if (dueTime == null){
 			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
 		}else{
-			this.dueTime=dueTime;
+			this.dueTime = new DateTime(dueTime);
 		}
 	}
 

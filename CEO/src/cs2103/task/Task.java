@@ -22,8 +22,8 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	private final Uid taskUID;
 	private String title;
 	private String description;
-	private Date created;
-	private Date lastModified;
+	private DateTime created;
+	private DateTime lastModified;
 	protected static final String STRING_TYPE = "Type: ";
 	protected static final String STRING_DESCRIPTION = "Description: ";
 	protected static final long DAY_IN_MILLIS = 86400000L;
@@ -37,10 +37,11 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 			this.taskUID = taskUID;
 		}
 		if (created == null){
-			this.created = new Date(System.currentTimeMillis());
+			this.created = new DateTime(new Date());
 		} else {
-			this.created = created;
+			this.created = new DateTime(created);
 		}
+		this.lastModified = new DateTime(new Date());
 	}
 	
 	public int getTaskID(){
@@ -67,9 +68,6 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	}
 	
 	public Date getLastModified(){
-		if (this.lastModified == null){
-			this.lastModified = new Date();
-		}
 		return this.lastModified;
 	}
 	
@@ -97,9 +95,9 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	
 	public void updateLastModified(Date date){
 		if (date == null){
-			this.lastModified = new Date(System.currentTimeMillis());
+			this.lastModified = new DateTime(new Date());
 		} else {
-			this.lastModified = date;
+			this.lastModified = new DateTime(date);
 		}
 	}
 	
