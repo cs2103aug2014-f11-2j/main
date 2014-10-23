@@ -16,14 +16,28 @@ public class CommonUtilTest {
 		assertEquals(Array.get(testing, 0), "testing");
 		assertEquals(Array.get(testing, 1), "split");
 	}
-
+	
+	//boundary value analysis
 	@Test
 	public void testParseIntegerParameter() throws HandledException {
 		int test = CommonUtil.parseIntegerParameter("1");
 		assertEquals(test, 1);
 		
-		int test2 = CommonUtil.parseIntegerParameter("NOT AN INTEGER");
-		assertEquals(test2, -1);
+		int test1 = CommonUtil.parseIntegerParameter("0");
+		assertEquals(test1, 0);
+		
+		int test2 = CommonUtil.parseIntegerParameter("-2");
+		assertEquals(test2,-1);
+		
+		int test3 = CommonUtil.parseIntegerParameter("0.1");
+		assertEquals(test3, -1);
+		
+		int test4 = CommonUtil.parseIntegerParameter("-0.1");
+		assertEquals(test4, -1);
+		
+		
+		int test5 = CommonUtil.parseIntegerParameter("NOT AN INTEGER");
+		assertEquals(test5, -1);
 	}
 
 	@Test
