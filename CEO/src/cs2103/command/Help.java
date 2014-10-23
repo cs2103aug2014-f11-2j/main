@@ -134,7 +134,7 @@ public class Help extends QueryCommand {
 	
 	@Override
 	public String execute() throws HandledException{
-		CommonUtil.checkNullParameter(this.parameterList.getCommandType(), HandledException.ExceptionType.INVALID_CMD);
+		CommonUtil.checkNull(this.parameterList.getCommandType(), HandledException.ExceptionType.INVALID_CMD);
 		switch (parameterList.getCommandType().getValue()){
 		case LIST:
 			return HELP_LIST;

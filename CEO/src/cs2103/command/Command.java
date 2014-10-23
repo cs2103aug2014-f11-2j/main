@@ -15,7 +15,7 @@ public abstract class Command {
 	public abstract String execute() throws HandledException, FatalException;
 	
 	protected static Queue<String> separateCommand(String userInput) throws HandledException{
-		CommonUtil.checkNullString(userInput, HandledException.ExceptionType.INVALID_CMD);
+		CommonUtil.checkNull(userInput, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> result = new LinkedList<String>();
 		String[] parameters = userInput.trim().split("\\s+-");
 		for (String s:parameters){
@@ -25,7 +25,7 @@ public abstract class Command {
 	}
 	
 	protected static Map<String,String> separateParameters(Queue<String> parameterList) throws HandledException{
-		if (parameterList == null) throw new HandledException(HandledException.ExceptionType.INVALID_PARA);
+		CommonUtil.checkNull(parameterList, HandledException.ExceptionType.INVALID_PARA);
 		Map<String,String> parameterMap = new HashMap<String, String>();
 		while(!parameterList.isEmpty()){
 			String[] splitResult = CommonUtil.splitFirstWord(parameterList.poll());

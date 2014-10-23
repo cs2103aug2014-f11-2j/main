@@ -14,7 +14,7 @@ public class List extends QueryCommand {
 	
 	@Override
 	public String execute() throws HandledException, FatalException {
-		CommonUtil.checkNullParameter(this.parameterList.getTaskType(), HandledException.ExceptionType.INVALID_CMD);
+		CommonUtil.checkNull(this.parameterList.getTaskType(), HandledException.ExceptionType.INVALID_CMD);
 		switch (this.parameterList.getTaskType().getValue()){
 		case FLOATING:
 			return parseListResponse(TaskList.getInstance().getFloatingList());

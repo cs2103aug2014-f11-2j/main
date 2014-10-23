@@ -16,7 +16,7 @@ public class Delete extends InfluentialCommand {
 	
 	@Override
 	public String execute() throws HandledException, FatalException {
-		CommonUtil.checkNullParameter(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_CMD);
+		CommonUtil.checkNull(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_CMD);
 		Task deletingTask = TaskList.getInstance().getTaskByID(this.parameterList.getTaskID().getValue());
 		deletingTask.updateLastModified(null);
 		TaskList.getInstance().deleteTask(deletingTask);

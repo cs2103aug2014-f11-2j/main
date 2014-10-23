@@ -1,15 +1,16 @@
 package cs2103;
 
+import java.awt.Desktop;
+import java.awt.Desktop.Action;
+import java.io.IOException;
+import java.net.InetAddress;
+
 import cs2103.exception.HandledException;
-import cs2103.parameters.Parameter;
 
 public class CommonUtil {
-	public static void checkNullString(String str, HandledException.ExceptionType expectedException) throws HandledException{
-		if (str == null) throw new HandledException(expectedException);
-	}
 	
 	public static String[] splitFirstWord(String parameterString) throws HandledException{
-		checkNullString(parameterString, HandledException.ExceptionType.INVALID_CMD);
+		checkNull(parameterString, HandledException.ExceptionType.INVALID_CMD);
 		String[] result = new String[2];
 		int splitIndex = parameterString.indexOf(' ');
 		if (splitIndex == -1){
@@ -23,7 +24,7 @@ public class CommonUtil {
 	}
 	
 	public static int parseIntegerParameter(String parameter) throws HandledException {
-		checkNullString(parameter, HandledException.ExceptionType.INVALID_PARA);
+		checkNull(parameter, HandledException.ExceptionType.INVALID_PARA);
 		parameter = parameter.trim();
 		if (parameter.matches("[0-9]+")){
 			return Integer.parseInt(parameter);
@@ -41,16 +42,55 @@ public class CommonUtil {
 		}
 	}
 	
-	public static void checkNullParameter(Parameter parameter, HandledException.ExceptionType expectedException) throws HandledException{
-		if (parameter == null) throw new HandledException(expectedException);
+	public static void checkNull(Object obj, HandledException.ExceptionType expectedException) throws HandledException{
+		if (obj == null) throw new HandledException(expectedException);
 	}
 
 	public static String removeDash(String parameterString) throws HandledException{
-		CommonUtil.checkNullString(parameterString, HandledException.ExceptionType.INVALID_PARA);
+		checkNull(parameterString, HandledException.ExceptionType.INVALID_PARA);
 		if (parameterString.startsWith("-")){
 			return parameterString.substring(1);
 		}else{
 			return parameterString;
+		}
+	}
+	
+	public static void print(String feedback) {
+		if (feedback != null && !feedback.isEmpty()){
+			System.out.println(feedback);
+		}
+	}
+	
+	public static void printPrompt(String prompt){
+		if (prompt != null && !prompt.isEmpty()){
+			System.out.print(prompt);
+		}
+	}
+	
+	public static boolean checkSyncSupport(){
+		return checkNetwork() && checkBrowser();
+	}
+	
+	private static boolean checkNetwork(){
+		try {
+			InetAddress ad = InetAddress.getByName("accounts.google.com");
+			return ad.isReachable(5000);
+		} catch (IOException e) {
+			return false;
+		}
+	}
+	
+	private static boolean checkBrowser(){
+		try{
+			if (Desktop.isDesktopSupported()) {
+				Desktop desktop = Desktop.getDesktop();
+				if (desktop.isSupported(Action.BROWSE)) {
+					return true;
+				}
+			}
+			return false;
+		} catch (InternalError e) {
+			return false;
 		}
 	}
 }

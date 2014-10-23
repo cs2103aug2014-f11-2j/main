@@ -18,7 +18,7 @@ public class Mark extends InfluentialCommand {
 
 	@Override
 	public String execute() throws HandledException, FatalException {
-		CommonUtil.checkNullParameter(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_CMD);
+		CommonUtil.checkNull(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_CMD);
 		Task task = TaskList.getInstance().getTaskByID(parameterList.getTaskID().getValue());
 		if (task instanceof PeriodicTask){
 			return MESSAGE_MARK_FAILED;

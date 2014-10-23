@@ -18,11 +18,12 @@ public class HandledException extends Exception {
 	private static final String CLONE_FAILED = "Failed to clone task object";
 	private static final String NETWORK_ERR = "Error occured in your network stack";
 	private static final String UNEXPECTED_ERR = "An unexpected error occurred, operation failed";
+	private static final String LOGIN_FAIL = "Unable to get Credential from Google, Google Sync is disabled";
 	private final String errorMsg;
 	
 	public static enum ExceptionType{
 		INVALID_TASKID, INVALID_TASK_OBJ, INVALID_TASK_TYPE, INVALID_TIME, END_BEFORE_START, NO_TITLE, TASK_NOT_EXIST, INVALID_PARA, 
-		INVALID_CMD, INVALID_COMPLETE, LESS_THAN_ONE_PARA, CLONE_FAILED, NETWORK_ERR, UNEXPECTED_ERR;
+		INVALID_CMD, INVALID_COMPLETE, LESS_THAN_ONE_PARA, CLONE_FAILED, NETWORK_ERR, UNEXPECTED_ERR, LOGIN_FAIL;
 	}
 	
 	public HandledException(ExceptionType exceptionType){
@@ -65,6 +66,8 @@ public class HandledException extends Exception {
 			return NETWORK_ERR;
 		case UNEXPECTED_ERR:
 			return UNEXPECTED_ERR;
+		case LOGIN_FAIL:
+			return LOGIN_FAIL;
 		default:
 			return null;
 		}

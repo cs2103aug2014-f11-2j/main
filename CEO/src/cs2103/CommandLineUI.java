@@ -29,7 +29,7 @@ public class CommandLineUI {
 		undoStack = new Stack<InfluentialCommand>();
 		redoStack = new Stack<InfluentialCommand>();
 		this.taskList = TaskList.getInstance(dataFile, writeToFile);
-		print(String.format(MESSAGE_WELCOME_FORMAT, dataFile));
+		CommonUtil.print(String.format(MESSAGE_WELCOME_FORMAT, dataFile));
 	}
 	
 	private static CommandLineUI getInstance(String dataFile, boolean writeToFile) throws HandledException, FatalException{
@@ -44,7 +44,7 @@ public class CommandLineUI {
 		CommandLineUI main;
 		try{
 			if (args.length > 1){
-				print(MESSAGE_INCORRECT_ARG);
+				CommonUtil.print(MESSAGE_INCORRECT_ARG);
 				main = CommandLineUI.getInstance(args[0], true);
 			}else if (args.length == 1){
 				main = CommandLineUI.getInstance(args[0], true);
@@ -58,18 +58,18 @@ public class CommandLineUI {
 	}
 	
 	private void userLoop() throws HandledException, FatalException {
-		print(new UpdateTimeFromRecur().execute());
-		print(new Alert().execute());
+		CommonUtil.print(new UpdateTimeFromRecur().execute());
+		CommonUtil.print(new Alert().execute());
 		while (true) {
-			printPrompt(MESSAGE_USER_PROMPT);
+			CommonUtil.printPrompt(MESSAGE_USER_PROMPT);
 			String command = takeUserInput();
 			if (command != null && !command.isEmpty()){
 				String feedback=processUserInput(command);
 				if (feedback != null && feedback.equalsIgnoreCase("EXIT")){
-					print(MESSAGE_EXIT);
+					CommonUtil.print(MESSAGE_EXIT);
 					break;
 				}
-				print(feedback);
+				CommonUtil.print(feedback);
 			}
 		}
 	}
@@ -180,18 +180,6 @@ public class CommandLineUI {
 			}
 		}
 		return result;
-	}
-	
-	private static void print(String feedback) {
-		if (feedback != null && !feedback.isEmpty()){
-			System.out.println(feedback);
-		}
-	}
-	
-	private static void printPrompt(String prompt){
-		if (prompt != null){
-			System.out.print(prompt);
-		}
 	}
 	
 	private static void printErrorAndExit(){

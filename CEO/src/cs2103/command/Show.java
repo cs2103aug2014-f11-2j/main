@@ -16,18 +16,15 @@ public class Show extends QueryCommand {
 	
 	@Override
 	public String execute() throws HandledException, FatalException {
-		CommonUtil.checkNullParameter(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_CMD);
+		CommonUtil.checkNull(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_CMD);
 		return formatShowDetail(TaskList.getInstance().getTaskByID(parameterList.getTaskID().getValue()));
 	}
 	
 	private static String formatShowDetail(Task task) throws HandledException{
-		if (task == null){
-			throw new HandledException(HandledException.ExceptionType.INVALID_TASK_OBJ);
-		} else {
-			StringBuffer sb = new StringBuffer();
-			sb.append(String.format(MESSAGE_SHOW_FORMAT, task.getTaskID()));
-			sb.append(task.toDetail());
-			return CommonUtil.deleteLastChar(sb);
-		}
+		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
+		StringBuffer sb = new StringBuffer();
+		sb.append(String.format(MESSAGE_SHOW_FORMAT, task.getTaskID()));
+		sb.append(task.toDetail());
+		return CommonUtil.deleteLastChar(sb);
 	}
 }

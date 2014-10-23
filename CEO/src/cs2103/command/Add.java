@@ -23,7 +23,7 @@ public class Add extends InfluentialCommand {
 	private static final String[] allowedQuickTimeLiteral = {"from", "by", "on", "in", "at"};
 	
 	public Add(String command) throws HandledException{
-		CommonUtil.checkNullString(command, HandledException.ExceptionType.INVALID_CMD);
+		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> parameterQueue = separateCommand(command);
 		if (!command.startsWith("-")){
 			this.parameterList.addAllParameters(parseQuickAdd(parameterQueue.poll()));

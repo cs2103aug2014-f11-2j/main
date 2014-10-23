@@ -20,7 +20,7 @@ public class Update extends InfluentialCommand {
 	private static final String MESSAGE_UPDATE_FORMAT = "You have updated task with ID %1$d";
 	
 	public Update(String command) throws HandledException{
-		CommonUtil.checkNullString(command, HandledException.ExceptionType.INVALID_CMD);
+		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> parameterQueue = separateCommand(command);
 		this.parameterList.addParameter(TaskID.parse(parameterQueue.poll()));
 		Map<String, String> parameterMap = separateParameters(parameterQueue);
@@ -35,37 +35,34 @@ public class Update extends InfluentialCommand {
 	
 	@Override
 	public String execute() throws HandledException, FatalException {
-		if (this.parameterList.getTaskID() == null){
-			throw new HandledException(HandledException.ExceptionType.INVALID_TASKID);
+		CommonUtil.checkNull(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_TASKID);
+		Task task = TaskList.getInstance().getTaskByID(this.parameterList.getTaskID().getValue());
+		Task newTask;
+		if (this.parameterList.getTime() == null){
+			newTask = cloneTask(task);
 		} else {
-			Task task = TaskList.getInstance().getTaskByID(this.parameterList.getTaskID().getValue());
-			Task newTask;
-			if (this.parameterList.getTime() == null){
-				newTask = cloneTask(task);
-			} else {
-				newTask = task.convert(this.parameterList.getTime().getValue());
-			}
-			if (this.parameterList.getTitle() != null){
-				newTask.updateTitle(this.parameterList.getTitle().getValue());
-			}
-			if (this.parameterList.getDescription() != null){
-				newTask.updateDescription(this.parameterList.getDescription().getValue());
-			}
-			if (this.parameterList.getLocation() != null){
-				newTask.updateLocation(this.parameterList.getLocation().getValue());
-			}
-			if (this.parameterList.getComplete() != null){
-				newTask.updateComplete(this.parameterList.getComplete().getValue());
-			}
-			if (this.parameterList.getRecurrence() != null){
-				newTask.updateRecurrence(this.parameterList.getRecurrence().getValue());
-			}
-			newTask.updateLastModified(null);
-			TaskList.getInstance().updateTask(newTask);
-			this.undoBackup = task;
-			this.redoBackup = newTask;
-			return String.format(MESSAGE_UPDATE_FORMAT, this.parameterList.getTaskID().getValue());
+			newTask = task.convert(this.parameterList.getTime().getValue());
 		}
+		if (this.parameterList.getTitle() != null){
+			newTask.updateTitle(this.parameterList.getTitle().getValue());
+		}
+		if (this.parameterList.getDescription() != null){
+			newTask.updateDescription(this.parameterList.getDescription().getValue());
+		}
+		if (this.parameterList.getLocation() != null){
+			newTask.updateLocation(this.parameterList.getLocation().getValue());
+		}
+		if (this.parameterList.getComplete() != null){
+			newTask.updateComplete(this.parameterList.getComplete().getValue());
+		}
+		if (this.parameterList.getRecurrence() != null){
+			newTask.updateRecurrence(this.parameterList.getRecurrence().getValue());
+		}
+		newTask.updateLastModified(null);
+		TaskList.getInstance().updateTask(newTask);
+		this.undoBackup = task;
+		this.redoBackup = newTask;
+		return String.format(MESSAGE_UPDATE_FORMAT, this.parameterList.getTaskID().getValue());
 	}
 	
 	private static Task cloneTask(Task task) throws HandledException{

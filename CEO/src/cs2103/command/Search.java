@@ -21,7 +21,7 @@ import cs2103.task.Task;
 public class Search extends QueryCommand {
 	
 	public Search(String command) throws HandledException{
-		CommonUtil.checkNullString(command, HandledException.ExceptionType.INVALID_CMD);
+		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> parameterQueue = separateCommand(command);
 		if (!command.startsWith("-")){
 			this.parameterList.addParameter(TaskType.parse(parameterQueue.poll()));
