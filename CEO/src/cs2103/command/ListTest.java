@@ -2,6 +2,7 @@ package cs2103.command;
 
 import static org.junit.Assert.*;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import cs2103.TaskList;
@@ -10,7 +11,8 @@ import cs2103.exception.HandledException;
 
 public class ListTest {
 
-	private void initialise() throws HandledException, FatalException{
+	@BeforeClass
+	public static void initialise() throws HandledException, FatalException{
 		TaskList.getInstance(null, false);
 		Add addObj = new Add("add -title floating");
 		addObj.execute();
@@ -22,11 +24,7 @@ public class ListTest {
 	
 	@Test
 	public void testAllList() throws HandledException, FatalException {
-		try{
-			TaskList.getInstance();
-		}catch(FatalException e){
-			initialise();
-		}
+		
 		List listAll = new List("all");
 		String result = listAll.execute();
 		assertEquals("1. floating\n" +
@@ -39,12 +37,8 @@ public class ListTest {
 	
 	@Test
 	public void testDefaultlist() throws FatalException, HandledException{
-		try{
-			TaskList.getInstance();
-		}catch(FatalException e){
-			initialise();
-		}
-		List listDefault = new List("list");
+		
+		List listDefault = new List("hello");
 		String result = listDefault.execute();
 		assertEquals("1. floating\n" +
 				"Type: Floating	Status: Needs Action\n" +
@@ -56,11 +50,7 @@ public class ListTest {
 	
 	@Test
 	public void testPeriodicList() throws FatalException, HandledException{
-		try{
-			TaskList.getInstance();
-		}catch(FatalException e){
-			initialise();
-		}
+		
 		List listPeriodic = new List("periodic");
 		String result = listPeriodic.execute();
 		assertEquals("3. periodic\n" +
@@ -69,11 +59,7 @@ public class ListTest {
 	
 	@Test
 	public void testDeadlineList() throws HandledException, FatalException{
-		try{
-			TaskList.getInstance();
-		}catch(FatalException e){
-			initialise();
-		}
+		
 		List listDeadline = new List("deadline");
 		String result = listDeadline.execute();
 		assertEquals("2. deadline\n" +
@@ -82,11 +68,7 @@ public class ListTest {
 	
 	@Test
 	public void testFloatingList() throws HandledException, FatalException{
-		try{
-			TaskList.getInstance();
-		}catch(FatalException e){
-			initialise();
-		}
+		
 		List listFloating = new List("floating");
 		String result = listFloating.execute();
 		assertEquals("1. floating\n" +
