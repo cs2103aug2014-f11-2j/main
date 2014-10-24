@@ -8,12 +8,13 @@ import org.junit.Test;
 import cs2103.TaskList;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
+import cs2103.parameters.Option;
 
 public class SearchTest {
 	
 	@BeforeClass
 	public static void initialise() throws HandledException, FatalException{
-		TaskList.getInstance(null, false);
+		TaskList.getInstance(new Option(Option.Value.TEST));
 		Add addObj = new Add("-title Jap homework -time 2014/10/23 21:00");
 		addObj.execute();
 		addObj = new Add("-title revise stats homework -description revise chp 5 to 7 -location NUS UTOWN -time 2014/10/24 20:00 to 2014/10/25 20:00");

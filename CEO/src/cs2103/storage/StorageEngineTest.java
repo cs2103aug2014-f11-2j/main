@@ -21,7 +21,7 @@ public class StorageEngineTest {
 	@Before
 	public void before() throws HandledException, FatalException{
 		file.delete();
-		this.storage = new StorageEngine(file.getName());
+		this.storage = new StorageEngine(file);
 	}
 	
 	@Test

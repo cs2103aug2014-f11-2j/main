@@ -7,9 +7,10 @@ import cs2103.command.*;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.CommandType;
+import cs2103.parameters.Option;
 
 public class CommandLineUI {
-	private static final String MESSAGE_WELCOME_FORMAT = "Welcome to the CEO. %1$s is ready for use.";
+	private static final String MESSAGE_WELCOME = "Welcome to the CEO. I am now ready for use.";
 	private static final String MESSAGE_EXIT = "You have exited CEO. Hope to see you again.";
 	private static final String MESSAGE_USER_PROMPT = "Command me please: ";
 	private static final String MESSAGE_COMMAND_ERROR = "Your input command is invalid, please check your command and try again";
@@ -25,16 +26,16 @@ public class CommandLineUI {
 	private Stack<InfluentialCommand> redoStack;
 	private Scanner scanner = new Scanner(System.in);
 	
-	private CommandLineUI(String dataFile, boolean writeToFile) throws HandledException, FatalException{
+	private CommandLineUI(Option option) throws HandledException, FatalException{
 		undoStack = new Stack<InfluentialCommand>();
 		redoStack = new Stack<InfluentialCommand>();
-		this.taskList = TaskList.getInstance(dataFile, writeToFile);
-		CommonUtil.print(String.format(MESSAGE_WELCOME_FORMAT, dataFile));
+		this.taskList = TaskList.getInstance(option);
+		CommonUtil.print(String.format(MESSAGE_WELCOME));
 	}
 	
-	public static CommandLineUI getInstance(String dataFile, boolean writeToFile) throws HandledException, FatalException{
+	public static CommandLineUI getInstance(Option option) throws HandledException, FatalException{
 		if (commandLine == null){
-			commandLine = new CommandLineUI(dataFile, writeToFile);
+			commandLine = new CommandLineUI(option);
 			assert(commandLine.taskList.getAllList() != null);
 		}
 		return commandLine;
@@ -43,15 +44,8 @@ public class CommandLineUI {
 	public static void main(String[] args){
 		CommandLineUI main;
 		try{
-			if (args.length > 1){
-				CommonUtil.print(MESSAGE_INCORRECT_ARG);
-				main = CommandLineUI.getInstance(args[0], true);
-			}else if (args.length == 1){
-				main = CommandLineUI.getInstance(args[0], true);
-			}else{
-				main = CommandLineUI.getInstance("default.ics", true);
-			}
-		main.userLoop();
+			main = CommandLineUI.getInstance(Option.parse(args));
+			main.userLoop();
 		} catch (HandledException | FatalException e){
 			System.err.println(MESSAGE_INITIALIZATION_ERROR);
 		}

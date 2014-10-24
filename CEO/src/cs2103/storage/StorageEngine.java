@@ -48,15 +48,15 @@ public class StorageEngine {
 		file = null;
 	}
 	
-	public StorageEngine(String dataFile) throws HandledException, FatalException{
-		if (dataFile == null || dataFile.isEmpty()){
+	public StorageEngine(File file) throws HandledException, FatalException{
+		if (file == null){
 			throw new FatalException(FatalException.ExceptionType.ILLEGAL_FILE);
 		}
 		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION, true);
-		this.file = new File(dataFile);
 		if (!file.exists() || file.length()==0){
 			createNewFile();
 		}
+		this.file = file;
 		readFromFile();
 	}
 	

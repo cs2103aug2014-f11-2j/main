@@ -8,12 +8,13 @@ import org.junit.Test;
 import cs2103.TaskList;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
+import cs2103.parameters.Option;
 
 public class MarkTest {
 
 	@BeforeClass
 	public static void initialise() throws HandledException, FatalException{
-		TaskList.getInstance(null, false);
+		TaskList.getInstance(new Option(Option.Value.TEST));
 		Add addObj = new Add("-title floating");
 		addObj.execute();
 		addObj = new Add("-title deadline -time 2014/10/23 20:20");

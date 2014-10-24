@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
+import cs2103.parameters.Option;
 
 public class CommandLineUITest {
 	
@@ -18,8 +19,7 @@ public class CommandLineUITest {
 	
 	@Test
 	public void testInvalidCommand() throws HandledException, FatalException {
-		CommandLineUI test = CommandLineUI.getInstance(null, false);
-		
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		//test invalid command
 		String invalidTest = test.testCommand("‐title submit ‐description IVLE ‐location NUS ‐time 2014/09/09 23:59 2014/09/08 00:00 to 2014/09/09 23:59");
 		assertEquals(invalidTest, MESSAGE_COMMAND_ERROR);
@@ -27,7 +27,7 @@ public class CommandLineUITest {
 	
 	@Test
 	public void testExitCommand() throws HandledException, FatalException {
-		CommandLineUI test = CommandLineUI.getInstance(null, false);
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		//test exit command
 		String exitTest = test.testCommand("exit");
 		assertEquals(exitTest, "EXIT");
@@ -35,7 +35,7 @@ public class CommandLineUITest {
 		
 	@Test
 	public void testAddCommand() throws HandledException, FatalException {
-		CommandLineUI test = CommandLineUI.getInstance(null, false);
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		//test add 
 		String addTest = test.testCommand("add -title write test cases -description write test cases for CS2103 -location eclipse -time 2014/08/08/00:00 to 2014/09/09/23:59 -recurring 2d2");
 		assertEquals(addTest, MESSAGE_ADD_SUCCESS);
@@ -43,7 +43,7 @@ public class CommandLineUITest {
 		
 	@Test
 	public void testUpdateCommand() throws HandledException, FatalException {
-		CommandLineUI test = CommandLineUI.getInstance(null, false);
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		test.testCommand("add -title write test cases -description write test cases for CS2103 -location eclipse -time 2014/08/08/00:00 to 2014/09/09/23:59 -recurring 2d2");
 		
 		//test update command
@@ -55,7 +55,7 @@ public class CommandLineUITest {
 	
 	@Test
 	public void testSearchCommand() throws HandledException, FatalException {
-		CommandLineUI test = CommandLineUI.getInstance(null, false);
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		//test search command
 		String searchTest = test.testCommand("search floating");
 		assertEquals(searchTest, MESSAGE_EMPTY_SEARCH);
@@ -63,7 +63,7 @@ public class CommandLineUITest {
 	
 	@Test
 	public void testDeleteCommand() throws HandledException, FatalException {
-		CommandLineUI test = CommandLineUI.getInstance(null, false);
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		test.testCommand("add -title write test cases -description write test cases for CS2103 -location eclipse -time 2014/08/08/00:00 to 2014/09/09/23:59 -recurring 2d2");
 		//test delete command
 		String deleteTest = test.testCommand("delete 1");

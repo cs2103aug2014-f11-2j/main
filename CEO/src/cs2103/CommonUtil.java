@@ -70,7 +70,7 @@ public class CommonUtil {
 		}
 	}
 	
-	private static void print(Ansi feedback) {
+	public static void print(Ansi feedback) {
 		if (feedback != null){
 			AnsiConsole.out.println(feedback);
 		}

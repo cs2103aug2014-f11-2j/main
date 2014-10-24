@@ -8,12 +8,13 @@ import org.junit.Test;
 import cs2103.TaskList;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
+import cs2103.parameters.Option;
 
 public class AddTest {
 	
 	@BeforeClass 
 	public static void initialise() throws HandledException, FatalException{
-		TaskList.getInstance(null,false);
+		TaskList.getInstance(new Option(Option.Value.TEST));
 	}
 	
 	@Test

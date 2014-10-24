@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
+import cs2103.parameters.Option;
 import cs2103.task.DeadlineTask;
 import cs2103.task.FloatingTask;
 import cs2103.task.PeriodicTask;
@@ -21,7 +22,7 @@ public class TaskListTest {
 	
 	@Test
 	public void testGetPeriodicList() throws FatalException, HandledException {
-		TaskList test = TaskList.getInstance(null, false);
+		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
 		Uid testUid = new Uid("test");
 		
 		Calendar cal =Calendar.getInstance();
@@ -41,7 +42,7 @@ public class TaskListTest {
 
 	@Test
 	public void testGetDeadlineList() throws FatalException, HandledException {
-		TaskList test = TaskList.getInstance(null, false);
+		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
 		Uid testUid = new Uid("test");
 		
 		Calendar cal =Calendar.getInstance();
@@ -61,7 +62,7 @@ public class TaskListTest {
 
 	@Test
 	public void testGetFloatingList() throws HandledException, FatalException {
-		TaskList test = TaskList.getInstance(null, false);
+		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
 		Uid testUid = new Uid("test");
 		
 		Calendar cal =Calendar.getInstance();
@@ -78,7 +79,7 @@ public class TaskListTest {
 	
 	@Test
 	public void testGetAllList() throws HandledException, FatalException {
-		TaskList testAll = TaskList.getInstance(null, false);
+		TaskList testAll = TaskList.getInstance(new Option(Option.Value.TEST));
 		Uid testUid = new Uid("test");
 		
 		Calendar cal =Calendar.getInstance();
@@ -102,7 +103,7 @@ public class TaskListTest {
 	
 	@Test
 	public void testGetTaskByID() throws HandledException, FatalException {
-		TaskList test = TaskList.getInstance(null, false);
+		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
 		Uid testUid = new Uid("test");
 		
 		Calendar cal =Calendar.getInstance();
@@ -123,7 +124,7 @@ public class TaskListTest {
 	
 	@Test
 	public void testAddTask() throws HandledException, FatalException {
-		TaskList testAdd = TaskList.getInstance(null, false);
+		TaskList testAdd = TaskList.getInstance(new Option(Option.Value.TEST));
 		Uid testUid = new Uid("test");
 		
 		Calendar cal =Calendar.getInstance();
@@ -143,7 +144,7 @@ public class TaskListTest {
 	
 	@Test
 	public void testUpdateTask() throws HandledException, FatalException {
-		TaskList test = TaskList.getInstance(null, false);
+		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
 		Uid testUid = new Uid("test");
 		
 		Calendar cal =Calendar.getInstance();
@@ -168,7 +169,7 @@ public class TaskListTest {
 
 	@Test
 	public void testDeleteTask() throws HandledException, FatalException {
-		TaskList test = TaskList.getInstance(null, false);
+		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
 		Uid testUid = new Uid("test");
 		
 		Calendar cal =Calendar.getInstance();

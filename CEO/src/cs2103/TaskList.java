@@ -1,9 +1,11 @@
 package cs2103;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
+import cs2103.parameters.Option;
 import cs2103.storage.StorageEngine;
 import cs2103.task.DeadlineTask;
 import cs2103.task.FloatingTask;
@@ -14,21 +16,36 @@ import java.util.Collections;
 
 public class TaskList {
 	private static TaskList taskList;
-	private StorageEngine storage;
+	private final StorageEngine storage;
+	private final StorageEngine trash;
+	private final File dataFile = new File("CEOStore.ics");
+	private final File trashFile = new File("CEOTrash.ics");
+	private boolean enableSync;
 	private ArrayList<Task> tasks;
+	private ArrayList<Task> trashs;
 	
-	private TaskList(String dataFile, boolean writeToFile) throws FatalException, HandledException{
-		if (writeToFile){
-			this.storage = new StorageEngine(dataFile);
-		} else {
+	private TaskList(Option option) throws FatalException, HandledException{
+		this.enableSync = false;
+		switch(option.getValue()){
+		default:
+		case DEFAULT:
+			this.enableSync = true;
+		case NOSYNC:
+			this.storage = new StorageEngine(this.dataFile);
+			this.trash = new StorageEngine(trashFile);
+			break;
+		case TEST:
 			this.storage = new StorageStub();
+			this.trash = new StorageStub();
+			break;
 		}
 		this.tasks = this.storage.getTaskList();
+		this.trashs = this.trash.getTaskList();
 	}
 	
-	public static TaskList getInstance(String dataFile, boolean writeToFile) throws HandledException, FatalException{
+	public static TaskList getInstance(Option option) throws HandledException, FatalException{
 		if (taskList == null){
-			taskList = new TaskList(dataFile, writeToFile);
+			taskList = new TaskList(option);
 		}
 		return taskList;
 	}

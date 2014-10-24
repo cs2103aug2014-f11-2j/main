@@ -4,7 +4,7 @@ import cs2103.CommonUtil;
 import cs2103.exception.HandledException;
 
 public class Option implements Parameter {
-	public static final String type = "OPTIONS";
+	public static final String type = "OPTION";
 	public static enum Value {
 		DEFAULT, SYNC, NOSYNC, TEST;
 	}
