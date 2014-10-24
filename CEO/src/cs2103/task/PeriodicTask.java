@@ -85,21 +85,18 @@ public class PeriodicTask extends Task {
 	private FloatingTask toFloating() throws HandledException {
 		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getTitle(), false);
 		newTask.updateDescription(this.getDescription());
-		newTask.updateTaskID(this.getTaskID());
 		return newTask;
 	}
 
 	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
 		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getCreated(), this.getTitle(), dueTime, false);
 		newTask.updateDescription(this.getDescription());
-		newTask.updateTaskID(this.getTaskID());
 		return newTask;
 	}
 
 	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
 		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getCreated(), this.getTitle(), this.getLocation(), startTime, endTime, this.getRecurrence());
 		newTask.updateDescription(this.getDescription());
-		newTask.updateTaskID(this.getTaskID());
 		return newTask;
 	}
 
@@ -108,7 +105,6 @@ public class PeriodicTask extends Task {
 		try {
 			PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getCreated(), this.getTitle(), this.getLocation(), this.getStartTime(), this.getEndTime(), this.getRecurrence());
 			newTask.updateDescription(this.getDescription());
-			newTask.updateTaskID(this.getTaskID());
 			return newTask;
 		} catch (HandledException e) {
 			throw new CloneNotSupportedException();

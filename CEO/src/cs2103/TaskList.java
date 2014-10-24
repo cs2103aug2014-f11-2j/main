@@ -7,6 +7,7 @@ import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Option;
 import cs2103.storage.StorageEngine;
+import cs2103.storage.StorageStub;
 import cs2103.task.DeadlineTask;
 import cs2103.task.FloatingTask;
 import cs2103.task.PeriodicTask;
@@ -112,6 +113,15 @@ public class TaskList {
 		} else {
 			return this.tasks.get(taskID-1);
 		}
+	}
+	
+	public Task getTaskByTask(Task task){
+		for (Task existingTask:this.tasks){
+			if (existingTask.equals(task)){
+				return existingTask;
+			}
+		}
+		return null;
 	}
 	
 	public void addTask(Task task) throws HandledException, FatalException{

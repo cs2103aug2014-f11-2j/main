@@ -59,7 +59,7 @@ public class Update extends InfluentialCommand {
 			newTask.updateRecurrence(this.parameterList.getRecurrence().getValue());
 		}
 		newTask.updateLastModified(null);
-		TaskList.getInstance().updateTask(newTask);
+		newTask = this.updateTaskToList(newTask);
 		this.undoBackup = task;
 		this.redoBackup = newTask;
 		return this.formatReturnString(String.format(MESSAGE_UPDATE_FORMAT, this.parameterList.getTaskID().getValue()), newTask);
@@ -72,6 +72,14 @@ public class Update extends InfluentialCommand {
 		} catch (CloneNotSupportedException e) {
 			throw new HandledException(HandledException.ExceptionType.CLONE_FAILED);
 		}
+	}
+	
+	private Task updateTaskToList(Task newTask) throws HandledException, FatalException{
+		TaskList taskList = TaskList.getInstance();
+		taskList.updateTask(newTask);
+		newTask = taskList.getTaskByTask(newTask);
+		CommonUtil.checkNull(newTask, HandledException.ExceptionType.INVALID_TASK_OBJ);
+		return newTask;
 	}
 	
 	@Override
