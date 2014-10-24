@@ -18,21 +18,23 @@ public class TaskList {
 	private static TaskList taskList;
 	private final StorageEngine storage;
 	private final StorageEngine trash;
-	private final File dataFile = new File("CEOStore.ics");
-	private final File trashFile = new File("CEOTrash.ics");
+	private final File dataFile;
+	private final File trashFile;
 	private boolean enableSync;
 	private ArrayList<Task> tasks;
 	private ArrayList<Task> trashs;
 	
 	private TaskList(Option option) throws FatalException, HandledException{
 		this.enableSync = false;
+		this.dataFile = new File("CEOStore.ics");
+		this.trashFile = new File("CEOTrash.ics");
 		switch(option.getValue()){
 		default:
 		case DEFAULT:
 			this.enableSync = true;
 		case NOSYNC:
 			this.storage = new StorageEngine(this.dataFile);
-			this.trash = new StorageEngine(trashFile);
+			this.trash = new StorageEngine(this.trashFile);
 			break;
 		case TEST:
 			this.storage = new StorageStub();

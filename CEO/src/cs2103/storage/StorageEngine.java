@@ -45,7 +45,7 @@ public class StorageEngine {
 	private final File file;
 	
 	public StorageEngine(){
-		file = null;
+		this.file = null;
 	}
 	
 	public StorageEngine(File file) throws HandledException, FatalException{
@@ -53,10 +53,10 @@ public class StorageEngine {
 			throw new FatalException(FatalException.ExceptionType.ILLEGAL_FILE);
 		}
 		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION, true);
-		if (!file.exists() || file.length()==0){
+		this.file = file;
+		if (!this.file.exists() || this.file.length() == 0){
 			createNewFile();
 		}
-		this.file = file;
 		readFromFile();
 	}
 	
