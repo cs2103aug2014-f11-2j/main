@@ -30,7 +30,7 @@ public class DeadlineTask extends Task {
 		this.complete=complete;
 	}
 	
-	public Date getDueTime(){
+	public DateTime getDueTime(){
 		return this.dueTime;
 	}
 	
@@ -121,7 +121,7 @@ public class DeadlineTask extends Task {
 
 	@Override
 	public Component toComponent() {
-		VToDo component = new VToDo(new DateTime(this.getDueTime()), new DateTime(this.getDueTime()), this.getTitle());
+		VToDo component = new VToDo(this.getDueTime(), this.getDueTime(), this.getTitle());
 		this.addCommonProperty(component);
 		component.getProperties().add(completeToStatus(this.getComplete()));
 		return component;

@@ -106,7 +106,7 @@ public class FloatingTask extends Task {
 
 	@Override
 	public Component toComponent() {
-		VToDo component = new VToDo(new DateTime(new Date()), this.getTitle());
+		VToDo component = new VToDo(new DateTime(), this.getTitle());
 		this.addCommonProperty(component);
 		component.getProperties().add(completeToStatus(this.getComplete()));
 		return component;

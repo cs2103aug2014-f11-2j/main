@@ -30,11 +30,11 @@ public class PeriodicTask extends Task {
 		this.updateRecurrence(recurrence);
 	}
 	
-	public Date getStartTime(){
+	public DateTime getStartTime(){
 		return this.startTime;
 	}
 	
-	public Date getEndTime(){
+	public DateTime getEndTime(){
 		return this.endTime;
 	}
 	
@@ -158,7 +158,7 @@ public class PeriodicTask extends Task {
 
 	@Override
 	public Component toComponent() {
-		VEvent component = new VEvent(new DateTime(this.getStartTime()), new DateTime(this.getEndTime()),this.getTitle());
+		VEvent component = new VEvent(this.getStartTime(), this.getEndTime(),this.getTitle());
 		this.addCommonProperty(component);
 		if (this.getRecurrence() != null){
 			component.getProperties().add(new RRule(this.getRecurrence()));
