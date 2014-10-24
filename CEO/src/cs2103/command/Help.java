@@ -11,7 +11,7 @@ public class Help extends QueryCommand {
             								  "      [-L or -location <location>] [-R or -recurring <number h/d/w/m/y>]\n" +
             								  "      [-T or -time {<blank>|<time>|<<time> to <time>>}])\n" +
             								  "  +Add a new task. Enter \"help add\" for more\n\n" +
-            								  "  list <floating|deadline|periodic|all>\n" +
+            								  "  list (<floating|deadline|periodic|all>)\n" +
             								  "  +List existing tasks. Enter \"help list\" for more\n\n" +
             								  "  show <task ID>\n" +
             								  "  +Show detail of the task with specified task ID. Enter \"help show\" for more\n\n" +
@@ -93,11 +93,12 @@ public class Help extends QueryCommand {
 			 								 "           -time 2014/10/12 14:30 -complete true\n\n" + 
 			 								 "This will effectively update the task with Task ID 1 to a Deadline task with title \"Task Title\", with description \"Describe this task\", with a deadline at 2014/10/12 14:30 and indicate the task is complete\n";
 	public static final String HELP_LIST = "List usage:\n" +
-										   "list <floating|deadline|periodic|all>\n" +
-										   "\tfloating\t\tlist tasks with no dates set\n" +
-										   "\tperiodic\t\tlist tasks that are recurring\n" +
-										   "\tdeadline\t\tlist tasks that have a single deadline\n\n" +
-										   "\tall\t\tlist all tasks" +
+										   "list (<floating|deadline|periodic|all>)\n" +
+										   "  list only incomplete tasks if no type is specified\n" +
+										   "  floating\t\tlist tasks with no dates set\n" +
+										   "  periodic\t\tlist tasks that are recurring\n" +
+										   "  deadline\t\tlist tasks that have a single deadline\n\n" +
+										   "  all\t\tlist all tasks" +
 										   "Example:\nlist deadline\n";
 	public static final String HELP_SHOW = "Show has no extra options\n" +
 										   "Example:\nshow 1\n";
@@ -116,7 +117,6 @@ public class Help extends QueryCommand {
 			 								 "  -keyword <Keyword>          Search title, description and location\n" +
 			 								 "                              for the specified keyword\n" +
 			 								 "  -complete <true|false>      Specify the complete status you want to search\n" +
-			 								 "                              Periodic tasks will be excluded\n" +
 			 								 "  -time <blank>               Search only deadline and periodic tasks\n" +
 			 								 "        <time>                Search deadline and periodic tasks that\n" +
 			 								 "                              due time or start time is before given time\n" +

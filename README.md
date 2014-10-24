@@ -13,7 +13,7 @@ Basic Command Line Interface Usage
  
  2. Show tasklist:
  
- `List <floating|deadline|periodic|all>`
+ `List (<floating|deadline|periodic|all>)`
  
  3. Show task detail:
  
