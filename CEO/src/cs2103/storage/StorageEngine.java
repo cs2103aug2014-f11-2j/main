@@ -1,4 +1,4 @@
-package cs2103;
+package cs2103.storage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,13 +8,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
+import cs2103.CommonUtil;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.task.DeadlineTask;
 import cs2103.task.FloatingTask;
 import cs2103.task.PeriodicTask;
 import cs2103.task.Task;
+
 import java.util.Collections;
+
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.data.ParserException;

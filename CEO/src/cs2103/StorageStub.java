@@ -3,6 +3,7 @@ package cs2103;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import cs2103.storage.StorageEngine;
 import cs2103.task.Task;
 
 public class StorageStub extends StorageEngine {

@@ -62,9 +62,10 @@ public class CommandLineUI {
 		CommonUtil.print(new Alert().execute());
 		while (true) {
 			CommonUtil.printPrompt(MESSAGE_USER_PROMPT);
-			String command = takeUserInput();
+			String command = scanner.nextLine();
+			CommonUtil.clearConsole();
 			if (command != null && !command.isEmpty()){
-				String feedback=processUserInput(command);
+				String feedback = processUserInput(command);
 				if (feedback != null && feedback.equalsIgnoreCase("EXIT")){
 					CommonUtil.print(MESSAGE_EXIT);
 					break;
@@ -72,14 +73,6 @@ public class CommandLineUI {
 				CommonUtil.print(feedback);
 			}
 		}
-	}
-	
-	private String takeUserInput(){
-		String userInput = scanner.nextLine();
-		if (userInput.equals("")){
-			userInput = null;
-		}
-		return userInput;
 	}
 	
 	private String processUserInput(String userInput) {

@@ -1,4 +1,4 @@
-package cs2103;
+package cs2103.storage;
 
 import static org.junit.Assert.*;
 
@@ -9,6 +9,7 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 
+import cs2103.TestUtil;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.task.*;
