@@ -95,15 +95,8 @@ public class Search extends QueryCommand {
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		if (searchList != null){
 			for (Task task:searchList) {
-				if( task instanceof FloatingTask) {
-					if ((((FloatingTask)task).getComplete())==complete) {
-						returnList.add(task);
-					}
-				}
-				if (task instanceof DeadlineTask) {
-					if ((((DeadlineTask)task).getComplete())==complete) {
-						returnList.add(task);
-					}
+				if (task.getComplete() == complete){
+					returnList.add(task);
 				}
 			}
 		}

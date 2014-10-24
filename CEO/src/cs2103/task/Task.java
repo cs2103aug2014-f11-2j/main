@@ -147,6 +147,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	public abstract String toSummary();
 	public abstract String toDetail();
 	public abstract Component toComponent();
+	public abstract boolean getComplete();
 	public abstract boolean checkPeriod(Date[] time);
 	public abstract boolean matches(String keyword);
 	public boolean checkAlert() {

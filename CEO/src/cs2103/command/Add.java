@@ -19,7 +19,7 @@ import cs2103.parameters.Title;
 import cs2103.task.*;
 
 public class Add extends InfluentialCommand {
-	private static final String MESSAGE_ADD = "You have successfully added a new task.";
+	private static final String MESSAGE_ADD = "You have successfully added a new task.\n";
 	private static final String[] allowedQuickTimeLiteral = {"from", "by", "on", "in", "at"};
 	
 	public Add(String command) throws HandledException{
@@ -56,7 +56,7 @@ public class Add extends InfluentialCommand {
 		TaskList.getInstance().addTask(task);
 		this.undoBackup = task;
 		this.redoBackup = task;
-		return MESSAGE_ADD;
+		return this.formatReturnString(MESSAGE_ADD, task);
 	}
 	
 	private static ArrayList<Parameter> parseQuickAdd(String quickAddString) throws HandledException{

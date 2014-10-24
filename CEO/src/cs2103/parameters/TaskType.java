@@ -5,7 +5,7 @@ public class TaskType implements Parameter {
 	private final Value value;
 	
 	public static enum Value {
-		ALL, FLOATING, DEADLINE, PERIODIC, INVALID;
+		ALL, FLOATING, DEADLINE, PERIODIC, DEFAULT, INVALID;
 	}
 	
 	public TaskType(Value value){
@@ -26,8 +26,8 @@ public class TaskType implements Parameter {
 	}
 	
 	private static Value parseTaskType(String taskTypeString){
-		if (taskTypeString == null){
-			return Value.INVALID;
+		if (taskTypeString == null || taskTypeString.isEmpty()){
+			return Value.DEFAULT;
 		}
 		if (taskTypeString.equalsIgnoreCase("all")){
 			return Value.ALL;

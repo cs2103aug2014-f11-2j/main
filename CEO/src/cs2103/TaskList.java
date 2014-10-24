@@ -83,9 +83,8 @@ public class TaskList {
 	}
 	
 	public ArrayList<FloatingTask> getFloatingList() throws HandledException, FatalException{
-		ArrayList<Task> allList = getAllList();
 		ArrayList<FloatingTask> returnList = new ArrayList<FloatingTask>();
-		for (Task task:allList){
+		for (Task task:this.tasks){
 			if (task instanceof FloatingTask){
 				returnList.add((FloatingTask) task);
 			}
@@ -93,11 +92,21 @@ public class TaskList {
 		return returnList;
 	}
 	
-	public ArrayList<Task> getAllList() throws HandledException, FatalException{
+	public ArrayList<Task> getDefaultList() throws HandledException{
+		ArrayList<Task> returnList = new ArrayList<Task>();
+		for (Task task:this.tasks){
+			if (!task.getComplete()){
+				returnList.add(task);
+			}
+		}
+		return returnList;
+	}
+	
+	public ArrayList<Task> getAllList() throws HandledException{
 		return this.tasks;
 	}
 	
-	public Task getTaskByID(int taskID) throws HandledException, FatalException{
+	public Task getTaskByID(int taskID) throws HandledException{
 		if (taskID > this.tasks.size() || taskID < 1){
 			throw new HandledException(HandledException.ExceptionType.INVALID_TASKID);
 		} else {

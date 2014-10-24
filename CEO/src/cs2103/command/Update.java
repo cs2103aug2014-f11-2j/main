@@ -17,7 +17,7 @@ import cs2103.parameters.Title;
 import cs2103.task.Task;
 
 public class Update extends InfluentialCommand {
-	private static final String MESSAGE_UPDATE_FORMAT = "You have updated task with ID %1$d";
+	private static final String MESSAGE_UPDATE_FORMAT = "You have updated task with ID %1$d\n";
 	
 	public Update(String command) throws HandledException{
 		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
@@ -62,7 +62,7 @@ public class Update extends InfluentialCommand {
 		TaskList.getInstance().updateTask(newTask);
 		this.undoBackup = task;
 		this.redoBackup = newTask;
-		return String.format(MESSAGE_UPDATE_FORMAT, this.parameterList.getTaskID().getValue());
+		return this.formatReturnString(String.format(MESSAGE_UPDATE_FORMAT, this.parameterList.getTaskID().getValue()), newTask);
 	}
 	
 	private static Task cloneTask(Task task) throws HandledException{

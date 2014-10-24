@@ -19,10 +19,12 @@ public class FloatingTask extends Task {
 		this.updateComplete(complete);
 	}
 	
+	@Override
 	public boolean getComplete(){
 		return this.complete;
 	}
 	
+	@Override
 	public void updateComplete(boolean complete){
 		this.complete=complete;
 	}
@@ -50,12 +52,14 @@ public class FloatingTask extends Task {
 	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
 		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getCreated(), this.getTitle(), dueTime, this.getComplete());
 		newTask.updateDescription(this.getDescription());
+		newTask.updateTaskID(this.getTaskID());
 		return newTask;
 	}
 
 	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
 		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getCreated(), this.getTitle(), null, startTime, endTime, null);
 		newTask.updateDescription(this.getDescription());
+		newTask.updateTaskID(this.getTaskID());
 		return newTask;
 	}
 
@@ -64,6 +68,7 @@ public class FloatingTask extends Task {
 		try {
 			FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getTitle(), this.getComplete());
 			newTask.updateDescription(this.getDescription());
+			newTask.updateTaskID(this.getTaskID());
 			return newTask;
 		} catch (HandledException e) {
 			throw new CloneNotSupportedException();
