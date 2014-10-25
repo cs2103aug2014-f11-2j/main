@@ -8,10 +8,18 @@ import cs2103.exception.HandledException;
 import cs2103.task.Task;
 
 public class StorageStub implements StorageInterface {
+	private static StorageStub storage;
 	private ArrayList<Task> tasks;
 	
-	public StorageStub(){
+	private StorageStub(){
 		this.tasks = new ArrayList<Task>();
+	}
+	
+	public static StorageStub getInstance(){
+		if (storage == null){
+			storage = new StorageStub();
+		}
+		return storage;
 	}
 	
 	@Override

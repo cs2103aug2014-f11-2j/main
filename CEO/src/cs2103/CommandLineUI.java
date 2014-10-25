@@ -108,6 +108,9 @@ public class CommandLineUI {
 			case MARK:
 				commandObject = new Mark(command[1]);
 				break;
+			case RESTORE:
+				commandObject = new Restore(command[1]);
+				break;
 			case INVALID:
 			default:
 				return MESSAGE_COMMAND_ERROR;

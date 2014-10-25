@@ -39,11 +39,12 @@ import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.util.CompatibilityHints;
 
 public class StorageEngine implements StorageInterface{
+	private static StorageEngine storage;
 	private net.fortuna.ical4j.model.Calendar calendar;
 	private IndexedComponentList indexedComponents;
 	private final File file;
 	
-	public StorageEngine(File file) throws HandledException, FatalException{
+	private StorageEngine(File file) throws HandledException, FatalException{
 		if (file == null){
 			throw new FatalException(FatalException.ExceptionType.ILLEGAL_FILE);
 		}
@@ -53,6 +54,13 @@ public class StorageEngine implements StorageInterface{
 			createNewFile();
 		}
 		readFromFile();
+	}
+	
+	public static StorageEngine getInstance(File file) throws HandledException, FatalException{
+		if (storage == null){
+			storage = new StorageEngine(file);
+		}
+		return storage;
 	}
 	
 	public ArrayList<Task> getTaskList() throws FatalException, HandledException{

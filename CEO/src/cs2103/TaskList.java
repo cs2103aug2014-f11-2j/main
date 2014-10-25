@@ -31,10 +31,10 @@ public class TaskList {
 		case DEFAULT:
 			this.enableSync = true;
 		case NOSYNC:
-			this.storage = new StorageEngine(this.dataFile);
+			this.storage = StorageEngine.getInstance(this.dataFile);
 			break;
 		case TEST:
-			this.storage = new StorageStub();
+			this.storage = StorageStub.getInstance();
 			break;
 		}
 		this.tasks = this.storage.getTaskList();
