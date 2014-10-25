@@ -22,13 +22,10 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Preconditions;
-import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
-import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.TasksScopes;
 
 import cs2103.CommonUtil;
-import cs2103.exception.HandledException;
 
 public class GoogleReceiver {
 	private static final String APPLICATION_NAME = "cs2103-CEO/1.0";
@@ -52,9 +49,10 @@ public class GoogleReceiver {
 	    receiver = new LocalServerReceiver();
 	    clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(new ByteArrayInputStream(client_secret.getBytes())));
 	    flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, clientSecrets, scopes).setDataStoreFactory(dataStoreFactory).build();
+	    this.authorize();
 	}
 	
-	public Credential authorize() throws HandledException, IOException{
+	private Credential authorize() throws IOException{
 		try{
 			Credential credential = flow.loadCredential(userId);
 			if (credential != null && (credential.getRefreshToken() != null || credential.getExpiresInSeconds() > 60)) {
@@ -70,15 +68,15 @@ public class GoogleReceiver {
 		}
 	}
 	
-	public Calendar getCalendar() throws HandledException, IOException{
-		return new Calendar.Builder(httpTransport, JSON_FACTORY, this.authorize()).setApplicationName(APPLICATION_NAME).build();
+	public com.google.api.services.calendar.Calendar getCalendarClient() throws IOException{
+		return new com.google.api.services.calendar.Calendar.Builder(httpTransport, JSON_FACTORY, this.authorize()).setApplicationName(APPLICATION_NAME).build();
 	}
 	
-	public Tasks getTasks() throws HandledException, IOException{
-		return new Tasks.Builder(httpTransport, JSON_FACTORY, this.authorize()).setApplicationName(APPLICATION_NAME).build();
+	public com.google.api.services.tasks.Tasks getTasksClient() throws IOException{
+		return new com.google.api.services.tasks.Tasks.Builder(httpTransport, JSON_FACTORY, this.authorize()).setApplicationName(APPLICATION_NAME).build();
 	}
 	
-	private void onAuthorization(AuthorizationCodeRequestUrl authorizationUrl) throws HandledException, IOException{
+	private void onAuthorization(AuthorizationCodeRequestUrl authorizationUrl) throws IOException{
 	    String url = authorizationUrl.build();
 	    Preconditions.checkNotNull(url);
 	    CommonUtil.print("Please open the following address in your browser:");
@@ -88,7 +86,7 @@ public class GoogleReceiver {
 	    	CommonUtil.print("Attempting to open that address in the default browser now...");
 	    	desktop.browse(URI.create(url));
 	    } else {
-	    	throw new HandledException(HandledException.ExceptionType.LOGIN_FAIL);
+	    	throw new IOException("Login failed");
 	    }
 	}
 }

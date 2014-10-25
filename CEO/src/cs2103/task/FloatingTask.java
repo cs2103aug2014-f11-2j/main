@@ -2,6 +2,8 @@ package cs2103.task;
 
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
+
 import cs2103.exception.HandledException;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
@@ -128,7 +130,7 @@ public class FloatingTask extends Task {
 		if (keyword == null || keyword.isEmpty()){
 			return true;
 		} else {
-			if (this.getTitle().contains(keyword) || this.getDescription().contains(keyword)){
+			if (StringUtils.containsIgnoreCase(this.getTitle(), keyword) || StringUtils.containsIgnoreCase(this.getDescription(), keyword)){
 				return true;
 			} else {
 				return false;
