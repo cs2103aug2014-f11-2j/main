@@ -5,10 +5,10 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
-import cs2103.CommonUtil;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.ParameterList;
+import cs2103.util.CommonUtil;
 
 public abstract class Command {
 	protected ParameterList parameterList = new ParameterList();

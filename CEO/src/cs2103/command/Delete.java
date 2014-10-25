@@ -3,13 +3,13 @@ package cs2103.command;
 import java.util.Map;
 import java.util.Queue;
 
-import cs2103.CommonUtil;
 import cs2103.TaskList;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.DeleteOption;
 import cs2103.parameters.TaskID;
 import cs2103.task.Task;
+import cs2103.util.CommonUtil;
 
 public class Delete extends InfluentialCommand {
 	private static final String MESSAGE_DELETE_FORMAT = "You have deleted task with ID %1$d";

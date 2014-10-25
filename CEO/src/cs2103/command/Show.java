@@ -1,11 +1,11 @@
 package cs2103.command;
 
-import cs2103.CommonUtil;
 import cs2103.TaskList;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.TaskID;
 import cs2103.task.Task;
+import cs2103.util.CommonUtil;
 
 public class Show extends QueryCommand {
 	private static final String MESSAGE_SHOW_FORMAT = "The details for Task %1$d:\n";

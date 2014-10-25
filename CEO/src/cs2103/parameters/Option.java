@@ -1,7 +1,7 @@
 package cs2103.parameters;
 
-import cs2103.CommonUtil;
 import cs2103.exception.HandledException;
+import cs2103.util.CommonUtil;
 
 public class Option implements Parameter {
 	public static final String type = "OPTION";

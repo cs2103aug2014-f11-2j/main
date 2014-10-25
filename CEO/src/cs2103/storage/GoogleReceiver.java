@@ -25,7 +25,7 @@ import com.google.api.client.util.Preconditions;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.tasks.TasksScopes;
 
-import cs2103.CommonUtil;
+import cs2103.util.CommonUtil;
 
 public class GoogleReceiver {
 	private static final String APPLICATION_NAME = "cs2103-CEO/1.0";

@@ -1,4 +1,4 @@
-package cs2103;
+package cs2103.util;
 
 import java.awt.Desktop;
 import java.awt.Desktop.Action;

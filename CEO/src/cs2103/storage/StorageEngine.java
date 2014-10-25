@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
-import cs2103.CommonUtil;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.task.DeadlineTask;
 import cs2103.task.FloatingTask;
 import cs2103.task.PeriodicTask;
 import cs2103.task.Task;
+import cs2103.util.CommonUtil;
 
 import java.util.Collections;
 

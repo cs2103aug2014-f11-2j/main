@@ -14,10 +14,10 @@ import net.fortuna.ical4j.model.property.Uid;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
 
-import cs2103.CommonUtil;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.task.*;
+import cs2103.util.CommonUtil;
 
 public class GoogleEngine implements StorageInterface {
 	private final GoogleReceiver receiver;

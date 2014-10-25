@@ -9,10 +9,10 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
 
-import cs2103.TestUtil;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.task.*;
+import cs2103.util.TestUtil;
 
 public class StorageEngineTest {
 	StorageEngine storage;
