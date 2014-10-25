@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Option;
+import cs2103.storage.StorageInterface;
 import cs2103.storage.StorageEngine;
 import cs2103.storage.StorageStub;
 import cs2103.task.DeadlineTask;
@@ -17,8 +18,8 @@ import java.util.Collections;
 
 public class TaskList {
 	private static TaskList taskList;
-	private final StorageEngine storage;
-	private final StorageEngine trash;
+	private final StorageInterface storage;
+	private final StorageInterface trash;
 	private final File dataFile;
 	private final File trashFile;
 	private boolean enableSync;

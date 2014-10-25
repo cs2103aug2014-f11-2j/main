@@ -39,14 +39,10 @@ import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.util.CompatibilityHints;
 
-public class StorageEngine {
+public class StorageEngine implements StorageInterface{
 	private net.fortuna.ical4j.model.Calendar calendar;
 	private IndexedComponentList indexedComponents;
 	private final File file;
-	
-	public StorageEngine(){
-		this.file = null;
-	}
 	
 	public StorageEngine(File file) throws HandledException, FatalException{
 		if (file == null){
@@ -78,7 +74,6 @@ public class StorageEngine {
 	@SuppressWarnings("unchecked") 
 	private ArrayList<Task> readFromFile() throws FatalException, HandledException{
 		try{
-			CommonUtil.checkNull(file, FatalException.ExceptionType.ILLEGAL_FILE);
 			FileInputStream fin = new FileInputStream(file);
 			CalendarBuilder builder = new CalendarBuilder();
 			this.calendar = builder.build(fin);
@@ -102,7 +97,6 @@ public class StorageEngine {
 
 	private void writeToFile() throws HandledException, FatalException{
 		try {
-			CommonUtil.checkNull(file, FatalException.ExceptionType.ILLEGAL_FILE);
 			calendar.validate();
 			FileOutputStream fout;
 			fout = new FileOutputStream(file);

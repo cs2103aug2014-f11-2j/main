@@ -5,7 +5,7 @@ import java.util.Collections;
 
 import cs2103.task.Task;
 
-public class StorageStub extends StorageEngine {
+public class StorageStub implements StorageInterface {
 	private ArrayList<Task> tasks;
 	
 	public StorageStub(){
