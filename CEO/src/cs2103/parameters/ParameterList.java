@@ -86,4 +86,8 @@ public class ParameterList {
 	public Keyword getKeyword() throws HandledException{
 		return this.getParameter(Keyword.type, Keyword.class);
 	}
+	
+	public DeleteOption getDeleteOption() throws HandledException{
+		return this.getParameter(DeleteOption.type, DeleteOption.class);
+	}
 }
