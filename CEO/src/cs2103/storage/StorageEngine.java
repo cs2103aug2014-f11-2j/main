@@ -118,7 +118,7 @@ public class StorageEngine implements StorageInterface{
 		Component updating = task.toComponent();
 		Component existing = this.indexedComponents.getComponent(task.getTaskUID().getValue());
 		if (existing == null){
-			throw new HandledException(HandledException.ExceptionType.TASK_NOT_EXIST);
+			calendar.getComponents().add(updating);
 		}else{
 			calendar.getComponents().remove(existing);
 			calendar.getComponents().add(updating);

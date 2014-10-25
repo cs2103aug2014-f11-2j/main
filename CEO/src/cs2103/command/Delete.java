@@ -30,7 +30,7 @@ public class Delete extends InfluentialCommand {
 		if (this.undoBackup == null){
 			return null;
 		} else {
-			TaskList.getInstance().addTask(this.undoBackup);
+			TaskList.getInstance().restoreTask(this.undoBackup);
 			return this;
 		}
 	}

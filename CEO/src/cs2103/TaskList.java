@@ -19,32 +19,25 @@ import java.util.Collections;
 public class TaskList {
 	private static TaskList taskList;
 	private final StorageInterface storage;
-	private final StorageInterface trash;
 	private final File dataFile;
-	private final File trashFile;
 	private boolean enableSync;
 	private ArrayList<Task> tasks;
-	private ArrayList<Task> trashs;
 	
 	private TaskList(Option option) throws FatalException, HandledException{
 		this.enableSync = false;
 		this.dataFile = new File("CEOStore.ics");
-		this.trashFile = new File("CEOTrash.ics");
 		switch(option.getValue()){
 		default:
 		case DEFAULT:
 			this.enableSync = true;
 		case NOSYNC:
 			this.storage = new StorageEngine(this.dataFile);
-			this.trash = new StorageEngine(this.trashFile);
 			break;
 		case TEST:
 			this.storage = new StorageStub();
-			this.trash = new StorageStub();
 			break;
 		}
 		this.tasks = this.storage.getTaskList();
-		this.trashs = this.trash.getTaskList();
 	}
 	
 	public static TaskList getInstance(Option option) throws HandledException, FatalException{
@@ -152,7 +145,17 @@ public class TaskList {
 	}
 	
 	public void deleteTask(Task task) throws HandledException, FatalException{
-		task.delete();
+		if (task.isDeleted()){
+			this.storage.deleteTask(task);
+		} else {
+			task.delete();
+			this.storage.updateTask(task);
+		}
+		this.tasks = this.storage.getTaskList();
+	}
+	
+	public void restoreTask(Task task) throws HandledException, FatalException{
+		task.restore();
 		this.storage.updateTask(task);
 		this.tasks = this.storage.getTaskList();
 	}
