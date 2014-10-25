@@ -9,7 +9,6 @@ import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.DeleteOption;
 import cs2103.parameters.TaskID;
-import cs2103.parameters.Title;
 import cs2103.task.Task;
 
 public class Delete extends InfluentialCommand {
@@ -52,6 +51,9 @@ public class Delete extends InfluentialCommand {
 		if (this.redoBackup == null){
 			return null;
 		} else {
+			if (this.parameterList.getDeleteOption() != null){
+				this.redoBackup.delete();
+			}
 			TaskList.getInstance().deleteTask(this.redoBackup);
 			return this;
 		}

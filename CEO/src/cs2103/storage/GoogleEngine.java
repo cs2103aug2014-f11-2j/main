@@ -40,7 +40,17 @@ public class GoogleEngine implements StorageInterface {
 	
 	@Override
 	public void deleteTask(Task task) throws HandledException, FatalException {
-		// TODO Auto-generated method stub
+		try {
+			tryToRemove(task);
+		} catch (IOException e) {
+			try {
+				this.calendar = this.receiver.getCalendarClient();
+				this.tasks = this.receiver.getTasksClient();
+				tryToRemove(task);
+			} catch (IOException e1) {
+				throw new HandledException(HandledException.ExceptionType.SYNC_FAIL);
+			}
+		}
 	}
 
 	@Override
@@ -50,17 +60,17 @@ public class GoogleEngine implements StorageInterface {
 
 	@Override
 	public void addTask(Task task) throws HandledException, FatalException {
+		try {
+			tryToInsert(task);
+		} catch (IOException e) {
 			try {
+				this.calendar = this.receiver.getCalendarClient();
+				this.tasks = this.receiver.getTasksClient();
 				tryToInsert(task);
-			} catch (IOException e) {
-				try {
-					this.calendar = this.receiver.getCalendarClient();
-					this.tasks = this.receiver.getTasksClient();
-					tryToInsert(task);
-				} catch (IOException e1) {
-					throw new HandledException(HandledException.ExceptionType.SYNC_FAIL);
-				}
+			} catch (IOException e1) {
+				throw new HandledException(HandledException.ExceptionType.SYNC_FAIL);
 			}
+		}
 	}
 
 	@Override
@@ -113,10 +123,8 @@ public class GoogleEngine implements StorageInterface {
 	private void tryToRemove(Task task) throws IOException{
 		if (task instanceof PeriodicTask){
 			this.calendar.events().delete(calendarIdentifier, task.getTaskUID().getValue());
-		} else if (task instanceof DeadlineTask){
-			this.tasks.tasks().insert(DEFAULT_TASKS, ((DeadlineTask) task).toGTask());
-		} else if (task instanceof FloatingTask){
-			this.tasks.tasks().insert(DEFAULT_TASKS, ((FloatingTask) task).toGTask());
+		} else if (task instanceof DeadlineTask || task instanceof FloatingTask){
+			this.tasks.tasks().delete(DEFAULT_TASKS, task.getTaskUID().getValue());
 		}
 	}
 	
