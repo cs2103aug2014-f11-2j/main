@@ -26,8 +26,8 @@ public class StorageEngineTest {
 	
 	@Test
 	public void testAddNewTask() throws HandledException, FatalException {
-		Task task1 = new FloatingTask(null, null, "Test 1", false);
-		Task task2 = new DeadlineTask(null, null, "Test 2", new Date(), false);
+		Task task1 = new FloatingTask(null, null, "Test 1", null);
+		Task task2 = new DeadlineTask(null, null, "Test 2", new Date(), null);
 		Task task3 = new PeriodicTask(null, null, "Test 3", "Test Location", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis() + 864000L), null);
 		storage.updateTask(task1);
 		storage.updateTask(task2);

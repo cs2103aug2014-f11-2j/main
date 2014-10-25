@@ -158,9 +158,9 @@ public class StorageEngine implements StorageInterface{
 		Date componentCreated = component.getCreated() == null? new Date():component.getCreated().getDateTime();
 		String componentTitle = readTitle(component);
 		if (component.getDue() == null){
-			task = new FloatingTask(componentUID, componentCreated, componentTitle, readStatusToComplete(component));
+			task = new FloatingTask(componentUID, componentCreated, componentTitle, readCompleted(component));
 		}else{
-			task = new DeadlineTask(componentUID, componentCreated, componentTitle, component.getDue().getDate(),readStatusToComplete(component));
+			task = new DeadlineTask(componentUID, componentCreated, componentTitle, component.getDue().getDate(),readCompleted(component));
 		}
 		task.updateDescription(readDescription(component));
 		task.updateLastModified(component.getLastModified() == null? new Date():component.getLastModified().getDateTime());
@@ -175,11 +175,11 @@ public class StorageEngine implements StorageInterface{
 		}
 	}
 	
-	private boolean readStatusToComplete(VToDo component){
-		if (component.getStatus().equals(Status.VTODO_COMPLETED)){
-			return true;
+	private Date readCompleted(VToDo component){
+		if (component.getDateCompleted() == null){
+			return null;
 		}else{
-			return false;
+			return component.getDateCompleted().getDateTime();
 		}
 	}
 	

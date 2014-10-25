@@ -9,26 +9,31 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VToDo;
+import net.fortuna.ical4j.model.property.Completed;
 import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Uid;
 
 public class FloatingTask extends Task {
-	private boolean complete;
+	private DateTime completed;
 	private static final String TYPE_FLOATING = "Floating";
 	
-	public FloatingTask(Uid taskUID, Date created, String title, boolean complete) throws HandledException{
+	public FloatingTask(Uid taskUID, Date created, String title, Date completed) throws HandledException{
 		super(taskUID, created, title);
-		this.updateComplete(complete);
+		this.updateCompleted(completed);
 	}
 	
 	@Override
-	public boolean getComplete(){
-		return this.complete;
+	public DateTime getCompleted(){
+		return this.completed;
 	}
 	
 	@Override
-	public void updateComplete(boolean complete){
-		this.complete=complete;
+	public void updateCompleted(Date completed){
+		if (completed == null){
+			this.completed = null;
+		} else {
+			this.completed = new DateTime(completed);
+		}
 	}
 	
 	@Override
@@ -52,7 +57,7 @@ public class FloatingTask extends Task {
 	}
 
 	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
-		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getCreated(), this.getTitle(), dueTime, this.getComplete());
+		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getCreated(), this.getTitle(), dueTime, this.getCompleted());
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
@@ -66,7 +71,7 @@ public class FloatingTask extends Task {
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		try {
-			FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getTitle(), this.getComplete());
+			FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getTitle(), this.getCompleted());
 			newTask.updateDescription(this.getDescription());
 			return newTask;
 		} catch (HandledException e) {
@@ -91,7 +96,7 @@ public class FloatingTask extends Task {
 		sb.append(STRING_TYPE);
 		sb.append(TYPE_FLOATING);
 		sb.append("\tStatus: ");
-		sb.append(completeToString(this.getComplete()));
+		sb.append(completedToString(this.getCompleted()));
 		return sb.append("\n").toString();
 	}
 
@@ -103,21 +108,18 @@ public class FloatingTask extends Task {
 		sb.append(this.getDescription());
 		return sb.append("\n").toString();
 	}
-	
-	private static String completeToString(boolean complete){
-		return complete?"Completed":"Needs Action";
-	}
 
 	@Override
 	public Component toComponent() {
 		VToDo component = new VToDo(new DateTime(), this.getTitle());
 		this.addCommonProperty(component);
-		component.getProperties().add(completeToStatus(this.getComplete()));
+		if (this.getCompleted() == null){
+			component.getProperties().add(Status.VTODO_NEEDS_ACTION);
+		} else {
+			component.getProperties().add(Status.VTODO_COMPLETED);
+			component.getProperties().add(new Completed(this.getCompleted()));
+		}
 		return component;
-	}
-	
-	private static Status completeToStatus(boolean complete){
-		return complete?Status.VTODO_COMPLETED:Status.VTODO_NEEDS_ACTION;
 	}
 
 	@Override

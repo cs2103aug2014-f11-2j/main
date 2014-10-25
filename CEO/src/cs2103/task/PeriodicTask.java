@@ -85,13 +85,13 @@ public class PeriodicTask extends Task {
 	}
 	
 	private FloatingTask toFloating() throws HandledException {
-		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getTitle(), false);
+		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getTitle(), null);
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
 
 	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
-		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getCreated(), this.getTitle(), dueTime, false);
+		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getCreated(), this.getTitle(), dueTime, null);
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
@@ -115,13 +115,17 @@ public class PeriodicTask extends Task {
 	}
 	
 	@Override
-	public boolean getComplete() {
-		return this.getEndTime().before(new DateTime());
+	public DateTime getCompleted() {
+		if (this.getEndTime().before(new DateTime())){
+			return this.getEndTime();
+		} else {
+			return null;
+		}
 	}
 	
 	@Override
-	public void updateComplete(boolean complete) {
-		return;
+	public void updateCompleted(Date complete) {
+		//Not needed for this type
 	}
 
 	@Override

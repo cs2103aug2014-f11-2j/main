@@ -45,15 +45,15 @@ public class Add extends InfluentialCommand {
 		String location = this.parameterList.getLocation() == null? null : this.parameterList.getLocation().getValue();
 		Recur recurrence = this.parameterList.getRecurrence() == null ? null : this.parameterList.getRecurrence().getValue();
 		if (time[0] == null && time[1] == null){
-			task = new FloatingTask(null, null, title, false);
+			task = new FloatingTask(null, null, title, null);
 		} else if (time[1] == null){
-			task = new DeadlineTask(null, null, title, time[0], false);
+			task = new DeadlineTask(null, null, title, time[0], null);
 		} else {
 			task = new PeriodicTask(null, null, title, location, time[0], time[1], recurrence);
 		}
 		task.updateDescription(description);
 		task.updateLastModified(null);
-		task = this.addTaskToList(task);
+		task = this.updateTaskToList(task);
 		this.undoBackup = task;
 		this.redoBackup = task;
 		return this.formatReturnString(MESSAGE_ADD, task);
@@ -107,14 +107,6 @@ public class Add extends InfluentialCommand {
 		} else {
 			return timeParameter.getValue();
 		}
-	}
-	
-	private Task addTaskToList(Task task) throws HandledException, FatalException{
-		TaskList taskList = TaskList.getInstance();
-		taskList.addTask(task);
-		task = taskList.getTaskByTask(task);
-		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
-		return task;
 	}
 	
 	@Override

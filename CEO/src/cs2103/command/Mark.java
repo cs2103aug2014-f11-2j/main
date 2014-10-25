@@ -1,5 +1,7 @@
 package cs2103.command;
 
+import java.util.Date;
+
 import cs2103.CommonUtil;
 import cs2103.TaskList;
 import cs2103.exception.FatalException;
@@ -9,7 +11,7 @@ import cs2103.task.PeriodicTask;
 import cs2103.task.Task;
 
 public class Mark extends InfluentialCommand {
-	private static final String MESSAGE_MARK_FORMAT = "Successfully marked %1$d as completed";
+	private static final String MESSAGE_MARK_FORMAT = "Successfully marked %1$d as completed\n";
 	private static final String MESSAGE_MARK_FAILED = "The task you specified does not contain status information";
 	
 	public Mark(String command) throws HandledException{
@@ -24,11 +26,12 @@ public class Mark extends InfluentialCommand {
 			return MESSAGE_MARK_FAILED;
 		} else {
 			Task newTask = cloneTask(task);
-			newTask.updateComplete(true);
+			newTask.updateCompleted(new Date());
 			TaskList.getInstance().updateTask(newTask);
+			newTask = this.updateTaskToList(newTask);
 			this.undoBackup = task;
 			this.redoBackup = newTask;
-			return String.format(MESSAGE_MARK_FORMAT, parameterList.getTaskID().getValue());
+			return this.formatReturnString(String.format(MESSAGE_MARK_FORMAT, this.parameterList.getTaskID().getValue()), newTask);
 		}
 	}
 	

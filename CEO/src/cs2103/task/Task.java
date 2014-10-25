@@ -118,6 +118,10 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.UK);
 		return dateFormat.format(date);
 	}
+
+	protected static String completedToString(DateTime completed){
+		return completed == null?"Needs Action":"Completed";
+	}
 	
 	private static Uid generateUid() throws HandledException{
 		try {
@@ -138,7 +142,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		}
 	}
 	
-	public abstract void updateComplete(boolean complete);
+	public abstract void updateCompleted(Date complete);
 	public abstract void updateLocation(String location);
 	public abstract void updateRecurrence(Recur recurrence);
 	public abstract Task convert(Date[] time) throws HandledException;
@@ -147,9 +151,10 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	public abstract String toSummary();
 	public abstract String toDetail();
 	public abstract Component toComponent();
-	public abstract boolean getComplete();
+	public abstract DateTime getCompleted();
 	public abstract boolean checkPeriod(Date[] time);
 	public abstract boolean matches(String keyword);
+	
 	public boolean checkAlert() {
 		Date[] time = new Date[2];
 		time[0] = new Date();

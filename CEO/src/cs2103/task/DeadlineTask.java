@@ -10,28 +10,33 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VToDo;
+import net.fortuna.ical4j.model.property.Completed;
 import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Uid;
 
 public class DeadlineTask extends Task {
 	private DateTime dueTime;
-	private boolean complete;
+	private DateTime completed;
 	private static final String TYPE_DEADLINE = "Deadline";
 	
-	public DeadlineTask(Uid taskUID, Date created, String title, Date dueTime, boolean complete) throws HandledException {
+	public DeadlineTask(Uid taskUID, Date created, String title, Date dueTime, Date completed) throws HandledException {
 		super(taskUID, created, title);
 		this.updateDueTime(dueTime);;
-		this.updateComplete(complete);
+		this.updateCompleted(completed);
 	}
 	
 	@Override
-	public boolean getComplete(){
-		return this.complete;
+	public DateTime getCompleted(){
+		return this.completed;
 	}
 	
 	@Override
-	public void updateComplete(boolean complete){
-		this.complete=complete;
+	public void updateCompleted(Date completed){
+		if (completed == null){
+			this.completed = null;
+		} else {
+			this.completed = new DateTime(completed);
+		}
 	}
 	
 	public DateTime getDueTime(){
@@ -59,13 +64,13 @@ public class DeadlineTask extends Task {
 	}
 	
 	private FloatingTask toFloating() throws HandledException {
-		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getTitle(), false);
+		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getTitle(), this.getCompleted());
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
 
 	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
-		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getCreated(), this.getTitle(), dueTime, this.getComplete());
+		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getCreated(), this.getTitle(), dueTime, this.getCompleted());
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
@@ -79,7 +84,7 @@ public class DeadlineTask extends Task {
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		try {
-			DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getCreated(), this.getTitle(), this.getDueTime(), this.getComplete());
+			DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getCreated(), this.getTitle(), this.getDueTime(), this.getCompleted());
 			newTask.updateDescription(this.getDescription());
 			return newTask;
 		} catch (HandledException e) {
@@ -104,7 +109,7 @@ public class DeadlineTask extends Task {
 		sb.append(STRING_TYPE);
 		sb.append(TYPE_DEADLINE);
 		sb.append("\tStatus: ");
-		sb.append(completeToString(this.getComplete()));
+		sb.append(completedToString(this.getCompleted()));
 		sb.append("\tDue At: ");
 		sb.append(dateToString(this.getDueTime()));
 		return sb.append("\n").toString();
@@ -118,21 +123,18 @@ public class DeadlineTask extends Task {
 		sb.append(this.getDescription());
 		return sb.append("\n").toString();
 	}
-	
-	private static String completeToString(boolean complete){
-		return complete?"Completed":"Needs Action";
-	}
 
 	@Override
 	public Component toComponent() {
 		VToDo component = new VToDo(this.getDueTime(), this.getDueTime(), this.getTitle());
 		this.addCommonProperty(component);
-		component.getProperties().add(completeToStatus(this.getComplete()));
+		if (this.getCompleted() == null){
+			component.getProperties().add(Status.VTODO_NEEDS_ACTION);
+		} else {
+			component.getProperties().add(Status.VTODO_COMPLETED);
+			component.getProperties().add(new Completed(this.getCompleted()));
+		}
 		return component;
-	}
-	
-	private static Status completeToStatus(boolean complete){
-		return complete?Status.VTODO_COMPLETED:Status.VTODO_NEEDS_ACTION;
 	}
 	
 	public static sortComparator getComparator(){

@@ -95,7 +95,7 @@ public class Search extends QueryCommand {
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		if (searchList != null){
 			for (Task task:searchList) {
-				if (task.getComplete() == complete){
+				if ((task.getCompleted() != null) == complete){
 					returnList.add(task);
 				}
 			}

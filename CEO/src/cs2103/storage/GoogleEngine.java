@@ -48,6 +48,12 @@ public class GoogleEngine implements StorageInterface {
 	}
 	
 	private Task parseTask(com.google.api.services.tasks.model.Task gTask){
+		gTask.getTitle();
+		gTask.getDeleted();
+		gTask.getDue();
+		gTask.getId();
+		gTask.getNotes();
+		
 		return null;
 	}
 	

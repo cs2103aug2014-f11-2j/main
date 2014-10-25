@@ -1,5 +1,6 @@
 package cs2103.command;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Queue;
 
@@ -53,7 +54,7 @@ public class Update extends InfluentialCommand {
 			newTask.updateLocation(this.parameterList.getLocation().getValue());
 		}
 		if (this.parameterList.getComplete() != null){
-			newTask.updateComplete(this.parameterList.getComplete().getValue());
+			newTask.updateCompleted(this.parameterList.getComplete().getValue()?new Date():null);
 		}
 		if (this.parameterList.getRecurrence() != null){
 			newTask.updateRecurrence(this.parameterList.getRecurrence().getValue());
@@ -72,14 +73,6 @@ public class Update extends InfluentialCommand {
 		} catch (CloneNotSupportedException e) {
 			throw new HandledException(HandledException.ExceptionType.CLONE_FAILED);
 		}
-	}
-	
-	private Task updateTaskToList(Task newTask) throws HandledException, FatalException{
-		TaskList taskList = TaskList.getInstance();
-		taskList.updateTask(newTask);
-		newTask = taskList.getTaskByTask(newTask);
-		CommonUtil.checkNull(newTask, HandledException.ExceptionType.INVALID_TASK_OBJ);
-		return newTask;
 	}
 	
 	@Override

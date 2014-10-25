@@ -97,7 +97,7 @@ public class TaskList {
 	public ArrayList<Task> getDefaultList() throws HandledException{
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for (Task task:this.tasks){
-			if (!task.getComplete()){
+			if (task.getCompleted() == null){
 				returnList.add(task);
 			}
 		}
