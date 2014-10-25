@@ -33,7 +33,6 @@ import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RRule;
-import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.model.ValidationException;
@@ -107,12 +106,19 @@ public class StorageEngine implements StorageInterface{
 		}
 	}
 	
+	@Override
+	public void addTask(Task task) throws HandledException, FatalException {
+		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
+		calendar.getComponents().add(task.toComponent());
+	}
+	
+	@Override
 	public void updateTask(Task task) throws HandledException, FatalException{
 		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		Component updating = task.toComponent();
 		Component existing = this.indexedComponents.getComponent(task.getTaskUID().getValue());
 		if (existing == null){
-			calendar.getComponents().add(updating);
+			throw new HandledException(HandledException.ExceptionType.TASK_NOT_EXIST);
 		}else{
 			calendar.getComponents().remove(existing);
 			calendar.getComponents().add(updating);
@@ -120,6 +126,8 @@ public class StorageEngine implements StorageInterface{
 		writeToFile();
 	}
 	
+	
+	@Override
 	public void deleteTask(Task task) throws HandledException, FatalException{
 		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		Component existing = this.indexedComponents.getComponent(task.getTaskUID().getValue());
@@ -146,7 +154,7 @@ public class StorageEngine implements StorageInterface{
 		}
 		String componentLocation = readLocation(component);
 		Recur componentRecurrence = readRecur(component);
-		task = new PeriodicTask(componentUID, componentCreated, componentTitle, componentLocation, componentStartTime, componentEndTime, componentRecurrence);
+		task = new PeriodicTask(componentUID, componentCreated, component.getStatus(), componentTitle, componentLocation, componentStartTime, componentEndTime, componentRecurrence);
 		task.updateDescription(readDescription(component));
 		task.updateLastModified(component.getLastModified() == null? new Date():component.getLastModified().getDateTime());
 		return task;
@@ -158,9 +166,9 @@ public class StorageEngine implements StorageInterface{
 		Date componentCreated = component.getCreated() == null? new Date():component.getCreated().getDateTime();
 		String componentTitle = readTitle(component);
 		if (component.getDue() == null){
-			task = new FloatingTask(componentUID, componentCreated, componentTitle, readCompleted(component));
+			task = new FloatingTask(componentUID, componentCreated, component.getStatus(), componentTitle, readCompleted(component));
 		}else{
-			task = new DeadlineTask(componentUID, componentCreated, componentTitle, component.getDue().getDate(),readCompleted(component));
+			task = new DeadlineTask(componentUID, componentCreated, component.getStatus(), componentTitle, component.getDue().getDate(), readCompleted(component));
 		}
 		task.updateDescription(readDescription(component));
 		task.updateLastModified(component.getLastModified() == null? new Date():component.getLastModified().getDateTime());

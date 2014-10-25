@@ -17,9 +17,10 @@ public class FloatingTask extends Task {
 	private DateTime completed;
 	private static final String TYPE_FLOATING = "Floating";
 	
-	public FloatingTask(Uid taskUID, Date created, String title, Date completed) throws HandledException{
+	public FloatingTask(Uid taskUID, Date created, Status status, String title, Date completed) throws HandledException{
 		super(taskUID, created, title);
 		this.updateCompleted(completed);
+		this.updateStatus(status);
 	}
 	
 	@Override
@@ -33,6 +34,44 @@ public class FloatingTask extends Task {
 			this.completed = null;
 		} else {
 			this.completed = new DateTime(completed);
+		}
+	}
+	
+	@Override
+	protected void updateStatus(Status status){
+		if (status == null){
+			this.status = Status.VTODO_NEEDS_ACTION;
+		} else {
+			this.status = status;
+		}
+	}
+
+	@Override
+	public void updateLocation(String location) {
+		return;
+	}
+
+	@Override
+	public void updateRecurrence(Recur recurrence) {
+		return;
+	}
+	
+	@Override
+	public boolean isDeleted() {
+		return this.getStatus().equals(Status.VTODO_CANCELLED);
+	}
+
+	@Override
+	public void delete() {
+		this.updateStatus(Status.VTODO_CANCELLED);
+	}
+
+	@Override
+	public void restore() {
+		if (this.getCompleted() == null){
+			this.updateStatus(Status.VTODO_NEEDS_ACTION);
+		} else {
+			this.updateStatus(Status.VTODO_COMPLETED);
 		}
 	}
 	
@@ -57,13 +96,13 @@ public class FloatingTask extends Task {
 	}
 
 	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
-		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getCreated(), this.getTitle(), dueTime, this.getCompleted());
+		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getCreated(), Status.VTODO_NEEDS_ACTION, this.getTitle(), dueTime, this.getCompleted());
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
 
 	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
-		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getCreated(), this.getTitle(), null, startTime, endTime, null);
+		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getCreated(), Status.VEVENT_CONFIRMED, this.getTitle(), null, startTime, endTime, null);
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
@@ -71,7 +110,7 @@ public class FloatingTask extends Task {
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		try {
-			FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getTitle(), this.getCompleted());
+			FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getStatus(), this.getTitle(), this.getCompleted());
 			newTask.updateDescription(this.getDescription());
 			return newTask;
 		} catch (HandledException e) {
@@ -80,19 +119,10 @@ public class FloatingTask extends Task {
 	}
 
 	@Override
-	public void updateLocation(String location) {
-		return;
-	}
-
-	@Override
-	public void updateRecurrence(Recur recurrence) {
-		return;
-	}
-
-	@Override
 	public String toSummary() {
 		StringBuffer sb = new StringBuffer();
 		sb.append(this.getTaskID()).append(". ").append(this.getTitle()).append("\n");
+		if (this.isDeleted()) sb.append(DELETED);
 		sb.append(STRING_TYPE);
 		sb.append(TYPE_FLOATING);
 		sb.append("\tStatus: ");
@@ -113,13 +143,27 @@ public class FloatingTask extends Task {
 	public Component toComponent() {
 		VToDo component = new VToDo(new DateTime(), this.getTitle());
 		this.addCommonProperty(component);
-		if (this.getCompleted() == null){
-			component.getProperties().add(Status.VTODO_NEEDS_ACTION);
+		if (this.isDeleted()){
+			component.getProperties().add(Status.VTODO_CANCELLED);
 		} else {
-			component.getProperties().add(Status.VTODO_COMPLETED);
-			component.getProperties().add(new Completed(this.getCompleted()));
+			if (this.getCompleted() == null){
+				component.getProperties().add(Status.VTODO_NEEDS_ACTION);
+			} else {
+				component.getProperties().add(Status.VTODO_COMPLETED);
+				component.getProperties().add(new Completed(this.getCompleted()));
+			}
 		}
 		return component;
+	}
+	
+	public com.google.api.services.tasks.model.Task toGTask(){
+		com.google.api.services.tasks.model.Task gTask = new com.google.api.services.tasks.model.Task();
+		gTask.setTitle(this.getTitle());
+		gTask.setId(this.getTaskUID().getValue());
+		if (this.getCompleted() != null) gTask.setCompleted(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
+		gTask.setNotes(this.getDescription());
+		gTask.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
+		return gTask;
 	}
 
 	@Override

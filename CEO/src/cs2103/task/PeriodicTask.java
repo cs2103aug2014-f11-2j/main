@@ -1,7 +1,9 @@
 package cs2103.task;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -12,6 +14,7 @@ import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.RRule;
+import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Uid;
 
 public class PeriodicTask extends Task {
@@ -25,11 +28,12 @@ public class PeriodicTask extends Task {
 	private static final String STRING_LOCATION = "Location: ";
 	private static final String STRING_RECUR = "Recurrence: ";
 	
-	public PeriodicTask(Uid taskUID, Date created, String title, String location, Date startTime, Date endTime, Recur recurrence) throws HandledException {
+	public PeriodicTask(Uid taskUID, Date created, Status status, String title, String location, Date startTime, Date endTime, Recur recurrence) throws HandledException {
 		super(taskUID, created, title);
 		this.updateTime(startTime, endTime);
 		this.updateLocation(location);
 		this.updateRecurrence(recurrence);
+		this.updateStatus(status);
 	}
 	
 	public DateTime getStartTime(){
@@ -55,7 +59,6 @@ public class PeriodicTask extends Task {
 		return this.location;
 	}
 	
-	
 	public void updateLocation(String location){
 		if (location == null){
 			this.location = "";
@@ -73,6 +76,44 @@ public class PeriodicTask extends Task {
 	}
 
 	@Override
+	public DateTime getCompleted() {
+		if (this.getEndTime().before(new DateTime())){
+			return this.getEndTime();
+		} else {
+			return null;
+		}
+	}
+	
+	@Override
+	public void updateCompleted(Date complete) {
+		return;
+	}
+	
+	@Override
+	protected void updateStatus(Status status){
+		if (status == null){
+			this.status = Status.VEVENT_CONFIRMED;
+		} else {
+			this.status = status;
+		}
+	}
+	
+	@Override
+	public boolean isDeleted() {
+		return this.getStatus().equals(Status.VEVENT_CANCELLED);
+	}
+
+	@Override
+	public void delete() {
+		this.updateStatus(Status.VEVENT_CANCELLED);
+	}
+
+	@Override
+	public void restore() {
+		this.updateStatus(Status.VEVENT_CONFIRMED);
+	}
+	
+	@Override
 	public Task convert(Date[] time) throws HandledException {
 		if (time == null) throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
 		if (time[0] == null && time[1] == null){
@@ -85,19 +126,19 @@ public class PeriodicTask extends Task {
 	}
 	
 	private FloatingTask toFloating() throws HandledException {
-		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getTitle(), null);
+		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), Status.VTODO_NEEDS_ACTION, this.getTitle(), null);
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
 
 	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
-		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getCreated(), this.getTitle(), dueTime, null);
+		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getCreated(), Status.VTODO_NEEDS_ACTION, this.getTitle(), dueTime, null);
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
 
 	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
-		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getCreated(), this.getTitle(), this.getLocation(), startTime, endTime, this.getRecurrence());
+		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getCreated(), this.getStatus(), this.getTitle(), this.getLocation(), startTime, endTime, this.getRecurrence());
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
@@ -105,7 +146,7 @@ public class PeriodicTask extends Task {
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		try {
-			PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getCreated(), this.getTitle(), this.getLocation(), this.getStartTime(), this.getEndTime(), this.getRecurrence());
+			PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getCreated(), this.getStatus(), this.getTitle(), this.getLocation(), this.getStartTime(), this.getEndTime(), this.getRecurrence());
 			newTask.updateDescription(this.getDescription());
 			return newTask;
 		} catch (HandledException e) {
@@ -113,25 +154,12 @@ public class PeriodicTask extends Task {
 		}
 		
 	}
-	
-	@Override
-	public DateTime getCompleted() {
-		if (this.getEndTime().before(new DateTime())){
-			return this.getEndTime();
-		} else {
-			return null;
-		}
-	}
-	
-	@Override
-	public void updateCompleted(Date complete) {
-		//Not needed for this type
-	}
 
 	@Override
 	public String toSummary() {
 		StringBuffer sb = new StringBuffer();
 		sb.append(this.getTaskID()).append(". ").append(this.getTitle()).append("\n");
+		if (this.isDeleted()) sb.append(DELETED);
 		sb.append(STRING_TYPE);
 		if (this.getRecurrence() == null){
 			sb.append(TYPE_PERIODIC);
@@ -174,8 +202,25 @@ public class PeriodicTask extends Task {
 		if (this.getRecurrence() != null){
 			component.getProperties().add(new RRule(this.getRecurrence()));
 		}
+		component.getProperties().add(this.getStatus());
 		component.getProperties().add(new Location(this.getLocation()));
 		return component;
+	}
+	
+	public com.google.api.services.calendar.model.Event toGEvent(){
+		com.google.api.services.calendar.model.Event gEvent = new com.google.api.services.calendar.model.Event();
+		gEvent.setSummary(this.getTitle());
+		gEvent.setDescription(this.getDescription());
+		gEvent.setLocation(this.getLocation());
+		gEvent.setId(this.getTaskUID().getValue());
+		gEvent.setCreated(new com.google.api.client.util.DateTime(this.getCreated().getTime()));
+		gEvent.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
+		gEvent.setStart(new com.google.api.services.calendar.model.EventDateTime().setDateTime(new com.google.api.client.util.DateTime(this.getStartTime().getTime())));
+		gEvent.setEnd(new com.google.api.services.calendar.model.EventDateTime().setDateTime(new com.google.api.client.util.DateTime(this.getEndTime().getTime())));
+		List<String> recurrenceList = new ArrayList<String>();
+		recurrenceList.add(this.getRecurrence().toString());
+		gEvent.setRecurrence(recurrenceList);
+		return gEvent;
 	}
 	
 	public static sortComparator getComparator(){

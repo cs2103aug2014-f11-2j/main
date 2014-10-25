@@ -13,6 +13,7 @@ import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.Created;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.LastModified;
+import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.util.SimpleHostInfo;
 import net.fortuna.ical4j.util.UidGenerator;
@@ -24,9 +25,11 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	private String description;
 	private DateTime created;
 	private DateTime lastModified;
+	protected Status status;
 	protected static final String STRING_TYPE = "Type: ";
 	protected static final String STRING_DESCRIPTION = "Description: ";
 	protected static final long DAY_IN_MILLIS = 86400000L;
+	protected static final String DELETED = "(Deleted Task)\n";
 	
 	public Task(Uid taskUID, Date created, String title) throws HandledException{
 		if (title == null) throw new HandledException(HandledException.ExceptionType.NO_TITLE);
@@ -145,6 +148,10 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	public abstract void updateCompleted(Date complete);
 	public abstract void updateLocation(String location);
 	public abstract void updateRecurrence(Recur recurrence);
+	protected abstract void updateStatus(Status status);
+	public abstract boolean isDeleted();
+	public abstract void delete();
+	public abstract void restore();
 	public abstract Task convert(Date[] time) throws HandledException;
 	@Override
 	public abstract Object clone() throws CloneNotSupportedException;
@@ -154,6 +161,10 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	public abstract DateTime getCompleted();
 	public abstract boolean checkPeriod(Date[] time);
 	public abstract boolean matches(String keyword);
+	
+	public Status getStatus(){
+		return this.status;
+	}
 	
 	public boolean checkAlert() {
 		Date[] time = new Date[2];

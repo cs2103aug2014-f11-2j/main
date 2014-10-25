@@ -5,7 +5,7 @@ public class TaskType implements Parameter {
 	private final Value value;
 	
 	public static enum Value {
-		ALL, FLOATING, DEADLINE, PERIODIC, DEFAULT, INVALID;
+		ALL, FLOATING, DEADLINE, PERIODIC, DEFAULT, TRASH, INVALID;
 	}
 	
 	public TaskType(Value value){
@@ -37,6 +37,8 @@ public class TaskType implements Parameter {
 			return Value.DEADLINE;
 		} else if (taskTypeString.equalsIgnoreCase("periodic")){
 			return Value.PERIODIC;
+		} else if (taskTypeString.equalsIgnoreCase("trash")){
+			return Value.TRASH;
 		} else {
 			return Value.INVALID;
 		}

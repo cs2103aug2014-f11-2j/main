@@ -94,6 +94,16 @@ public class TaskList {
 		return returnList;
 	}
 	
+	public ArrayList<Task> getTrashList(){
+		ArrayList<Task> returnList = new ArrayList<Task>();
+		for (Task task:this.tasks){
+			if (task.isDeleted()){
+				returnList.add(task);
+			}
+		}
+		return returnList;
+	}
+	
 	public ArrayList<Task> getDefaultList() throws HandledException{
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for (Task task:this.tasks){
@@ -105,7 +115,13 @@ public class TaskList {
 	}
 	
 	public ArrayList<Task> getAllList() throws HandledException{
-		return this.tasks;
+		ArrayList<Task> returnList = new ArrayList<Task>();
+		for (Task task:this.tasks){
+			if (!task.isDeleted()){
+				returnList.add(task);
+			}
+		}
+		return returnList;
 	}
 	
 	public Task getTaskByID(int taskID) throws HandledException{
@@ -126,7 +142,7 @@ public class TaskList {
 	}
 	
 	public void addTask(Task task) throws HandledException, FatalException{
-		this.storage.updateTask(task);
+		this.storage.addTask(task);
 		this.tasks = this.storage.getTaskList();
 	}
 	
@@ -136,7 +152,8 @@ public class TaskList {
 	}
 	
 	public void deleteTask(Task task) throws HandledException, FatalException{
-		this.storage.deleteTask(task);
+		task.delete();
+		this.storage.updateTask(task);
 		this.tasks = this.storage.getTaskList();
 	}
 }

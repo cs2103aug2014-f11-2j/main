@@ -11,7 +11,7 @@ import org.fusesource.jansi.AnsiConsole;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import static org.fusesource.jansi.Ansi.*;
-import static org.fusesource.jansi.Ansi.Color.*;
+
 public class CommonUtil {
 	
 	public static String[] splitFirstWord(String parameterString) throws HandledException{

@@ -24,6 +24,8 @@ public class List extends QueryCommand {
 			return parseListResponse(TaskList.getInstance().getPeriodicList());
 		case ALL:
 			return parseListResponse(TaskList.getInstance().getAllList());
+		case TRASH:
+			return parseListResponse(TaskList.getInstance().getTrashList());
 		case DEFAULT:
 		case INVALID:
 		default:

@@ -45,11 +45,11 @@ public class Add extends InfluentialCommand {
 		String location = this.parameterList.getLocation() == null? null : this.parameterList.getLocation().getValue();
 		Recur recurrence = this.parameterList.getRecurrence() == null ? null : this.parameterList.getRecurrence().getValue();
 		if (time[0] == null && time[1] == null){
-			task = new FloatingTask(null, null, title, null);
+			task = new FloatingTask(null, null, null, title, null);
 		} else if (time[1] == null){
-			task = new DeadlineTask(null, null, title, time[0], null);
+			task = new DeadlineTask(null, null, null, title, time[0], null);
 		} else {
-			task = new PeriodicTask(null, null, title, location, time[0], time[1], recurrence);
+			task = new PeriodicTask(null, null, null, title, location, time[0], time[1], recurrence);
 		}
 		task.updateDescription(description);
 		task.updateLastModified(null);
