@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.util.Date;
 
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Uid;
 
 import org.junit.After;
@@ -18,12 +20,13 @@ public class FloatingTaskTest extends TaskTest {
 	static FloatingTask ft;
 	Uid taskUID = null;
 	Date created = null; 
+	Status status = null;
 	String title = "Testing";
-	boolean complete = false;
+	Date complete = null;
 
 	@Before
 	public void setUp() throws Exception {
-		ft = new FloatingTask(taskUID, created, title, complete);
+		ft = new FloatingTask(taskUID, created, status, title, complete);
 		ft.updateDescription(null);
 	}
 
@@ -35,7 +38,7 @@ public class FloatingTaskTest extends TaskTest {
 	
 	public void testFloatingTaskConstructionOne() {
 		try{
-			ft = new FloatingTask(taskUID, created, "", complete);
+			ft = new FloatingTask(taskUID, created, status, "", complete);
 			fail("Expected- Handled Exception");
 		} catch(HandledException e){
 			assertEquals(e.getErrorMsg(), "A Non-empty title must be specified!");
@@ -44,7 +47,7 @@ public class FloatingTaskTest extends TaskTest {
 	
 	public void testFloatingTaskConstructionTwo() {
 		try{
-			ft = new FloatingTask(taskUID, created, title, complete);
+			ft = new FloatingTask(taskUID, created, status, title, complete);
 			assertTrue(true);
 		} catch(HandledException e){
 			fail("Expected- Successful Creation");
@@ -52,11 +55,13 @@ public class FloatingTaskTest extends TaskTest {
 	}
 	
 	@Test
-	public void testUpdateAndGetComplete() {
-		ft.updateComplete(true);
-		assertEquals(true, ft.getComplete());
-		ft.updateComplete(false);
-		assertEquals(false, ft.getComplete());
+	public void testUpdateAndGetCompleted() {
+		ft.updateCompleted(null);
+		assertEquals(null, ft.getCompleted());
+		Date testDate = new Date(1,1,1);
+		ft.updateCompleted(testDate);
+		DateTime testDate2 = new DateTime(testDate);
+		assertTrue(ft.getCompleted().equals(testDate2));
 	}
 	
 	@Test
