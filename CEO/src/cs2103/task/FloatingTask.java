@@ -159,7 +159,10 @@ public class FloatingTask extends Task {
 	public com.google.api.services.tasks.model.Task toGTask(){
 		com.google.api.services.tasks.model.Task gTask = new com.google.api.services.tasks.model.Task();
 		gTask.setTitle(this.getTitle());
-		if (this.getCompleted() != null) gTask.setCompleted(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
+		if (this.getCompleted() != null){
+			gTask.setCompleted(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
+			gTask.setStatus("completed");
+		}
 		gTask.setNotes(this.getDescription());
 		gTask.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
 		return gTask;

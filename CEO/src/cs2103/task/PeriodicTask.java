@@ -232,6 +232,7 @@ public class PeriodicTask extends Task {
 		gEvent.setLocation(this.getLocation());
 		gEvent.setCreated(new com.google.api.client.util.DateTime(this.getCreated().getTime()));
 		gEvent.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
+		gEvent.setStatus("confirmed");
 		gEvent.setStart(dateTimeToEventDateTime(this.getStartTime()));
 		gEvent.setEnd(dateTimeToEventDateTime(this.getEndTime()));
 		List<String> recurrenceList = recurToGoogle(this.getRecurrence());

@@ -175,7 +175,10 @@ public class DeadlineTask extends Task {
 		com.google.api.services.tasks.model.Task gTask = new com.google.api.services.tasks.model.Task();
 		gTask.setTitle(this.getTitle());
 		gTask.setDue(new com.google.api.client.util.DateTime(this.getDueTime().getTime()));
-		if (this.getCompleted() != null) gTask.setCompleted(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
+		if (this.getCompleted() != null){
+			gTask.setCompleted(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
+			gTask.setStatus("completed");
+		}
 		gTask.setNotes(this.getDescription());
 		gTask.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
 		return gTask;

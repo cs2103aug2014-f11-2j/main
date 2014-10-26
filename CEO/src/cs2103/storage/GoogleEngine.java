@@ -188,7 +188,10 @@ public class GoogleEngine{
 	}
 	
 	private Task tryToUpdate(Task task) throws IOException, HandledException{
-		if (!task.getStatus().equals(Status.VTODO_CANCELLED)){
+		if (task.isDeleted()){
+			tryToRemove(task);
+			return null;
+		} else {
 			Task returnTask;
 			if (task instanceof PeriodicTask){
 				returnTask = this.executeUpdate((PeriodicTask) task); 
@@ -198,7 +201,6 @@ public class GoogleEngine{
 			returnTask.updateCreated(task.getCreated());
 			return returnTask;
 		}
-		return null;
 	}
 	
 	private Task executeUpdate(PeriodicTask task) throws IOException, HandledException{
@@ -223,9 +225,10 @@ public class GoogleEngine{
 				}
 				updating.setSequence(sequence);
 				return parseGEvent(this.calendar.events().patch(calendarIdentifier, task.getTaskUID().getValue(), updating).execute());
+			} else {
+				return this.tryToInsert(task);
 			}
 		}
-		return null;
 	}
 	
 	private Task executeUpdate(Task task) throws IOException, HandledException{
@@ -240,14 +243,20 @@ public class GoogleEngine{
 			return this.tryToInsert(task);
 		} else {
 			if (this.tasks.tasks().get(DEFAULT_TASKS, task.getTaskUID().getValue()).execute() != null){
+				com.google.api.services.tasks.model.Task gTask;
 				if (task instanceof FloatingTask){
-					return parseGTask(this.tasks.tasks().patch(DEFAULT_TASKS, task.getTaskUID().getValue(), ((FloatingTask) task).toGTask()).execute());
+					gTask = ((FloatingTask) task).toGTask();
 				} else if (task instanceof DeadlineTask){
-					return parseGTask(this.tasks.tasks().patch(DEFAULT_TASKS, task.getTaskUID().getValue(), ((DeadlineTask) task).toGTask()).execute());
+					gTask = ((DeadlineTask) task).toGTask();
+				} else {
+					return null;
 				}
+				this.tasks.tasks().delete(DEFAULT_TASKS, task.getTaskUID().getValue()).execute();
+				return parseGTask(this.tasks.tasks().insert(DEFAULT_TASKS, gTask).execute());
+			} else {
+				return this.tryToInsert(task);
 			}
 		}
-		return null;
 	}
 
 	private void tryToGetLastUpdated() throws IOException{

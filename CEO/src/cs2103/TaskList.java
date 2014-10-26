@@ -123,10 +123,6 @@ public class TaskList {
 		}
 	}
 	
-	private Task getTaskByTask(Task task){
-		return this.getTaskByTask(task, this.tasks);
-	}
-	
 	public Task addTask(Task task) throws HandledException, FatalException{
 		this.storage.updateTask(task);
 		this.tasks = this.storage.getTaskList();
@@ -161,6 +157,20 @@ public class TaskList {
 		if (this.google != null){
 			this.deleteToGoogle(task);
 			this.tasks = this.storage.getTaskList();
+		}
+	}
+	
+	public void syncWithGoogle(){
+		if (this.google == null) return;
+		CommonUtil.print(SYNCING);
+		try {
+			ArrayList<Task> googleList = this.google.getTaskList();
+			syncFromGoogle(googleList);
+			syncToGoogle(googleList);
+			this.tasks = this.storage.getTaskList();
+		} catch (FatalException | HandledException | IOException e) {
+			e.printStackTrace();
+			this.google = null;
 		}
 	}
 	
@@ -208,20 +218,6 @@ public class TaskList {
 			CommonUtil.print(SYNCING_ERROR);
 		}
 		return null;
-	}
-	
-	public void syncWithGoogle(){
-		if (this.google == null) return;
-		CommonUtil.print(SYNCING);
-		try {
-			ArrayList<Task> googleList = this.google.getTaskList();
-			syncFromGoogle(googleList);
-			syncToGoogle(googleList);
-			this.tasks = this.storage.getTaskList();
-		} catch (FatalException | HandledException | IOException e) {
-			e.printStackTrace();
-			this.google = null;
-		}
 	}
 	
 	private void syncFromGoogle(ArrayList<Task> googleList) throws HandledException, FatalException{
@@ -282,6 +278,10 @@ public class TaskList {
 			}
 		}
 		return returnList;
+	}
+	
+	private Task getTaskByTask(Task task){
+		return this.getTaskByTask(task, this.tasks);
 	}
 	
 	private Task getTaskByTask(Task task, ArrayList<Task> taskList){
