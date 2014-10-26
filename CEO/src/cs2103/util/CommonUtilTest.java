@@ -10,7 +10,7 @@ import cs2103.exception.HandledException;
 
 public class CommonUtilTest {
 
-	@Test
+	@Test(expected = HandledException.class)
 	public void testSplitFirstWord() throws HandledException {
 		String[] testing = CommonUtil.splitFirstWord("testing split");
 		assertEquals(Array.get(testing, 0), "testing");
@@ -23,10 +23,12 @@ public class CommonUtilTest {
 		String[] testing2 = CommonUtil.splitFirstWord("123");
 		assertEquals(Array.get(testing2, 0), "123");
 		assertNull(Array.get(testing2, 1));
+		
+		CommonUtil.splitFirstWord(null);
 	}
 	
 	//boundary value analysis
-	@Test
+	@Test(expected = HandledException.class)
 	public void testParseIntegerParameter() throws HandledException {
 		int test = CommonUtil.parseIntegerParameter("1");
 		assertEquals(test, 1);
@@ -46,6 +48,8 @@ public class CommonUtilTest {
 		
 		int test5 = CommonUtil.parseIntegerParameter("NOT AN INTEGER");
 		assertEquals(test5, -1);
+		
+		CommonUtil.parseIntegerParameter(null);
 	}
 
 	@Test
@@ -63,7 +67,7 @@ public class CommonUtilTest {
 		assertEquals(test2, "12");
 	}
 	
-	@Test
+	@Test(expected = HandledException.class)
 	public void testRemoveDash() throws HandledException {
 		//test string with dash
 		String test = CommonUtil.removeDash("-testing");
@@ -80,6 +84,9 @@ public class CommonUtilTest {
 		//test with dash only
 		String test3 = CommonUtil.removeDash("-");
 		assertEquals(test3, "");
+		
+		//test for null string
+		CommonUtil.removeDash(null);
 	}
 
 }
