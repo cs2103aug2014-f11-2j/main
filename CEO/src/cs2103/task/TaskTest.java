@@ -27,8 +27,7 @@ public abstract class TaskTest {
 	public abstract void testToSummary();
 	public abstract void testToDetail();
 	public abstract void testClone() throws CloneNotSupportedException;
-	public abstract void testUpdateAndGetStatus();
-	public abstract void testDeleteAndIsDelete();
+	public abstract void testUpdateAndGetStatus();;
 	public abstract void testRestore();
 	
 	public void testCheckAlert(Task task){
@@ -128,47 +127,11 @@ public abstract class TaskTest {
 		assertTrue(task.equals(task.clone()));
 	}
 	
-	static boolean compareFloatingTasks(FloatingTask dlt1, FloatingTask dlt2){
-		if (dlt1.getCompleted()!=dlt2.getCompleted()) {
-			return false;
-		} 
-		return compareCommonValuesInTasks(dlt1,dlt2);
+	public void testDeleteAndIsDelete(Task task) {
+		assertEquals(false, task.isDeleted());
+		task.delete();
+		assertEquals(true, task.isDeleted());
 	}
 	
-	static boolean compareDeadlineTasks(DeadlineTask t1, DeadlineTask t2){
-		if (t1.getCompleted()!=t2.getCompleted()) {
-			return false;
-		} else if (t1.getDueTime()!=t2.getDueTime()){
-			return false;
-		} 
-		return compareCommonValuesInTasks(t1,t2);
-	}
-	
-	static boolean comparePeriodicTasks(PeriodicTask t1,PeriodicTask t2){
-		if (t1.getStartTime()!=t2.getStartTime()) {
-			return false;
-		} else if (t1.getRecurrence()!=t2.getRecurrence()){
-			return false;
-		} else if (t1.getEndTime()!=t2.getEndTime()){
- 			return false;
- 		} else if (t1.getLocation()!=t2.getLocation()){
- 			return false;
- 		}
-		return compareCommonValuesInTasks(t1,t2);
-	}
-	
-	static boolean compareCommonValuesInTasks(Task t1,Task t2){
-		if (!(t1.getLastModified().equals(t2.getLastModified()))){
-			return false;
- 		} else if (t1.getCreated()!=t2.getCreated()) {
-			return false;
-		} else if (t1.getDescription()!=t2.getDescription()) {
-			return false;
-		} else if (t1.getTitle()!=t2.getTitle()) {
-			return false;
-		} else if (t1.getTaskID()!=t1.getTaskID()) {
- 			return false;
- 		}
-		return true;
-	} 
+
 }

@@ -206,12 +206,9 @@ public class DeadlineTaskTest extends TaskTest{
 		assertEquals(testStatus, dlt.getStatus());
 	}
 
-	@Override
 	@Test
 	public void testDeleteAndIsDelete() {
-		assertEquals(false, dlt.isDeleted());
-		dlt.delete();
-		assertEquals(true, dlt.isDeleted());
+		testDeleteAndIsDelete(dlt);
 	}
 
 	@Override

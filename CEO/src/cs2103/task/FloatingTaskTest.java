@@ -152,12 +152,9 @@ public class FloatingTaskTest extends TaskTest {
 		assertEquals(testStatus, ft.getStatus());
 	}
 
-	@Override
 	@Test
 	public void testDeleteAndIsDelete() {
-		assertEquals(false, ft.isDeleted());
-		ft.delete();
-		assertEquals(true, ft.isDeleted());
+		testDeleteAndIsDelete(ft);
 	}
 
 	@Override
