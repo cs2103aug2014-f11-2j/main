@@ -15,7 +15,6 @@ public class HandledException extends Exception {
 	private static final String INVALID_COMPLETE = "Your input value for complete is invalid, please check your input and try again!";
 	private static final String LESS_THAN_ONE_PARA = "You need to specify at least one parameter";
 	private static final String CLONE_FAILED = "Failed to clone task object";
-	private static final String NETWORK_ERR = "Error occured in your network stack";
 	private static final String UNEXPECTED_ERR = "An unexpected error occurred, operation failed";
 	private static final String LOGIN_FAIL = "Unable to get Credential from Google, Google Sync is disabled";
 	private static final String SYNC_FAIL = "Unable to get your data from Google, Google Sync is disabled";
@@ -23,7 +22,7 @@ public class HandledException extends Exception {
 	
 	public static enum ExceptionType{
 		INVALID_TASKID, INVALID_TASK_OBJ, INVALID_TASK_TYPE, INVALID_TIME, END_BEFORE_START, TASK_NOT_EXIST, INVALID_PARA, 
-		INVALID_CMD, INVALID_COMPLETE, LESS_THAN_ONE_PARA, CLONE_FAILED, NETWORK_ERR, UNEXPECTED_ERR, LOGIN_FAIL, SYNC_FAIL;
+		INVALID_CMD, INVALID_COMPLETE, LESS_THAN_ONE_PARA, CLONE_FAILED, UNEXPECTED_ERR, LOGIN_FAIL, SYNC_FAIL;
 	}
 	
 	public HandledException(ExceptionType exceptionType){
@@ -60,8 +59,6 @@ public class HandledException extends Exception {
 			return LESS_THAN_ONE_PARA;
 		case CLONE_FAILED:
 			return CLONE_FAILED;
-		case NETWORK_ERR:
-			return NETWORK_ERR;
 		case UNEXPECTED_ERR:
 			return UNEXPECTED_ERR;
 		case LOGIN_FAIL:
