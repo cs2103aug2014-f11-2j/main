@@ -15,6 +15,7 @@ import cs2103.task.DeadlineTask;
 import cs2103.task.FloatingTask;
 import cs2103.task.PeriodicTask;
 import cs2103.task.Task;
+import cs2103.util.CommonUtil;
 
 import java.util.Collections;
 
@@ -24,11 +25,13 @@ public class TaskList {
 	private final File dataFile;
 	private GoogleEngine google;
 	private ArrayList<Task> tasks;
+	private static final String SYNCING = "Syncing with Google, please wait for a while";
 	
 	private TaskList(Option option) throws FatalException, HandledException{
 		this.dataFile = new File("CEOStore.ics");
 		switch(option.getValue()){
 		default:
+		case SYNC:
 		case DEFAULT:
 			try{
 				this.google = GoogleEngine.getInstance();
@@ -179,6 +182,7 @@ public class TaskList {
 	
 	public void syncWithGoogle(){
 		if (this.google == null) return;
+		CommonUtil.print(SYNCING);
 		try {
 			ArrayList<Task> googleList = this.google.getTaskList();
 			syncFromGoogle(googleList);
