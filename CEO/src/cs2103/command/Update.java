@@ -18,8 +18,8 @@ import cs2103.task.Task;
 import cs2103.util.CommonUtil;
 
 public class Update extends InfluentialCommand {
-	private static final String MESSAGE_UPDATE_FORMAT = "You have updated task with ID %1$d\n";
-	private static final String MESSAGE_UPDATE_FAIL_FORMAT = "Fail to update task with ID %1$d\n";
+	private static final String MESSAGE_UPDATE = "You have updated task with ID %1$d\n";
+	private static final String MESSAGE_UPDATE_FAIL = "Fail to update task with ID %1$d";
 	
 	public Update(String command) throws HandledException{
 		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
@@ -63,11 +63,11 @@ public class Update extends InfluentialCommand {
 		newTask.updateLastModified(null);
 		newTask = TaskList.getInstance().updateTask(newTask);
 		if (newTask == null){
-			return String.format(MESSAGE_UPDATE_FAIL_FORMAT, this.parameterList.getTaskID().getValue());
+			return String.format(MESSAGE_UPDATE_FAIL, this.parameterList.getTaskID().getValue());
 		} else {
 			this.undoBackup = task;
 			this.redoBackup = newTask;
-			return this.formatReturnString(String.format(MESSAGE_UPDATE_FORMAT, this.parameterList.getTaskID().getValue()), newTask);
+			return this.formatReturnString(String.format(MESSAGE_UPDATE, this.parameterList.getTaskID().getValue()), newTask);
 		}
 	}
 	

@@ -110,11 +110,6 @@ public class StorageEngine implements StorageInterface{
 	}
 	
 	@Override
-	public void addTask(Task task) throws HandledException, FatalException {
-		updateTask(task);
-	}
-	
-	@Override
 	public void updateTask(Task task) throws HandledException, FatalException{
 		if (task != null){
 			Component updating = task.toComponent();

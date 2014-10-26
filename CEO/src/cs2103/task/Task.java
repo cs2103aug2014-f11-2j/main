@@ -36,11 +36,8 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		} else {
 			this.taskUID = taskUID;
 		}
-		if (created == null){
-			this.created = new DateTime(new Date());
-		} else {
-			this.created = new DateTime(created);
-		}
+		this.updateCreated(created);
+		this.updateLastModified(null);
 	}
 	
 	private Uid generateUid(){
@@ -85,7 +82,6 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		} else {
 			this.title = title;
 		}
-		this.updateLastModified(null);
 	}
 	
 	public void updateDescription(String description){
@@ -94,7 +90,6 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		} else {
 			this.description = description;
 		}
-		this.updateLastModified(null);
 	}
 	
 	public void updateLastModified(Date date){
@@ -102,6 +97,14 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 			this.lastModified = new DateTime();
 		} else {
 			this.lastModified = new DateTime(date);
+		}
+	}
+	
+	public void updateCreated(Date date){
+		if (date == null){
+			this.created = new DateTime();
+		} else {
+			this.created = new DateTime(date);
 		}
 	}
 	
@@ -113,7 +116,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	protected void addCommonProperty(Component component){
 		component.getProperties().add(this.getTaskUID());
 		component.getProperties().add(new Created(this.getCreated()));
-		component.getProperties().add(new LastModified(this.getLastModified()));
+		component.getProperties().add(new LastModified(new DateTime()));
 		component.getProperties().add(new Description(this.getDescription()));
 	}
 	

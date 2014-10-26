@@ -11,7 +11,7 @@ import cs2103.task.Task;
 import cs2103.util.CommonUtil;
 
 public class Mark extends InfluentialCommand {
-	private static final String MESSAGE_MARK_FORMAT = "Successfully marked task %1$d as completed\n";
+	private static final String MESSAGE_MARK = "Successfully marked task %1$d as completed\n";
 	private static final String MESSAGE_MARK_FAILED = "Failed to mark task %1$d as completed";
 	
 	public Mark(String command) throws HandledException{
@@ -34,7 +34,7 @@ public class Mark extends InfluentialCommand {
 			} else {
 				this.undoBackup = task;
 				this.redoBackup = newTask;
-				return this.formatReturnString(String.format(MESSAGE_MARK_FORMAT, this.parameterList.getTaskID().getValue()), newTask);
+				return this.formatReturnString(String.format(MESSAGE_MARK, this.parameterList.getTaskID().getValue()), newTask);
 			}
 		}
 	}

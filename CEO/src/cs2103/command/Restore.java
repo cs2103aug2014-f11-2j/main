@@ -9,6 +9,7 @@ import cs2103.util.CommonUtil;
 
 public class Restore extends InfluentialCommand {
 	private static final String MESSAGE_RESTORE = "You have successfully restored a task with ID %1$d\n";
+	private static final String MESSAGE_RESTORE_FAIL = "Failed to restor the task with ID %1$d";
 	public Restore(String command) throws HandledException {
 		this.parameterList.addParameter(TaskID.parse(command));
 	}
@@ -18,7 +19,8 @@ public class Restore extends InfluentialCommand {
 		if (this.undoBackup == null){
 			return null;
 		} else {
-			TaskList.getInstance().restoreTask(this.undoBackup);
+			this.undoBackup.delete();
+			TaskList.getInstance().updateTask(this.undoBackup);
 			return this;
 		}
 	}
@@ -28,7 +30,8 @@ public class Restore extends InfluentialCommand {
 		if (this.redoBackup == null){
 			return null;
 		} else {
-			TaskList.getInstance().deleteTask(this.redoBackup);
+			this.redoBackup.restore();
+			TaskList.getInstance().updateTask(this.redoBackup);
 			return this;
 		}
 	}
@@ -38,10 +41,14 @@ public class Restore extends InfluentialCommand {
 		CommonUtil.checkNull(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_CMD);
 		TaskList taskList = TaskList.getInstance();
 		Task task = taskList.getTaskByID(parameterList.getTaskID().getValue());
-		this.undoBackup = task;
-		taskList.restoreTask(task);
-		task = taskList.getTaskByTask(task);
-		this.redoBackup = task;
-		return this.formatReturnString(String.format(MESSAGE_RESTORE, parameterList.getTaskID().getValue()), task);
+		task.restore();
+		task = TaskList.getInstance().updateTask(task);
+		if (task == null){
+			return String.format(MESSAGE_RESTORE_FAIL, parameterList.getTaskID().getValue());
+		} else {
+			this.undoBackup = task;
+			this.redoBackup = task;
+			return this.formatReturnString(String.format(MESSAGE_RESTORE, parameterList.getTaskID().getValue()), task);
+		}
 	}
 }

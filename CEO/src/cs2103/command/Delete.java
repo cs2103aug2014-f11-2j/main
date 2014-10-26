@@ -27,10 +27,12 @@ public class Delete extends InfluentialCommand {
 		CommonUtil.checkNull(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_CMD);
 		Task deletingTask = TaskList.getInstance().getTaskByID(this.parameterList.getTaskID().getValue());
 		deletingTask.updateLastModified(null);
-		if (this.parameterList.getDeleteOption() != null){
+		if (this.parameterList.getDeleteOption() == null && !deletingTask.isDeleted()){
 			deletingTask.delete();
+			TaskList.getInstance().updateTask(deletingTask);
+		} else {
+			TaskList.getInstance().deleteTask(deletingTask);
 		}
-		TaskList.getInstance().deleteTask(deletingTask);
 		this.undoBackup = deletingTask;
 		this.redoBackup = deletingTask;
 		return String.format(MESSAGE_DELETE_FORMAT, this.parameterList.getTaskID().getValue());
@@ -41,7 +43,8 @@ public class Delete extends InfluentialCommand {
 		if (this.undoBackup == null){
 			return null;
 		} else {
-			TaskList.getInstance().restoreTask(this.undoBackup);
+			this.undoBackup.restore();
+			TaskList.getInstance().updateTask(this.undoBackup);
 			return this;
 		}
 	}
@@ -51,10 +54,12 @@ public class Delete extends InfluentialCommand {
 		if (this.redoBackup == null){
 			return null;
 		} else {
-			if (this.parameterList.getDeleteOption() != null){
+			if (this.parameterList.getDeleteOption() == null){
 				this.redoBackup.delete();
+				TaskList.getInstance().updateTask(this.redoBackup);
+			} else {
+				TaskList.getInstance().deleteTask(this.redoBackup);
 			}
-			TaskList.getInstance().deleteTask(this.redoBackup);
 			return this;
 		}
 	}

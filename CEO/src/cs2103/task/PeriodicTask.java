@@ -59,7 +59,6 @@ public class PeriodicTask extends Task {
 				this.endTime = new DateTime(endTime);
 			}
 		}
-		this.updateLastModified(null);
 	}
 	
 	public String getLocation(){
@@ -72,7 +71,6 @@ public class PeriodicTask extends Task {
 		} else {
 			this.location = location;
 		}
-		this.updateLastModified(null);
 	}
 
 	public Recur getRecurrence(){
@@ -81,7 +79,6 @@ public class PeriodicTask extends Task {
 	
 	public void updateRecurrence(Recur recurrence){
 		this.recurrence = recurrence;
-		this.updateLastModified(null);
 	}
 
 	@Override
@@ -105,7 +102,6 @@ public class PeriodicTask extends Task {
 		} else {
 			this.status = status;
 		}
-		this.updateLastModified(null);
 	}
 	
 	@Override

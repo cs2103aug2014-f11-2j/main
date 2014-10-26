@@ -6,9 +6,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
-
-import org.apache.commons.codec.binary.Base64;
 
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.Status;
@@ -18,7 +15,6 @@ import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
 
-import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.task.*;
 import cs2103.util.CommonUtil;
@@ -53,7 +49,7 @@ public class GoogleEngine{
 		return storage;
 	}
 	
-	public void deleteTask(Task task) throws HandledException, FatalException {
+	public void deleteTask(Task task) throws IOException {
 		try {
 			tryToRemove(task);
 		} catch (IOException e) {
@@ -62,12 +58,12 @@ public class GoogleEngine{
 				this.tasks = this.receiver.getTasksClient();
 				tryToRemove(task);
 			} catch (IOException e1) {
-				throw new HandledException(HandledException.ExceptionType.SYNC_FAIL);
+				throw e1;
 			}
 		}
 	}
 	
-	public void updateTask(Task task) throws HandledException, FatalException {
+	public void updateTask(Task task) throws IOException{
 		try {
 			tryToUpdate(task);
 		} catch (IOException e) {
@@ -76,12 +72,12 @@ public class GoogleEngine{
 				this.tasks = this.receiver.getTasksClient();
 				tryToUpdate(task);
 			} catch (IOException e1) {
-				throw new HandledException(HandledException.ExceptionType.SYNC_FAIL);
+				throw e1;
 			}
 		}
 	}
 
-	public Task addTask(Task task) throws HandledException, FatalException {
+	public Task addTask(Task task) throws HandledException, IOException {
 		try {
 			return tryToInsert(task);
 		} catch (IOException e) {
@@ -90,12 +86,12 @@ public class GoogleEngine{
 				this.tasks = this.receiver.getTasksClient();
 				return tryToInsert(task);
 			} catch (IOException e1) {
-				throw new HandledException(HandledException.ExceptionType.SYNC_FAIL);
+				throw e1;
 			}
 		}
 	}
 
-	public ArrayList<Task> getTaskList() throws FatalException,	HandledException {
+	public ArrayList<Task> getTaskList() throws HandledException  {
 		ArrayList<Task> taskList = new ArrayList<Task>();
 		for (com.google.api.services.calendar.model.Event gEvent:this.getEvents()){
 			taskList.add(this.parseGEvent(gEvent));
@@ -106,7 +102,7 @@ public class GoogleEngine{
 		return taskList;
 	}
 	
-	private void getLastUpdated() throws HandledException{
+	private void getLastUpdated() throws IOException{
 		try {
 			this.tryToGetLastUpdated();
 		} catch (IOException e) {
@@ -115,12 +111,12 @@ public class GoogleEngine{
 				this.tasks = this.receiver.getTasksClient();
 				this.tryToGetLastUpdated();
 			} catch (IOException e1) {
-				throw new HandledException(HandledException.ExceptionType.SYNC_FAIL);
+				throw e1;
 			}
 		}
 	}
 	
-	public boolean needToUpdate(Task task) throws HandledException{
+	public boolean needToSync(Task task) throws IOException{
 		Date calendarLastUpdateSaved = this.calendarLastUpdate;
 		Date taskLastUpdateSaved = this.taskLastUpdate;
 		this.getLastUpdated();
@@ -163,19 +159,38 @@ public class GoogleEngine{
 	
 	private Task tryToInsert(Task task) throws IOException, HandledException{
 		if (!task.getStatus().equals(Status.VTODO_CANCELLED)){
+			Task returnTask;
 			if (task instanceof PeriodicTask){
-				return parseGEvent(this.calendar.events().insert(calendarIdentifier, ((PeriodicTask) task).toGEvent()).execute());
+				returnTask = tryToInsert(((PeriodicTask) task).toGEvent());
 			} else if (task instanceof DeadlineTask){
-				com.google.api.services.tasks.model.Task gTask = ((DeadlineTask) task).toGTask();
-				gTask.setId(null);
-				return parseGTask(this.tasks.tasks().insert(DEFAULT_TASKS, gTask).execute());
+				returnTask = tryToInsert(((DeadlineTask) task).toGTask());
 			} else if (task instanceof FloatingTask){
-				com.google.api.services.tasks.model.Task gTask = ((FloatingTask) task).toGTask();
-				gTask.setId(null);
-				return parseGTask(this.tasks.tasks().insert(DEFAULT_TASKS, gTask).execute());
+				returnTask = tryToInsert(((FloatingTask) task).toGTask());
+			} else {
+				return null;
 			}
+			returnTask.updateCreated(task.getCreated());
+			return returnTask;
 		}
 		return null;
+	}
+	
+	private Task tryToInsert(com.google.api.services.tasks.model.Task gTask) throws HandledException, IOException{
+		try{
+			return parseGTask(this.tasks.tasks().insert(DEFAULT_TASKS, gTask).execute());
+		} catch (GoogleJsonResponseException e){
+			gTask.setId(null);
+			return parseGTask(this.tasks.tasks().insert(DEFAULT_TASKS, gTask).execute());
+		}
+	}
+	
+	private Task tryToInsert(com.google.api.services.calendar.model.Event gEvent) throws HandledException, IOException{
+		try{
+			return parseGEvent(this.calendar.events().insert(calendarIdentifier, gEvent).execute());
+		} catch (GoogleJsonResponseException e){
+			gEvent.setId(null);
+			return parseGEvent(this.calendar.events().insert(calendarIdentifier, gEvent).execute());
+		}
 	}
 	
 	private void tryToRemove(Task task) throws IOException{
@@ -186,7 +201,7 @@ public class GoogleEngine{
 		}
 	}
 	
-	private void tryToUpdate(Task task) throws IOException, HandledException{
+	private void tryToUpdate(Task task) throws IOException{
 		if (!task.getStatus().equals(Status.VTODO_CANCELLED)){
 			if (task instanceof PeriodicTask){
 				com.google.api.services.calendar.model.Event updating = ((PeriodicTask) task).toGEvent();
@@ -346,20 +361,5 @@ public class GoogleEngine{
 		} catch (IOException e) {
 			throw new HandledException(HandledException.ExceptionType.SYNC_FAIL);
 		}
-	}
-	
-	public void testTasks() throws HandledException, IOException{
-		//for (com.google.api.services.tasks.model.Task gTask:this.getTasks()){
-			Task task = new FloatingTask(null, null, null, "Testkula2", null);
-			com.google.api.services.tasks.model.Task gTask = new com.google.api.services.tasks.model.Task();
-			gTask.setId("MDc5OTAzNTU4MDUzNDY1OTc5NTM6MDoyMDg3MDQ2MzM4");
-			gTask.setTitle(task.getTitle());
-			this.tasks.tasks().insert(DEFAULT_TASKS, gTask).execute();
-			//gTask.setStatus("cancelled");
-			//this.tasks.tasks().update(DEFAULT_TASKS, gTask.getId(), gTask).execute();
-			//this.tasks.tasks().delete(DEFAULT_TASKS, gTask.getId()).execute();
-			//System.out.println(gTask.getStatus() + " " + gTask.getDeleted());
-			
-		//}
 	}
 }
