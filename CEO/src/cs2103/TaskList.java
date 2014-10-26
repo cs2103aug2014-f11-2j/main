@@ -130,55 +130,84 @@ public class TaskList {
 	public Task addTask(Task task) throws HandledException, FatalException{
 		this.storage.updateTask(task);
 		this.tasks = this.storage.getTaskList();
+		Task returnTask = this.getTaskByTask(task);
 		if (this.google != null){
-			try {
-				if (this.google.needToSync(task)){
-					this.syncWithGoogle();
-				} else {
-					this.google.addTask(task);
-				}
-			} catch (IOException e) {
-				CommonUtil.print(SYNCING_ERROR);
+			Task added = this.addToGoogle(task);
+			this.tasks = this.storage.getTaskList();
+			if (added != null){
+				returnTask = this.getTaskByTask(added);
 			}
 		}
-		return this.getTaskByTask(task);
+		return returnTask;
 	}
 	
 	public Task updateTask(Task task) throws HandledException, FatalException{
 		this.storage.updateTask(task);
 		this.tasks = this.storage.getTaskList();
+		Task returnTask = this.getTaskByTask(task);
 		if (this.google != null){
-			try {
-				if (this.google.needToSync(task)){
-					this.syncWithGoogle();
-				} else {
-					if (task.isDeleted()){
-						this.google.deleteTask(task);
-					} else {
-						this.google.updateTask(task);
-					}
-				}
-			} catch (IOException e) {
-				CommonUtil.print(SYNCING_ERROR);
+			Task updated = this.updateToGoogle(task);
+			this.tasks = this.storage.getTaskList();
+			if (updated != null){
+				returnTask = this.getTaskByTask(updated);
 			}
 		}
-		return this.getTaskByTask(task);
+		return returnTask;
 	}
 	
 	public void deleteTask(Task task) throws HandledException, FatalException{
 		this.storage.deleteTask(task);
 		this.tasks = this.storage.getTaskList();
 		if (this.google != null){
-			try {
-				if (this.google.needToSync(task)){
-					this.syncWithGoogle();
-				} else {
-					this.google.deleteTask(task);
-				}
-			} catch (IOException e) {
-				CommonUtil.print(SYNCING_ERROR);
-			}
+			this.deleteToGoogle(task);
+			this.tasks = this.storage.getTaskList();
 		}
+	}
+	
+	private void deleteToGoogle(Task task) throws FatalException, HandledException{
+		try {
+			if (this.google.needToSync(task)){
+				this.syncWithGoogle();
+			} else {
+				this.google.deleteTask(task);
+			}
+		} catch (IOException e) {
+			CommonUtil.print(SYNCING_ERROR);
+		}
+	}
+	
+	private Task updateToGoogle(Task task) throws HandledException, FatalException{
+		try {
+			if (this.google.needToSync(task)){
+				this.syncWithGoogle();
+			} else {
+				if (task.isDeleted()){
+					this.google.deleteTask(task);
+				} else {
+					Task updating = this.google.updateTask(task);
+					if (updating != null){
+						this.updateUidInList(task, updating);
+						return updating;
+					}
+				}
+			}
+		} catch (IOException e) {
+			CommonUtil.print(SYNCING_ERROR);
+		}
+		return null;
+	}
+
+	private Task addToGoogle(Task task) throws HandledException, FatalException{
+		try {
+			if (this.google.needToSync(task)){
+				this.syncWithGoogle();
+			} else {
+				return this.google.addTask(task);
+			}
+		} catch (IOException e) {
+			CommonUtil.print(SYNCING_ERROR);
+		}
+		return null;
 	}
 	
 	public void syncWithGoogle(){
@@ -203,13 +232,9 @@ public class TaskList {
 					this.storage.updateTask(remoteTask);
 				}
 			} else {
-				if (remoteTask.isDeleted()){
-					this.storage.deleteTask(remoteTask);
-				} else {
-					if (localTask.getLastModified().before(remoteTask.getLastModified())){
-						remoteTask.updateCreated(localTask.getCreated());
-						this.storage.updateTask(remoteTask);
-					}
+				if (localTask.getLastModified().before(remoteTask.getLastModified())){
+					remoteTask.updateCreated(localTask.getCreated());
+					this.storage.updateTask(remoteTask);
 				}
 			}
 		}
@@ -221,20 +246,31 @@ public class TaskList {
 			if (remoteTask == null){
 				Task adding = this.google.addTask(localTask);
 				if (adding != null){
-					this.storage.deleteTask(localTask);
-					this.storage.updateTask(adding);
+					this.updateUidInList(localTask, adding);
 				}
 			} else {
-				if (localTask.isDeleted()){
-					if (!remoteTask.isDeleted()){
+				if (!remoteTask.isDeleted()){
+					if (localTask.isDeleted()){
 						this.google.deleteTask(remoteTask);
-					}
-				} else {
-					if (remoteTask.getLastModified().before(localTask.getLastModified())){
-						this.google.updateTask(localTask);
+					} else {
+						if (remoteTask.getLastModified().before(localTask.getLastModified())){
+							Task updating = this.google.updateTask(localTask);
+							if (updating != null){
+								this.updateUidInList(localTask, updating);
+							}
+						}
 					}
 				}
 			}
+		}
+	}
+	
+	private void updateUidInList(Task oldTask, Task newTask) throws HandledException, FatalException{
+		if (oldTask.equals(newTask)){
+			this.storage.updateTask(newTask);
+		} else {
+			this.storage.deleteTask(oldTask);
+			this.storage.updateTask(newTask);
 		}
 	}
 	
