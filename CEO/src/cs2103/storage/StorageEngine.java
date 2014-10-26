@@ -14,7 +14,6 @@ import cs2103.task.DeadlineTask;
 import cs2103.task.FloatingTask;
 import cs2103.task.PeriodicTask;
 import cs2103.task.Task;
-import cs2103.util.CommonUtil;
 
 import java.util.Collections;
 
@@ -61,10 +60,6 @@ public class StorageEngine implements StorageInterface{
 			storage = new StorageEngine(file);
 		}
 		return storage;
-	}
-	
-	public ArrayList<Task> getTaskList() throws FatalException, HandledException{
-		return this.readFromFile();
 	}
 	
 	private void createNewFile() throws HandledException, FatalException{
@@ -115,37 +110,36 @@ public class StorageEngine implements StorageInterface{
 	}
 	
 	@Override
-	public void addTask(Task task) throws HandledException, FatalException {
-		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
-		calendar.getComponents().add(task.toComponent());
-		writeToFile();
-	}
-	
-	@Override
 	public void updateTask(Task task) throws HandledException, FatalException{
-		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
-		Component updating = task.toComponent();
-		Component existing = this.indexedComponents.getComponent(task.getTaskUID().getValue());
-		if (existing == null){
-			calendar.getComponents().add(updating);
-		}else{
-			calendar.getComponents().remove(existing);
-			calendar.getComponents().add(updating);
+		if (task != null){
+			Component updating = task.toComponent();
+			Component existing = this.indexedComponents.getComponent(task.getTaskUID().getValue());
+			if (existing == null){
+				calendar.getComponents().add(updating);
+			}else{
+				calendar.getComponents().remove(existing);
+				calendar.getComponents().add(updating);
+			}
+			writeToFile();
 		}
-		writeToFile();
 	}
-	
 	
 	@Override
 	public void deleteTask(Task task) throws HandledException, FatalException{
-		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
-		Component existing = this.indexedComponents.getComponent(task.getTaskUID().getValue());
-		if (existing == null){
-			throw new HandledException(HandledException.ExceptionType.TASK_NOT_EXIST);
-		}else{
-			calendar.getComponents().remove(existing);
+		if (task != null){
+			Component existing = this.indexedComponents.getComponent(task.getTaskUID().getValue());
+			if (existing == null){
+				throw new HandledException(HandledException.ExceptionType.TASK_NOT_EXIST);
+			}else{
+				calendar.getComponents().remove(existing);
+			}
+			writeToFile();
 		}
-		writeToFile();
+	}
+
+	@Override
+	public ArrayList<Task> getTaskList() throws FatalException, HandledException{
+		return this.readFromFile();
 	}
 	
 	private Task parseVEvent(VEvent component) throws ParseException, FatalException, HandledException{
@@ -158,8 +152,8 @@ public class StorageEngine implements StorageInterface{
 		if (component.getStartDate() == null || component.getEndDate() == null){
 			throw new FatalException(FatalException.ExceptionType.ILLEGAL_FILE);
 		}else{
-			componentStartTime=component.getStartDate().getDate();
-			componentEndTime=component.getEndDate().getDate();
+			componentStartTime = component.getStartDate().getDate();
+			componentEndTime = component.getEndDate().getDate();
 		}
 		String componentLocation = readLocation(component);
 		Recur componentRecurrence = readRecur(component);
@@ -180,7 +174,7 @@ public class StorageEngine implements StorageInterface{
 			task = new DeadlineTask(componentUID, componentCreated, component.getStatus(), componentTitle, component.getDue().getDate(), readCompleted(component));
 		}
 		task.updateDescription(readDescription(component));
-		task.updateLastModified(component.getLastModified() == null? new Date():component.getLastModified().getDateTime());
+		task.updateLastModified(component.getLastModified() == null?null:component.getLastModified().getDateTime());
 		return task;
 	}
 	

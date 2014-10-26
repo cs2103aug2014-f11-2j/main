@@ -1,6 +1,5 @@
 package cs2103.command;
 
-import cs2103.TaskList;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.task.Task;
@@ -17,13 +16,5 @@ public abstract class InfluentialCommand extends Command{
 		StringBuffer sb = new StringBuffer();
 		sb.append(msg).append(task.toDetail());
 		return CommonUtil.deleteLastChar(sb);
-	}
-	
-	protected Task updateTaskToList(Task newTask) throws HandledException, FatalException{
-		TaskList taskList = TaskList.getInstance();
-		taskList.updateTask(newTask);
-		newTask = taskList.getTaskByTask(newTask);
-		CommonUtil.checkNull(newTask, HandledException.ExceptionType.INVALID_TASK_OBJ);
-		return newTask;
 	}
 }

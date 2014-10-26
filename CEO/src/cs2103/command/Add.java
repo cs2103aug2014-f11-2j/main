@@ -20,6 +20,7 @@ import cs2103.util.CommonUtil;
 
 public class Add extends InfluentialCommand {
 	private static final String MESSAGE_ADD = "You have successfully added a new task.\n";
+	private static final String MESSAGE_ADD_FAIL = "Fail to add a new task.";
 	private static final String[] allowedQuickTimeLiteral = {"from", "by", "on", "in", "at"};
 	
 	public Add(String command) throws HandledException{
@@ -53,10 +54,14 @@ public class Add extends InfluentialCommand {
 		}
 		task.updateDescription(description);
 		task.updateLastModified(null);
-		task = this.addTaskToList(task);
-		this.undoBackup = task;
-		this.redoBackup = task;
-		return this.formatReturnString(MESSAGE_ADD, task);
+		task = TaskList.getInstance().addTask(task);
+		if (task == null){
+			return MESSAGE_ADD_FAIL;
+		} else {
+			this.undoBackup = task;
+			this.redoBackup = task;
+			return this.formatReturnString(MESSAGE_ADD, task);
+		}
 	}
 	
 	private static ArrayList<Parameter> parseQuickAdd(String quickAddString) throws HandledException{
@@ -107,14 +112,6 @@ public class Add extends InfluentialCommand {
 		} else {
 			return timeParameter.getValue();
 		}
-	}
-	
-	private Task addTaskToList(Task newTask) throws HandledException, FatalException{
-		TaskList taskList = TaskList.getInstance();
-		taskList.addTask(newTask);
-		newTask = taskList.getTaskByTask(newTask);
-		CommonUtil.checkNull(newTask, HandledException.ExceptionType.INVALID_TASK_OBJ);
-		return newTask;
 	}
 	
 	@Override

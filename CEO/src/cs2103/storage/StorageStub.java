@@ -3,8 +3,6 @@ package cs2103.storage;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import cs2103.exception.FatalException;
-import cs2103.exception.HandledException;
 import cs2103.task.Task;
 
 public class StorageStub implements StorageInterface {
@@ -33,11 +31,6 @@ public class StorageStub implements StorageInterface {
 	@Override
 	public void updateTask(Task task){
 		this.deleteTask(task);
-		this.tasks.add(task);
-	}
-
-	@Override
-	public void addTask(Task task) throws HandledException, FatalException {
 		this.tasks.add(task);
 	}
 	

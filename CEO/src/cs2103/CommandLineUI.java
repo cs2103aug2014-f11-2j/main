@@ -11,9 +11,13 @@ import cs2103.parameters.Option;
 import cs2103.util.CommonUtil;
 
 public class CommandLineUI {
-	private static final String MESSAGE_WELCOME = "Welcome to the CEO. I am now ready for use.";
+	private static final String MESSAGE_WELCOME_FORMAT = "Welcome to the CEO. %1$s";
+	private static final String MESSAGE_SYNC_ENABLED = "Google Sync is enabled";
+	private static final String MESSAGE_SYNC_DISABLED = "Google Sync is disabled";
+	private static final String MESSAGE_TEST_MODE = "You are now in test mode";
 	private static final String MESSAGE_EXIT = "You have exited CEO. Hope to see you again.";
 	private static final String MESSAGE_USER_PROMPT = "Command me please: ";
+	private static final String MESSAGE_SYNC_PROMPT = "Do you want to enable google sync? y/n:";
 	private static final String MESSAGE_COMMAND_ERROR = "Your input command is invalid, please check your command and try again";
 	private static final String MESSAGE_FATAL_ERR = "A fatal error has occurred, program will now exit. Check log for detail";
 	private static final String MESSAGE_INITIALIZATION_ERROR = "Failed to initialize CEO, program will now exit";
@@ -29,8 +33,20 @@ public class CommandLineUI {
 	private CommandLineUI(Option option) throws HandledException, FatalException{
 		undoStack = new Stack<InfluentialCommand>();
 		redoStack = new Stack<InfluentialCommand>();
+		option = this.verifyOption(option);
 		this.taskList = TaskList.getInstance(option);
-		CommonUtil.print(String.format(MESSAGE_WELCOME));
+		switch(option.getValue()){
+		default:
+		case DEFAULT:
+			CommonUtil.print(String.format(MESSAGE_WELCOME_FORMAT, MESSAGE_SYNC_ENABLED));
+			break;
+		case NOSYNC:
+			CommonUtil.print(String.format(MESSAGE_WELCOME_FORMAT, MESSAGE_SYNC_DISABLED));
+			break;
+		case TEST:
+			CommonUtil.print(String.format(MESSAGE_WELCOME_FORMAT, MESSAGE_TEST_MODE));
+			break;
+		}
 	}
 	
 	public static CommandLineUI getInstance(Option option) throws HandledException, FatalException{
@@ -112,6 +128,9 @@ public class CommandLineUI {
 			case RESTORE:
 				commandObject = new Restore(command[1]);
 				break;
+			case SYNC:
+				commandObject = new Sync();
+				break;
 			case INVALID:
 			default:
 				return MESSAGE_COMMAND_ERROR;
@@ -175,6 +194,29 @@ public class CommandLineUI {
 	private static void printErrorAndExit(){
 		System.err.print(MESSAGE_FATAL_ERR);
 		System.exit(-1);
+	}
+	
+	private Option verifyOption(Option option){
+		if (option == null || option.getValue().equals(Option.Value.DEFAULT)){
+			if (CommonUtil.checkSyncSupport()){
+				CommonUtil.printPrompt(MESSAGE_SYNC_PROMPT);
+				String answer = null;
+				while(true){
+					answer = this.scanner.nextLine();
+					if (answer != null){
+						if (answer.equalsIgnoreCase("y")){
+							return new Option(Option.Value.DEFAULT);
+						} else if (answer.equalsIgnoreCase("n")){
+							return new Option(Option.Value.NOSYNC);
+						}
+					}
+				}
+			} else {
+				return new Option(Option.Value.NOSYNC);
+			}
+		} else {
+			return option;
+		}
 	}
 	
 	public String testCommand(String testCommandInput){
