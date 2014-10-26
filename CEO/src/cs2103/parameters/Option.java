@@ -6,7 +6,7 @@ import cs2103.util.CommonUtil;
 public class Option implements Parameter {
 	public static final String type = "OPTION";
 	public static enum Value {
-		DEFAULT, NOSYNC, TEST;
+		DEFAULT, NOSYNC, TEST, SYNC;
 	}
 	private final Value value;
 	
@@ -36,6 +36,8 @@ public class Option implements Parameter {
 				return Value.NOSYNC;
 			} else if (option.equalsIgnoreCase("test")){
 				return Value.TEST;
+			} else if (option.equalsIgnoreCase("sync") || option.equalsIgnoreCase("enabled-sync")){
+				return Value.SYNC;
 			} else {
 				return Value.DEFAULT;
 			}

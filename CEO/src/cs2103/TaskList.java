@@ -15,6 +15,7 @@ import cs2103.task.DeadlineTask;
 import cs2103.task.FloatingTask;
 import cs2103.task.PeriodicTask;
 import cs2103.task.Task;
+import cs2103.util.CommonUtil;
 
 import java.util.Collections;
 
@@ -24,11 +25,14 @@ public class TaskList {
 	private final File dataFile;
 	private GoogleEngine google;
 	private ArrayList<Task> tasks;
+	private static final String SYNCING = "Syncing with Google, please wait for a while";
+	private static final String SYNCING_ERROR = "Some error occurred when commit changes to Google";
 	
 	private TaskList(Option option) throws FatalException, HandledException{
 		this.dataFile = new File("CEOStore.ics");
 		switch(option.getValue()){
 		default:
+		case SYNC:
 		case DEFAULT:
 			try{
 				this.google = GoogleEngine.getInstance();
@@ -134,7 +138,7 @@ public class TaskList {
 					this.google.addTask(task);
 				}
 			} catch (IOException e) {
-				this.google = null;
+				CommonUtil.print(SYNCING_ERROR);
 			}
 		}
 		return this.getTaskByTask(task);
@@ -155,7 +159,7 @@ public class TaskList {
 					}
 				}
 			} catch (IOException e) {
-				this.google = null;
+				CommonUtil.print(SYNCING_ERROR);
 			}
 		}
 		return this.getTaskByTask(task);
@@ -172,19 +176,21 @@ public class TaskList {
 					this.google.deleteTask(task);
 				}
 			} catch (IOException e) {
-				this.google = null;
+				CommonUtil.print(SYNCING_ERROR);
 			}
 		}
 	}
 	
 	public void syncWithGoogle(){
 		if (this.google == null) return;
+		CommonUtil.print(SYNCING);
 		try {
 			ArrayList<Task> googleList = this.google.getTaskList();
 			syncFromGoogle(googleList);
 			syncToGoogle(googleList);
 			this.tasks = this.storage.getTaskList();
 		} catch (FatalException | HandledException | IOException e) {
+			e.printStackTrace();
 			this.google = null;
 		}
 	}
@@ -193,11 +199,17 @@ public class TaskList {
 		for (Task remoteTask:googleList){
 			Task localTask = this.getTaskByTask(remoteTask, this.tasks);
 			if (localTask == null){
-				this.storage.updateTask(remoteTask);
-			} else {
-				if (localTask.getLastModified().before(remoteTask.getLastModified())){
-					remoteTask.updateCreated(localTask.getCreated());
+				if (!remoteTask.isDeleted()){
 					this.storage.updateTask(remoteTask);
+				}
+			} else {
+				if (remoteTask.isDeleted()){
+					this.storage.deleteTask(remoteTask);
+				} else {
+					if (localTask.getLastModified().before(remoteTask.getLastModified())){
+						remoteTask.updateCreated(localTask.getCreated());
+						this.storage.updateTask(remoteTask);
+					}
 				}
 			}
 		}
@@ -214,7 +226,9 @@ public class TaskList {
 				}
 			} else {
 				if (localTask.isDeleted()){
-					this.google.deleteTask(remoteTask);
+					if (!remoteTask.isDeleted()){
+						this.google.deleteTask(remoteTask);
+					}
 				} else {
 					if (remoteTask.getLastModified().before(localTask.getLastModified())){
 						this.google.updateTask(localTask);

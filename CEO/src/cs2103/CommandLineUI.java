@@ -37,6 +37,7 @@ public class CommandLineUI {
 		this.taskList = TaskList.getInstance(option);
 		switch(option.getValue()){
 		default:
+		case SYNC:
 		case DEFAULT:
 			CommonUtil.print(String.format(MESSAGE_WELCOME_FORMAT, MESSAGE_SYNC_ENABLED));
 			break;
@@ -196,7 +197,7 @@ public class CommandLineUI {
 		System.exit(-1);
 	}
 	
-	private Option verifyOption(Option option){
+	private Option verifyOption(Option option) throws HandledException{
 		if (option == null || option.getValue().equals(Option.Value.DEFAULT)){
 			if (CommonUtil.checkSyncSupport()){
 				CommonUtil.printPrompt(MESSAGE_SYNC_PROMPT);
@@ -205,7 +206,7 @@ public class CommandLineUI {
 					answer = this.scanner.nextLine();
 					if (answer != null){
 						if (answer.equalsIgnoreCase("y")){
-							return new Option(Option.Value.DEFAULT);
+							return new Option(Option.Value.SYNC);
 						} else if (answer.equalsIgnoreCase("n")){
 							return new Option(Option.Value.NOSYNC);
 						}
