@@ -23,6 +23,7 @@ public class Alert extends QueryCommand {
 			sb.append(deadlineAlert);
 		}
 		if (periodicAlert != null){
+			if (deadlineAlert != null) sb.append("\n");
 			sb.append(MESSAGE_TASKS_STARTING);
 			sb.append(periodicAlert);
 		}

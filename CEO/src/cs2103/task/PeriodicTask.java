@@ -230,7 +230,6 @@ public class PeriodicTask extends Task {
 		gEvent.setSummary(this.getTitle());
 		gEvent.setDescription(this.getDescription());
 		gEvent.setLocation(this.getLocation());
-		gEvent.setId(this.getTaskUID().getValue());
 		gEvent.setCreated(new com.google.api.client.util.DateTime(this.getCreated().getTime()));
 		gEvent.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
 		gEvent.setStart(dateTimeToEventDateTime(this.getStartTime()));
