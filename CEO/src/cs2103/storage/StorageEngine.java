@@ -118,6 +118,7 @@ public class StorageEngine implements StorageInterface{
 	public void addTask(Task task) throws HandledException, FatalException {
 		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		calendar.getComponents().add(task.toComponent());
+		writeToFile();
 	}
 	
 	@Override

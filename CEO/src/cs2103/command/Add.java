@@ -53,7 +53,7 @@ public class Add extends InfluentialCommand {
 		}
 		task.updateDescription(description);
 		task.updateLastModified(null);
-		task = this.updateTaskToList(task);
+		task = this.addTaskToList(task);
 		this.undoBackup = task;
 		this.redoBackup = task;
 		return this.formatReturnString(MESSAGE_ADD, task);
@@ -107,6 +107,14 @@ public class Add extends InfluentialCommand {
 		} else {
 			return timeParameter.getValue();
 		}
+	}
+	
+	private Task addTaskToList(Task newTask) throws HandledException, FatalException{
+		TaskList taskList = TaskList.getInstance();
+		taskList.addTask(newTask);
+		newTask = taskList.getTaskByTask(newTask);
+		CommonUtil.checkNull(newTask, HandledException.ExceptionType.INVALID_TASK_OBJ);
+		return newTask;
 	}
 	
 	@Override
