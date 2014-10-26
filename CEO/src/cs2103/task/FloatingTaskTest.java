@@ -15,6 +15,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import cs2103.exception.HandledException;
+import cs2103.util.TestUtil;
 
 public class FloatingTaskTest extends TaskTest {
 	static FloatingTask ft;
@@ -68,12 +69,12 @@ public class FloatingTaskTest extends TaskTest {
 	public void testConvert() throws HandledException {
 		testConvert(ft);
 	}
-
+	
 	@Test
 	public void testClone() {
 		try {
-			FloatingTask task=(FloatingTask) ft.clone();
-			assertTrue(compareFloatingTasks(task, ft));
+			FloatingTask task = (FloatingTask) ft.clone();
+			assertTrue(TestUtil.compareTasks(task,ft));
 		} catch (CloneNotSupportedException e){
 			fail("Expected- Successful Clone");
 		}
@@ -135,11 +136,38 @@ public class FloatingTaskTest extends TaskTest {
 
 	@Override
 	public void testCompareTo() throws HandledException {
-		FloatingTask ft2=new FloatingTask(taskUID, created, title, false);
+		FloatingTask ft2=new FloatingTask(taskUID, created, status, title, complete);
 		assertEquals(0, ft.compareTo(ft2));
 	}
 	
 	@Test public void testEquals() throws CloneNotSupportedException, HandledException{
 		testEquals(ft);
+	}
+	
+	@Test
+	public void testUpdateAndGetStatus(){
+		assertEquals(Status.VTODO_NEEDS_ACTION, ft.getStatus());
+		Status testStatus = new Status();
+		ft.updateStatus(testStatus);
+		assertEquals(testStatus, ft.getStatus());
+	}
+
+	@Override
+	@Test
+	public void testDeleteAndIsDelete() {
+		assertEquals(false, ft.isDeleted());
+		ft.delete();
+		assertEquals(true, ft.isDeleted());
+	}
+
+	@Override
+	@Test
+	public void testRestore() {
+		ft.restore();
+		assertEquals(Status.VTODO_NEEDS_ACTION, ft.getStatus());
+		Date testDate = new Date(1,1,1);
+		ft.updateCompleted(testDate);
+		ft.restore();
+		assertEquals(Status.VTODO_COMPLETED, ft.getStatus());
 	}
 }

@@ -21,15 +21,21 @@ public class TestUtil {
 	}
 	
 	private static boolean compareFloating(FloatingTask task1, FloatingTask task2){
-		if (task1 == null || task2 == null) return false;
+		if (task1 == null || task2 == null) return false;		
+		if (task1.getCompleted() == null && task2.getCompleted() != null) return false;
+		if (task1.getCompleted() != null && task2.getCompleted() == null) return false;
+		if (task1.getCompleted() == null && task2.getCompleted() == null) return true;
 		if (task1.getCompleted().getTime() != task2.getCompleted().getTime()) return false;
 		return true;
 	}
 	
 	private static boolean compareDeadline(DeadlineTask task1, DeadlineTask task2){
 		if (task1 == null || task2 == null) return false;
-		if (task1.getCompleted().getTime() != task2.getCompleted().getTime()) return false;
 		if (task1.getDueTime().getTime() != task2.getDueTime().getTime()) return false;
+		if (task1.getCompleted() == null && task2.getCompleted() != null) return false;
+		if (task1.getCompleted() != null && task2.getCompleted() == null) return false;
+		if (task1.getCompleted() == null && task2.getCompleted() == null) return true;
+		if (task1.getCompleted().getTime() != task2.getCompleted().getTime()) return false;
 		return true;
 	}
 	
