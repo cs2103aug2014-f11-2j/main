@@ -18,12 +18,4 @@ public abstract class InfluentialCommand extends Command{
 		sb.append(msg).append(task.toDetail());
 		return CommonUtil.deleteLastChar(sb);
 	}
-	
-	protected Task updateTaskToList(Task newTask) throws HandledException, FatalException{
-		TaskList taskList = TaskList.getInstance();
-		taskList.updateTask(newTask);
-		newTask = taskList.getTaskByTask(newTask);
-		CommonUtil.checkNull(newTask, HandledException.ExceptionType.INVALID_TASK_OBJ);
-		return newTask;
-	}
 }

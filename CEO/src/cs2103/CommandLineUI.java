@@ -112,6 +112,9 @@ public class CommandLineUI {
 			case RESTORE:
 				commandObject = new Restore(command[1]);
 				break;
+			case SYNC:
+				commandObject = new Sync();
+				break;
 			case INVALID:
 			default:
 				return MESSAGE_COMMAND_ERROR;

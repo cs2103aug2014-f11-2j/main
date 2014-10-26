@@ -11,8 +11,8 @@ import cs2103.task.Task;
 import cs2103.util.CommonUtil;
 
 public class Mark extends InfluentialCommand {
-	private static final String MESSAGE_MARK_FORMAT = "Successfully marked %1$d as completed\n";
-	private static final String MESSAGE_MARK_FAILED = "The task you specified does not contain status information";
+	private static final String MESSAGE_MARK_FORMAT = "Successfully marked task %1$d as completed\n";
+	private static final String MESSAGE_MARK_FAILED = "Failed to mark task %1$d as completed";
 	
 	public Mark(String command) throws HandledException{
 		this.parameterList.addParameter(TaskID.parse(command));
@@ -23,15 +23,19 @@ public class Mark extends InfluentialCommand {
 		CommonUtil.checkNull(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_CMD);
 		Task task = TaskList.getInstance().getTaskByID(parameterList.getTaskID().getValue());
 		if (task instanceof PeriodicTask){
-			return MESSAGE_MARK_FAILED;
+			return String.format(MESSAGE_MARK_FAILED, this.parameterList.getTaskID().getValue());
 		} else {
 			Task newTask = cloneTask(task);
 			newTask.updateCompleted(new Date());
 			TaskList.getInstance().updateTask(newTask);
-			newTask = this.updateTaskToList(newTask);
-			this.undoBackup = task;
-			this.redoBackup = newTask;
-			return this.formatReturnString(String.format(MESSAGE_MARK_FORMAT, this.parameterList.getTaskID().getValue()), newTask);
+			newTask = TaskList.getInstance().updateTask(newTask);
+			if (newTask == null){
+				return String.format(MESSAGE_MARK_FAILED, this.parameterList.getTaskID().getValue());
+			} else {
+				this.undoBackup = task;
+				this.redoBackup = newTask;
+				return this.formatReturnString(String.format(MESSAGE_MARK_FORMAT, this.parameterList.getTaskID().getValue()), newTask);
+			}
 		}
 	}
 	

@@ -35,6 +35,7 @@ public class FloatingTask extends Task {
 		} else {
 			this.completed = new DateTime(completed);
 		}
+		this.updateLastModified(null);
 	}
 	
 	@Override
@@ -44,6 +45,7 @@ public class FloatingTask extends Task {
 		} else {
 			this.status = status;
 		}
+		this.updateLastModified(null);
 	}
 
 	@Override

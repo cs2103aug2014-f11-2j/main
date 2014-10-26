@@ -9,7 +9,6 @@ public class HandledException extends Exception {
 	private static final String INVALID_TASK_TYPE = "Your input task type is not valid, please check your input and try again!";
 	private static final String INVALID_TIME = "Your input time cannot be parsed, please check your input and try again!";
 	private static final String END_BEFORE_START = "Your end time is before start time, please check your input and try again";
-	private static final String NO_TITLE = "A Non-empty title must be specified!";
 	private static final String TASK_NOT_EXIST = "The task you intended to delete does not exist in the file.";
 	private static final String INVALID_PARA = "Your input parameters are not valid, please check your input and try again!";
 	private static final String INVALID_CMD = "Your input command contains error, please check your input and try again!";
@@ -23,7 +22,7 @@ public class HandledException extends Exception {
 	private final String errorMsg;
 	
 	public static enum ExceptionType{
-		INVALID_TASKID, INVALID_TASK_OBJ, INVALID_TASK_TYPE, INVALID_TIME, END_BEFORE_START, NO_TITLE, TASK_NOT_EXIST, INVALID_PARA, 
+		INVALID_TASKID, INVALID_TASK_OBJ, INVALID_TASK_TYPE, INVALID_TIME, END_BEFORE_START, TASK_NOT_EXIST, INVALID_PARA, 
 		INVALID_CMD, INVALID_COMPLETE, LESS_THAN_ONE_PARA, CLONE_FAILED, NETWORK_ERR, UNEXPECTED_ERR, LOGIN_FAIL, SYNC_FAIL;
 	}
 	
@@ -49,8 +48,6 @@ public class HandledException extends Exception {
 			return INVALID_TIME;
 		case END_BEFORE_START:
 			return END_BEFORE_START;
-		case NO_TITLE:
-			return NO_TITLE;
 		case TASK_NOT_EXIST:
 			return TASK_NOT_EXIST;
 		case INVALID_PARA:

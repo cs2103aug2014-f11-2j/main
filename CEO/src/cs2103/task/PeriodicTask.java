@@ -11,6 +11,7 @@ import cs2103.exception.HandledException;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.RRule;
@@ -27,6 +28,7 @@ public class PeriodicTask extends Task {
 	private static final String TYPE_RECURRING = "Recurring";
 	private static final String STRING_LOCATION = "Location: ";
 	private static final String STRING_RECUR = "Recurrence: ";
+	private static final long YEAR_IN_MILLIS = 31556952000L;
 	
 	public PeriodicTask(Uid taskUID, Date created, Status status, String title, String location, Date startTime, Date endTime, Recur recurrence) throws HandledException {
 		super(taskUID, created, title);
@@ -51,8 +53,13 @@ public class PeriodicTask extends Task {
 			throw new HandledException(HandledException.ExceptionType.END_BEFORE_START);
 		} else {
 			this.startTime = new DateTime(startTime);
-			this.endTime = new DateTime(endTime);
+			if (endTime.getTime() - startTime.getTime() > YEAR_IN_MILLIS){
+				this.endTime = new DateTime(startTime.getTime() + YEAR_IN_MILLIS);
+			} else {
+				this.endTime = new DateTime(endTime);
+			}
 		}
+		this.updateLastModified(null);
 	}
 	
 	public String getLocation(){
@@ -65,6 +72,7 @@ public class PeriodicTask extends Task {
 		} else {
 			this.location = location;
 		}
+		this.updateLastModified(null);
 	}
 
 	public Recur getRecurrence(){
@@ -72,7 +80,8 @@ public class PeriodicTask extends Task {
 	}
 	
 	public void updateRecurrence(Recur recurrence){
-		this.recurrence=recurrence;
+		this.recurrence = recurrence;
+		this.updateLastModified(null);
 	}
 
 	@Override
@@ -96,6 +105,7 @@ public class PeriodicTask extends Task {
 		} else {
 			this.status = status;
 		}
+		this.updateLastModified(null);
 	}
 	
 	@Override
@@ -194,6 +204,18 @@ public class PeriodicTask extends Task {
 		sb.append(recur.getFrequency()).append("\n");
 		return sb.toString();
 	}
+	
+	private static List<String> recurToGoogle(Recur recur){
+		if (recur == null){
+			return null;
+		} else {
+			List<String> recurrenceList = new ArrayList<String>();
+			StringBuffer sb = new StringBuffer();
+			sb.append("RRULE:").append(recur.toString());
+			recurrenceList.add(sb.toString());
+			return recurrenceList;
+		}
+	}
 
 	@Override
 	public Component toComponent() {
@@ -215,11 +237,10 @@ public class PeriodicTask extends Task {
 		gEvent.setId(this.getTaskUID().getValue());
 		gEvent.setCreated(new com.google.api.client.util.DateTime(this.getCreated().getTime()));
 		gEvent.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
-		gEvent.setStart(new com.google.api.services.calendar.model.EventDateTime().setDateTime(new com.google.api.client.util.DateTime(this.getStartTime().getTime())));
-		gEvent.setEnd(new com.google.api.services.calendar.model.EventDateTime().setDateTime(new com.google.api.client.util.DateTime(this.getEndTime().getTime())));
-		List<String> recurrenceList = new ArrayList<String>();
-		recurrenceList.add(this.getRecurrence().toString());
-		gEvent.setRecurrence(recurrenceList);
+		gEvent.setStart(dateTimeToEventDateTime(this.getStartTime()));
+		gEvent.setEnd(dateTimeToEventDateTime(this.getEndTime()));
+		List<String> recurrenceList = recurToGoogle(this.getRecurrence());
+		if (recurrenceList != null) gEvent.setRecurrence(recurrenceList);
 		return gEvent;
 	}
 	
@@ -271,5 +292,12 @@ public class PeriodicTask extends Task {
 			}
 		}
 		return null;
+	}
+	
+	private static com.google.api.services.calendar.model.EventDateTime dateTimeToEventDateTime(DateTime time){
+		com.google.api.services.calendar.model.EventDateTime eventDateTime = new com.google.api.services.calendar.model.EventDateTime();
+		eventDateTime.setTimeZone(TimeZone.getDefault().getID());
+		eventDateTime.setDateTime(new com.google.api.client.util.DateTime(time.getTime()));
+		return eventDateTime;
 	}
 }

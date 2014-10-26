@@ -38,6 +38,7 @@ public class DeadlineTask extends Task {
 		} else {
 			this.completed = new DateTime(completed);
 		}
+		this.updateLastModified(null);
 	}
 	
 	public DateTime getDueTime(){
@@ -50,6 +51,7 @@ public class DeadlineTask extends Task {
 		}else{
 			this.dueTime = new DateTime(dueTime);
 		}
+		this.updateLastModified(null);
 	}
 	
 	@Override
@@ -59,6 +61,7 @@ public class DeadlineTask extends Task {
 		} else {
 			this.status = status;
 		}
+		this.updateLastModified(null);
 	}
 
 	@Override
