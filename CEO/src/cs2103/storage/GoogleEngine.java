@@ -242,17 +242,22 @@ public class GoogleEngine{
 			this.calendar.events().delete(calendarIdentifier, task.getTaskUID().getValue()).execute();
 			return this.tryToInsert(task);
 		} else {
-			if (this.tasks.tasks().get(DEFAULT_TASKS, task.getTaskUID().getValue()).execute() != null){
-				com.google.api.services.tasks.model.Task gTask;
+			com.google.api.services.tasks.model.Task gTask = this.tasks.tasks().get(DEFAULT_TASKS, task.getTaskUID().getValue()).execute();
+			if (gTask != null){
+				com.google.api.services.tasks.model.Task newGTask;
 				if (task instanceof FloatingTask){
-					gTask = ((FloatingTask) task).toGTask();
+					newGTask = ((FloatingTask) task).toGTask();
 				} else if (task instanceof DeadlineTask){
-					gTask = ((DeadlineTask) task).toGTask();
+					newGTask = ((DeadlineTask) task).toGTask();
 				} else {
 					return null;
 				}
-				this.tasks.tasks().delete(DEFAULT_TASKS, task.getTaskUID().getValue()).execute();
-				return parseGTask(this.tasks.tasks().insert(DEFAULT_TASKS, gTask).execute());
+				if (gTask.getCompleted() == null){
+					return parseGTask(this.tasks.tasks().patch(DEFAULT_TASKS, gTask.getId(), newGTask).execute());
+				} else {
+					this.tasks.tasks().delete(DEFAULT_TASKS, gTask.getId()).execute();
+					return parseGTask(this.tasks.tasks().insert(DEFAULT_TASKS, newGTask).execute());
+				}
 			} else {
 				return this.tryToInsert(task);
 			}
