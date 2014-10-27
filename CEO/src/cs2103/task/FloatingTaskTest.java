@@ -49,7 +49,7 @@ public class FloatingTaskTest extends TaskTest {
 	public void testUpdateAndGetCompleted() {
 		ft.updateCompleted(null);
 		assertEquals(null, ft.getCompleted());
-		Date testDate = new Date(1,1,1);
+		Date testDate = new DateTime(1);
 		ft.updateCompleted(testDate);
 		DateTime testDate2 = new DateTime(testDate);
 		assertTrue(ft.getCompleted().equals(testDate2));
@@ -61,13 +61,9 @@ public class FloatingTaskTest extends TaskTest {
 	}
 	
 	@Test
-	public void testClone() {
-		try {
+	public void testClone() throws CloneNotSupportedException {
 			FloatingTask task = (FloatingTask) ft.clone();
 			assertTrue(TestUtil.compareTasks(task,ft));
-		} catch (CloneNotSupportedException e){
-			fail("Expected- Successful Clone");
-		}
 	}
 
 	@Test
@@ -89,11 +85,11 @@ public class FloatingTaskTest extends TaskTest {
 	public void testMatches() {
 		String keyword=null;
 		assertEquals(ft.matches(keyword), true);
-		keyword="";
+		keyword = "";
 		assertEquals(ft.matches(keyword), true);
-		keyword="Testing";
+		keyword = "Testing";
 		assertEquals(ft.matches(keyword), true);
-		keyword="Coding";
+		keyword = "Coding";
 		assertEquals(ft.matches(keyword), false);
 		ft.updateDescription("Coding");
 		assertEquals(ft.matches(keyword), true);
@@ -126,7 +122,7 @@ public class FloatingTaskTest extends TaskTest {
 
 	@Override
 	public void testCompareTo() throws HandledException {
-		FloatingTask ft2=new FloatingTask(taskUID, created, status, title, complete);
+		FloatingTask ft2 = new FloatingTask(taskUID, created, status, title, complete);
 		assertEquals(0, ft.compareTo(ft2));
 	}
 	
@@ -152,7 +148,7 @@ public class FloatingTaskTest extends TaskTest {
 	public void testRestore() {
 		ft.restore();
 		assertEquals(Status.VTODO_NEEDS_ACTION, ft.getStatus());
-		Date testDate = new Date(1,1,1);
+		Date testDate = new DateTime(1);
 		ft.updateCompleted(testDate);
 		ft.restore();
 		assertEquals(Status.VTODO_COMPLETED, ft.getStatus());
