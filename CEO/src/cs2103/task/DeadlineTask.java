@@ -198,7 +198,7 @@ public class DeadlineTask extends Task {
 	public boolean checkPeriod(Date[] time) {
 		if (time == null){
 			return true;
-		} else if (time[0] == null && time[1] == null){
+		} else if (time[0] == null){
 			return true;
 		} else if (time[1] == null){
 			return this.getDueTime().before(time[0]);

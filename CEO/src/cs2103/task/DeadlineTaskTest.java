@@ -138,7 +138,7 @@ public class DeadlineTaskTest extends TaskTest{
 		assertEquals(dlt.checkPeriod(time), true);
 		time[0] = null;
 		time[1] = new Date(2011, 1, 1);
-		assertEquals(dlt.checkPeriod(time), false);
+		assertEquals(dlt.checkPeriod(time), true);
 	}
 
 	@Test
