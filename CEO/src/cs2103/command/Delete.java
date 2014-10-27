@@ -46,7 +46,7 @@ public class Delete extends InfluentialCommand {
 			return null;
 		} else {
 			this.undoBackup.restore();
-			this.target.updateLastModified(null);
+			this.undoBackup.updateLastModified(null);
 			TaskList.getInstance().updateTask(this.undoBackup);
 			return this;
 		}

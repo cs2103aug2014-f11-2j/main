@@ -119,6 +119,7 @@ public class Add extends InfluentialCommand {
 		if (this.undoBackup == null){
 			return null;
 		} else {
+			this.undoBackup.updateLastModified(null);
 			TaskList.getInstance().deleteTask(this.undoBackup);
 			return this;
 		}
@@ -129,6 +130,7 @@ public class Add extends InfluentialCommand {
 		if (this.redoBackup == null){
 			return null;
 		} else {
+			this.redoBackup.updateLastModified(null);
 			TaskList.getInstance().addTask(this.redoBackup);
 			return this;
 		}

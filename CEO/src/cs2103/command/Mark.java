@@ -29,6 +29,7 @@ public class Mark extends InfluentialCommand {
 		} else {
 			Task newTask = cloneTask(this.target);
 			newTask.updateCompleted(new Date());
+			this.target.updateLastModified(null);
 			newTask = TaskList.getInstance().updateTask(newTask);
 			if (newTask == null){
 				return String.format(MESSAGE_MARK_FAILED, this.parameterList.getTaskID().getValue());
@@ -55,6 +56,7 @@ public class Mark extends InfluentialCommand {
 		if (this.undoBackup == null){
 			return null;
 		} else {
+			this.undoBackup.updateLastModified(null);
 			TaskList.getInstance().updateTask(this.undoBackup);
 			return this;
 		}
@@ -65,6 +67,7 @@ public class Mark extends InfluentialCommand {
 		if (this.redoBackup == null){
 			return null;
 		} else {
+			this.redoBackup.updateLastModified(null);
 			TaskList.getInstance().updateTask(this.redoBackup);
 			return this;
 		}
