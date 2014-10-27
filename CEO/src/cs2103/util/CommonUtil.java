@@ -100,6 +100,6 @@ public class CommonUtil {
 	}
 	
 	public static void clearConsole(){
-		ConsoleClear.clr();
+		//ConsoleClear.clr();
 	}
 }
