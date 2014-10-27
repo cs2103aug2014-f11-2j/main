@@ -16,7 +16,6 @@ import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Status;
-import net.fortuna.ical4j.model.property.Uid;
 
 public class PeriodicTask extends Task {
 	private DateTime startTime;
@@ -30,7 +29,7 @@ public class PeriodicTask extends Task {
 	private static final String STRING_RECUR = "Recurrence: ";
 	private static final long YEAR_IN_MILLIS = 31556952000L;
 	
-	public PeriodicTask(Uid taskUID, Date created, Status status, String title, String location, Date startTime, Date endTime, Recur recurrence) throws HandledException {
+	public PeriodicTask(String taskUID, Date created, Status status, String title, String location, Date startTime, Date endTime, Recur recurrence) throws HandledException {
 		super(taskUID, created, title);
 		this.updateTime(startTime, endTime);
 		this.updateLocation(location);

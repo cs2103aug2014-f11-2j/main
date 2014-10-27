@@ -11,13 +11,12 @@ import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.Completed;
 import net.fortuna.ical4j.model.property.Status;
-import net.fortuna.ical4j.model.property.Uid;
 
 public class FloatingTask extends Task {
 	private DateTime completed;
 	private static final String TYPE_FLOATING = "Floating";
 	
-	public FloatingTask(Uid taskUID, Date created, Status status, String title, Date completed) throws HandledException{
+	public FloatingTask(String taskUID, Date created, Status status, String title, Date completed) throws HandledException{
 		super(taskUID, created, title);
 		this.updateCompleted(completed);
 		this.updateStatus(status);

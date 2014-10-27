@@ -32,7 +32,6 @@ import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RRule;
-import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.util.CompatibilityHints;
@@ -113,7 +112,7 @@ public class StorageEngine implements StorageInterface{
 	public void updateTask(Task task) throws HandledException, FatalException{
 		if (task != null){
 			Component updating = task.toComponent();
-			Component existing = this.indexedComponents.getComponent(task.getTaskUID().getValue());
+			Component existing = this.indexedComponents.getComponent(task.getTaskUID());
 			if (existing == null){
 				calendar.getComponents().add(updating);
 			}else{
@@ -127,7 +126,7 @@ public class StorageEngine implements StorageInterface{
 	@Override
 	public void deleteTask(Task task) throws HandledException, FatalException{
 		if (task != null){
-			Component existing = this.indexedComponents.getComponent(task.getTaskUID().getValue());
+			Component existing = this.indexedComponents.getComponent(task.getTaskUID());
 			if (existing == null){
 				throw new HandledException(HandledException.ExceptionType.TASK_NOT_EXIST);
 			}else{
@@ -144,7 +143,7 @@ public class StorageEngine implements StorageInterface{
 	
 	private Task parseVEvent(VEvent component) throws ParseException, FatalException, HandledException{
 		Task task;
-		Uid componentUID = component.getUid();
+		String componentUID = component.getUid() == null? null:component.getUid().getValue();
 		Date componentCreated = component.getCreated() == null? new Date():component.getCreated().getDateTime();
 		String componentTitle = readTitle(component);
 		Date componentStartTime;
@@ -165,7 +164,7 @@ public class StorageEngine implements StorageInterface{
 	
 	private Task parseVToDo(VToDo component) throws ParseException, HandledException, FatalException{
 		Task task;
-		Uid componentUID = component.getUid();
+		String componentUID = component.getUid() == null? null:component.getUid().getValue();
 		Date componentCreated = component.getCreated() == null? new Date():component.getCreated().getDateTime();
 		String componentTitle = readTitle(component);
 		if (component.getDue() == null){

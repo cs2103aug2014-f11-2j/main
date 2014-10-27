@@ -12,14 +12,13 @@ import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.Completed;
 import net.fortuna.ical4j.model.property.Status;
-import net.fortuna.ical4j.model.property.Uid;
 
 public class DeadlineTask extends Task {
 	private DateTime dueTime;
 	private DateTime completed;
 	private static final String TYPE_DEADLINE = "Deadline";
 	
-	public DeadlineTask(Uid taskUID, Date created, Status status, String title, Date dueTime, Date completed) throws HandledException {
+	public DeadlineTask(String taskUID, Date created, Status status, String title, Date dueTime, Date completed) throws HandledException {
 		super(taskUID, created, title);
 		this.updateDueTime(dueTime);;
 		this.updateCompleted(completed);
