@@ -12,14 +12,13 @@ import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.Completed;
 import net.fortuna.ical4j.model.property.Status;
-import net.fortuna.ical4j.model.property.Uid;
 
 public class DeadlineTask extends Task {
 	private DateTime dueTime;
 	private DateTime completed;
 	private static final String TYPE_DEADLINE = "Deadline";
 	
-	public DeadlineTask(Uid taskUID, Date created, Status status, String title, Date dueTime, Date completed) throws HandledException {
+	public DeadlineTask(String taskUID, Date created, Status status, String title, Date dueTime, Date completed) throws HandledException {
 		super(taskUID, created, title);
 		this.updateDueTime(dueTime);;
 		this.updateCompleted(completed);
@@ -175,7 +174,10 @@ public class DeadlineTask extends Task {
 		com.google.api.services.tasks.model.Task gTask = new com.google.api.services.tasks.model.Task();
 		gTask.setTitle(this.getTitle());
 		gTask.setDue(new com.google.api.client.util.DateTime(this.getDueTime().getTime()));
-		if (this.getCompleted() != null) gTask.setCompleted(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
+		if (this.getCompleted() != null){
+			gTask.setCompleted(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
+			gTask.setStatus("completed");
+		}
 		gTask.setNotes(this.getDescription());
 		gTask.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
 		return gTask;
@@ -196,7 +198,7 @@ public class DeadlineTask extends Task {
 	public boolean checkPeriod(Date[] time) {
 		if (time == null){
 			return true;
-		} else if (time[0] == null && time[1] == null){
+		} else if (time[0] == null){
 			return true;
 		} else if (time[1] == null){
 			return this.getDueTime().before(time[0]);

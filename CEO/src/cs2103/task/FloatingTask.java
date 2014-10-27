@@ -11,13 +11,12 @@ import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.Completed;
 import net.fortuna.ical4j.model.property.Status;
-import net.fortuna.ical4j.model.property.Uid;
 
 public class FloatingTask extends Task {
 	private DateTime completed;
 	private static final String TYPE_FLOATING = "Floating";
 	
-	public FloatingTask(Uid taskUID, Date created, Status status, String title, Date completed) throws HandledException{
+	public FloatingTask(String taskUID, Date created, Status status, String title, Date completed) {
 		super(taskUID, created, title);
 		this.updateCompleted(completed);
 		this.updateStatus(status);
@@ -109,13 +108,9 @@ public class FloatingTask extends Task {
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		try {
-			FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getStatus(), this.getTitle(), this.getCompleted());
-			newTask.updateDescription(this.getDescription());
-			return newTask;
-		} catch (HandledException e) {
-			throw new CloneNotSupportedException();
-		}
+		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getStatus(), this.getTitle(), this.getCompleted());
+		newTask.updateDescription(this.getDescription());
+		return newTask;
 	}
 
 	@Override
@@ -159,7 +154,10 @@ public class FloatingTask extends Task {
 	public com.google.api.services.tasks.model.Task toGTask(){
 		com.google.api.services.tasks.model.Task gTask = new com.google.api.services.tasks.model.Task();
 		gTask.setTitle(this.getTitle());
-		if (this.getCompleted() != null) gTask.setCompleted(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
+		if (this.getCompleted() != null){
+			gTask.setCompleted(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
+			gTask.setStatus("completed");
+		}
 		gTask.setNotes(this.getDescription());
 		gTask.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
 		return gTask;

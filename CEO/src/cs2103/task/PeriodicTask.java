@@ -16,7 +16,6 @@ import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Status;
-import net.fortuna.ical4j.model.property.Uid;
 
 public class PeriodicTask extends Task {
 	private DateTime startTime;
@@ -30,7 +29,7 @@ public class PeriodicTask extends Task {
 	private static final String STRING_RECUR = "Recurrence: ";
 	private static final long YEAR_IN_MILLIS = 31556952000L;
 	
-	public PeriodicTask(Uid taskUID, Date created, Status status, String title, String location, Date startTime, Date endTime, Recur recurrence) throws HandledException {
+	public PeriodicTask(String taskUID, Date created, Status status, String title, String location, Date startTime, Date endTime, Recur recurrence) throws HandledException {
 		super(taskUID, created, title);
 		this.updateTime(startTime, endTime);
 		this.updateLocation(location);
@@ -232,6 +231,7 @@ public class PeriodicTask extends Task {
 		gEvent.setLocation(this.getLocation());
 		gEvent.setCreated(new com.google.api.client.util.DateTime(this.getCreated().getTime()));
 		gEvent.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
+		gEvent.setStatus("confirmed");
 		gEvent.setStart(dateTimeToEventDateTime(this.getStartTime()));
 		gEvent.setEnd(dateTimeToEventDateTime(this.getEndTime()));
 		List<String> recurrenceList = recurToGoogle(this.getRecurrence());
@@ -254,7 +254,7 @@ public class PeriodicTask extends Task {
 	public boolean checkPeriod(Date[] time) {
 		if (time == null){
 			return true;
-		} else if (time[0] == null && time[1] == null){
+		} else if (time[0] == null){
 			return true;
 		} else if (time[1] == null){
 			return this.getStartTime().before(time[0]);
@@ -280,10 +280,14 @@ public class PeriodicTask extends Task {
 		DateTime now = new DateTime();
 		if (this.getRecurrence() != null){
 			if (this.getEndTime().before(now)){
-				Date startTime = (this.getRecurrence().getNextDate(new DateTime(this.getStartTime()), now));
-				Date endTime = new Date(this.getEndTime().getTime() - this.getStartTime().getTime() + startTime.getTime());
-				this.updateTime(startTime, endTime);
-				return this;
+				Date startTime = this.getRecurrence().getNextDate(this.getStartTime(), now);
+				if (startTime == null){
+					return null;
+				} else {
+					Date endTime = new Date(this.getEndTime().getTime() - this.getStartTime().getTime() + startTime.getTime());
+					this.updateTime(startTime, endTime);
+					return this;
+				}
 			}
 		}
 		return null;

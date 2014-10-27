@@ -17,7 +17,7 @@ public class HandledException extends Exception {
 	private static final String CLONE_FAILED = "Failed to clone task object";
 	private static final String UNEXPECTED_ERR = "An unexpected error occurred, operation failed";
 	private static final String LOGIN_FAIL = "Unable to get Credential from Google, Google Sync is disabled";
-	private static final String SYNC_FAIL = "Unable to get your data from Google, Google Sync is disabled";
+	private static final String SYNC_FAIL = "Unable to sync your data with Google, Google Sync is disabled";
 	private final String errorMsg;
 	
 	public static enum ExceptionType{

@@ -18,7 +18,7 @@ import net.fortuna.ical4j.model.property.Uid;
 
 public abstract class Task implements Comparable<Task>, Cloneable{;
 	private int taskID;
-	private final Uid taskUID;
+	private final String taskUID;
 	private String title;
 	private String description;
 	private DateTime created;
@@ -29,7 +29,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	protected static final long DAY_IN_MILLIS = 86400000L;
 	protected static final String DELETED = "(Deleted Task)\n";
 	
-	public Task(Uid taskUID, Date created, String title) throws HandledException{
+	public Task(String taskUID, Date created, String title) {
 		this.updateTitle(title);
 		if (taskUID == null){
 			this.taskUID = this.generateUid();
@@ -40,16 +40,16 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		this.updateLastModified(null);
 	}
 	
-	private Uid generateUid(){
+	private String generateUid(){
 		SecureRandom random = new SecureRandom();
-		return new Uid(new BigInteger(130, random).toString(32));
+		return new BigInteger(130, random).toString(32);
 	}
 	
 	public int getTaskID(){
 		return this.taskID;
 	}
 	
-	public Uid getTaskUID(){
+	public String getTaskUID(){
 		return this.taskUID;
 	}
 	
@@ -76,7 +76,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		this.taskID = id;
 	}
 	
-	public void updateTitle(String title) throws HandledException{
+	public void updateTitle(String title) {
 		if (title == null || title.isEmpty()){
 			this.title = "";
 		} else {
@@ -114,7 +114,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	}
 	
 	protected void addCommonProperty(Component component){
-		component.getProperties().add(this.getTaskUID());
+		component.getProperties().add(new Uid(this.getTaskUID()));
 		component.getProperties().add(new Created(this.getCreated()));
 		component.getProperties().add(new LastModified(new DateTime()));
 		component.getProperties().add(new Description(this.getDescription()));
@@ -134,7 +134,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	public boolean equals(Object o){
 		if (o == null) return false;
 		if (o instanceof Task){
-			return this.getTaskUID().getValue().equals(((Task) o).getTaskUID().getValue());
+			return this.getTaskUID().equals(((Task) o).getTaskUID());
 		} else {
 			return false;
 		}

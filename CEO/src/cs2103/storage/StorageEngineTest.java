@@ -49,7 +49,7 @@ public class StorageEngineTest {
 			expectedList.add(task);
 		}
 		for (Task task:expectedList){
-			task.updateTitle(task.getTaskUID().getValue());
+			task.updateTitle(task.getTaskUID());
 			storage.updateTask(task);
 		}
 		testList = storage.getTaskList();

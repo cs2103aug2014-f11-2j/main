@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.util.Date;
 
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Uid;
 
 import org.junit.After;
@@ -13,17 +15,19 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import cs2103.exception.HandledException;
+import cs2103.util.TestUtil;
 
 public class FloatingTaskTest extends TaskTest {
 	static FloatingTask ft;
-	Uid taskUID = null;
+	String taskUID = null;
 	Date created = null; 
+	Status status = null;
 	String title = "Testing";
-	boolean complete = false;
+	Date complete = null;
 
 	@Before
 	public void setUp() throws Exception {
-		ft = new FloatingTask(taskUID, created, title, complete);
+		ft = new FloatingTask(taskUID, created, status, title, complete);
 		ft.updateDescription(null);
 	}
 
@@ -34,41 +38,33 @@ public class FloatingTaskTest extends TaskTest {
 	}
 	
 	public void testFloatingTaskConstructionOne() {
-		try{
-			ft = new FloatingTask(taskUID, created, "", complete);
-			fail("Expected- Handled Exception");
-		} catch(HandledException e){
-			assertEquals(e.getErrorMsg(), "A Non-empty title must be specified!");
-		}
+		ft = new FloatingTask(taskUID, created, status, "", complete);
 	}
 	
 	public void testFloatingTaskConstructionTwo() {
-		try{
-			ft = new FloatingTask(taskUID, created, title, complete);
-			assertTrue(true);
-		} catch(HandledException e){
-			fail("Expected- Successful Creation");
-		}
+		ft = new FloatingTask(taskUID, created, status, title, complete);
 	}
 	
 	@Test
-	public void testUpdateAndGetComplete() {
-		ft.updateComplete(true);
-		assertEquals(true, ft.getComplete());
-		ft.updateComplete(false);
-		assertEquals(false, ft.getComplete());
+	public void testUpdateAndGetCompleted() {
+		ft.updateCompleted(null);
+		assertEquals(null, ft.getCompleted());
+		Date testDate = new Date(1,1,1);
+		ft.updateCompleted(testDate);
+		DateTime testDate2 = new DateTime(testDate);
+		assertTrue(ft.getCompleted().equals(testDate2));
 	}
 	
 	@Test
 	public void testConvert() throws HandledException {
 		testConvert(ft);
 	}
-
+	
 	@Test
 	public void testClone() {
 		try {
-			FloatingTask task=(FloatingTask) ft.clone();
-			assertTrue(compareFloatingTasks(task, ft));
+			FloatingTask task = (FloatingTask) ft.clone();
+			assertTrue(TestUtil.compareTasks(task,ft));
 		} catch (CloneNotSupportedException e){
 			fail("Expected- Successful Clone");
 		}
@@ -130,11 +126,35 @@ public class FloatingTaskTest extends TaskTest {
 
 	@Override
 	public void testCompareTo() throws HandledException {
-		FloatingTask ft2=new FloatingTask(taskUID, created, title, false);
+		FloatingTask ft2=new FloatingTask(taskUID, created, status, title, complete);
 		assertEquals(0, ft.compareTo(ft2));
 	}
 	
 	@Test public void testEquals() throws CloneNotSupportedException, HandledException{
 		testEquals(ft);
+	}
+	
+	@Test
+	public void testUpdateAndGetStatus(){
+		assertEquals(Status.VTODO_NEEDS_ACTION, ft.getStatus());
+		Status testStatus = new Status();
+		ft.updateStatus(testStatus);
+		assertEquals(testStatus, ft.getStatus());
+	}
+
+	@Test
+	public void testDeleteAndIsDelete() {
+		testDeleteAndIsDelete(ft);
+	}
+
+	@Override
+	@Test
+	public void testRestore() {
+		ft.restore();
+		assertEquals(Status.VTODO_NEEDS_ACTION, ft.getStatus());
+		Date testDate = new Date(1,1,1);
+		ft.updateCompleted(testDate);
+		ft.restore();
+		assertEquals(Status.VTODO_COMPLETED, ft.getStatus());
 	}
 }

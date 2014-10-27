@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
 
-class ErrorLogging {
+public class ErrorLogging {
 	private static ErrorLogging log;
 	private final File file;
 	
