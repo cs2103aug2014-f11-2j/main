@@ -27,7 +27,7 @@ public class CommonUtilTest {
 		CommonUtil.splitFirstWord(null);
 	}
 	
-	//boundary value analysis
+	
 	@Test(expected = HandledException.class)
 	public void testParseIntegerParameter() throws HandledException {
 		int test = CommonUtil.parseIntegerParameter("1");
@@ -65,6 +65,7 @@ public class CommonUtilTest {
 		StringBuffer testNum = new StringBuffer("123");
 		String test2 = CommonUtil.deleteLastChar(testNum);
 		assertEquals(test2, "12");
+		
 	}
 	
 	@Test(expected = HandledException.class)

@@ -3,15 +3,12 @@ package cs2103;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
-import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Status;
 
 import org.junit.Test;
 
-import com.google.api.client.util.DateTime;
 
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
