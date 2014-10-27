@@ -5,12 +5,8 @@ import java.awt.Desktop.Action;
 import java.io.IOException;
 import java.net.InetAddress;
 
-import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.AnsiConsole;
-
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
-import static org.fusesource.jansi.Ansi.*;
 
 public class CommonUtil {
 	
@@ -70,12 +66,6 @@ public class CommonUtil {
 		}
 	}
 	
-	public static void print(Ansi feedback) {
-		if (feedback != null){
-			AnsiConsole.out.println(feedback);
-		}
-	}
-	
 	public static void printPrompt(String prompt){
 		if (prompt != null && !prompt.isEmpty()){
 			System.out.print(prompt);
@@ -110,6 +100,6 @@ public class CommonUtil {
 	}
 	
 	public static void clearConsole(){
-		AnsiConsole.out.print(ansi().eraseScreen());
+		ConsoleClear.clr();
 	}
 }

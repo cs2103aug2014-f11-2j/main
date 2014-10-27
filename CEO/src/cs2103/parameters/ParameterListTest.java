@@ -2,11 +2,8 @@ package cs2103.parameters;
 
 import static org.junit.Assert.*;
 
-import java.util.Queue;
-
 import org.junit.Test;
 
-import cs2103.command.Command;
 import cs2103.exception.HandledException;
 
 public class ParameterListTest {

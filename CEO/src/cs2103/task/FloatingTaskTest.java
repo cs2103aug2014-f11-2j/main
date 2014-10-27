@@ -6,12 +6,8 @@ import java.util.Date;
 
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.property.Status;
-import net.fortuna.ical4j.model.property.Uid;
 
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import cs2103.exception.HandledException;

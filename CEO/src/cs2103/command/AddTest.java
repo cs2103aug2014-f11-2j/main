@@ -24,6 +24,7 @@ public class AddTest {
 		assertEquals("You have successfully added a new task.",addObj.execute());
 	}
 	
+	@SuppressWarnings("unused")
 	@Test(expected = HandledException.class)
 	public void testAddNullCommand() throws HandledException{
 		Add addObj = new Add(null);
