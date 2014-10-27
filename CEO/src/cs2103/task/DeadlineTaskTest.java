@@ -1,17 +1,11 @@
 package cs2103.task;
 
 import static org.junit.Assert.*;
-
-import java.text.DateFormat;
 import java.util.Date;
-import java.util.Locale;
-
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.property.Status;
-import net.fortuna.ical4j.model.property.Uid;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import cs2103.exception.HandledException;
@@ -24,7 +18,7 @@ public class DeadlineTaskTest extends TaskTest{
 	Status status = null;
 	String title = "Testing";
 	Date complete = null;
-	static Date dueTime = new Date(1000, 1, 1);
+	static Date dueTime = new DateTime(1000);
 
 	@Before
 	public void setUp() throws Exception {
@@ -33,55 +27,32 @@ public class DeadlineTaskTest extends TaskTest{
 	}
 	
 	@Test 
-	public void testDeadlineTaskConstructor(){
+	public void testDeadlineTaskConstructor() throws HandledException{
 		testDeadlineTaskConstructionOne();
 		testDeadlineTaskConstructionTwo();
 		testDeadlineTaskConstructionThree();
-		testDeadlineTaskConstructionFour();
+	}
+		
+	public void testDeadlineTaskConstructionOne() throws HandledException {
+		exception.expect(HandledException.class);
+		dlt = new DeadlineTask(taskUID, created, status, " ", null, complete);
 	}
 	
-	public void testDeadlineTaskConstructionOne() {
-		try{
-			dlt = new DeadlineTask(taskUID, created, status, null, dueTime, complete);
-			fail("Expected- Handled Exception");
-		} catch(HandledException e){
-			assertEquals(e.getErrorMsg(), "A Non-empty title must be specified!");
-		}
+	public void testDeadlineTaskConstructionTwo() throws HandledException {
+		dlt = new DeadlineTask(taskUID, created, status,  " ", dueTime, complete);
+		assertTrue(true);
 	}
 	
-	public void testDeadlineTaskConstructionTwo() {
-		try{
-			dlt = new DeadlineTask(taskUID, created, status, " ", null, complete);
-			fail("Expected- Handled Exception");
-		} catch(HandledException e){
-			assertEquals(e.getErrorMsg(), "Your input time cannot be parsed, please check your input and try again!");
-		}
-	}
-	
-	@SuppressWarnings("deprecation")
-	public void testDeadlineTaskConstructionThree() {
-		try{
-			dlt = new DeadlineTask(taskUID, created, status,  " ", dueTime, complete);
-			assertTrue(true);
-		} catch(HandledException e){
-			fail("Expected- Successful Creation");
-		}
-	}
-	
-	public void testDeadlineTaskConstructionFour() {
-		try{
-			dlt = new DeadlineTask(taskUID, created, status,  " ", dueTime, new DateTime());
-			assertTrue(true);
-		} catch(HandledException e){
-			fail("Expected- Successful Creation");
-		}
+	public void testDeadlineTaskConstructionThree() throws HandledException {
+		dlt = new DeadlineTask(taskUID, created, status,  " ", dueTime, new DateTime());
+		assertTrue(true);	
 	}
 	
 	@Test
 	public void testUpdateAndGetComplete() {
 		dlt.updateCompleted(null);
 		assertEquals(null, dlt.getCompleted());
-		Date testDate = new Date(1,1,1);
+		Date testDate = new DateTime();
 		dlt.updateCompleted(testDate);
 		DateTime testDate2 = new DateTime(testDate);
 		assertTrue(dlt.getCompleted().equals(testDate2));
@@ -89,8 +60,7 @@ public class DeadlineTaskTest extends TaskTest{
 
 	@Test
 	public void testUpdateAndGetDueTime() throws HandledException{
-		@SuppressWarnings("deprecation")
-		Date newDate = new Date(1000, 1, 2);
+		Date newDate = new DateTime();
 		try {
 			dlt.updateDueTime(newDate);
 		} catch (HandledException e){
@@ -107,37 +77,33 @@ public class DeadlineTaskTest extends TaskTest{
 	
 	@Test
 	public void testClone() throws CloneNotSupportedException {
-		try {
-			DeadlineTask task = (DeadlineTask) dlt.clone();
-			assertTrue(TestUtil.compareTasks(task, dlt));
-		} catch (CloneNotSupportedException e){
-			fail("Expected- Successful Clone");
-		}
+		DeadlineTask task = (DeadlineTask) dlt.clone();
+		assertTrue(TestUtil.compareTasks(task, dlt));
 	}
 
 	@Test
 	public void testToSummary() {
 		assertEquals("0. Testing\nType: Deadline\tStatus: Needs Action\t"
-				+ "Due At: 01-Feb-2900 00:00:00\n", dlt.toSummary());
+				+ "Due At: 01-Jan-1970 07:30:01\n", dlt.toSummary());
 	}
 
 	@Test
 	public void testToDetail() {
 		assertEquals("0. Testing\nType: Deadline\tStatus: Needs Action\t"
-				+ "Due At: 01-Feb-2900 00:00:00\nDescription: \n", dlt.toDetail());
+				+ "Due At: 01-Jan-1970 07:30:01\nDescription: \n", dlt.toDetail());
 		dlt.updateDescription("Description");
 		assertEquals("0. Testing\nType: Deadline\tStatus: Needs Action\t"
-				+ "Due At: 01-Feb-2900 00:00:00\nDescription: Description\n", dlt.toDetail());
+				+ "Due At: 01-Jan-1970 07:30:01\nDescription: Description\n", dlt.toDetail());
 	}
 
 	@Test
 	public void testCheckPeriod() {
 		Date[] time = new Date[2];
 		assertEquals(dlt.checkPeriod(time), true);
-		time[0] = new Date(1000, 1, 2);
-		assertEquals(dlt.checkPeriod(time), true);
+		time[0] = new DateTime(1001);
+		assertEquals(dlt.checkPeriod(time), false);
 		time[0] = null;
-		time[1] = new Date(2011, 1, 1);
+		time[1] = new DateTime(1002);
 		assertEquals(dlt.checkPeriod(time), true);
 	}
 
@@ -216,10 +182,9 @@ public class DeadlineTaskTest extends TaskTest{
 	public void testRestore() {
 		dlt.restore();
 		assertEquals(Status.VTODO_NEEDS_ACTION, dlt.getStatus());
-		Date testDate = new Date(1,1,1);
+		Date testDate = new DateTime();
 		dlt.updateCompleted(testDate);
 		dlt.restore();
 		assertEquals(Status.VTODO_COMPLETED, dlt.getStatus());
-		
 	}
 }

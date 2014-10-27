@@ -2,18 +2,13 @@ package cs2103.task;
 
 import static org.junit.Assert.*;
 
+
 import java.util.Date;
 
 import net.fortuna.ical4j.model.DateTime;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 import cs2103.exception.HandledException;
 import cs2103.util.TestUtil;
 
@@ -30,13 +25,16 @@ public abstract class TaskTest {
 	public abstract void testUpdateAndGetStatus();;
 	public abstract void testRestore();
 	
+	@Rule
+	public ExpectedException exception = ExpectedException.none();
+	
 	public void testCheckAlert(Task task){
 		assertFalse(task.checkAlert());
 	}
 		
 	public void testUpdateAndGetLastModified(Task task) {
 		assertTrue(task.getLastModified().equals(new DateTime(new Date())));
-		Date newDate= new Date(1000,1,2);
+		Date newDate= new DateTime(1000);
 		task.updateLastModified(newDate);
 		assertTrue(task.getLastModified().equals(newDate));
 	}
@@ -58,27 +56,43 @@ public abstract class TaskTest {
 	}
 	
 	public void testConvert(Task task) throws HandledException {
+		testConvertOne(task);
+		testConvertToFloating(task);
+		testConvertToDeadline(task);
+		testConvertToPeriodic(task);
+	}
+	
+	public void testConvertOne(Task task) throws HandledException{
+		exception.expect(HandledException.class);
 		Date[] time=null;
-		try{
-			task.convert(time);
-			fail("Expected- Handled Exception");
-		} catch(HandledException e){
-			assertEquals("Your input time cannot be parsed, please check your input and try again!", e.getErrorMsg());
-		}
-		time= new Date[2];
-		time[0]=null;
-		time[1]=null;
+		task.convert(time);	
+	}
+	
+	public void testConvertToFloating(Task task) throws HandledException {
+		Date[] time = new Date[2];
+		time[0] = null;
+		time[1] = null;
 		Task dummyTask = task.convert(time);
 		assertTrue(dummyTask instanceof FloatingTask);
-		dummyTask= task.convert(time);
-		Task taskExpected = new FloatingTask((task).getTaskUID(),task.getCreated(), task.getStatus(),
-				task.getTitle(), task.getCompleted());
+		Task taskExpected;
+		if (task instanceof PeriodicTask) {
+			taskExpected = new FloatingTask((task).getTaskUID(),task.getCreated(), task.getStatus(),
+					task.getTitle(), null);
+		} else {
+			taskExpected = new FloatingTask((task).getTaskUID(),task.getCreated(), task.getStatus(),
+					task.getTitle(), task.getCompleted());	
+		}
 		taskExpected.updateDescription(task.getDescription());
 		assertTrue(TestUtil.compareTasks(dummyTask, taskExpected));
-		
-		time[0]= new Date(2014,1,1);
-		dummyTask =task.convert(time);
+	}
+	
+	public void testConvertToDeadline(Task task) throws HandledException {
+		Date[] time = new Date[2];
+		time[0] = new DateTime(2014);
+		time[1] = null;
+		Task dummyTask =task.convert(time);
 		assertTrue(dummyTask instanceof DeadlineTask);
+		Task taskExpected;
 		if (task instanceof DeadlineTask) {
 			taskExpected = new DeadlineTask(task.getTaskUID(), task.getCreated(), task.getStatus(),
 					task.getTitle(), time[0], ((DeadlineTask) task).getCompleted());
@@ -91,10 +105,15 @@ public abstract class TaskTest {
 		}
 		taskExpected.updateDescription(task.getDescription());
 		assertTrue(TestUtil.compareTasks(dummyTask, taskExpected));
-		
-		time[1]= new Date(2014,2,1);
-		dummyTask=task.convert(time);
+	}
+	
+	public void testConvertToPeriodic(Task task) throws HandledException {
+		Date[] time = new Date[2];
+		time[0] = new DateTime(2014);
+		time[1]= new DateTime(2015);
+		Task dummyTask=task.convert(time);
 		assertTrue(dummyTask instanceof PeriodicTask);
+		Task taskExpected;
 		if (task instanceof PeriodicTask) {
 			taskExpected= new PeriodicTask(task.getTaskUID(), task.getCreated(), task.getStatus(),
 					task.getTitle(), ((PeriodicTask) task).getLocation(), time[0], time[1], null);
@@ -121,6 +140,4 @@ public abstract class TaskTest {
 		task.delete();
 		assertEquals(true, task.isDeleted());
 	}
-	
-
 }
