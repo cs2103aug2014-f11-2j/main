@@ -13,28 +13,30 @@ import cs2103.util.CommonUtil;
 
 public class Delete extends InfluentialCommand {
 	private static final String MESSAGE_DELETE_FORMAT = "You have deleted task with ID %1$d";
+	private Task target;
 	
-	public Delete(String command) throws HandledException{
+	public Delete(String command) throws HandledException, FatalException{
 		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> parameterQueue = separateCommand(command);
 		this.parameterList.addParameter(TaskID.parse(parameterQueue.poll()));
 		Map<String, String> parameterMap = separateParameters(parameterQueue);
 		this.parameterList.addParameter(DeleteOption.parse(getParameterString(parameterMap, DeleteOption.allowedLiteral)));
+		CommonUtil.checkNull(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_CMD);
+		this.target = TaskList.getInstance().getTaskByID(this.parameterList.getTaskID().getValue());
 	}
 	
 	@Override
 	public String execute() throws HandledException, FatalException {
-		CommonUtil.checkNull(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_CMD);
-		Task deletingTask = TaskList.getInstance().getTaskByID(this.parameterList.getTaskID().getValue());
-		deletingTask.updateLastModified(null);
-		if (this.parameterList.getDeleteOption() == null && !deletingTask.isDeleted()){
-			deletingTask.delete();
-			TaskList.getInstance().updateTask(deletingTask);
+		CommonUtil.checkNull(this.target, HandledException.ExceptionType.INVALID_TASK_OBJ);
+		this.target.updateLastModified(null);
+		if (this.parameterList.getDeleteOption() == null && !this.target.isDeleted()){
+			this.target.delete();
+			TaskList.getInstance().updateTask(this.target);
 		} else {
-			TaskList.getInstance().deleteTask(deletingTask);
+			TaskList.getInstance().deleteTask(this.target);
 		}
-		this.undoBackup = deletingTask;
-		this.redoBackup = deletingTask;
+		this.undoBackup = this.target;
+		this.redoBackup = this.target;
 		return String.format(MESSAGE_DELETE_FORMAT, this.parameterList.getTaskID().getValue());
 	}
 
@@ -44,6 +46,7 @@ public class Delete extends InfluentialCommand {
 			return null;
 		} else {
 			this.undoBackup.restore();
+			this.target.updateLastModified(null);
 			TaskList.getInstance().updateTask(this.undoBackup);
 			return this;
 		}
@@ -54,12 +57,7 @@ public class Delete extends InfluentialCommand {
 		if (this.redoBackup == null){
 			return null;
 		} else {
-			if (this.parameterList.getDeleteOption() == null){
-				this.redoBackup.delete();
-				TaskList.getInstance().updateTask(this.redoBackup);
-			} else {
-				TaskList.getInstance().deleteTask(this.redoBackup);
-			}
+			this.execute();
 			return this;
 		}
 	}

@@ -160,7 +160,7 @@ public class CommandLineUI {
 	
 	private int executeUndo(int steps) throws HandledException, FatalException{
 		int result = 0;
-		while(result < this.undoStack.size() && result < steps){
+		while(!this.undoStack.isEmpty() && result < steps){
 			InfluentialCommand undoCommand = undoStack.pop().undo();
 			if (undoCommand != null){
 				result++;
@@ -182,7 +182,7 @@ public class CommandLineUI {
 	
 	private int executeRedo(int steps) throws HandledException, FatalException{
 		int result = 0;
-		while(result < this.redoStack.size() && result < steps){
+		while(!this.undoStack.isEmpty() && result < steps){
 			InfluentialCommand undoCommand = redoStack.pop().redo();
 			if (undoCommand != null){
 				result++;

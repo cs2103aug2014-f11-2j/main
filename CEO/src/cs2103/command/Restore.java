@@ -10,8 +10,12 @@ import cs2103.util.CommonUtil;
 public class Restore extends InfluentialCommand {
 	private static final String MESSAGE_RESTORE = "You have successfully restored a task with ID %1$d\n";
 	private static final String MESSAGE_RESTORE_FAIL = "Failed to restor the task with ID %1$d";
-	public Restore(String command) throws HandledException {
+	private Task target;
+	
+	public Restore(String command) throws HandledException, FatalException {
 		this.parameterList.addParameter(TaskID.parse(command));
+		CommonUtil.checkNull(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_CMD);
+		this.target = TaskList.getInstance().getTaskByID(this.parameterList.getTaskID().getValue());
 	}
 
 	@Override
@@ -30,25 +34,22 @@ public class Restore extends InfluentialCommand {
 		if (this.redoBackup == null){
 			return null;
 		} else {
-			this.redoBackup.restore();
-			TaskList.getInstance().updateTask(this.redoBackup);
+			this.execute();
 			return this;
 		}
 	}
 
 	@Override
 	public String execute() throws HandledException, FatalException {
-		CommonUtil.checkNull(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_CMD);
-		TaskList taskList = TaskList.getInstance();
-		Task task = taskList.getTaskByID(parameterList.getTaskID().getValue());
-		task.restore();
-		task = TaskList.getInstance().updateTask(task);
-		if (task == null){
+		CommonUtil.checkNull(this.target, HandledException.ExceptionType.INVALID_TASK_OBJ);
+		this.target.restore();
+		this.target = TaskList.getInstance().updateTask(this.target);
+		if (this.target == null){
 			return String.format(MESSAGE_RESTORE_FAIL, parameterList.getTaskID().getValue());
 		} else {
-			this.undoBackup = task;
-			this.redoBackup = task;
-			return this.formatReturnString(String.format(MESSAGE_RESTORE, parameterList.getTaskID().getValue()), task);
+			this.undoBackup = this.target;
+			this.redoBackup = this.target;
+			return this.formatReturnString(String.format(MESSAGE_RESTORE, parameterList.getTaskID().getValue()), this.target);
 		}
 	}
 }

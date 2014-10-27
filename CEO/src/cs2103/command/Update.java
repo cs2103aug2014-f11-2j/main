@@ -20,8 +20,9 @@ import cs2103.util.CommonUtil;
 public class Update extends InfluentialCommand {
 	private static final String MESSAGE_UPDATE = "You have updated task with ID %1$d\n";
 	private static final String MESSAGE_UPDATE_FAIL = "Fail to update task with ID %1$d";
+	private Task target;
 	
-	public Update(String command) throws HandledException{
+	public Update(String command) throws HandledException, FatalException{
 		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> parameterQueue = separateCommand(command);
 		this.parameterList.addParameter(TaskID.parse(parameterQueue.poll()));
@@ -33,17 +34,18 @@ public class Update extends InfluentialCommand {
 		this.parameterList.addParameter(Recurrence.parse(getParameterString(parameterMap, Recurrence.allowedLiteral)));
 		this.parameterList.addParameter(Complete.parse(getParameterString(parameterMap, Complete.allowedLiteral)));
 		if (this.parameterList.getParameterCount() <= 1) throw new HandledException(HandledException.ExceptionType.LESS_THAN_ONE_PARA);
+		CommonUtil.checkNull(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_TASKID);
+		this.target = TaskList.getInstance().getTaskByID(this.parameterList.getTaskID().getValue());
 	}
 	
 	@Override
 	public String execute() throws HandledException, FatalException {
-		CommonUtil.checkNull(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_TASKID);
-		Task task = TaskList.getInstance().getTaskByID(this.parameterList.getTaskID().getValue());
+		CommonUtil.checkNull(this.target, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		Task newTask;
 		if (this.parameterList.getTime() == null){
-			newTask = cloneTask(task);
+			newTask = cloneTask(this.target);
 		} else {
-			newTask = task.convert(this.parameterList.getTime().getValue());
+			newTask = this.target.convert(this.parameterList.getTime().getValue());
 		}
 		if (this.parameterList.getTitle() != null){
 			newTask.updateTitle(this.parameterList.getTitle().getValue());
@@ -65,7 +67,7 @@ public class Update extends InfluentialCommand {
 		if (newTask == null){
 			return String.format(MESSAGE_UPDATE_FAIL, this.parameterList.getTaskID().getValue());
 		} else {
-			this.undoBackup = task;
+			this.undoBackup = this.target;
 			this.redoBackup = newTask;
 			return this.formatReturnString(String.format(MESSAGE_UPDATE, this.parameterList.getTaskID().getValue()), newTask);
 		}
