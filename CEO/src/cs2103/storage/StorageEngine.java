@@ -63,7 +63,7 @@ public class StorageEngine implements StorageInterface{
 	
 	private void createNewFile() throws HandledException, FatalException{
 		this.calendar = new net.fortuna.ical4j.model.Calendar();
-		this.calendar.getProperties().add(new ProdId("-//cs2103-f11-2j//CEO 0.3//EN"));
+		this.calendar.getProperties().add(new ProdId("-//cs2103-f11-2j//CEO 0.4//EN"));
 		this.calendar.getProperties().add(Version.VERSION_2_0);
 		this.calendar.getProperties().add(CalScale.GREGORIAN);
 		TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();

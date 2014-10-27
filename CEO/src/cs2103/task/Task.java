@@ -29,7 +29,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	protected static final long DAY_IN_MILLIS = 86400000L;
 	protected static final String DELETED = "(Deleted Task)\n";
 	
-	public Task(String taskUID, Date created, String title) throws HandledException{
+	public Task(String taskUID, Date created, String title) {
 		this.updateTitle(title);
 		if (taskUID == null){
 			this.taskUID = this.generateUid();
@@ -76,7 +76,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		this.taskID = id;
 	}
 	
-	public void updateTitle(String title) throws HandledException{
+	public void updateTitle(String title) {
 		if (title == null || title.isEmpty()){
 			this.title = "";
 		} else {

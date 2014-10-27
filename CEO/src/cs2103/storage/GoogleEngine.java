@@ -251,6 +251,7 @@ public class GoogleEngine{
 				} else {
 					return null;
 				}
+				gTask.setDeleted(false);
 				if (gTask.getCompleted() == null || newGTask.getCompleted() != null){
 					return parseGTask(this.tasks.tasks().patch(DEFAULT_TASKS, gTask.getId(), newGTask).execute());
 				} else {

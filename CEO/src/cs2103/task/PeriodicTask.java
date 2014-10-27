@@ -280,10 +280,14 @@ public class PeriodicTask extends Task {
 		DateTime now = new DateTime();
 		if (this.getRecurrence() != null){
 			if (this.getEndTime().before(now)){
-				Date startTime = (this.getRecurrence().getNextDate(new DateTime(this.getStartTime()), now));
-				Date endTime = new Date(this.getEndTime().getTime() - this.getStartTime().getTime() + startTime.getTime());
-				this.updateTime(startTime, endTime);
-				return this;
+				Date startTime = this.getRecurrence().getNextDate(this.getStartTime(), now);
+				if (startTime == null){
+					return null;
+				} else {
+					Date endTime = new Date(this.getEndTime().getTime() - this.getStartTime().getTime() + startTime.getTime());
+					this.updateTime(startTime, endTime);
+					return this;
+				}
 			}
 		}
 		return null;

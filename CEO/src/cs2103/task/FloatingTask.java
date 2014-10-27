@@ -16,7 +16,7 @@ public class FloatingTask extends Task {
 	private DateTime completed;
 	private static final String TYPE_FLOATING = "Floating";
 	
-	public FloatingTask(String taskUID, Date created, Status status, String title, Date completed) throws HandledException{
+	public FloatingTask(String taskUID, Date created, Status status, String title, Date completed) {
 		super(taskUID, created, title);
 		this.updateCompleted(completed);
 		this.updateStatus(status);
@@ -108,13 +108,9 @@ public class FloatingTask extends Task {
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		try {
-			FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getStatus(), this.getTitle(), this.getCompleted());
-			newTask.updateDescription(this.getDescription());
-			return newTask;
-		} catch (HandledException e) {
-			throw new CloneNotSupportedException();
-		}
+		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getStatus(), this.getTitle(), this.getCompleted());
+		newTask.updateDescription(this.getDescription());
+		return newTask;
 	}
 
 	@Override
