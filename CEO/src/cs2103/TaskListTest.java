@@ -11,6 +11,8 @@ import net.fortuna.ical4j.model.property.Status;
 
 import org.junit.Test;
 
+import com.google.api.client.util.DateTime;
+
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Option;
@@ -32,7 +34,7 @@ public class TaskListTest {
 		test.addTask(testPeriodicTask);
 		
 		ArrayList<PeriodicTask> returnTest = test.getPeriodicList();
-		assertTrue(TestUtil.compareTasks(returnTest.get(0),testPeriodicTask));
+		assertTrue(TestUtil.compareTasks(returnTest.get(1),testPeriodicTask));
 	}
 
 	@Test
@@ -54,45 +56,43 @@ public class TaskListTest {
 		FloatingTask testTask = new FloatingTask("testFloat", new Date(), testStatus, "testFloating", new Date());
 		testFloat.addTask(testTask);
 		ArrayList<FloatingTask> returnTest = testFloat.getFloatingList();
-		assertTrue(TestUtil.compareTasks(returnTest.get(0), testTask));
+		assertTrue(TestUtil.compareTasks(returnTest.get(2), testTask));
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Test
 	public void testGetAllList() throws HandledException, FatalException {
 		TaskList testAll = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testStatus");
-		Date startDate = new Date(2014, 10, 25, 15, 45, 15);
-		Date completeDate = new Date(2014, 10, 27, 16, 14, 25);
+		Date startDate = new Date(System.currentTimeMillis());
+		Date completeDate = new Date(System.currentTimeMillis() + 864000L);
 		
 		Task testAllTask = new FloatingTask("testAll", startDate, testStatus, "testAll", completeDate);
 		testAll.addTask(testAllTask);
 		
 		ArrayList<Task> test = testAll.getAllList();
-		assertTrue(TestUtil.compareTasks(test.get(2), testAllTask));
+		assertTrue(TestUtil.compareTasks(test.get(4), testAllTask));
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Test
 	public void testGetTaskByID() throws HandledException, FatalException {
 		TaskList testID = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testID");
-		Date createdDate = new Date(2014, 10, 25, 15, 45, 15);
-		Date dueDate = new Date(2014, 10, 27, 16, 14, 23);
+		Date createdDate = new Date(System.currentTimeMillis());
+		Date dueDate = new Date(System.currentTimeMillis() + 865000L);
 		
 		
-		DeadlineTask testIDTask = new DeadlineTask("testID", createdDate, testStatus, "testID", dueDate, new Date());
+		DeadlineTask testIDTask = new DeadlineTask("testID", createdDate, testStatus, "testID", new Date(), dueDate);
 		testID.addTask(testIDTask);
-		assertTrue(TestUtil.compareTasks(testID.getTaskByID(4), testIDTask));
+		
+		assertTrue(TestUtil.compareTasks(testID.getTaskByID(7), testIDTask));
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Test
 	public void testAddTask() throws HandledException, FatalException {
 		TaskList testAdd = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testAdd");
-		Date startDate = new Date(2014, 11, 21, 15, 45, 15);
-		Date completeDate = new Date(2014, 11, 27, 16, 14, 43);
+		Date startDate = new Date(System.currentTimeMillis());
+		Date completeDate =new Date(System.currentTimeMillis() + 863000L);
 		
 		Task testAddTask = new FloatingTask("testAdd", startDate, testStatus, "testAdd", completeDate);
 		testAdd.addTask(testAddTask);
@@ -101,15 +101,14 @@ public class TaskListTest {
 	}
 	
 	
-	@SuppressWarnings("deprecation")
 	@Test
 	public void testUpdateTask() throws HandledException, FatalException {
 		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testUpdate");
-		Date startDate = new Date(2014, 11, 21, 15, 45, 15);
-		Date completeDate = new Date(2014, 12, 27, 16, 14, 43);
-		Date startDate1 = new Date(2014,12, 21, 15, 45, 15);
-		Date completeDate1 = new Date(2014, 12, 25, 16, 14, 43);
+		Date startDate = new Date(System.currentTimeMillis());
+		Date completeDate = new Date(System.currentTimeMillis() + 861000L);
+		Date startDate1 = new Date(System.currentTimeMillis());
+		Date completeDate1 = new Date(System.currentTimeMillis() + 867000L);
 		
 		FloatingTask testTask = new FloatingTask("testUpdate", startDate, testStatus, "testUpdate", completeDate);
 		test.addTask(testTask);
@@ -122,13 +121,12 @@ public class TaskListTest {
 		assertTrue(TestUtil.compareTasks(returnTest1.get(1), testTask1));
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void testDeleteTask() throws HandledException, FatalException {
 		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testDelete");
-		Date startDate = new Date(2014, 10, 30, 15, 45, 15);
-		Date completeDate = new Date(2014, 11, 27, 16, 14, 43);
+		Date startDate = new Date(System.currentTimeMillis());
+		Date completeDate = new Date(System.currentTimeMillis() + 861000L);
 		
 		PeriodicTask testTask = new PeriodicTask("testDelete", startDate, testStatus, "testDelete", "testingDelete", startDate,completeDate, null);
 		test.addTask(testTask);
@@ -138,13 +136,12 @@ public class TaskListTest {
 		assertTrue(returnTest1.isEmpty());
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Test
 	public void testGetTrashList() throws HandledException, FatalException {
 		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testTrash");
-		Date startDate = new Date(2014, 10, 30, 15, 45, 15);
-		Date completeDate = new Date(2014, 11, 27, 16, 14, 43);
+		Date startDate = new Date(System.currentTimeMillis());
+		Date completeDate = new Date(System.currentTimeMillis() + 869000L);
 		
 		PeriodicTask testTask = new PeriodicTask("testTrash", startDate, testStatus, "testTrash", "testingTrash", startDate,completeDate, null);
 		test.addTask(testTask);
@@ -153,13 +150,12 @@ public class TaskListTest {
 		assertTrue(TestUtil.compareTasks(testTrash.get(0), testTask));
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Test
 	public void testGetDefaultList() throws HandledException, FatalException {
 		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testDefault");
-		Date startDate = new Date(2014, 10, 23, 15, 45, 15);
-		Date completeDate = new Date(2014, 10, 25, 16, 14, 43);
+		Date startDate = new Date(System.currentTimeMillis());
+		Date completeDate = new Date(System.currentTimeMillis() + 866000L);
 		
 		PeriodicTask testingDefault = new PeriodicTask("testDefault", startDate, testStatus, "testDefault", "testingDefault", startDate,completeDate, null);
 		test.addTask(testingDefault);
