@@ -12,7 +12,8 @@ import cs2103.task.Task;
 import cs2103.util.CommonUtil;
 
 public class Delete extends InfluentialCommand {
-	private static final String MESSAGE_DELETE_FORMAT = "You have deleted task with ID %1$d";
+	private static final String MESSAGE_DELETE = "You have moved task with ID %1$d to trash";
+	private static final String MESSAGE_PERMANENTLY_DELETE = "You have permanently deleted task with ID %1$d";
 	private Task target;
 	
 	public Delete(String command) throws HandledException, FatalException{
@@ -29,15 +30,16 @@ public class Delete extends InfluentialCommand {
 	public String execute() throws HandledException, FatalException {
 		CommonUtil.checkNull(this.target, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		this.target.updateLastModified(null);
+		this.undoBackup = this.target;
+		this.redoBackup = this.target;
 		if (this.parameterList.getDeleteOption() == null && !this.target.isDeleted()){
 			this.target.delete();
 			TaskList.getInstance().updateTask(this.target);
+			return String.format(MESSAGE_DELETE, this.parameterList.getTaskID().getValue());
 		} else {
 			TaskList.getInstance().deleteTask(this.target);
+			return String.format(MESSAGE_PERMANENTLY_DELETE, this.parameterList.getTaskID().getValue());
 		}
-		this.undoBackup = this.target;
-		this.redoBackup = this.target;
-		return String.format(MESSAGE_DELETE_FORMAT, this.parameterList.getTaskID().getValue());
 	}
 
 	@Override
