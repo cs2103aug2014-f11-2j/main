@@ -1,8 +1,8 @@
 package cs2103.util;
 
-public class ConsoleClear {
+public class Console {
 	static {
 		System.loadLibrary("ConsoleClear");
 	}
-	public static native void clr();
+	public native void clr();
 }
