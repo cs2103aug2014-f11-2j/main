@@ -15,19 +15,20 @@ public class CommandLineUITest {
 	private static final String MESSAGE_COMMAND_ERROR = "Your input command is invalid, please check your command and try again";
 	private static final String MESSAGE_ADD_SUCCESS = "You have successfully added a new task." ;
 	private static final String MESSAGE_ADD_SUCCESS_1 = "4. Submit homework "; 
-	private static final String MESSAGE_ADD_SUCCESS_2 ="Type: Deadline	Status: Needs Action	Due At: 27-Dec-2014 18:00:00";
+	private static final String MESSAGE_ADD_SUCCESS_2 ="Type: Deadline	Status: Needs Action	Due At: 21-Dec-2014 18:00:00";
 	private static final String MESSAGE_ADD_SUCCESS_3 = "Description: ";
 	private static final String MESSAGE_UPDATE_SUCCESS = "You have updated task with ID 2";
 	private static final String MESSAGE_UPDATE_SUCCESS_1 = "3. Submit nothing";
-	private static final String MESSAGE_UPDATE_SUCCESS_2 = "Type: Floating	Status: Completed";
+	private static final String MESSAGE_UPDATE_SUCCESS_2 = "Type: Deadline	Status: Completed	Due At: 05-Jun-2015 18:00:00";
 	private static final String MESSAGE_UPDATE_SUCCESS_3 = "Description: ";
-	private static final String MESSAGE_DELETE_SUCCESS = "You have deleted task with ID 1";
+	private static final String MESSAGE_UPDATE_UNSUCCESSFUL = "You need to specify at least one parameter";
+	private static final String MESSAGE_DELETE_SUCCESS = "You have moved task with ID 1 to trash";
 	private static final String MESSAGE_INVALID_ID = "Your input task ID is not valid, please check your input and try again!";
 	private static final String MESSAGE_EMPTY_SEARCH = "The task list is empty";
 	private static final String MESSAGE_NULL_ERROR = "Your input command contains error, please check your input and try again!";
 	private static final String MESSAGE_MARK_SUCCESS = "Successfully marked task 2 as completed";
-	private static final String MESSAGE_MARK_SUCCESS_1 = "2. get rich in 6 months";
-	private static final String MESSAGE_MARK_SUCCESS_2 = "Type: Floating	Status: Completed";
+	private static final String MESSAGE_MARK_SUCCESS_1 = "2. get rich ";
+	private static final String MESSAGE_MARK_SUCCESS_2 = "Type: Deadline	Status: Completed	Due At: 05-Jun-2015 18:00:00";
 	private static final String MESSAGE_MARK_SUCCESS_3 = "Description: ";
 	private static final String HELP_DEFAULT = "CEO Usage:\n" +
 			  								   "  add <Quick add string>\n" +
@@ -151,18 +152,17 @@ public class CommandLineUITest {
 			 								 "This will effectively return the completed Deadline tasks which title, description or location contains \"example keyword\"\n(when complete parameter is specified, it is implied that all Periodic Tasks will be excluded)\n";
 	private static final String HELP_MARK = "Mark has no extra options\n" +
 			   							   "Example: mark 2\n";
-	private static final String MESSAGE_REDO_SUCCESS = "Successfully redo 0 tasks";
-	private static final String MESSAGE_UNDO_SUCCESS = "Successfully undo 1 tasks";
+	private static final String MESSAGE_REDO_SUCCESS = "Successfully redo 0 operations";
+	private static final String MESSAGE_UNDO_SUCCESS = "Successfully undo 1 operations";
 	private static final String MESSAGE_LIST_SUCCESS = "The task list is empty";
 	private static final String MESSAGE_SHOW_SUCCESS = "The details for Task 2:";
-	private static final String MESSAGE_SHOW_SUCCESS_1 = "2. get rich in 6 months";
-	private static final String MESSAGE_SHOW_SUCCESS_2 = "Type: Floating	Status: Completed";
+	private static final String MESSAGE_SHOW_SUCCESS_1 = "2. get rich ";
+	private static final String MESSAGE_SHOW_SUCCESS_2 = "Type: Deadline	Status: Completed	Due At: 05-Jun-2015 18:00:00";
 	private static final String MESSAGE_SHOW_SUCCESS_3 = "Description: ";
 	
 	@Test
 	public void testInvalidCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
-		//test invalid command
 		String invalidTest = test.testCommand("‐title submit ‐description IVLE ‐location NUS ‐time 2014/09/09 23:59 2014/09/08 00:00 to 2014/09/09 23:59");
 		assertEquals(invalidTest, MESSAGE_COMMAND_ERROR);
 	}	
@@ -170,7 +170,6 @@ public class CommandLineUITest {
 	@Test
 	public void testExitCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
-		//test exit command
 		String exitTest = test.testCommand("exit");
 		assertEquals(exitTest, "EXIT");
 	}
@@ -178,8 +177,7 @@ public class CommandLineUITest {
 	@Test
 	public void testAddCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
-		//test add 
-		String addTest = test.testCommand("add Submit homework by 6pm in two months time");
+		String addTest = test.testCommand("add Submit homework on 21 December 2014 at 6pm");
 		String[] separatedTest = addTest.split("\n");
 		
 		assertEquals(Array.get(separatedTest, 0), MESSAGE_ADD_SUCCESS);
@@ -192,7 +190,7 @@ public class CommandLineUITest {
 	public void testUpdateCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		
-		test.testCommand("add Submit test cases by 6 pm in 3 months time");
+		test.testCommand("add Submit test cases on 27 December 2014 at 7pm");
 		String updateTest = test.testCommand("Update 2 -title Submit nothing");
 		String[] separatedTest = updateTest.split("\n");
 		assertEquals(Array.get(separatedTest, 0), MESSAGE_UPDATE_SUCCESS);
@@ -200,14 +198,13 @@ public class CommandLineUITest {
 		assertEquals(Array.get(separatedTest, 2), MESSAGE_UPDATE_SUCCESS_2);
 		assertEquals(Array.get(separatedTest, 3), MESSAGE_UPDATE_SUCCESS_3);
 		
-		String invalidUpdateTest = test.testCommand("show 4");
-		assertEquals(invalidUpdateTest, MESSAGE_INVALID_ID);
+		String invalidUpdateTest = test.testCommand("Update 4 invalid");
+		assertEquals(invalidUpdateTest, MESSAGE_UPDATE_UNSUCCESSFUL);
 	}
 	
 	@Test
 	public void testSearchCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
-		//test search command
 		String searchTest = test.testCommand("search periodic");
 		assertEquals(searchTest, MESSAGE_EMPTY_SEARCH);
 	}
@@ -216,9 +213,11 @@ public class CommandLineUITest {
 	public void testDeleteCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		test.testCommand("add -title write test cases -description write test cases for CS2103 -location eclipse -time 2014/08/08/00:00 to 2014/09/09/23:59 -recurring 2d2");
-		//test delete command
 		String deleteTest = test.testCommand("delete 1");
 		assertEquals(deleteTest, MESSAGE_DELETE_SUCCESS);
+		
+		String invalidDelete = test.testCommand("delete 23");
+		assertEquals(invalidDelete, MESSAGE_INVALID_ID);
 	}
 	
 	@Test
@@ -238,13 +237,17 @@ public class CommandLineUITest {
 	@Test
 	public void testMarkCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
-		test.testCommand("add get rich in 6 months");
+		test.testCommand("add get rich on 5 June 2015 at 6pm");
 		String markTest = test.testCommand("mark 2");
+
 		String[] separatedTest = markTest.split("\n");
 		assertEquals(Array.get(separatedTest, 0), MESSAGE_MARK_SUCCESS);
 		assertEquals(Array.get(separatedTest, 1), MESSAGE_MARK_SUCCESS_1);
 		assertEquals(Array.get(separatedTest, 2), MESSAGE_MARK_SUCCESS_2);
 		assertEquals(Array.get(separatedTest, 3), MESSAGE_MARK_SUCCESS_3);
+		
+		String invalidMark = test.testCommand("mark 23");
+		assertEquals(invalidMark, MESSAGE_INVALID_ID);
 	}
 	
 	@Test 
@@ -252,6 +255,7 @@ public class CommandLineUITest {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String redoTest = test.testCommand("redo 1");
 		assertEquals(redoTest, MESSAGE_REDO_SUCCESS);
+		
 	}
 	
 	@Test
