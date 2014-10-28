@@ -21,8 +21,8 @@ public class CommandLineUI {
 	private static final String MESSAGE_COMMAND_ERROR = "Your input command is invalid, please check your command and try again";
 	private static final String MESSAGE_FATAL_ERR = "A fatal error has occurred, program will now exit. Check log for detail";
 	private static final String MESSAGE_INITIALIZATION_ERROR = "Failed to initialize CEO, program will now exit";
-	private static final String MESSAGE_UNDO_FORMAT = "Successfully undo %1$d tasks";
-	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d tasks";
+	private static final String MESSAGE_UNDO_FORMAT = "Successfully undo %1$d operations";
+	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d operations";
 	
 	private static CommandLineUI commandLine;
 	private TaskList taskList;
