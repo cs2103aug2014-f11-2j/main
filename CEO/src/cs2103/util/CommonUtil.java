@@ -109,6 +109,5 @@ public class CommonUtil {
 		} catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
 			System.out.println();
 		}
-		
 	}
 }
