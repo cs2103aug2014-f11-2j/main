@@ -101,13 +101,14 @@ public class CommonUtil {
 	
 	public static void clearConsole(){
 		try{
-	        if (System.getProperty("os.name").contains("Windows")){
-	        	new Console().clr();
-	        } else {
-	            System.out.println("\u001b[2J");
-	        }
-	    } catch (Exception e) {
-	        System.out.println();
-	    }
+			if (System.getProperty("os.name").contains("Windows")){
+		        new Console().clr();
+			} else {
+		        System.out.println("\u001b[2J");
+			}
+		} catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
+			System.out.println();
+		}
+		
 	}
 }
