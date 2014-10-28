@@ -182,7 +182,7 @@ public class CommandLineUI {
 	
 	private int executeRedo(int steps) throws HandledException, FatalException{
 		int result = 0;
-		while(!this.undoStack.isEmpty() && result < steps){
+		while(!this.redoStack.isEmpty() && result < steps){
 			InfluentialCommand undoCommand = redoStack.pop().redo();
 			if (undoCommand != null){
 				result++;
