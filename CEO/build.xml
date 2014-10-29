@@ -40,7 +40,6 @@
 		</copy>
 
 		<manifestclasspath property="manifest.classpath" jarfile="${jar.file}">
-			<classpath refid="."/>
 	    	<classpath refid="libraries.path"/>
 		</manifestclasspath>
 

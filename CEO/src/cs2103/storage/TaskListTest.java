@@ -1,4 +1,4 @@
-package cs2103;
+package cs2103.storage;
 
 import static org.junit.Assert.*;
 
@@ -8,7 +8,6 @@ import java.util.Date;
 import net.fortuna.ical4j.model.property.Status;
 
 import org.junit.Test;
-
 
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;

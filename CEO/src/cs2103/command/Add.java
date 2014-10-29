@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Queue;
 
 import net.fortuna.ical4j.model.Recur;
-import cs2103.TaskList;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Description;
@@ -15,6 +14,7 @@ import cs2103.parameters.Parameter;
 import cs2103.parameters.Recurrence;
 import cs2103.parameters.Time;
 import cs2103.parameters.Title;
+import cs2103.storage.TaskList;
 import cs2103.task.*;
 import cs2103.util.CommonUtil;
 

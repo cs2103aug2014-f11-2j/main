@@ -6,37 +6,17 @@ import java.util.Date;
 import org.apache.commons.lang.StringUtils;
 
 import cs2103.exception.HandledException;
-import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VToDo;
-import net.fortuna.ical4j.model.property.Completed;
 import net.fortuna.ical4j.model.property.Status;
 
-public class DeadlineTask extends Task {
+public class DeadlineTask extends ToDoTask {
 	private DateTime dueTime;
-	private DateTime completed;
 	private static final String TYPE_DEADLINE = "Deadline";
 	
 	public DeadlineTask(String taskUID, Date created, Status status, String title, Date dueTime, Date completed) throws HandledException {
-		super(taskUID, created, title);
-		this.updateDueTime(dueTime);;
-		this.updateCompleted(completed);
-		this.updateStatus(status);
-	}
-	
-	@Override
-	public DateTime getCompleted(){
-		return this.completed;
-	}
-	
-	@Override
-	public void updateCompleted(Date completed){
-		if (completed == null){
-			this.completed = null;
-		} else {
-			this.completed = new DateTime(completed);
-		}
+		super(taskUID, created, status, title, completed);
+		this.updateDueTime(dueTime);
 	}
 	
 	public DateTime getDueTime(){
@@ -48,44 +28,6 @@ public class DeadlineTask extends Task {
 			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
 		}else{
 			this.dueTime = new DateTime(dueTime);
-		}
-	}
-	
-	@Override
-	protected void updateStatus(Status status){
-		if (status == null){
-			this.status = Status.VTODO_NEEDS_ACTION;
-		} else {
-			this.status = status;
-		}
-	}
-
-	@Override
-	public void updateLocation(String location) {
-		return;
-	}
-
-	@Override
-	public void updateRecurrence(Recur recurrence) {
-		return;
-	}
-	
-	@Override
-	public boolean isDeleted() {
-		return this.getStatus().equals(Status.VTODO_CANCELLED);
-	}
-
-	@Override
-	public void delete() {
-		this.updateStatus(Status.VTODO_CANCELLED);
-	}
-
-	@Override
-	public void restore() {
-		if (this.getCompleted() == null){
-			this.updateStatus(Status.VTODO_NEEDS_ACTION);
-		} else {
-			this.updateStatus(Status.VTODO_COMPLETED);
 		}
 	}
 
@@ -152,36 +94,6 @@ public class DeadlineTask extends Task {
 		sb.append(this.getDescription());
 		return sb.append("\n").toString();
 	}
-
-	@Override
-	public Component toComponent() {
-		VToDo component = new VToDo(this.getDueTime(), this.getDueTime(), this.getTitle());
-		this.addCommonProperty(component);
-		if (this.isDeleted()){
-			component.getProperties().add(Status.VTODO_CANCELLED);
-		} else {
-			if (this.getCompleted() == null){
-				component.getProperties().add(Status.VTODO_NEEDS_ACTION);
-			} else {
-				component.getProperties().add(Status.VTODO_COMPLETED);
-				component.getProperties().add(new Completed(this.getCompleted()));
-			}
-		}
-		return component;
-	}
-	
-	public com.google.api.services.tasks.model.Task toGTask(){
-		com.google.api.services.tasks.model.Task gTask = new com.google.api.services.tasks.model.Task();
-		gTask.setTitle(this.getTitle());
-		gTask.setDue(new com.google.api.client.util.DateTime(this.getDueTime().getTime()));
-		if (this.getCompleted() != null){
-			gTask.setCompleted(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
-			gTask.setStatus("completed");
-		}
-		gTask.setNotes(this.getDescription());
-		gTask.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
-		return gTask;
-	}
 	
 	public static sortComparator getComparator(){
 		return new sortComparator();
@@ -218,5 +130,20 @@ public class DeadlineTask extends Task {
 				return false;
 			}
 		}
+	}
+
+	@Override
+	protected VToDo toVToDo() {
+		VToDo vToDo = new VToDo(this.getCreated(), this.getDueTime(), this.getTitle());
+		this.addVToDoProperty(vToDo);
+		return vToDo;
+	}
+	
+	@Override
+	public com.google.api.services.tasks.model.Task toGTask(){
+		com.google.api.services.tasks.model.Task gTask = new com.google.api.services.tasks.model.Task();
+		this.addGTaskProperty(gTask);
+		gTask.setDue(new com.google.api.client.util.DateTime(this.getDueTime().getTime()));
+		return gTask;
 	}
 }

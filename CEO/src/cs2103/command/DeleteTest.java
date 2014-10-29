@@ -5,10 +5,10 @@ import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import cs2103.TaskList;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Option;
+import cs2103.storage.TaskList;
 
 public class DeleteTest {
 

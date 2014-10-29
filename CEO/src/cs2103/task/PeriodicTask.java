@@ -8,18 +8,14 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
 import cs2103.exception.HandledException;
-import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
-import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Status;
 
-public class PeriodicTask extends Task {
-	private DateTime startTime;
-	private DateTime endTime;
+public class PeriodicTask extends EventTask {
 	private String location;
 	private Recur recurrence;
 
@@ -27,37 +23,11 @@ public class PeriodicTask extends Task {
 	private static final String TYPE_RECURRING = "Recurring";
 	private static final String STRING_LOCATION = "Location: ";
 	private static final String STRING_RECUR = "Recurrence: ";
-	private static final long YEAR_IN_MILLIS = 31556952000L;
 	
 	public PeriodicTask(String taskUID, Date created, Status status, String title, String location, Date startTime, Date endTime, Recur recurrence) throws HandledException {
-		super(taskUID, created, title);
-		this.updateTime(startTime, endTime);
+		super(taskUID, created, status, title, endTime, endTime);
 		this.updateLocation(location);
 		this.updateRecurrence(recurrence);
-		this.updateStatus(status);
-	}
-	
-	public DateTime getStartTime(){
-		return this.startTime;
-	}
-	
-	public DateTime getEndTime(){
-		return this.endTime;
-	}
-	
-	public void updateTime(Date startTime, Date endTime) throws HandledException{
-		if (startTime == null || endTime == null){
-			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
-		} else if (startTime.after(endTime)){
-			throw new HandledException(HandledException.ExceptionType.END_BEFORE_START);
-		} else {
-			this.startTime = new DateTime(startTime);
-			if (endTime.getTime() - startTime.getTime() > YEAR_IN_MILLIS){
-				this.endTime = new DateTime(startTime.getTime() + YEAR_IN_MILLIS);
-			} else {
-				this.endTime = new DateTime(endTime);
-			}
-		}
 	}
 	
 	public String getLocation(){
@@ -78,44 +48,6 @@ public class PeriodicTask extends Task {
 	
 	public void updateRecurrence(Recur recurrence){
 		this.recurrence = recurrence;
-	}
-
-	@Override
-	public DateTime getCompleted() {
-		if (this.getEndTime().before(new DateTime())){
-			return this.getEndTime();
-		} else {
-			return null;
-		}
-	}
-	
-	@Override
-	public void updateCompleted(Date complete) {
-		return;
-	}
-	
-	@Override
-	protected void updateStatus(Status status){
-		if (status == null){
-			this.status = Status.VEVENT_CONFIRMED;
-		} else {
-			this.status = status;
-		}
-	}
-	
-	@Override
-	public boolean isDeleted() {
-		return this.getStatus().equals(Status.VEVENT_CANCELLED);
-	}
-
-	@Override
-	public void delete() {
-		this.updateStatus(Status.VEVENT_CANCELLED);
-	}
-
-	@Override
-	public void restore() {
-		this.updateStatus(Status.VEVENT_CONFIRMED);
 	}
 	
 	@Override
@@ -213,27 +145,21 @@ public class PeriodicTask extends Task {
 	}
 
 	@Override
-	public Component toComponent() {
-		VEvent component = new VEvent(this.getStartTime(), this.getEndTime(),this.getTitle());
-		this.addCommonProperty(component);
+	public VEvent toVEvent() {
+		VEvent vEvent = new VEvent(this.getStartTime(), this.getEndTime(),this.getTitle());
+		this.addCommonProperty(vEvent);
 		if (this.getRecurrence() != null){
-			component.getProperties().add(new RRule(this.getRecurrence()));
+			vEvent.getProperties().add(new RRule(this.getRecurrence()));
 		}
-		component.getProperties().add(this.getStatus());
-		component.getProperties().add(new Location(this.getLocation()));
-		return component;
+		vEvent.getProperties().add(this.getStatus());
+		vEvent.getProperties().add(new Location(this.getLocation()));
+		return vEvent;
 	}
 	
 	public com.google.api.services.calendar.model.Event toGEvent(){
 		com.google.api.services.calendar.model.Event gEvent = new com.google.api.services.calendar.model.Event();
-		gEvent.setSummary(this.getTitle());
-		gEvent.setDescription(this.getDescription());
+		this.addGEventProperty(gEvent);
 		gEvent.setLocation(this.getLocation());
-		gEvent.setCreated(new com.google.api.client.util.DateTime(this.getCreated().getTime()));
-		gEvent.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
-		gEvent.setStatus("confirmed");
-		gEvent.setStart(dateTimeToEventDateTime(this.getStartTime()));
-		gEvent.setEnd(dateTimeToEventDateTime(this.getEndTime()));
 		List<String> recurrenceList = recurToGoogle(this.getRecurrence());
 		if (recurrenceList != null) gEvent.setRecurrence(recurrenceList);
 		return gEvent;
@@ -291,12 +217,5 @@ public class PeriodicTask extends Task {
 			}
 		}
 		return null;
-	}
-	
-	private static com.google.api.services.calendar.model.EventDateTime dateTimeToEventDateTime(DateTime time){
-		com.google.api.services.calendar.model.EventDateTime eventDateTime = new com.google.api.services.calendar.model.EventDateTime();
-		eventDateTime.setTimeZone(TimeZone.getDefault().getID());
-		eventDateTime.setDateTime(new com.google.api.client.util.DateTime(time.getTime()));
-		return eventDateTime;
 	}
 }

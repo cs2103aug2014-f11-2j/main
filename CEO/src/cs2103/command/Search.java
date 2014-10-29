@@ -5,13 +5,13 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Queue;
 
-import cs2103.TaskList;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Complete;
 import cs2103.parameters.Keyword;
 import cs2103.parameters.TaskType;
 import cs2103.parameters.Time;
+import cs2103.storage.TaskList;
 import cs2103.task.Task;
 import cs2103.util.CommonUtil;
 
