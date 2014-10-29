@@ -12,9 +12,6 @@ import cs2103.parameters.Complete;
 import cs2103.parameters.Keyword;
 import cs2103.parameters.TaskType;
 import cs2103.parameters.Time;
-import cs2103.task.DeadlineTask;
-import cs2103.task.FloatingTask;
-import cs2103.task.PeriodicTask;
 import cs2103.task.Task;
 import cs2103.util.CommonUtil;
 
@@ -24,10 +21,10 @@ public class Search extends QueryCommand {
 		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> parameterQueue = separateCommand(command);
 		if (!command.startsWith("-")){
-			this.parameterList.addParameter(TaskType.parse(parameterQueue.poll()));
+			this.parameterList.addParameter(Keyword.parse(parameterQueue.poll()));
 		}
 		Map<String, String> parameterMap = separateParameters(parameterQueue);
-		this.parameterList.addParameter(Keyword.parse(getParameterString(parameterMap, Keyword.allowedLiteral)));
+		this.parameterList.addParameter(TaskType.parse(getParameterString(parameterMap, TaskType.allowedLiteral)));
 		this.parameterList.addParameter(Time.parse(getParameterString(parameterMap, Time.allowedLiteral)));
 		this.parameterList.addParameter(Complete.parse(getParameterString(parameterMap, Complete.allowedLiteral)));
 	}
@@ -47,34 +44,32 @@ public class Search extends QueryCommand {
 		return parseListResponse(searchList);
 	}
 	
-	private static ArrayList<Task> getInitialList(TaskType taskType) throws HandledException, FatalException{
-		ArrayList<Task> searchList = TaskList.getInstance().getAllList();
+	private ArrayList<Task> getInitialList(TaskType taskType) throws HandledException, FatalException{
 		if (taskType == null){
-			return searchList;
+			return TaskList.getInstance().getDefaultList();
 		} else {
 			switch (taskType.getValue()){
 			case FLOATING:
-				return filterType(searchList, FloatingTask.class);
+				return toTaskList(TaskList.getInstance().getFloatingList());
 			case DEADLINE:
-				return filterType(searchList, DeadlineTask.class);
+				return toTaskList(TaskList.getInstance().getDeadlineList());
 			case PERIODIC:
-				return filterType(searchList, PeriodicTask.class);
+				return toTaskList(TaskList.getInstance().getPeriodicList());
+			case TRASH:
+				return TaskList.getInstance().getTrashList();
 			case ALL:
+				return TaskList.getInstance().getAllList();
 			case INVALID:
 			default:
-				return searchList;
+				return TaskList.getInstance().getDefaultList();
 			}
 		}
 	}
 	
-	private static <T extends Task> ArrayList<Task> filterType(ArrayList<Task> searchList, Class<T> type){
+	private static <T extends Task> ArrayList<Task> toTaskList(ArrayList<T> tasks){
 		ArrayList<Task> returnList = new ArrayList<Task>();
-		if (searchList != null){
-			for (Task task:searchList){
-				if (task.getClass() == type){
-					returnList.add(task);
-				}
-			}
+		for (Task task:tasks){
+			returnList.add(task);
 		}
 		return returnList;
 	}

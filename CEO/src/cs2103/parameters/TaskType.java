@@ -1,6 +1,7 @@
 package cs2103.parameters;
 
 public class TaskType implements Parameter {
+	public static final String[] allowedLiteral = {"K", "type", "kind", "tasktype"};
 	public static final String type = "TASKTYPE";
 	private final Value value;
 	

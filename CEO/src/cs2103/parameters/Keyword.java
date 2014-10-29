@@ -1,7 +1,6 @@
 package cs2103.parameters;
 
 public class Keyword implements Parameter {
-	public static final String[] allowedLiteral = {"K", "keyword"};
 	public static final String type = "KEYWORD";
 	private final String keyword;
 	
