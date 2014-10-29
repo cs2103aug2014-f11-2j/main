@@ -10,6 +10,9 @@ import cs2103.exception.HandledException;
 import cs2103.parameters.Option;
 import cs2103.storage.TaskList;
 
+import cs2103.parameters.ParameterList;
+import cs2103.parameters.TaskType.Value;
+
 public class SearchTest {
 	
 	@BeforeClass
@@ -35,6 +38,9 @@ public class SearchTest {
 	public void testSearchKeyword() throws HandledException, FatalException {	
 		
 		Search searchTitle = new Search("all -keyword homework");
+		ParameterList pl = searchTitle.getParameterList();
+		assertEquals("homework",pl.getKeyword().getValue());
+		assertEquals(Value.ALL,pl.getTaskType().getValue());
 		String result = searchTitle.execute();
 		assertEquals("1. Jap homework\n" +
 				"Type: Deadline	Status: Needs Action	Due At: 23-Oct-2014 21:00:00\n" +
@@ -47,8 +53,13 @@ public class SearchTest {
 	public void testSearchComplete() throws FatalException, HandledException{
 		
 		Search searchComplete = new Search("all -complete");
+		ParameterList pl = searchComplete.getParameterList();
+		assertEquals(Value.ALL,pl.getTaskType().getValue());
+		assertEquals(true,pl.getComplete().getValue());
 		String result = searchComplete.execute();
-		assertEquals("6. complete\n" +
+		assertEquals("2. revise stats homework\n" +
+				"Type: Periodic	From: 24-Oct-2014 20:00:00 To 25-Oct-2014 20:00:00\n" +
+				"6. complete\n" +
 				"Type: Floating	Status: Completed",result);
 	}
 	
@@ -56,6 +67,8 @@ public class SearchTest {
 	public void testSearchPeriodic() throws HandledException, FatalException{
 		
 		Search searchPeriodic = new Search("periodic");
+		ParameterList pl = searchPeriodic.getParameterList();
+		assertEquals(Value.PERIODIC,pl.getTaskType().getValue());
 		String result = searchPeriodic.execute();
 		assertEquals("2. revise stats homework\n" +
 				"Type: Periodic	From: 24-Oct-2014 20:00:00 To 25-Oct-2014 20:00:00",result);
@@ -66,6 +79,8 @@ public class SearchTest {
 		
 		Search searchDeadline = new Search("deadline");
 		String result = searchDeadline.execute();
+		ParameterList pl = searchDeadline.getParameterList();
+		assertEquals(Value.DEADLINE,pl.getTaskType().getValue());
 		assertEquals("1. Jap homework\n" +
 				"Type: Deadline	Status: Needs Action	Due At: 23-Oct-2014 21:00:00\n" +
 				"3. celebrate 21st :D\n" +
@@ -76,6 +91,8 @@ public class SearchTest {
 	public void testSearchFloating() throws HandledException, FatalException{
 		
 		Search searchFloating = new Search("floating");
+		ParameterList pl = searchFloating.getParameterList();
+		assertEquals(Value.FLOATING,pl.getTaskType().getValue());
 		String result = searchFloating.execute();
 		assertEquals("4. do cs2105 networking assignment\n" +
 				"Type: Floating	Status: Needs Action\n" +
@@ -89,6 +106,9 @@ public class SearchTest {
 	public void testSearchTime() throws HandledException, FatalException{
 		
 		Search searchTime = new Search("all -time");
+		ParameterList pl = searchTime.getParameterList();
+		assertEquals(Value.ALL,pl.getTaskType().getValue());
+		assertNotNull(pl.getTime());
 		String result = searchTime.execute();
 		assertEquals("1. Jap homework\n" +
 				"Type: Deadline	Status: Needs Action	Due At: 23-Oct-2014 21:00:00\n" +
