@@ -9,6 +9,8 @@ import cs2103.TaskList;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Option;
+import cs2103.parameters.ParameterList;
+import cs2103.parameters.Time;
 
 public class UpdateTest {
 	
@@ -22,15 +24,22 @@ public class UpdateTest {
 	@Test
 	public void testUpdate() throws HandledException, FatalException {
 		
-		Update updateTitle = new Update("1 -title I was wrong");
+		Update updateTitle = new Update("1 -title I was wrong -description can't remember -location earth" +
+				" -time 2014/12/25 20:20 to 2014/12/31 23:59 -recur 2d");
+		ParameterList pl = updateTitle.getParameterList();
+		assertEquals("I was wrong",pl.getTitle().getValue());
+		assertEquals("can't remember",pl.getDescription().getValue());
+		assertEquals("earth",pl.getLocation().getValue());
+		assertEquals(Time.parse("2014/12/25 20:20 to 2014/12/31 23:59").getValue()[0].toString(),pl.getTime().getValue()[0].toString());
+		assertNotNull(pl.getRecurrence());
 		String result = updateTitle.execute();
-		assertEquals("You have updated task with ID 1",result);
-		List list = new List("floating");
-		result = list.execute();
-		
-		assertEquals("1. I was wrong\n" +
-				"Type: Floating	Status: Needs Action",result);
-	}
+		assertEquals("You have updated task with ID 1\n" +
+				"1. I was wrong\n" +
+				"Type: Recurring	From: 25-Dec-2014 20:20:00 To 31-Dec-2014 23:59:00\n" +
+				"Recurrence: 2 DAILY\n" +
+				"Location: earth\n" +
+				"Description: can't remember",result);
+		}
 	
 	@Test(expected = HandledException.class)
 	public void testInvalidUpdate() throws HandledException, FatalException{
