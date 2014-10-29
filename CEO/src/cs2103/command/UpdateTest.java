@@ -10,7 +10,11 @@ import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Option;
 import cs2103.parameters.ParameterList;
+import cs2103.parameters.Recurrence;
 import cs2103.parameters.Time;
+import cs2103.task.PeriodicTask;
+import cs2103.task.Task;
+import cs2103.util.TestUtil;
 
 public class UpdateTest {
 	
@@ -26,20 +30,26 @@ public class UpdateTest {
 		
 		Update updateTitle = new Update("1 -title I was wrong -description can't remember -location earth" +
 				" -time 2014/12/25 20:20 to 2014/12/31 23:59 -recur 2d");
+		
+		String time = "2014/12/25 20:20 to 2014/12/31 23:59";
+		
 		ParameterList pl = updateTitle.getParameterList();
 		assertEquals("I was wrong",pl.getTitle().getValue());
 		assertEquals("can't remember",pl.getDescription().getValue());
 		assertEquals("earth",pl.getLocation().getValue());
-		assertEquals(Time.parse("2014/12/25 20:20 to 2014/12/31 23:59").getValue()[0].toString(),pl.getTime().getValue()[0].toString());
+		assertEquals(Time.parse(time).getValue()[0].toString(),pl.getTime().getValue()[0].toString());
 		assertNotNull(pl.getRecurrence());
-		String result = updateTitle.execute();
-		assertEquals("You have updated task with ID 1\n" +
-				"1. I was wrong\n" +
-				"Type: Recurring	From: 25-Dec-2014 20:20:00 To 31-Dec-2014 23:59:00\n" +
-				"Recurrence: 2 DAILY\n" +
-				"Location: earth\n" +
-				"Description: can't remember",result);
+		updateTitle.execute();
+		
+		Task task = new PeriodicTask(null, null, null, "I was wrong", "earth",Time.parse(time).getValue()[0], 
+				Time.parse(time).getValue()[1], Recurrence.parse("2d").getValue());
+		task.updateDescription("can't remember");
+		task.updateLastModified(null);
+		
+		for(Task t : TaskList.getInstance().getPeriodicList()){
+			TestUtil.compareTasks(task, t);
 		}
+	}
 	
 	@Test(expected = HandledException.class)
 	public void testInvalidUpdate() throws HandledException, FatalException{

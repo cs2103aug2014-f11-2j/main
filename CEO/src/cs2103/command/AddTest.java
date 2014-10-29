@@ -12,6 +12,9 @@ import cs2103.parameters.Option;
 import cs2103.parameters.ParameterList;
 import cs2103.parameters.Recurrence;
 import cs2103.parameters.Time;
+import cs2103.task.PeriodicTask;
+import cs2103.task.Task;
+import cs2103.util.TestUtil;
 
 public class AddTest {
 	
@@ -23,18 +26,25 @@ public class AddTest {
 	@Test
 	public void testAddCorrectCommand() throws HandledException, FatalException {
 		Add addObj;
-		addObj = new Add("-title hello -description some description -time 2014/12/12 20:20 -recur 2d");
+		addObj = new Add("-title hello -description some description -location earth -time 2014/12/12 20:20 to 2014/12/15 20:20 -recur 2d");
 		ParameterList pl = addObj.getParameterList();
 		assertEquals("hello",pl.getTitle().getValue());
 		assertEquals("some description",pl.getDescription().getValue());
-		assertEquals(Time.parse("2014/12/12 20:20").getValue()[0].toString(), pl.getTime().getValue()[0].toString());
+		assertEquals(Time.parse("2014/12/12 20:20 to 2014/12/15 20:20").getValue()[0].toString(), pl.getTime().getValue()[0].toString());
 		assertEquals(Recurrence.parse("2d").getValue().toString(), pl.getRecurrence().getValue().toString());
-		String result = addObj.execute();
-		
-		assertEquals("You have successfully added a new task.\n" +
+		addObj.execute();
+		String time = "2014/12/12 20:20  to 2014/12/15 20:20";
+		Task dt = new PeriodicTask(null, null, null, "hello", "earth",Time.parse(time).getValue()[0],
+				Time.parse(time).getValue()[1],Recurrence.parse("2d").getValue());
+		dt.updateDescription("some description");
+		dt.updateLastModified(null);
+		for(Task t :TaskList.getInstance().getDeadlineList()){
+			assertTrue(TestUtil.compareTasks(t, dt));
+		}
+		/*assertEquals("You have successfully added a new task.\n" +
 				"1. hello\n" +
 				"Type: Deadline	Status: Needs Action	Due At: 12-Dec-2014 20:20:00\n" +
-				"Description: some description",result);
+				"Description: some description",result);*/
 	}
 	
 	@SuppressWarnings("unused")

@@ -10,6 +10,9 @@ import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Option;
 import cs2103.parameters.ParameterList;
+import cs2103.task.FloatingTask;
+import cs2103.task.Task;
+import cs2103.util.TestUtil;
 
 public class DeleteTest {
 
@@ -37,8 +40,14 @@ public class DeleteTest {
 		Add addObj = new Add("-title tempDelete");
 		addObj.execute();
 		Delete deleteObj = new Delete("1");
-		String result = deleteObj.execute();
-		assertEquals("You have moved task with ID 1 to trash",result);
+		deleteObj.execute();
+		Task task = new FloatingTask(null, null, null, "tempDelete", null);
+		task.updateDescription(null);
+		task.updateLastModified(null);
+		for(Task t : TaskList.getInstance().getTrashList()){
+			TestUtil.compareTasks(task, t);
+		}
+		//assertEquals("You have moved task with ID 1 to trash",result);
 	}
 	
 	@Test(expected = HandledException.class)
