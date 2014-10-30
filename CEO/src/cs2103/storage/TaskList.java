@@ -1,4 +1,4 @@
-package cs2103;
+package cs2103.storage;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,10 +8,6 @@ import cs2103.exception.ErrorLogging;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Option;
-import cs2103.storage.GoogleEngine;
-import cs2103.storage.StorageInterface;
-import cs2103.storage.StorageEngine;
-import cs2103.storage.StorageStub;
 import cs2103.task.DeadlineTask;
 import cs2103.task.FloatingTask;
 import cs2103.task.PeriodicTask;
@@ -27,7 +23,9 @@ public class TaskList {
 	private GoogleEngine google;
 	private ArrayList<Task> tasks;
 	private static final String SYNCING = "Syncing with Google, please wait for a while";
-	private static final String SYNCING_ERROR = "Some error occurred when commit changes to Google";
+	private static final String COMMIT_ERROR = "Some error occurred when commit changes to Google";
+	private static final String SYNC_FROM_GOOGLE = "Downloaded %1$d tasks from Google";
+	private static final String SYNC_TO_GOOGLE = "Uploaded %1$d tasks to Google";
 	private static final String SYNC_FAIL = "Unable to sync your data with Google, Google Sync is disabled";
 	
 	private TaskList(Option option) throws FatalException, HandledException{
@@ -164,22 +162,25 @@ public class TaskList {
 	}
 	
 	public boolean syncWithGoogle(){
-		if (this.google == null) return false;
-		CommonUtil.print(SYNCING);
-		try {
-			ArrayList<Task> googleList = this.google.getTaskList();
-			syncFromGoogle(googleList);
-			syncToGoogle(googleList);
-			this.tasks = this.storage.getTaskList();
-			this.google.updateLastUpdated();
-			return true;
-		} catch (IOException | FatalException | HandledException e) {
-			if (e instanceof IOException){
-				ErrorLogging.getInstance().writeToLog(SYNCING_ERROR, e);
-			}
-			CommonUtil.print(SYNC_FAIL);
-			this.google = null;
+		if (this.google == null){
 			return false;
+		} else {
+			CommonUtil.print(SYNCING);
+			try {
+				ArrayList<Task> googleList = this.google.getTaskList();
+				CommonUtil.print(String.format(SYNC_FROM_GOOGLE, syncFromGoogle(googleList)));
+				CommonUtil.print(String.format(SYNC_TO_GOOGLE, syncToGoogle(googleList)));
+				this.tasks = this.storage.getTaskList();
+				this.google.updateLastUpdated();
+				return true;
+			} catch (IOException | FatalException | HandledException e) {
+				if (e instanceof IOException){
+					ErrorLogging.getInstance().writeToLog(COMMIT_ERROR, e);
+				}
+				CommonUtil.print(SYNC_FAIL);
+				this.google = null;
+				return false;
+			}
 		}
 	}
 	
@@ -192,8 +193,8 @@ public class TaskList {
 				this.google.updateLastUpdated();
 			}
 		} catch (IOException e) {
-			ErrorLogging.getInstance().writeToLog(SYNCING_ERROR, e);
-			CommonUtil.print(SYNCING_ERROR);
+			ErrorLogging.getInstance().writeToLog(COMMIT_ERROR, e);
+			CommonUtil.print(COMMIT_ERROR);
 		}
 	}
 	
@@ -214,8 +215,8 @@ public class TaskList {
 				}
 			}
 		} catch (IOException e) {
-			ErrorLogging.getInstance().writeToLog(SYNCING_ERROR, e);
-			CommonUtil.print(SYNCING_ERROR);
+			ErrorLogging.getInstance().writeToLog(COMMIT_ERROR, e);
+			CommonUtil.print(COMMIT_ERROR);
 		}
 		return null;
 	}
@@ -230,29 +231,34 @@ public class TaskList {
 				return returnTask;
 			}
 		} catch (IOException e) {
-			ErrorLogging.getInstance().writeToLog(SYNCING_ERROR, e);
-			CommonUtil.print(SYNCING_ERROR);
+			ErrorLogging.getInstance().writeToLog(COMMIT_ERROR, e);
+			CommonUtil.print(COMMIT_ERROR);
 		}
 		return null;
 	}
 	
-	private void syncFromGoogle(ArrayList<Task> googleList) throws HandledException, FatalException{
+	private int syncFromGoogle(ArrayList<Task> googleList) throws HandledException, FatalException{
+		int count = 0;
 		for (Task remoteTask:googleList){
 			Task localTask = this.getTaskByTask(remoteTask, this.tasks);
 			if (localTask == null){
 				if (!remoteTask.isDeleted()){
 					this.storage.updateTask(remoteTask);
+					count++;
 				}
 			} else {
 				if (localTask.getLastModified().before(remoteTask.getLastModified())){
 					remoteTask.updateCreated(localTask.getCreated());
 					this.storage.updateTask(remoteTask);
+					count++;
 				}
 			}
 		}
+		return count;
 	}
 	
-	private void syncToGoogle(ArrayList<Task> googleList) throws HandledException, FatalException{
+	private int syncToGoogle(ArrayList<Task> googleList) throws HandledException, FatalException{
+		int count = 0;
 		for (Task localTask:this.tasks){
 			Task remoteTask = this.getTaskByTask(localTask, googleList);
 			if (remoteTask == null){
@@ -260,11 +266,12 @@ public class TaskList {
 				try {
 					adding = this.google.addTask(localTask);
 				} catch (IOException e) {
-					ErrorLogging.getInstance().writeToLog(SYNCING_ERROR, e);
+					ErrorLogging.getInstance().writeToLog(COMMIT_ERROR, e);
 					adding = null;
 				}
 				if (adding != null){
 					this.updateUidInList(localTask, adding);
+					count++;
 				}
 			} else {
 				if (!remoteTask.isDeleted()){
@@ -273,16 +280,18 @@ public class TaskList {
 						try {
 							updating = this.google.updateTask(localTask);
 						} catch (IOException e) {
-							ErrorLogging.getInstance().writeToLog(SYNCING_ERROR, e);
+							ErrorLogging.getInstance().writeToLog(COMMIT_ERROR, e);
 							updating = null;
 						}
 						if (updating != null){
 							this.updateUidInList(localTask, updating);
+							count++;
 						}
 					}
 				}
 			}
 		}
+		return count;
 	}
 	
 	private void updateUidInList(Task oldTask, Task newTask) throws HandledException, FatalException{

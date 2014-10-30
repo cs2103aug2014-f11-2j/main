@@ -8,5 +8,5 @@ public class Console {
 			System.loadLibrary("lib/ConsoleClear_x86");
 		}
 	}
-	public native void clr();
+	public static native void clr();
 }

@@ -38,9 +38,12 @@
 	    	<path refid="libraries.path"/>
 			<path refid="dll.path"/>
 		</copy>
+		<copy todir="${jar.dir}" flatten="true">
+			<file name="./CEO.sh"/>
+			<file name="./CEO.bat"/>
+		</copy>
 
 		<manifestclasspath property="manifest.classpath" jarfile="${jar.file}">
-			<classpath refid="."/>
 	    	<classpath refid="libraries.path"/>
 		</manifestclasspath>
 

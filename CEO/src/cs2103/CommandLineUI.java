@@ -8,6 +8,7 @@ import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.CommandType;
 import cs2103.parameters.Option;
+import cs2103.storage.TaskList;
 import cs2103.util.CommonUtil;
 
 public class CommandLineUI {

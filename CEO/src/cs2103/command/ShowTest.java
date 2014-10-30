@@ -5,10 +5,12 @@ import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import cs2103.TaskList;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Option;
+import cs2103.storage.TaskList;
+
+import cs2103.parameters.ParameterList;
 
 public class ShowTest {
 	@BeforeClass
@@ -22,6 +24,8 @@ public class ShowTest {
 	public void testShow() throws HandledException, FatalException {
 		
 		Show show = new Show("1");
+		ParameterList pl = show.getParameterList();
+		assertEquals(1,pl.getTaskID().getValue());
 		String result = show.execute();
 		assertEquals("The details for Task 1:\n" +
 				"1. testShow\n" +

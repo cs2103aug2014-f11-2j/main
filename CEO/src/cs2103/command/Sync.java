@@ -1,8 +1,8 @@
 package cs2103.command;
 
-import cs2103.TaskList;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
+import cs2103.storage.TaskList;
 
 public class Sync extends InfluentialCommand {
 	private static final String SUCCESS = "Successfully sync your data with Google";

@@ -48,7 +48,8 @@ public class GoogleEngine{
 		return storage;
 	}
 	
-	public void deleteTask(Task task) throws IOException {
+	public void deleteTask(Task task) throws IOException, HandledException {
+		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		try {
 			tryToRemove(task);
 		} catch (IOException e) {
@@ -63,6 +64,7 @@ public class GoogleEngine{
 	}
 	
 	public Task updateTask(Task task) throws IOException, HandledException{
+		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		try {
 			return tryToUpdate(task);
 		} catch (IOException e) {
@@ -77,6 +79,7 @@ public class GoogleEngine{
 	}
 
 	public Task addTask(Task task) throws HandledException, IOException {
+		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		try {
 			return tryToInsert(task);
 		} catch (IOException e) {
@@ -119,18 +122,20 @@ public class GoogleEngine{
 		Date calendarLastUpdateSaved = this.calendarLastUpdate;
 		Date taskLastUpdateSaved = this.taskLastUpdate;
 		this.updateLastUpdated();
-		if (task instanceof PeriodicTask){
+		if (task instanceof EventTask){
 			if (this.calendarLastUpdate.after(calendarLastUpdateSaved)){
 				return true;
 			} else {
 				return false;
 			}
-		} else {
+		} else if (task instanceof ToDoTask){
 			if (this.taskLastUpdate.after(taskLastUpdateSaved)){
 				return true;
 			} else {
 				return false;
 			}
+		} else {
+			return false;
 		}
 	}
 	
@@ -159,12 +164,10 @@ public class GoogleEngine{
 	private Task tryToInsert(Task task) throws IOException, HandledException{
 		if (!task.getStatus().equals(Status.VTODO_CANCELLED)){
 			Task returnTask;
-			if (task instanceof PeriodicTask){
-				returnTask = parseGEvent(this.calendar.events().insert(calendarIdentifier, ((PeriodicTask) task).toGEvent()).execute());
-			} else if (task instanceof DeadlineTask){
-				returnTask = parseGTask(this.tasks.tasks().insert(DEFAULT_TASKS, ((DeadlineTask) task).toGTask()).execute());
-			} else if (task instanceof FloatingTask){
-				returnTask = parseGTask(this.tasks.tasks().insert(DEFAULT_TASKS, ((FloatingTask) task).toGTask()).execute());
+			if (task instanceof EventTask){
+				returnTask = parseGEvent(this.calendar.events().insert(calendarIdentifier, ((EventTask) task).toGEvent()).execute());
+			} else if (task instanceof ToDoTask){
+				returnTask = parseGTask(this.tasks.tasks().insert(DEFAULT_TASKS, ((ToDoTask) task).toGTask()).execute());
 			} else {
 				return null;
 			}
@@ -175,11 +178,11 @@ public class GoogleEngine{
 	}
 	
 	private void tryToRemove(Task task) throws IOException{
-		if (task instanceof PeriodicTask){
+		if (task instanceof EventTask){
 			if (this.calendar.events().get(calendarIdentifier, task.getTaskUID()).execute() != null){
 				this.calendar.events().delete(calendarIdentifier, task.getTaskUID()).execute();
 			}
-		} else if (task instanceof DeadlineTask || task instanceof FloatingTask){
+		} else if (task instanceof ToDoTask){
 			if (this.tasks.tasks().get(DEFAULT_TASKS, task.getTaskUID()).execute() != null){
 				this.tasks.tasks().delete(DEFAULT_TASKS, task.getTaskUID()).execute();
 			}
@@ -192,17 +195,19 @@ public class GoogleEngine{
 			return null;
 		} else {
 			Task returnTask;
-			if (task instanceof PeriodicTask){
-				returnTask = this.executeUpdate((PeriodicTask) task); 
+			if (task instanceof EventTask){
+				returnTask = this.executeUpdate((EventTask) task); 
+			} else if (task instanceof ToDoTask){
+				returnTask = this.executeUpdate((ToDoTask) task);
 			} else {
-				returnTask = this.executeUpdate(task);
+				return null;
 			}
 			returnTask.updateCreated(task.getCreated());
 			return returnTask;
 		}
 	}
 	
-	private Task executeUpdate(PeriodicTask task) throws IOException, HandledException{
+	private Task executeUpdate(EventTask task) throws IOException, HandledException{
 		boolean converting = false;
 		try{
 			converting = this.tasks.tasks().get(DEFAULT_TASKS, task.getTaskUID()).execute() != null;
@@ -230,7 +235,7 @@ public class GoogleEngine{
 		}
 	}
 	
-	private Task executeUpdate(Task task) throws IOException, HandledException{
+	private Task executeUpdate(ToDoTask task) throws IOException, HandledException{
 		boolean converting = false;
 		try{
 			converting = this.calendar.events().get(calendarIdentifier, task.getTaskUID()).execute() != null;
@@ -243,14 +248,7 @@ public class GoogleEngine{
 		} else {
 			com.google.api.services.tasks.model.Task gTask = this.tasks.tasks().get(DEFAULT_TASKS, task.getTaskUID()).execute();
 			if (gTask != null){
-				com.google.api.services.tasks.model.Task newGTask;
-				if (task instanceof FloatingTask){
-					newGTask = ((FloatingTask) task).toGTask();
-				} else if (task instanceof DeadlineTask){
-					newGTask = ((DeadlineTask) task).toGTask();
-				} else {
-					return null;
-				}
+				com.google.api.services.tasks.model.Task newGTask = task.toGTask();
 				gTask.setDeleted(false);
 				if (gTask.getCompleted() == null || newGTask.getCompleted() != null){
 					return parseGTask(this.tasks.tasks().patch(DEFAULT_TASKS, gTask.getId(), newGTask).execute());

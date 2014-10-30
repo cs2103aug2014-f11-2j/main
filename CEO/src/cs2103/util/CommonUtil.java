@@ -102,7 +102,7 @@ public class CommonUtil {
 	public static void clearConsole(){
 		try{
 			if (System.getProperty("os.name").contains("Windows")){
-		        new Console().clr();
+		        Console.clr();
 			} else {
 		        System.out.println("\u001b[2J");
 			}
