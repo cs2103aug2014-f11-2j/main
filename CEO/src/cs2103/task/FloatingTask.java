@@ -16,7 +16,7 @@ public class FloatingTask extends ToDoTask {
 	}
 	
 	@Override
-	public Task convert(Date[] time) throws HandledException {
+	protected Task convert(Date[] time) throws HandledException {
 		if (time == null) throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
 		if (time[0] == null && time[1] == null){
 			return this.toFloating();
