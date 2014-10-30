@@ -30,7 +30,7 @@ public class TaskListTest {
 		test.addTask(testPeriodicTask);
 		
 		ArrayList<PeriodicTask> returnTest = test.getPeriodicList();
-		assertTrue(TestUtil.compareTasks(returnTest.get(1),testPeriodicTask));
+		assertTrue(TestUtil.compareTasks(returnTest.get(0),testPeriodicTask));
 	}
 
 	@Test
