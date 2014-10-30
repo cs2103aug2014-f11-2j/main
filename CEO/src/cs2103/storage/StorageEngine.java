@@ -1,6 +1,7 @@
 package cs2103.storage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
@@ -48,9 +49,6 @@ public class StorageEngine implements StorageInterface{
 		}
 		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION, true);
 		this.file = file;
-		if (!this.file.exists() || this.file.length() == 0){
-			createNewFile();
-		}
 		readFromFile();
 	}
 	
@@ -75,6 +73,10 @@ public class StorageEngine implements StorageInterface{
 	@SuppressWarnings("unchecked") 
 	private ArrayList<Task> readFromFile() throws FatalException, HandledException{
 		try{
+			if (!file.exists() || file.length() == 0) {
+				this.file.delete();
+				this.createNewFile();
+			}
 			FileInputStream fin = new FileInputStream(file);
 			CalendarBuilder builder = new CalendarBuilder();
 			this.calendar = builder.build(fin);
@@ -89,7 +91,10 @@ public class StorageEngine implements StorageInterface{
 			}
 			indexedComponents = new IndexedComponentList(calendar.getComponents(), Property.UID);
 			return sortTaskList(taskList);
-		}catch(IOException e){
+		} catch (FileNotFoundException e){
+			this.createNewFile();
+			return this.readFromFile();
+		} catch(IOException e){
 			throw new FatalException(FatalException.ExceptionType.READ_ERROR);
 		} catch (ParseException | ParserException e) {
 			throw new FatalException(FatalException.ExceptionType.ILLEGAL_FILE);
@@ -103,6 +108,9 @@ public class StorageEngine implements StorageInterface{
 			fout = new FileOutputStream(file);
 			CalendarOutputter outputter = new CalendarOutputter();
 			outputter.output(this.calendar, fout);
+		} catch (FileNotFoundException e){
+			this.createNewFile();
+			this.writeToFile();
 		} catch (IOException | ValidationException e) {
 			throw new FatalException(FatalException.ExceptionType.WRITE_ERROR);
 		}

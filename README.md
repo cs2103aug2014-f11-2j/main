@@ -13,7 +13,7 @@ Basic Command Line Interface Usage
  
  2. Show tasklist:
  
- `List (<floating|deadline|periodic|all>)`
+ `List (<floating|deadline|periodic|all|trash>)`
  
  3. Show task detail:
  
@@ -25,11 +25,11 @@ Basic Command Line Interface Usage
  
  5. Delete a task:
  
- `Delete <task ID>`
+ `Delete <task ID> (-p)`
  
  6. Search for tasks:
  
- `search (<floating|deadline|periodic|all>) {[-K or --keyword <title/description/location keyword>] [-C or --complete {true|false}] [-T or -time {<blank>|<time>|<<time> to <time>>}]}`
+ `search (<title/description/location keyword>) {[-K or -type <floating|deadline|periodic|all|trash>] [-C or -complete {true|false}] [-T or -time {<blank>|<time>|<<time> to <time>>}]}`
  
  7. Undo last changes:
  
@@ -42,4 +42,12 @@ Basic Command Line Interface Usage
  9. Display Help:
  
  `help (<add|list|show|delete|update|undo|redo|search>)`
+ 
+ 10. Sync with Google:
+ 
+ `sync (-disable)`
+ 
+ 11. Exit the program:
+ 
+ 'exit'
 

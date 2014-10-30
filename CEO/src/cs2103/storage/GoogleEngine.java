@@ -27,6 +27,7 @@ public class GoogleEngine{
 	private Date taskLastUpdate;
 	private Date calendarLastUpdate;
 	private static final long HOUR_IN_MILLIS = 3600000L;
+	private static final long DAY_IN_MILLIS = 86400000L;
 	private static final String DEFAULT_TASKS = "@default";
 	
 	private GoogleEngine() throws HandledException{
@@ -304,11 +305,32 @@ public class GoogleEngine{
 		if (gEvent.getStart() == null){
 			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
 		} else {
-			time[0] = new Date(gEvent.getStart().getDateTime().getValue());
-			if (gEvent.getEnd() == null){
-				time[1] = new Date(time[0].getTime() + HOUR_IN_MILLIS);
+			if (gEvent.getStart().getDateTime() == null){
+				if (gEvent.getStart().getDate() == null){
+					throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
+				} else {
+					time[0] = new Date(gEvent.getStart().getDate().getValue());
+					if (gEvent.getEnd() == null){
+						time[1] = new Date(time[0].getTime() + DAY_IN_MILLIS);
+					} else {
+						if (gEvent.getEnd().getDateTime() == null){
+							if (gEvent.getEnd().getDate() == null){
+								time[1] = new Date(time[0].getTime() + DAY_IN_MILLIS);
+							} else {
+								time[1] = new Date(gEvent.getEnd().getDate().getValue());
+							}
+						} else {
+							time[1] = new Date(gEvent.getEnd().getDateTime().getValue());
+						}
+					}
+				}
 			} else {
-				time[1] = new Date(gEvent.getStart().getDateTime().getValue());
+				time[0] = new Date(gEvent.getStart().getDateTime().getValue());
+				if (gEvent.getEnd() == null){
+					time[1] = new Date(time[0].getTime() + HOUR_IN_MILLIS);
+				} else {
+					time[1] = new Date(gEvent.getStart().getDateTime().getValue());
+				}
 			}
 		}
 		return time;
