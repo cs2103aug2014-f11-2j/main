@@ -19,6 +19,12 @@
 		</fileset>
 	</path>
 	
+	<path id="jar.libraries">    
+		<fileset dir="${jar.dir}/${lib.dir}">
+		    <include name="*.jar"/>
+		</fileset>
+	</path>
+	
 	<target name="clean" description="delete old files">
 		<delete dir="${class.dir}"/>
 		<delete dir="${jar.dir}"/>
@@ -44,7 +50,7 @@
 		</copy>
 
 		<manifestclasspath property="manifest.classpath" jarfile="${jar.file}">
-	    	<classpath refid="libraries.path"/>
+	    	<classpath refid="jar.libraries"/>
 		</manifestclasspath>
 
 		<jar destfile="${jar.file}" basedir="${class.dir}">
