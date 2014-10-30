@@ -49,5 +49,5 @@ Basic Command Line Interface Usage
  
  11. Exit the program:
  
- 'exit'
+ `exit`
 

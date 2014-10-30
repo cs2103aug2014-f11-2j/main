@@ -11,6 +11,10 @@ import cs2103.parameters.Option;
 import cs2103.storage.TaskList;
 import cs2103.util.CommonUtil;
 
+/**
+ * @author Yuri
+ * Controller class for CEO
+ */
 public class CommandLineUI {
 	private static final String MESSAGE_WELCOME_FORMAT = "Welcome to the CEO. %1$s";
 	private static final String MESSAGE_SYNC_ENABLED = "Google Sync is enabled";
