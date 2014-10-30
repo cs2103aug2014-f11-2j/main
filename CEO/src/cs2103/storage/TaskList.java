@@ -184,6 +184,17 @@ public class TaskList {
 		}
 	}
 	
+	public boolean manualSync() throws HandledException {
+		if (this.google == null) {
+			this.google = GoogleEngine.getInstance();
+		}
+		return this.syncWithGoogle();
+	}
+	
+	public void disableSync(){
+		this.google = null;
+	}
+	
 	private void deleteToGoogle(Task task) throws HandledException{
 		try {
 			if (this.google.needToSync(task)){

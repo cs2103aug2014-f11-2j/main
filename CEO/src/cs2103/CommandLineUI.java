@@ -131,7 +131,7 @@ public class CommandLineUI {
 				commandObject = new Restore(command[1]);
 				break;
 			case SYNC:
-				commandObject = new Sync();
+				commandObject = new Sync(command[1]);
 				break;
 			case INVALID:
 			default:

@@ -90,4 +90,8 @@ public class ParameterList {
 	public DeleteOption getDeleteOption() throws HandledException{
 		return this.getParameter(DeleteOption.type, DeleteOption.class);
 	}
+	
+	public Option getOption() throws HandledException{
+		return this.getParameter(Option.type, Option.class);
+	}
 }

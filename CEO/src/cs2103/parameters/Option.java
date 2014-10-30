@@ -32,11 +32,11 @@ public class Option implements Parameter {
 			return Value.DEFAULT;
 		} else {
 			String option = CommonUtil.removeDash(optionString[0]);
-			if (option.equalsIgnoreCase("nosync") || option.equalsIgnoreCase("no-sync") || option.equalsIgnoreCase("disable-sync")){
+			if (option.equalsIgnoreCase("nosync") || option.equalsIgnoreCase("no-sync") || option.equalsIgnoreCase("disable-sync") || option.equalsIgnoreCase("disable")){
 				return Value.NOSYNC;
 			} else if (option.equalsIgnoreCase("test")){
 				return Value.TEST;
-			} else if (option.equalsIgnoreCase("sync") || option.equalsIgnoreCase("enabled-sync")){
+			} else if (option.equalsIgnoreCase("sync") || option.equalsIgnoreCase("enable-sync") || option.equalsIgnoreCase("enable")){
 				return Value.SYNC;
 			} else {
 				return Value.DEFAULT;
