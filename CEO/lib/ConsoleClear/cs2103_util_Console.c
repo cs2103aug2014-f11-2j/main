@@ -5,7 +5,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	JNIEXPORT void JNICALL Java_cs2103_util_Console_clr(JNIEnv *env, jobject thisObj){
+	JNIEXPORT void JNICALL Java_cs2103_util_Console_clr(JNIEnv *env, jclass thisClass){
        HANDLE chwnd = GetStdHandle(STD_OUTPUT_HANDLE);
        COORD coordScreen = { 0, 0 };
        DWORD cCharsWritten;

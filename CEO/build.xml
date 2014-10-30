@@ -26,7 +26,7 @@
 	
 	<target name="compile" description="build class files" depends="clean">
 		<mkdir dir="${class.dir}"/>
-		<javac srcdir="${source.dir}" destdir="${class.dir}" includeAntRuntime="false">
+		<javac srcdir="${source.dir}" destdir="${class.dir}" includeAntRuntime="false" fork="true">
 			<exclude name="**/*Test*.java"/>
 	    	<classpath refid="libraries.path"/>
 		</javac>
