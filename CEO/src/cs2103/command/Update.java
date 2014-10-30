@@ -62,7 +62,6 @@ public class Update extends InfluentialCommand {
 		if (this.parameterList.getRecurrence() != null){
 			newTask.updateRecurrence(this.parameterList.getRecurrence().getValue());
 		}
-		newTask.updateLastModified(null);
 		newTask = TaskList.getInstance().updateTask(newTask);
 		if (newTask == null){
 			return String.format(MESSAGE_UPDATE_FAIL, this.parameterList.getTaskID().getValue());

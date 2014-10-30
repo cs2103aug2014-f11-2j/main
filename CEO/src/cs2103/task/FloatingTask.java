@@ -28,11 +28,9 @@ public class FloatingTask extends ToDoTask {
 	}
 	
 	private FloatingTask toFloating() throws HandledException {
-		try {
-			return (FloatingTask) this.clone();
-		} catch (CloneNotSupportedException e) {
-			throw new HandledException(HandledException.ExceptionType.CLONE_FAILED);
-		}
+		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getStatus(), this.getTitle(), this.getCompleted());
+		newTask.updateDescription(this.getDescription());
+		return newTask;
 	}
 
 	private DeadlineTask toDeadline(Date dueTime) throws HandledException {

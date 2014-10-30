@@ -29,7 +29,6 @@ public class Delete extends InfluentialCommand {
 	@Override
 	public String execute() throws HandledException, FatalException {
 		CommonUtil.checkNull(this.target, HandledException.ExceptionType.INVALID_TASK_OBJ);
-		this.target.updateLastModified(null);
 		this.undoBackup = this.target;
 		this.redoBackup = this.target;
 		if (this.parameterList.getDeleteOption() == null && !this.target.isDeleted()){
@@ -48,7 +47,6 @@ public class Delete extends InfluentialCommand {
 			return null;
 		} else {
 			this.undoBackup.restore();
-			this.undoBackup.updateLastModified(null);
 			TaskList.getInstance().updateTask(this.undoBackup);
 			return this;
 		}

@@ -29,7 +29,6 @@ public class Mark extends InfluentialCommand {
 		} else {
 			Task newTask = cloneTask(this.target);
 			newTask.updateCompleted(new Date());
-			this.target.updateLastModified(null);
 			newTask = TaskList.getInstance().updateTask(newTask);
 			if (newTask == null){
 				return String.format(MESSAGE_MARK_FAILED, this.parameterList.getTaskID().getValue());
