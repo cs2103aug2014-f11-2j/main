@@ -26,7 +26,7 @@ public class DeadlineTask extends ToDoTask {
 	public void updateDueTime(Date dueTime) throws HandledException{
 		if (dueTime == null){
 			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
-		}else{
+		} else {
 			this.dueTime = new DateTime(dueTime);
 		}
 	}
@@ -66,6 +66,7 @@ public class DeadlineTask extends ToDoTask {
 		try {
 			DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getCreated(), this.getStatus(), this.getTitle(), this.getDueTime(), this.getCompleted());
 			newTask.updateDescription(this.getDescription());
+			newTask.updateLastModified(null);
 			return newTask;
 		} catch (HandledException e) {
 			throw new CloneNotSupportedException();

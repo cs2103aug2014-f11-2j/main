@@ -30,14 +30,17 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	protected static final String DELETED = "(Deleted Task)\n";
 	
 	public Task(String taskUID, Date created, String title) {
-		this.updateTitle(title);
+		if (title == null){
+			this.title = "";
+		} else {
+			this.title = title;
+		}
 		if (taskUID == null){
 			this.taskUID = this.generateUid();
 		} else {
 			this.taskUID = taskUID;
 		}
 		this.updateCreated(created);
-		this.updateLastModified(null);
 	}
 	
 	private String generateUid(){
@@ -82,6 +85,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		} else {
 			this.title = title;
 		}
+		this.updateLastModified(null);
 	}
 	
 	public void updateDescription(String description){
@@ -90,6 +94,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		} else {
 			this.description = description;
 		}
+		this.updateLastModified(null);
 	}
 	
 	public void updateLastModified(Date date){
@@ -116,7 +121,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	protected void addCommonProperty(Component component){
 		component.getProperties().add(new Uid(this.getTaskUID()));
 		component.getProperties().add(new Created(this.getCreated()));
-		component.getProperties().add(new LastModified(new DateTime()));
+		component.getProperties().add(new LastModified(this.getLastModified() == null?new DateTime():this.getLastModified()));
 		component.getProperties().add(new Description(this.getDescription()));
 	}
 	
@@ -140,6 +145,12 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		}
 	}
 	
+	public Task update(Date[] time) throws HandledException{
+		Task returnTask = this.convert(time);
+		returnTask.updateLastModified(null);
+		return returnTask;
+	}
+	
 	public abstract void updateCompleted(Date complete);
 	public abstract void updateLocation(String location);
 	public abstract void updateRecurrence(Recur recurrence);
@@ -147,7 +158,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	public abstract boolean isDeleted();
 	public abstract void delete();
 	public abstract void restore();
-	public abstract Task convert(Date[] time) throws HandledException;
+	protected abstract Task convert(Date[] time) throws HandledException;
 	@Override
 	public abstract Object clone() throws CloneNotSupportedException;
 	public abstract String toSummary();

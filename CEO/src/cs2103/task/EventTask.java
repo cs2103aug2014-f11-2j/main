@@ -2,6 +2,8 @@ package cs2103.task;
 
 import java.util.Date;
 
+import com.google.api.client.util.Data;
+
 import cs2103.exception.HandledException;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
@@ -75,11 +77,13 @@ public abstract class EventTask extends Task {
 	@Override
 	public void delete() {
 		this.updateStatus(Status.VEVENT_CANCELLED);
+		this.updateLastModified(null);
 	}
 
 	@Override
 	public void restore() {
 		this.updateStatus(Status.VEVENT_CONFIRMED);
+		this.updateLastModified(null);
 	}
 	
 	@Override
@@ -91,7 +95,7 @@ public abstract class EventTask extends Task {
 		gEvent.setSummary(this.getTitle());
 		gEvent.setDescription(this.getDescription());
 		gEvent.setCreated(new com.google.api.client.util.DateTime(this.getCreated().getTime()));
-		gEvent.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
+		gEvent.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified() == null? new Date().getTime():this.getLastModified().getTime()));
 		gEvent.setStatus("confirmed");
 		gEvent.setStart(dateTimeToEventDateTime(this.getStartTime()));
 		gEvent.setEnd(dateTimeToEventDateTime(this.getEndTime()));
@@ -100,6 +104,7 @@ public abstract class EventTask extends Task {
 	private static com.google.api.services.calendar.model.EventDateTime dateTimeToEventDateTime(DateTime time){
 		com.google.api.services.calendar.model.EventDateTime eventDateTime = new com.google.api.services.calendar.model.EventDateTime();
 		eventDateTime.setTimeZone(TimeZone.getDefault().getID());
+		eventDateTime.setDate(Data.NULL_DATE_TIME);
 		eventDateTime.setDateTime(new com.google.api.client.util.DateTime(time.getTime()));
 		return eventDateTime;
 	}

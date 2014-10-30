@@ -250,13 +250,8 @@ public class GoogleEngine{
 			com.google.api.services.tasks.model.Task gTask = this.tasks.tasks().get(DEFAULT_TASKS, task.getTaskUID()).execute();
 			if (gTask != null){
 				com.google.api.services.tasks.model.Task newGTask = task.toGTask();
-				gTask.setDeleted(false);
-				if (gTask.getCompleted() == null || newGTask.getCompleted() != null){
-					return parseGTask(this.tasks.tasks().patch(DEFAULT_TASKS, gTask.getId(), newGTask).execute());
-				} else {
-					this.tasks.tasks().delete(DEFAULT_TASKS, gTask.getId()).execute();
-					return parseGTask(this.tasks.tasks().insert(DEFAULT_TASKS, newGTask).execute());
-				}
+				newGTask.setDeleted(false);
+				return parseGTask(this.tasks.tasks().patch(DEFAULT_TASKS, gTask.getId(), newGTask).execute());
 			} else {
 				return this.tryToInsert(task);
 			}

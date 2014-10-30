@@ -2,6 +2,8 @@ package cs2103.task;
 
 import java.util.Date;
 
+import com.google.api.client.util.Data;
+
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
@@ -59,6 +61,7 @@ public abstract class ToDoTask extends Task {
 	@Override
 	public void delete() {
 		this.updateStatus(Status.VTODO_CANCELLED);
+		this.updateLastModified(null);
 	}
 
 	@Override
@@ -68,6 +71,7 @@ public abstract class ToDoTask extends Task {
 		} else {
 			this.updateStatus(Status.VTODO_COMPLETED);
 		}
+		this.updateLastModified(null);
 	}
 	
 	@Override
@@ -91,12 +95,15 @@ public abstract class ToDoTask extends Task {
 	
 	protected void addGTaskProperty(com.google.api.services.tasks.model.Task gTask){
 		gTask.setTitle(this.getTitle());
-		if (this.getCompleted() != null){
-			gTask.setCompleted(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
+		if (this.getCompleted() == null){
+			gTask.setCompleted(Data.NULL_DATE_TIME);
+			gTask.setStatus("needsAction");
+		} else {
+			gTask.setCompleted(new com.google.api.client.util.DateTime(this.getCompleted().getTime()));
 			gTask.setStatus("completed");
 		}
 		gTask.setNotes(this.getDescription());
-		gTask.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
+		gTask.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified() == null?new Date().getTime():this.getLastModified().getTime()));
 	}
 	
 	public abstract com.google.api.services.tasks.model.Task toGTask();

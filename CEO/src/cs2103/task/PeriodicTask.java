@@ -85,6 +85,7 @@ public class PeriodicTask extends EventTask {
 		try {
 			PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getCreated(), this.getStatus(), this.getTitle(), this.getLocation(), this.getStartTime(), this.getEndTime(), this.getRecurrence());
 			newTask.updateDescription(this.getDescription());
+			newTask.updateLastModified(null);
 			return newTask;
 		} catch (HandledException e) {
 			throw new CloneNotSupportedException();

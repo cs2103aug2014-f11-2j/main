@@ -51,6 +51,7 @@ public class FloatingTask extends ToDoTask {
 	public Object clone() throws CloneNotSupportedException {
 		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getStatus(), this.getTitle(), this.getCompleted());
 		newTask.updateDescription(this.getDescription());
+		newTask.updateLastModified(null);
 		return newTask;
 	}
 
