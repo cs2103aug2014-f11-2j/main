@@ -3,6 +3,8 @@ package cs2103;
 import java.util.Scanner;
 import java.util.Stack;
 
+import org.fusesource.jansi.Ansi;
+
 import cs2103.command.*;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
@@ -10,11 +12,9 @@ import cs2103.parameters.CommandType;
 import cs2103.parameters.Option;
 import cs2103.storage.TaskList;
 import cs2103.util.CommonUtil;
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
 
-/**
- * @author Yuri
- * Controller class for CEO
- */
 public class CommandLineUI {
 	private static final String MESSAGE_WELCOME_FORMAT = "Welcome to the CEO. %1$s";
 	private static final String MESSAGE_SYNC_ENABLED = "Google Sync is enabled";
@@ -44,10 +44,10 @@ public class CommandLineUI {
 		default:
 		case SYNC:
 		case DEFAULT:
-			CommonUtil.print(String.format(MESSAGE_WELCOME_FORMAT, MESSAGE_SYNC_ENABLED));
+			CommonUtil.print(ansi().fg(GREEN).a(String.format(MESSAGE_WELCOME_FORMAT, MESSAGE_SYNC_ENABLED)).reset());
 			break;
 		case NOSYNC:
-			CommonUtil.print(String.format(MESSAGE_WELCOME_FORMAT, MESSAGE_SYNC_DISABLED));
+			CommonUtil.print(ansi().fg(RED).a(String.format(MESSAGE_WELCOME_FORMAT, MESSAGE_SYNC_DISABLED)).reset());
 			break;
 		case TEST:
 			CommonUtil.print(String.format(MESSAGE_WELCOME_FORMAT, MESSAGE_TEST_MODE));
@@ -81,17 +81,18 @@ public class CommandLineUI {
 			String command = scanner.nextLine();
 			CommonUtil.clearConsole();
 			if (command != null && !command.isEmpty()){
-				String feedback = processUserInput(command);
-				if (feedback != null && feedback.equalsIgnoreCase("EXIT")){
+				Ansi feedback = processUserInput(command);
+				if (feedback == null){
 					CommonUtil.print(MESSAGE_EXIT);
 					break;
+				} else {
+					CommonUtil.print(feedback);
 				}
-				CommonUtil.print(feedback);
 			}
 		}
 	}
 	
-	private String processUserInput(String userInput) {
+	private Ansi processUserInput(String userInput) {
 		try {
 			assert(userInput != null);
 			String command[] = CommonUtil.splitFirstWord(userInput);
@@ -105,7 +106,7 @@ public class CommandLineUI {
 				commandObject = new Update(command[1]);
 				break;
 			case EXIT:
-				return "EXIT";
+				return null;
 			case ADD:
 				commandObject = new Add(command[1]);
 				break;
@@ -139,28 +140,29 @@ public class CommandLineUI {
 				break;
 			case INVALID:
 			default:
-				return MESSAGE_COMMAND_ERROR;
+				return ansi().a(MESSAGE_COMMAND_ERROR);
 			}
 			if (commandObject instanceof InfluentialCommand){
 				this.undoStack.push((InfluentialCommand) commandObject);
 			}
 			return commandObject.execute();
 		} catch (HandledException e) {
-			return e.getErrorMsg();
+			return ansi().a(e.getErrorMsg());
 		} catch (FatalException e) {
-			printErrorAndExit();
+			CommonUtil.printErrMsg(MESSAGE_FATAL_ERR);
+			System.exit(-1);
 			return null;
 		}
 	}
 	
-	private String undo(String steps) throws HandledException, FatalException {
+	private Ansi undo(String steps) throws HandledException, FatalException {
 		int result;
 		if (steps == null || steps.isEmpty()){
 			result = executeUndo(1);
 		} else {
 			result = executeUndo(CommonUtil.parseIntegerParameter(steps));
 		}
-		return String.format(MESSAGE_UNDO_FORMAT, result);
+		return ansi().fg(GREEN).a(String.format(MESSAGE_UNDO_FORMAT, result)).reset();
 	}
 	
 	private int executeUndo(int steps) throws HandledException, FatalException{
@@ -175,14 +177,14 @@ public class CommandLineUI {
 		return result;
 	}
 	
-	private String redo(String steps) throws HandledException, FatalException {
+	private Ansi redo(String steps) throws HandledException, FatalException {
 		int result;
 		if (steps == null || steps.isEmpty()){
 			result = executeRedo(1);
 		} else {
 			result = executeRedo(CommonUtil.parseIntegerParameter(steps));
 		}
-		return String.format(MESSAGE_REDO_FORMAT, result);
+		return ansi().fg(GREEN).a(String.format(MESSAGE_REDO_FORMAT, result)).reset();
 	}
 	
 	private int executeRedo(int steps) throws HandledException, FatalException{
@@ -195,11 +197,6 @@ public class CommandLineUI {
 			}
 		}
 		return result;
-	}
-	
-	private static void printErrorAndExit(){
-		System.err.print(MESSAGE_FATAL_ERR);
-		System.exit(-1);
 	}
 	
 	private Option verifyOption(Option option) throws HandledException{
@@ -230,6 +227,6 @@ public class CommandLineUI {
 	}
 	
 	public String testCommand(String testCommandInput){
-		return processUserInput(testCommandInput);
+		return processUserInput(testCommandInput).toString();
 	}
 }

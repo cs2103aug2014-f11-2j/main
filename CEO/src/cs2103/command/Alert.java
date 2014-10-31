@@ -2,56 +2,47 @@ package cs2103.command;
 
 import java.util.ArrayList;
 
+import org.fusesource.jansi.Ansi;
+import static org.fusesource.jansi.Ansi.*;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.storage.TaskList;
 import cs2103.task.DeadlineTask;
 import cs2103.task.PeriodicTask;
-import cs2103.util.CommonUtil;
 
 public class Alert extends QueryCommand {
-	private static final String MESSAGE_TASKS_DUE = "Tasks due within one day:\n";
-	private static final String MESSAGE_TASKS_STARTING = "Tasks start within one day:\n";
+	private static final Ansi MESSAGE_TASKS_DUE = ansi().a("Tasks due within one day:\n");
+	private static final Ansi MESSAGE_TASKS_STARTING = ansi().a("Tasks start within one day:\n");
 	
 	@Override
-	public String execute() throws HandledException, FatalException {
-		StringBuffer sb = new StringBuffer();
-		String deadlineAlert = alertDeadline();
-		String periodicAlert = alertPeriodic();
-		if (deadlineAlert != null){
-			sb.append(MESSAGE_TASKS_DUE);
-			sb.append(deadlineAlert);
-		}
-		if (periodicAlert != null){
-			if (deadlineAlert != null) sb.append("\n");
-			sb.append(MESSAGE_TASKS_STARTING);
-			sb.append(periodicAlert);
-		}
-		return sb.toString();
+	public Ansi execute() throws HandledException, FatalException {
+		Ansi returnString = ansi().a(MESSAGE_TASKS_DUE);
+		returnString.a(parseListResponse(this.alertDeadline()));
+		returnString.a(MESSAGE_TASKS_STARTING);
+		returnString.a(parseListResponse(this.alertPeriodic()));
+		return returnString;
 	}
 	
-	private static String alertDeadline() throws HandledException, FatalException{
+	private ArrayList<DeadlineTask> alertDeadline() throws HandledException, FatalException{
 		ArrayList<DeadlineTask> taskList = TaskList.getInstance().getDeadlineList();
-		StringBuffer sb = new StringBuffer();
+		ArrayList<DeadlineTask> returnList = new ArrayList<DeadlineTask>();
 		for (DeadlineTask task:taskList){
 			if (task.checkAlert()){
-				sb.append(task.toSummary());
-				sb.append('\n');
+				returnList.add(task);
 			}
 		}
-		return CommonUtil.deleteLastChar(sb);
+		return returnList;
 	}
 
-	private static String alertPeriodic() throws HandledException, FatalException{
+	private ArrayList<PeriodicTask> alertPeriodic() throws HandledException, FatalException{
 		ArrayList<PeriodicTask> taskList = TaskList.getInstance().getPeriodicList();
-		StringBuffer sb = new StringBuffer();
+		ArrayList<PeriodicTask> returnList = new ArrayList<PeriodicTask>();
 		for (PeriodicTask task:taskList){
 			if (task.checkAlert()){
-				sb.append(task.toSummary());
-				sb.append('\n');
+				returnList.add(task);
 			}
 		}
-		return CommonUtil.deleteLastChar(sb);
+		return returnList;
 	}
 
 }

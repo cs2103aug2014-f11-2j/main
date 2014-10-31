@@ -1,8 +1,10 @@
 package cs2103.command;
 
+import org.fusesource.jansi.Ansi;
 import cs2103.exception.HandledException;
 import cs2103.parameters.CommandType;
 import cs2103.util.CommonUtil;
+import static org.fusesource.jansi.Ansi.*;
 
 public class Help extends QueryCommand {
 	public static final String HELP_DEFAULT = "CEO Usage:\n" +
@@ -143,31 +145,35 @@ public class Help extends QueryCommand {
 	}
 	
 	@Override
-	public String execute() throws HandledException{
+	public Ansi execute() throws HandledException{
 		CommonUtil.checkNull(this.parameterList.getCommandType(), HandledException.ExceptionType.INVALID_CMD);
 		switch (parameterList.getCommandType().getValue()){
 		case LIST:
-			return HELP_LIST;
+			return stringToAnsi(HELP_LIST);
 		case UPDATE:
-			return HELP_UPDATE;
+			return stringToAnsi(HELP_UPDATE);
 		case ADD:
-			return HELP_ADD;
+			return stringToAnsi(HELP_ADD);
 		case DELETE:
-			return HELP_DELETE;
+			return stringToAnsi(HELP_DELETE);
 		case SHOW:
-			return HELP_SHOW;
+			return stringToAnsi(HELP_SHOW);
 		case UNDO:
-			return HELP_UNDO;
+			return stringToAnsi(HELP_UNDO);
 		case REDO:
-			return HELP_REDO;
+			return stringToAnsi(HELP_REDO);
 		case SEARCH:
-			return HELP_SEARCH;
+			return stringToAnsi(HELP_SEARCH);
 		case MARK:
-			return HELP_MARK;
+			return stringToAnsi(HELP_MARK);
 		case INVALID:
 		default:
-			return HELP_DEFAULT;
+			return stringToAnsi(HELP_DEFAULT);
 		}
+	}
+	
+	private static Ansi stringToAnsi(String helpString){
+		return ansi().a(helpString);
 	}
 
 }

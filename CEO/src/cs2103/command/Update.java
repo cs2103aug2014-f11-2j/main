@@ -4,6 +4,9 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Queue;
 
+import org.fusesource.jansi.Ansi;
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Complete;
@@ -39,7 +42,7 @@ public class Update extends InfluentialCommand {
 	}
 	
 	@Override
-	public String execute() throws HandledException, FatalException {
+	public Ansi execute() throws HandledException, FatalException {
 		CommonUtil.checkNull(this.target, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		Task newTask;
 		if (this.parameterList.getTime() == null){
@@ -64,11 +67,11 @@ public class Update extends InfluentialCommand {
 		}
 		newTask = TaskList.getInstance().updateTask(newTask);
 		if (newTask == null){
-			return String.format(MESSAGE_UPDATE_FAIL, this.parameterList.getTaskID().getValue());
+			return ansi().fg(RED).a(String.format(MESSAGE_UPDATE_FAIL, this.parameterList.getTaskID().getValue())).reset();
 		} else {
 			this.undoBackup = this.target;
 			this.redoBackup = newTask;
-			return this.formatReturnString(String.format(MESSAGE_UPDATE, this.parameterList.getTaskID().getValue()), newTask);
+			return ansi().fg(GREEN).a(String.format(MESSAGE_UPDATE, this.parameterList.getTaskID().getValue())).reset().a(newTask.toDetail());
 		}
 	}
 	

@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
-
+import org.fusesource.jansi.Ansi;
 import cs2103.exception.HandledException;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.component.VToDo;
@@ -12,7 +12,6 @@ import net.fortuna.ical4j.model.property.Status;
 
 public class DeadlineTask extends ToDoTask {
 	private DateTime dueTime;
-	private static final String TYPE_DEADLINE = "Deadline";
 	
 	public DeadlineTask(String taskUID, Date created, Status status, String title, Date dueTime, Date completed) throws HandledException {
 		super(taskUID, created, status, title, completed);
@@ -74,26 +73,11 @@ public class DeadlineTask extends ToDoTask {
 	}
 
 	@Override
-	public String toSummary() {
-		StringBuffer sb = new StringBuffer();
-		sb.append(this.getTaskID()).append(". ").append(this.getTitle()).append("\n");
-		if (this.isDeleted()) sb.append(DELETED);
-		sb.append(STRING_TYPE);
-		sb.append(TYPE_DEADLINE);
-		sb.append("\tStatus: ");
-		sb.append(completedToString(this.getCompleted()));
-		sb.append("\tDue At: ");
-		sb.append(dateToString(this.getDueTime()));
-		return sb.append("\n").toString();
-	}
-
-	@Override
-	public String toDetail() {
-		StringBuffer sb = new StringBuffer();
-		sb.append(this.toSummary());
-		sb.append(STRING_DESCRIPTION);
-		sb.append(this.getDescription());
-		return sb.append("\n").toString();
+	public Ansi toSummary() {
+		Ansi returnString = this.addCommonString();
+		returnString.a("Status: ").a(completedToString(this.getCompleted()));
+		returnString.a("\tDue At: ").a(this.dateToString(this.getDueTime()));
+		return returnString;
 	}
 	
 	public static sortComparator getComparator(){

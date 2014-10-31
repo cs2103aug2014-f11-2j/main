@@ -5,6 +5,9 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Queue;
 
+import org.fusesource.jansi.Ansi;
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
 import net.fortuna.ical4j.model.Recur;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
@@ -19,8 +22,8 @@ import cs2103.task.*;
 import cs2103.util.CommonUtil;
 
 public class Add extends InfluentialCommand {
-	private static final String MESSAGE_ADD = "You have successfully added a new task.\n";
-	private static final String MESSAGE_ADD_FAIL = "Fail to add a new task.";
+	private static final Ansi MESSAGE_ADD = ansi().fg(GREEN).a("You have successfully added a new task.\n").reset();
+	private static final Ansi MESSAGE_ADD_FAIL = ansi().fg(GREEN).a("Fail to add a new task.").reset();
 	private static final String[] allowedQuickTimeLiteral = {"from", "by", "on", "in", "at"};
 	
 	public Add(String command) throws HandledException{
@@ -38,7 +41,7 @@ public class Add extends InfluentialCommand {
 	}
 	
 	@Override
-	public String execute() throws HandledException, FatalException {
+	public Ansi execute() throws HandledException, FatalException {
 		Task task;
 		Date[] time = getTime(this.parameterList.getTime());
 		String title = this.parameterList.getTitle() == null ? null : this.parameterList.getTitle().getValue();
@@ -60,7 +63,7 @@ public class Add extends InfluentialCommand {
 		} else {
 			this.undoBackup = task;
 			this.redoBackup = task;
-			return this.formatReturnString(MESSAGE_ADD, task);
+			return MESSAGE_ADD.a(task.toDetail());
 		}
 	}
 	

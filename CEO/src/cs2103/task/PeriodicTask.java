@@ -6,7 +6,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-
+import org.fusesource.jansi.Ansi;
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
 import cs2103.exception.HandledException;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
@@ -19,8 +21,6 @@ public class PeriodicTask extends EventTask {
 	private String location;
 	private Recur recurrence;
 
-	private static final String TYPE_PERIODIC = "Periodic";
-	private static final String TYPE_RECURRING = "Recurring";
 	private static final String STRING_LOCATION = "Location: ";
 	private static final String STRING_RECUR = "Recurrence: ";
 	
@@ -94,43 +94,32 @@ public class PeriodicTask extends EventTask {
 	}
 
 	@Override
-	public String toSummary() {
-		StringBuffer sb = new StringBuffer();
-		sb.append(this.getTaskID()).append(". ").append(this.getTitle()).append("\n");
-		if (this.isDeleted()) sb.append(DELETED);
-		sb.append(STRING_TYPE);
-		if (this.getRecurrence() == null){
-			sb.append(TYPE_PERIODIC);
-		} else {
-			sb.append(TYPE_RECURRING);
+	public Ansi toSummary() {
+		Ansi returnString = this.addCommonString();
+		returnString.a("From: ");
+		returnString.a(this.dateToString(this.getStartTime()));
+		returnString.a(" to ");
+		returnString.a(this.dateToString(this.getEndTime())).a('\n').reset();
+		if (this.getRecurrence() != null){
+			returnString.a(recurToString(this.getRecurrence()));
 		}
-		sb.append("\tFrom: ");
-		sb.append(dateToString(this.getStartTime()));
-		sb.append(" To ");
-		sb.append(dateToString(this.getEndTime()));
-		return sb.append("\n").toString();
+		return returnString;
 	}
 
 	@Override
-	public String toDetail() {
-		StringBuffer sb = new StringBuffer();
-		sb.append(this.toSummary());
-		if (this.getRecurrence() != null){
-			sb.append(STRING_RECUR);
-			sb.append(recurToString(this.getRecurrence()));
-		}
-		sb.append(STRING_LOCATION);
-		sb.append(this.getLocation()).append("\n");
-		sb.append(STRING_DESCRIPTION);
-		sb.append(this.getDescription()).append("\n");
-		return sb.toString();
+	public Ansi toDetail() {
+		Ansi returnString = this.toSummary();
+		returnString.a(STRING_LOCATION);
+		returnString.fg(CYAN).a(this.getLocation()).a("\n").reset();
+		returnString.a(STRING_DESCRIPTION).a(this.getDescription()).reset();
+		return returnString;
 	}
 	
-	private static String recurToString(Recur recur){
-		StringBuffer sb = new StringBuffer();
-		sb.append(recur.getInterval()).append(" ");
-		sb.append(recur.getFrequency()).append("\n");
-		return sb.toString();
+	private static Ansi recurToString(Recur recur){
+		Ansi returnString = ansi().a(STRING_RECUR);
+		returnString.fg(YELLOW).a(recur.getInterval()).a(' ');
+		returnString.a(recur.getFrequency()).a('\n').reset();
+		return returnString;
 	}
 	
 	private static List<String> recurToGoogle(Recur recur){

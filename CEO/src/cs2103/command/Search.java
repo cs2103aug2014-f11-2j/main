@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Queue;
 
+import org.fusesource.jansi.Ansi;
+
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Complete;
@@ -30,7 +32,7 @@ public class Search extends QueryCommand {
 	}
 	
 	@Override
-	public String execute() throws HandledException, FatalException {
+	public Ansi execute() throws HandledException, FatalException {
 		ArrayList<Task> searchList = getInitialList(this.parameterList.getTaskType());
 		if (this.parameterList.getKeyword() != null){
 			searchList = filterKeyword(searchList, parameterList.getKeyword().getValue());

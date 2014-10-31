@@ -1,5 +1,7 @@
 package cs2103.command;
 
+import org.fusesource.jansi.Ansi;
+
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.TaskType;
@@ -13,7 +15,7 @@ public class List extends QueryCommand {
 	}
 	
 	@Override
-	public String execute() throws HandledException, FatalException {
+	public Ansi execute() throws HandledException, FatalException {
 		CommonUtil.checkNull(this.parameterList.getTaskType(), HandledException.ExceptionType.INVALID_CMD);
 		switch (this.parameterList.getTaskType().getValue()){
 		case FLOATING:

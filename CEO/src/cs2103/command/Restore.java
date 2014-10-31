@@ -1,5 +1,8 @@
 package cs2103.command;
 
+import org.fusesource.jansi.Ansi;
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.TaskID;
@@ -40,16 +43,16 @@ public class Restore extends InfluentialCommand {
 	}
 
 	@Override
-	public String execute() throws HandledException, FatalException {
+	public Ansi execute() throws HandledException, FatalException {
 		CommonUtil.checkNull(this.target, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		this.target.restore();
 		this.target = TaskList.getInstance().updateTask(this.target);
 		if (this.target == null){
-			return String.format(MESSAGE_RESTORE_FAIL, parameterList.getTaskID().getValue());
+			return ansi().fg(RED).a(String.format(MESSAGE_RESTORE_FAIL, parameterList.getTaskID().getValue())).reset();
 		} else {
 			this.undoBackup = this.target;
 			this.redoBackup = this.target;
-			return this.formatReturnString(String.format(MESSAGE_RESTORE, parameterList.getTaskID().getValue()), this.target);
+			return ansi().fg(GREEN).a(String.format(MESSAGE_RESTORE, parameterList.getTaskID().getValue())).reset().a(this.target.toDetail());
 		}
 	}
 }

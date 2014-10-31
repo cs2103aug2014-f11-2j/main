@@ -2,8 +2,12 @@ package cs2103.task;
 
 import java.util.Date;
 
+import org.fusesource.jansi.Ansi;
+
 import com.google.api.client.util.Data;
 
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
@@ -79,17 +83,22 @@ public abstract class ToDoTask extends Task {
 		return this.toVToDo();
 	}
 	
+	@Override
+	public Ansi toDetail() {
+		Ansi returnString = this.toSummary();
+		returnString.a(STRING_DESCRIPTION).a(this.getDescription()).a('\n').reset();
+		return returnString;
+	}
+	
 	protected void addVToDoProperty(VToDo vToDo){
 		this.addCommonProperty(vToDo);
 		if (this.isDeleted()){
 			vToDo.getProperties().add(Status.VTODO_CANCELLED);
+		} else if (this.getCompleted() == null){
+			vToDo.getProperties().add(Status.VTODO_NEEDS_ACTION);
 		} else {
-			if (this.getCompleted() == null){
-				vToDo.getProperties().add(Status.VTODO_NEEDS_ACTION);
-			} else {
-				vToDo.getProperties().add(Status.VTODO_COMPLETED);
-				vToDo.getProperties().add(new Completed(this.getCompleted()));
-			}
+			vToDo.getProperties().add(Status.VTODO_COMPLETED);
+			vToDo.getProperties().add(new Completed(this.getCompleted()));
 		}
 	}
 	
@@ -104,6 +113,16 @@ public abstract class ToDoTask extends Task {
 		}
 		gTask.setNotes(this.getDescription());
 		gTask.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
+	}
+	
+	protected static Ansi completedToString(DateTime completed){
+		Ansi returnString = ansi();
+		if (completed == null){
+			returnString.fg(RED).a("Needs Action");
+		} else {
+			returnString.fg(GREEN).a("Completed");
+		}
+		return returnString.reset();
 	}
 	
 	public abstract com.google.api.services.tasks.model.Task toGTask();

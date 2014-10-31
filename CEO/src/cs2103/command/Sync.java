@@ -1,5 +1,8 @@
 package cs2103.command;
 
+import org.fusesource.jansi.Ansi;
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Option;
@@ -7,9 +10,9 @@ import cs2103.storage.TaskList;
 import cs2103.util.CommonUtil;
 
 public class Sync extends InfluentialCommand {
-	private static final String SUCCESS = "Successfully sync your data with Google";
-	private static final String FAILURE = "Fail to sync your data with Google";
-	private static final String DISABLED = "You have disabled sync with Google";
+	private static final Ansi SUCCESS = ansi().fg(GREEN).a("Successfully sync your data with Google").reset();
+	private static final Ansi FAILURE = ansi().fg(RED).a("Fail to sync your data with Google").reset();
+	private static final Ansi DISABLED = ansi().fg(MAGENTA).a("You have disabled sync with Google").reset();
 	
 	public Sync(String command) throws HandledException {
 		if (command != null){
@@ -28,7 +31,7 @@ public class Sync extends InfluentialCommand {
 	}
 
 	@Override
-	public String execute() throws HandledException, FatalException {
+	public Ansi execute() throws HandledException, FatalException {
 		if (this.parameterList.getOption() != null && this.parameterList.getOption().getValue().equals(Option.Value.NOSYNC)){
 			TaskList.getInstance().disableSync();
 			return DISABLED;

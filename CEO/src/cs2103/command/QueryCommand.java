@@ -1,23 +1,23 @@
 package cs2103.command;
 
 import java.util.ArrayList;
-
 import cs2103.task.Task;
-import cs2103.util.CommonUtil;
+import org.fusesource.jansi.Ansi;
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
 
 public abstract class QueryCommand extends Command {
-	private static final String MESSAGE_EMPTY_LIST = "The task list is empty";
+	private static final Ansi MESSAGE_EMPTY_LIST = ansi().fg(RED).a("The task list is empty\n").reset();
 	
-	protected static <T extends Task> String parseListResponse(ArrayList<T> taskList){
+	protected static <T extends Task> Ansi parseListResponse(ArrayList<T> taskList){
 		if (taskList == null || taskList.size() == 0){
 			return MESSAGE_EMPTY_LIST;
 		} else {
-			StringBuffer sb = new StringBuffer();
+			Ansi returnString = ansi();
 			for (Task task:taskList){
-				sb.append(task.toSummary());
-				sb.append('\n');
+				returnString.a(task.toSummary());
 			}
-			return CommonUtil.deleteLastChar(sb);
+			return returnString;
 		}
 	}
 }

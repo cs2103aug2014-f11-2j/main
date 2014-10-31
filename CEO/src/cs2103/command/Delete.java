@@ -3,6 +3,9 @@ package cs2103.command;
 import java.util.Map;
 import java.util.Queue;
 
+import org.fusesource.jansi.Ansi;
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.DeleteOption;
@@ -27,17 +30,17 @@ public class Delete extends InfluentialCommand {
 	}
 	
 	@Override
-	public String execute() throws HandledException, FatalException {
+	public Ansi execute() throws HandledException, FatalException {
 		CommonUtil.checkNull(this.target, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		this.undoBackup = this.target;
 		this.redoBackup = this.target;
 		if (this.parameterList.getDeleteOption() == null && !this.target.isDeleted()){
 			this.target.delete();
 			TaskList.getInstance().updateTask(this.target);
-			return String.format(MESSAGE_DELETE, this.parameterList.getTaskID().getValue());
+			return ansi().fg(GREEN).a(String.format(MESSAGE_DELETE, this.parameterList.getTaskID().getValue())).reset();
 		} else {
 			TaskList.getInstance().deleteTask(this.target);
-			return String.format(MESSAGE_PERMANENTLY_DELETE, this.parameterList.getTaskID().getValue());
+			return ansi().fg(MAGENTA).a(String.format(MESSAGE_PERMANENTLY_DELETE, this.parameterList.getTaskID().getValue())).reset();
 		}
 	}
 

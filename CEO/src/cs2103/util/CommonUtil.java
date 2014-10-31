@@ -5,6 +5,11 @@ import java.awt.Desktop.Action;
 import java.io.IOException;
 import java.net.InetAddress;
 
+import org.fusesource.jansi.Ansi;
+import org.fusesource.jansi.AnsiConsole;
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
+
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 
@@ -60,9 +65,21 @@ public class CommonUtil {
 		}
 	}
 	
-	public static void print(String feedback) {
+	public static void print(String feedback){
 		if (feedback != null && !feedback.isEmpty()){
-			System.out.println(feedback);
+			print(ansi().a(feedback));
+		}
+	}
+	
+	public static void print(Ansi feedback) {
+		if (feedback != null){
+			AnsiConsole.out.println(feedback.reset());
+		}
+	}
+	
+	public static void printErrMsg(String errorMsg){
+		if (errorMsg != null && !errorMsg.isEmpty()){
+			print(ansi().fg(RED).a(errorMsg));
 		}
 	}
 	
@@ -104,10 +121,10 @@ public class CommonUtil {
 			if (System.getProperty("os.name").contains("Windows")){
 		        Console.clr();
 			} else {
-		        System.out.println("\u001b[2J");
+				AnsiConsole.out.println(ansi().eraseScreen().reset());
 			}
 		} catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
-			System.out.println();
+			AnsiConsole.out.println(ansi().eraseScreen().reset());
 		}
 	}
 }

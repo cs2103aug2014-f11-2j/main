@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
+import org.fusesource.jansi.Ansi;
+
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.ParameterList;
@@ -12,7 +14,7 @@ import cs2103.util.CommonUtil;
 
 public abstract class Command {
 	protected ParameterList parameterList = new ParameterList();
-	public abstract String execute() throws HandledException, FatalException;
+	public abstract Ansi execute() throws HandledException, FatalException;
 	
 	protected static Queue<String> separateCommand(String userInput) throws HandledException{
 		CommonUtil.checkNull(userInput, HandledException.ExceptionType.INVALID_CMD);

@@ -3,9 +3,12 @@ package cs2103.task;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
+import org.fusesource.jansi.Ansi;
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
 import cs2103.exception.HandledException;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateTime;
@@ -24,10 +27,9 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	private DateTime created;
 	private DateTime lastModified;
 	protected Status status;
-	protected static final String STRING_TYPE = "Type: ";
 	protected static final String STRING_DESCRIPTION = "Description: ";
 	protected static final long DAY_IN_MILLIS = 86400000L;
-	protected static final String DELETED = "(Deleted Task)\n";
+	protected static final Ansi DELETED = ansi().fg(MAGENTA).a("(Deleted Task)\n").reset();
 	
 	public Task(String taskUID, Date created, String title) {
 		this.updateTitle(title);
@@ -124,14 +126,22 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		component.getProperties().add(new Description(this.getDescription()));
 	}
 	
-	protected static String dateToString(Date date){
-		DateFormat dateFormat;
-		dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM, Locale.UK);
-		return dateFormat.format(date);
+	protected Ansi addCommonString(){
+		Ansi returnString = ansi().a(this.getTaskID()).a(". ").fg(YELLOW).a(this.getTitle()).a('\n').reset();
+		if (this.isDeleted()) returnString.a(DELETED);
+		return returnString;
 	}
-
-	protected static String completedToString(DateTime completed){
-		return completed == null?"Needs Action":"Completed";
+	
+	protected Ansi dateToString(Date date){
+		Ansi returnString = ansi();
+		DateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm a");
+		if (this.checkAlert()){
+			returnString.fg(RED);
+		} else {
+			returnString.fg(GREEN);
+		}
+		returnString.a(format.format(date)).reset();
+		return returnString;
 	}
 	
 	@Override
@@ -160,8 +170,8 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	protected abstract Task convert(Date[] time) throws HandledException;
 	@Override
 	public abstract Object clone() throws CloneNotSupportedException;
-	public abstract String toSummary();
-	public abstract String toDetail();
+	public abstract Ansi toSummary();
+	public abstract Ansi toDetail();
 	public abstract Component toComponent();
 	public abstract DateTime getCompleted();
 	public abstract boolean checkPeriod(Date[] time);
