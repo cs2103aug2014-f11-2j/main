@@ -205,23 +205,27 @@ public class CommandLineUI {
 	private Option verifyOption(Option option) throws HandledException{
 		if (option == null || option.getValue().equals(Option.Value.DEFAULT)){
 			if (CommonUtil.checkSyncSupport()){
-				CommonUtil.printPrompt(MESSAGE_SYNC_PROMPT);
-				String answer = null;
-				while(true){
-					answer = this.scanner.nextLine();
-					if (answer != null){
-						if (answer.equalsIgnoreCase("y")){
-							return new Option(Option.Value.SYNC);
-						} else if (answer.equalsIgnoreCase("n")){
-							return new Option(Option.Value.NOSYNC);
-						}
-					}
-				}
+				return askOption();
 			} else {
 				return new Option(Option.Value.NOSYNC);
 			}
 		} else {
 			return option;
+		}
+	}
+	
+	private Option askOption(){
+		CommonUtil.printPrompt(MESSAGE_SYNC_PROMPT);
+		String answer = null;
+		while(true){
+			answer = this.scanner.nextLine();
+			if (answer != null){
+				if (answer.equalsIgnoreCase("y")){
+					return new Option(Option.Value.SYNC);
+				} else if (answer.equalsIgnoreCase("n")){
+					return new Option(Option.Value.NOSYNC);
+				}
+			}
 		}
 	}
 	

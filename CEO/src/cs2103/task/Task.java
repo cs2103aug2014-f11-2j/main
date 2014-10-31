@@ -68,6 +68,9 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	}
 	
 	public DateTime getLastModified(){
+		if (this.lastModified == null){
+			this.updateLastModified(null);
+		}
 		return this.lastModified;
 	}
 	

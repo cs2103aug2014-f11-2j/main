@@ -103,7 +103,7 @@ public abstract class ToDoTask extends Task {
 			gTask.setStatus("completed");
 		}
 		gTask.setNotes(this.getDescription());
-		gTask.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified() == null?new Date().getTime():this.getLastModified().getTime()));
+		gTask.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
 	}
 	
 	public abstract com.google.api.services.tasks.model.Task toGTask();

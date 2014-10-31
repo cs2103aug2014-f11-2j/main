@@ -89,5 +89,4 @@ public class CommonUtilTest {
 		//test for null string
 		CommonUtil.removeDash(null);
 	}
-
 }

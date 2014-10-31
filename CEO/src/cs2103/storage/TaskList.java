@@ -232,12 +232,13 @@ public class TaskList {
 		return null;
 	}
 
-	private Task addToGoogle(Task task) throws HandledException {
+	private Task addToGoogle(Task task) throws HandledException, FatalException {
 		try {
 			if (this.google.needToSync(task)){
 				this.syncWithGoogle();
 			} else {
 				Task returnTask = this.google.addTask(task);
+				this.updateUidInList(task, returnTask);
 				this.google.updateLastUpdated();
 				return returnTask;
 			}
@@ -306,11 +307,13 @@ public class TaskList {
 	}
 	
 	private void updateUidInList(Task oldTask, Task newTask) throws HandledException, FatalException{
-		if (oldTask.equals(newTask)){
-			this.storage.updateTask(newTask);
-		} else {
-			this.storage.deleteTask(oldTask);
-			this.storage.updateTask(newTask);
+		if (newTask != null){
+			if (oldTask.equals(newTask)){
+				this.storage.updateTask(newTask);
+			} else {
+				this.storage.deleteTask(oldTask);
+				this.storage.updateTask(newTask);
+			}
 		}
 	}
 	

@@ -15,6 +15,7 @@ public abstract class QueryCommand extends Command {
 			StringBuffer sb = new StringBuffer();
 			for (Task task:taskList){
 				sb.append(task.toSummary());
+				sb.append('\n');
 			}
 			return CommonUtil.deleteLastChar(sb);
 		}

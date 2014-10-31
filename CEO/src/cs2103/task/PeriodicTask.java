@@ -25,7 +25,7 @@ public class PeriodicTask extends EventTask {
 	private static final String STRING_RECUR = "Recurrence: ";
 	
 	public PeriodicTask(String taskUID, Date created, Status status, String title, String location, Date startTime, Date endTime, Recur recurrence) throws HandledException {
-		super(taskUID, created, status, title, endTime, endTime);
+		super(taskUID, created, status, title, startTime, endTime);
 		this.updateLocation(location);
 		this.updateRecurrence(recurrence);
 	}

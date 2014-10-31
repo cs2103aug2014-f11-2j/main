@@ -45,7 +45,7 @@ public class Add extends InfluentialCommand {
 		String description = this.parameterList.getDescription() == null ? null : this.parameterList.getDescription().getValue();
 		String location = this.parameterList.getLocation() == null? null : this.parameterList.getLocation().getValue();
 		Recur recurrence = this.parameterList.getRecurrence() == null ? null : this.parameterList.getRecurrence().getValue();
-		if (time[0] == null && time[1] == null){
+		if (time[0] == null){
 			task = new FloatingTask(null, null, null, title, null);
 		} else if (time[1] == null){
 			task = new DeadlineTask(null, null, null, title, time[0], null);
@@ -106,10 +106,12 @@ public class Add extends InfluentialCommand {
 	}
 	
 	private static Date[] getTime(Time timeParameter){
-		Date[] time = new Date[2];
 		if (timeParameter == null){
-			return time;
+			return new Date[2];
 		} else {
+			for (Date date:timeParameter.getValue()){
+				System.out.println(date);
+			}
 			return timeParameter.getValue();
 		}
 	}
