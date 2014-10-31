@@ -14,6 +14,7 @@ import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
 
+import cs2103.exception.ErrorLogging;
 import cs2103.exception.HandledException;
 import cs2103.task.*;
 import cs2103.util.CommonUtil;
@@ -124,17 +125,9 @@ public class GoogleEngine{
 		Date taskLastUpdateSaved = this.taskLastUpdate;
 		this.updateLastUpdated();
 		if (task instanceof EventTask){
-			if (this.calendarLastUpdate.after(calendarLastUpdateSaved)){
-				return true;
-			} else {
-				return false;
-			}
+			return this.calendarLastUpdate.after(calendarLastUpdateSaved);
 		} else if (task instanceof ToDoTask){
-			if (this.taskLastUpdate.after(taskLastUpdateSaved)){
-				return true;
-			} else {
-				return false;
-			}
+			return this.taskLastUpdate.after(taskLastUpdateSaved);
 		} else {
 			return false;
 		}
@@ -335,25 +328,28 @@ public class GoogleEngine{
 		if (gEvent.getRecurrence() == null){
 			return null;
 		} else {
-			String recurString = null;
-			for (String s: gEvent.getRecurrence()){
-				if (s != null && s.startsWith("RRULE:")){
-					recurString = s.substring(6);
-					break;
-				}
-			}
-			if (recurString == null){
+			String recurString = getRecurrenceString(gEvent.getRecurrence());
+			return parseRecurrence(recurString);
+		}
+	}
+	
+	private static String getRecurrenceString(List<String> recurrenceList){
+		for (String s: recurrenceList){
+			if (s != null && s.startsWith("RRULE:")) return s.substring(6);
+		}
+		return null;
+	}
+	
+	private static Recur parseRecurrence(String recurString){
+		if (recurString == null){
+			return null;
+		} else {
+			try {
+				Recur recur = new Recur(recurString);
+				if (recur.getInterval() < 1) recur.setInterval(1);
+				return recur;
+			} catch (ParseException e) {
 				return null;
-			} else {
-				try {
-					Recur recur = new Recur(recurString);
-					if (recur.getInterval() < 1){
-						recur.setInterval(1);
-					}
-					return recur;
-				} catch (ParseException e) {
-					return null;
-				}
 			}
 		}
 	}
@@ -386,6 +382,7 @@ public class GoogleEngine{
 				this.tasks = this.receiver.getTasksClient();
 				return this.tasks.tasks().list(DEFAULT_TASKS).setShowDeleted(true).execute().getItems();
 			} catch (IOException e1) {
+				ErrorLogging.getInstance().writeToLog(e1.getMessage(), e1);
 				throw new HandledException(HandledException.ExceptionType.SYNC_FAIL);
 			}
 		}
@@ -399,6 +396,7 @@ public class GoogleEngine{
 				this.calendar = this.receiver.getCalendarClient();
 				return this.calendar.events().list(calendarIdentifier).setShowDeleted(true).execute().getItems();
 			} catch (IOException e1) {
+				ErrorLogging.getInstance().writeToLog(e1.getMessage(), e1);
 				throw new HandledException(HandledException.ExceptionType.SYNC_FAIL);
 			}
 		}
@@ -407,15 +405,13 @@ public class GoogleEngine{
 	private String getIdentifier() throws HandledException{
 		try {
 			CalendarList feed = this.calendar.calendarList().list().execute();
-			if (feed.getItems() != null) {
-		    	for (CalendarListEntry entry : feed.getItems()) {
-		    		if (entry.isPrimary()){
-		    			return entry.getId();
-		    		}
-		    	}
+			CommonUtil.checkNull(feed, HandledException.ExceptionType.SYNC_FAIL);
+		    for (CalendarListEntry entry : feed.getItems()) {
+		    	if (entry.isPrimary()) return entry.getId();
 		    }
 		    throw new HandledException(HandledException.ExceptionType.SYNC_FAIL);
 		} catch (IOException e) {
+			ErrorLogging.getInstance().writeToLog(e.getMessage(), e);
 			throw new HandledException(HandledException.ExceptionType.SYNC_FAIL);
 		}
 	}

@@ -36,6 +36,7 @@ public class Alert extends QueryCommand {
 		for (DeadlineTask task:taskList){
 			if (task.checkAlert()){
 				sb.append(task.toSummary());
+				sb.append('\n');
 			}
 		}
 		return CommonUtil.deleteLastChar(sb);
@@ -47,6 +48,7 @@ public class Alert extends QueryCommand {
 		for (PeriodicTask task:taskList){
 			if (task.checkAlert()){
 				sb.append(task.toSummary());
+				sb.append('\n');
 			}
 		}
 		return CommonUtil.deleteLastChar(sb);
