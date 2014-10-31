@@ -27,7 +27,6 @@ public class GoogleEngine{
 	private com.google.api.services.tasks.Tasks tasks;
 	private Date taskLastUpdate;
 	private Date calendarLastUpdate;
-	private static final long HOUR_IN_MILLIS = 3600000L;
 	private static final long DAY_IN_MILLIS = 86400000L;
 	private static final String DEFAULT_TASKS = "@default";
 	
@@ -215,13 +214,7 @@ public class GoogleEngine{
 			com.google.api.services.calendar.model.Event existing = this.calendar.events().get(calendarIdentifier, task.getTaskUID()).execute();
 			if (existing != null){
 				com.google.api.services.calendar.model.Event updating = task.toGEvent();
-				int sequence;
-				if (existing.getSequence() == null){
-					sequence = 1;
-				} else {
-					sequence = existing.getSequence();
-				}
-				updating.setSequence(sequence);
+				updating.setSequence(readSequence(existing));
 				return parseGEvent(this.calendar.events().patch(calendarIdentifier, task.getTaskUID(), updating).execute());
 			} else {
 				return this.tryToInsert(task);
@@ -254,6 +247,14 @@ public class GoogleEngine{
 	private void tryToGetLastUpdated() throws IOException{
 		this.calendarLastUpdate =  new Date(this.calendar.events().list(calendarIdentifier).setShowDeleted(true).execute().getUpdated().getValue());
 		this.taskLastUpdate = new Date(this.tasks.tasklists().get(DEFAULT_TASKS).execute().getUpdated().getValue());
+	}
+	
+	private int readSequence(com.google.api.services.calendar.model.Event gEvent){
+		if (gEvent.getSequence() == null){
+			return 2;
+		} else {
+			return gEvent.getSequence() + 1;
+		}
 	}
 	
 	private Date readCompleted(com.google.api.services.tasks.model.Task gTask){
@@ -293,35 +294,29 @@ public class GoogleEngine{
 		if (gEvent.getStart() == null){
 			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
 		} else {
-			if (gEvent.getStart().getDateTime() == null){
-				if (gEvent.getStart().getDate() == null){
-					throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
-				} else {
-					time[0] = new Date(gEvent.getStart().getDate().getValue());
-					if (gEvent.getEnd() == null){
-						time[1] = new Date(time[0].getTime() + DAY_IN_MILLIS);
-					} else {
-						if (gEvent.getEnd().getDateTime() == null){
-							if (gEvent.getEnd().getDate() == null){
-								time[1] = new Date(time[0].getTime() + DAY_IN_MILLIS);
-							} else {
-								time[1] = new Date(gEvent.getEnd().getDate().getValue());
-							}
-						} else {
-							time[1] = new Date(gEvent.getEnd().getDateTime().getValue());
-						}
-					}
-				}
+			com.google.api.client.util.DateTime startTime = readEventDateTime(gEvent.getStart());
+			CommonUtil.checkNull(startTime, HandledException.ExceptionType.INVALID_TIME);
+			time[0] = new Date(startTime.getValue());
+			com.google.api.client.util.DateTime endTime = readEventDateTime(gEvent.getEnd());
+			if (endTime == null) {
+				time[1] = new Date(time[0].getTime() + DAY_IN_MILLIS);
 			} else {
-				time[0] = new Date(gEvent.getStart().getDateTime().getValue());
-				if (gEvent.getEnd() == null){
-					time[1] = new Date(time[0].getTime() + HOUR_IN_MILLIS);
-				} else {
-					time[1] = new Date(gEvent.getStart().getDateTime().getValue());
-				}
+				time[1] = new Date(endTime.getValue());
 			}
 		}
 		return time;
+	}
+	
+	private static com.google.api.client.util.DateTime readEventDateTime(com.google.api.services.calendar.model.EventDateTime edt){
+		if (edt == null){
+			return null;
+		} else {
+			if (edt.getDateTime() == null) {
+				return edt.getDate();
+			} else {
+				return edt.getDateTime();
+			}
+		}
 	}
 	
 	private Recur readRecurrence(com.google.api.services.calendar.model.Event gEvent){
