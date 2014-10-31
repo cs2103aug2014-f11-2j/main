@@ -30,11 +30,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	protected static final String DELETED = "(Deleted Task)\n";
 	
 	public Task(String taskUID, Date created, String title) {
-		if (title == null){
-			this.title = "";
-		} else {
-			this.title = title;
-		}
+		this.updateTitle(title);
 		if (taskUID == null){
 			this.taskUID = this.generateUid();
 		} else {
@@ -80,7 +76,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	}
 	
 	public void updateTitle(String title) {
-		if (title == null || title.isEmpty()){
+		if (title == null){
 			this.title = "";
 		} else {
 			this.title = title;
