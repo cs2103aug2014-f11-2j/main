@@ -129,7 +129,7 @@ public class PeriodicTask extends EventTask {
 	private static Ansi recurToString(Recur recur){
 		Ansi returnString = ansi().a(STRING_RECUR);
 		returnString.fg(YELLOW).a(recur.getInterval()).a(' ');
-		returnString.a(recur.getFrequency()).a('\n').reset();
+		returnString.a(recur.getFrequency()).reset();
 		return returnString;
 	}
 	
@@ -208,6 +208,7 @@ public class PeriodicTask extends EventTask {
 			} else {
 				Date endTime = new Date(this.getEndTime().getTime() - this.getStartTime().getTime() + startTime.getTime());
 				this.updateTime(startTime, endTime);
+				this.updateLastModified(null);
 				return this;
 			}
 		}
