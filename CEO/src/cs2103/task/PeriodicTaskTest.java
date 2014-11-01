@@ -14,7 +14,7 @@ import org.junit.Test;
 import cs2103.exception.HandledException;
 import cs2103.util.TestUtil;
 
-public class PeriodicTaskTest extends TaskTest{
+public class PeriodicTaskTest extends EventTaskTest{
 	private static final String contant_TestLocation = "place";
 	private static final String contant_TestFrequency = "HOURLY";
 	static PeriodicTask pt;
@@ -22,20 +22,25 @@ public class PeriodicTaskTest extends TaskTest{
 	Date created = null; 
 	String title = "Testing";
 	String location = "Location";
+	String description = "Description";
 	Status status = null;
-	Date dueTime;
-	boolean complete;
-	static Date startTime = new DateTime(1000);
-	static Date endTime = new DateTime(1001);
-	Recur recurrence = null;
+	Date startTime = new DateTime(1000);
+	Date endTime = new DateTime(1001);
+	Recur recurrence = new Recur();
 
+	@Override
+	protected PeriodicTask getConcrete() {
+		return pt;
+	}
+	
 	@Before
 	public void setUp() throws Exception {
-		pt = new PeriodicTask(taskUID, created, status, title, location, startTime, endTime, recurrence);
-		pt.updateDescription(null);
-		recurrence = new Recur();
-		recurrence.setFrequency(contant_TestFrequency);
-		recurrence.setInterval(1);
+		pt = new PeriodicTask(this.taskUID, this.status, this.startTime, this.endTime);
+		pt.updateTitle(this.title);
+		pt.updateDescription(this.description);
+		pt.updateLocation(this.location);
+		pt.updateRecurrence(this.recurrence);
+		pt.updateLastModified(null);
 	}
 
 	@Test 
@@ -43,36 +48,22 @@ public class PeriodicTaskTest extends TaskTest{
 		testPeriodicTaskConstructionOne();
 		testPeriodicTaskConstructionTwo();
 		testPeriodicTaskConstructionThree();
-		testPeriodicTaskConstructionFour();
-		testPeriodicTaskConstructionFive();
 	}
 		
 	public void testPeriodicTaskConstructionOne() throws HandledException {
 		exception.expect(HandledException.class);
-		pt = new PeriodicTask(taskUID, created, status, title, location, null, null, recurrence);
+		pt = new PeriodicTask(this.taskUID, this.status, null, null);
 	}
 	
 	public void testPeriodicTaskConstructionTwo() throws HandledException {
 		exception.expect(HandledException.class);
-		Date startDate = new DateTime (2000);
-		Date endDate = new DateTime(1999);
-		pt = new PeriodicTask(taskUID, created, status, title, location, startDate, endDate, recurrence);
+		DateTime newStartTime = new DateTime(1);
+		DateTime newEndTime = new DateTime(0);
+		pt = new PeriodicTask(this.taskUID, this.status, newStartTime, newEndTime);
 	}
 
 	public void testPeriodicTaskConstructionThree() throws HandledException {
-		pt = new PeriodicTask(taskUID, created, status, title, location, startTime, endTime, null);
-		assertTrue(true);
-	}
-	
-	public void testPeriodicTaskConstructionFour() throws HandledException {
-		Recur recur = new Recur();
-		pt = new PeriodicTask(null, null, status, title, location, startTime, endTime, recur);
-		assertTrue(true);
-	}
-	
-	public void testPeriodicTaskConstructionFive() throws HandledException {
-		Recur recur = new Recur();
-		pt = new PeriodicTask(null, null, new Status(), title, location, startTime, endTime, recur);
+		pt = new PeriodicTask(this.taskUID, this.status, this.startTime, this.endTime);
 		assertTrue(true);
 	}
 	
@@ -156,36 +147,7 @@ public class PeriodicTaskTest extends TaskTest{
 		pt.updateLocation("New Location");
 		assertEquals(pt.matches(keyword), true);
 	}
-	
-	@Test
-	public void testUpdateAndGetStartAndEndTime() throws HandledException {
-		testUpdateAndGetStartAndEndTimeOne();
-		testUpdateAndGetStartAndEndTimeTwo();
-		testUpdateAndGetStartAndEndTimeThree();
-	}
-	
-	public void testUpdateAndGetStartAndEndTimeOne() throws HandledException{
-		exception.expect(HandledException.class);
-		Date date1 = null;
-		Date date2 = null;
-		pt.updateTime(date1, date2);
-	}
-	
-	public void testUpdateAndGetStartAndEndTimeTwo() throws HandledException{
-		exception.expect(HandledException.class);
-		Date date1 = new DateTime(2);
-		Date date2 = new DateTime(1);
-		pt.updateTime(date1, date2);
-	}
-	
-	public void testUpdateAndGetStartAndEndTimeThree() throws HandledException {
-		Date date1 = new DateTime(1);
-		Date date2 = new DateTime(2);
-		pt.updateTime(date1, date2);
-		assertEquals(pt.getStartTime(), date1);
-		assertEquals(pt.getEndTime(), date2);
-	
-	}
+
 	@Test
 	public void testUpdateTimeFromRecur() throws HandledException {
 		PeriodicTask pt2 = pt.updateTimeFromRecur();
@@ -202,25 +164,7 @@ public class PeriodicTaskTest extends TaskTest{
 		assertTrue(TestUtil.compareTasks(pt, pt2));	
 	}
 
-	@Test
-	public void testUpdateAndGetTaskID() {
-		testUpdateAndGetTaskID(pt);
-	}
 
-	@Test
-	public void testUpdateAndGetTitle() throws HandledException {
-		testUpdateAndGetTitle(pt);
-	}
-
-	@Test
-	public void testUpdateAndGetDescription() {
-		testUpdateAndGetDescription(pt);
-	}
-
-	@Test
-	public void testUpdateAndGetLastModified() {
-		testUpdateAndGetLastModified(pt);
-	}
 
 	@Test
 	public void testCompareTo() throws HandledException {

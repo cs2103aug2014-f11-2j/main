@@ -46,15 +46,15 @@ public class FloatingTaskTest extends ToDoTaskTest {
 	
 	@Test
 	public void testConvert() throws HandledException {
-		testConvertOne();
+		testConvertException();
 		testConvertToFloating();
 		testConvertToDeadline();
 		testConvertToPeriodic();
 	}
 	
-	private void testConvertOne() throws HandledException {
+	private void testConvertException() throws HandledException {
 		exception.expect(HandledException.class);
-		Date[] time=null;
+		DateTime[] time = null;
 		ft.convert(time);	
 	}
 
@@ -65,7 +65,7 @@ public class FloatingTaskTest extends ToDoTaskTest {
 		Task ft2 = ft.convert(time);
 		assertTrue(ft2 instanceof FloatingTask);
 		
-		Task taskExpected = new FloatingTask(null, null);
+		FloatingTask taskExpected = new FloatingTask(null, ft.getStatus());
 		taskExpected.updateTitle(ft.getTitle());
 		taskExpected.updateDescription(ft.getDescription());
 		taskExpected.updateLastModified(ft.getLastModified());
@@ -80,7 +80,7 @@ public class FloatingTaskTest extends ToDoTaskTest {
 		Task ft2 = ft.convert(time);
 		assertTrue(ft2 instanceof DeadlineTask);
 		
-		Task taskExpected = new DeadlineTask(null, null, time[0]);
+		DeadlineTask taskExpected = new DeadlineTask(null, null, time[0]);
 		taskExpected.updateTitle(ft.getTitle());
 		taskExpected.updateDescription(ft.getDescription());
 		taskExpected.updateLastModified(ft.getLastModified());
@@ -95,11 +95,9 @@ public class FloatingTaskTest extends ToDoTaskTest {
 		Task ft2 = ft.convert(time);
 		assertTrue(ft2 instanceof PeriodicTask);
 		
-		Task taskExpected = new PeriodicTask(null, null, time[0], time[1]);
+		PeriodicTask taskExpected = new PeriodicTask(null, null, time[0], time[1]);
 		taskExpected.updateTitle(ft.getTitle());
 		taskExpected.updateDescription(ft.getDescription());
-		ft.updateLocation(this.location);
-		ft.updateRecurrence(this.recurrence);
 		taskExpected.updateLastModified(ft.getLastModified());
 		taskExpected.updateCompleted(ft.getCompleted());
 		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
