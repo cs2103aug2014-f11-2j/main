@@ -39,15 +39,6 @@ public class CommonUtil {
 		}
 	}
 	
-	public static String deleteLastChar(StringBuffer sb){
-		if (sb.length() > 0){
-			sb.deleteCharAt(sb.length() - 1);
-			return sb.toString();
-		} else {
-			return null;
-		}
-	}
-	
 	public static void checkNull(Object obj, HandledException.ExceptionType expectedException) throws HandledException{
 		if (obj == null) throw new HandledException(expectedException);
 	}
@@ -73,13 +64,13 @@ public class CommonUtil {
 	
 	public static void print(Ansi feedback) {
 		if (feedback != null){
-			AnsiConsole.out.println(feedback.reset());
+			AnsiConsole.out.print(feedback.reset());
 		}
 	}
 	
 	public static void printErrMsg(String errorMsg){
 		if (errorMsg != null && !errorMsg.isEmpty()){
-			print(ansi().fg(RED).a(errorMsg).reset());
+			print(ansi().fgBright(RED).a(errorMsg).a('\n').reset());
 		}
 	}
 	

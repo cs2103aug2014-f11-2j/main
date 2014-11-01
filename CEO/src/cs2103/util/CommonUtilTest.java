@@ -51,22 +51,6 @@ public class CommonUtilTest {
 		
 		CommonUtil.parseIntegerParameter(null);
 	}
-
-	@Test
-	public void testDeleteLastChar() {
-		StringBuffer testBuffer = new StringBuffer("testing");
-		String test = CommonUtil.deleteLastChar(testBuffer);
-		assertEquals(test, "testin");
-		
-		StringBuffer testEmpty = new StringBuffer("");
-		String test1 = CommonUtil.deleteLastChar(testEmpty);
-		assertNull(test1);
-		
-		StringBuffer testNum = new StringBuffer("123");
-		String test2 = CommonUtil.deleteLastChar(testNum);
-		assertEquals(test2, "12");
-		
-	}
 	
 	@Test(expected = HandledException.class)
 	public void testRemoveDash() throws HandledException {

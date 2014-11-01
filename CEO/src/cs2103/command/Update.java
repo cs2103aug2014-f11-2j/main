@@ -22,7 +22,7 @@ import cs2103.util.CommonUtil;
 
 public class Update extends InfluentialCommand {
 	private static final String MESSAGE_UPDATE = "You have updated task with ID %1$d\n";
-	private static final String MESSAGE_UPDATE_FAIL = "Fail to update task with ID %1$d";
+	private static final String MESSAGE_UPDATE_FAIL = "Fail to update task with ID %1$d\n";
 	private Task target;
 	
 	public Update(String command) throws HandledException, FatalException{

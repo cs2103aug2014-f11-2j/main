@@ -15,8 +15,8 @@ import cs2103.util.CommonUtil;
 
 public class Mark extends InfluentialCommand {
 	private static final String MESSAGE_MARK = "Successfully marked task %1$d as completed\n";
-	private static final String MESSAGE_MARK_FAILED = "Failed to mark task %1$d as completed";
-	private static final String MESSAGE_MARK_NOTSUPPORTED = "Task %1$d does not support mark operation";
+	private static final String MESSAGE_MARK_FAILED = "Failed to mark task %1$d as completed\n";
+	private static final String MESSAGE_MARK_NOTSUPPORTED = "Task %1$d does not support mark operation\n";
 	private Task target;
 	
 	public Mark(String command) throws HandledException, FatalException{

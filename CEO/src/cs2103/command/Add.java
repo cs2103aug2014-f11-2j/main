@@ -23,7 +23,7 @@ import cs2103.util.CommonUtil;
 
 public class Add extends InfluentialCommand {
 	private static final Ansi MESSAGE_ADD = ansi().fg(GREEN).a("You have successfully added a new task.\n").reset();
-	private static final Ansi MESSAGE_ADD_FAIL = ansi().fg(GREEN).a("Fail to add a new task.").reset();
+	private static final Ansi MESSAGE_ADD_FAIL = ansi().fg(GREEN).a("Fail to add a new task.\n").reset();
 	private static final String[] allowedQuickTimeLiteral = {"from", "by", "on", "in", "at"};
 	
 	public Add(String command) throws HandledException{

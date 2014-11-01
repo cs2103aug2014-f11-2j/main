@@ -12,7 +12,7 @@ import cs2103.util.CommonUtil;
 
 public class Restore extends InfluentialCommand {
 	private static final String MESSAGE_RESTORE = "You have successfully restored a task with ID %1$d\n";
-	private static final String MESSAGE_RESTORE_FAIL = "Failed to restor the task with ID %1$d";
+	private static final String MESSAGE_RESTORE_FAIL = "Failed to restor the task with ID %1$d\n";
 	private Task target;
 	
 	public Restore(String command) throws HandledException, FatalException {

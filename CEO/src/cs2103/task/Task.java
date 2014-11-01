@@ -122,7 +122,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	
 	protected Ansi addCommonString(){
 		Ansi returnString = ansi().fg(YELLOW).a(this.getTaskID()).a(". ").reset();
-		returnString.a(this.getTitle()).bold().a('\n').boldOff().reset();
+		returnString.bold().a(this.getTitle()).a('\n').boldOff().reset();
 		if (this.isDeleted()) returnString.a(DELETED);
 		return returnString;
 	}

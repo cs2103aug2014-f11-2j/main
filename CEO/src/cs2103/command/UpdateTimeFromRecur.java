@@ -12,7 +12,7 @@ import cs2103.task.PeriodicTask;
 import cs2103.task.Task;
 
 public class UpdateTimeFromRecur extends InfluentialCommand {
-	private static final String MESSAGE_UPDATE_RECUR_TIME_FORMAT = "Successfully updated %1$d recurring tasks";
+	private static final String MESSAGE_UPDATE_RECUR_TIME_FORMAT = "Successfully updated %1$d recurring tasks\n";
 	
 	@Override
 	public Ansi execute() throws HandledException, FatalException {

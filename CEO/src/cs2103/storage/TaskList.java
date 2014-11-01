@@ -23,10 +23,10 @@ public class TaskList {
 	private final File dataFile;
 	private GoogleEngine google;
 	private ArrayList<Task> tasks;
-	private static final String SYNCING = "Syncing with Google, please wait for a while";
+	private static final String SYNCING = "Syncing with Google, please wait for a while\n";
 	private static final String COMMIT_ERROR = "Some error occurred when commit changes to Google";
-	private static final String SYNC_FROM_GOOGLE = "Downloaded %1$d tasks from Google";
-	private static final String SYNC_TO_GOOGLE = "Uploaded %1$d tasks to Google";
+	private static final String SYNC_FROM_GOOGLE = "Downloaded %1$d tasks from Google\n";
+	private static final String SYNC_TO_GOOGLE = "Uploaded %1$d tasks to Google\n";
 	private static final String SYNC_FAIL = "Unable to sync your data with Google, Google Sync is disabled";
 	
 	private TaskList(Option option) throws FatalException, HandledException{

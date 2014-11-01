@@ -15,7 +15,7 @@ public abstract class QueryCommand extends Command {
 		} else {
 			Ansi returnString = ansi();
 			for (Task task:taskList){
-				returnString.a(task.toSummary());
+				returnString.a(task.toSummary()).a('\n');
 			}
 			return returnString;
 		}

@@ -15,8 +15,8 @@ import cs2103.task.Task;
 import cs2103.util.CommonUtil;
 
 public class Delete extends InfluentialCommand {
-	private static final String MESSAGE_DELETE = "You have moved task with ID %1$d to trash";
-	private static final String MESSAGE_PERMANENTLY_DELETE = "You have permanently deleted task with ID %1$d";
+	private static final String MESSAGE_DELETE = "You have moved task with ID %1$d to trash\n";
+	private static final String MESSAGE_PERMANENTLY_DELETE = "You have permanently deleted task with ID %1$d\n";
 	private Task target;
 	
 	public Delete(String command) throws HandledException, FatalException{
