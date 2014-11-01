@@ -103,7 +103,7 @@ public class DeadlineTask extends ToDoTask {
 		if (this.checkAlert()){
 			returnString.fg(RED);
 		} else {
-			returnString.fg(GREEN);
+			returnString.fgBright(GREEN);
 		}
 		returnString.a(format.format(date)).reset();
 		return returnString;
