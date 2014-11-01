@@ -121,7 +121,7 @@ public abstract class EventTask extends Task {
 		Ansi returnString = ansi();
 		DateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm a");
 		if (this.checkAlert()){
-			returnString.fgBright(RED);
+			returnString.fg(RED).bold();
 		} else {
 			returnString.fg(GREEN);
 		}
