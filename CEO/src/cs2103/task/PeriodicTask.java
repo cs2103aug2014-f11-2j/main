@@ -109,9 +109,10 @@ public class PeriodicTask extends EventTask {
 		returnString.a("From: ");
 		returnString.a(this.dateToString(this.getStartTime()));
 		returnString.a(" to ");
-		returnString.a(this.dateToString(this.getEndTime())).a('\n').reset();
+		returnString.a(this.dateToString(this.getEndTime())).reset();
+		returnString.a('\n');
 		if (this.getRecurrence() != null){
-			returnString.a(recurToString(this.getRecurrence()));
+			returnString.a(recurToString(this.getRecurrence())).a('\n');
 		}
 		return returnString;
 	}
@@ -122,7 +123,7 @@ public class PeriodicTask extends EventTask {
 		returnString.a(STRING_LOCATION);
 		returnString.fg(CYAN).a(this.getLocation()).a("\n").reset();
 		returnString.a(STRING_DESCRIPTION).a(this.getDescription()).reset();
-		return returnString;
+		return returnString.a('\n');
 	}
 	
 	private static Ansi recurToString(Recur recur){

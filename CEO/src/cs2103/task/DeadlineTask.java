@@ -95,7 +95,7 @@ public class DeadlineTask extends ToDoTask {
 		Ansi returnString = this.addCommonString();
 		returnString.a("Status: ").a(completedToString(this.getCompleted()));
 		returnString.a("\tDue At: ").a(this.dateToString(this.getDueTime()));
-		return returnString;
+		return returnString.a('\n');
 	}
 	
 	protected Ansi dateToString(Date date){
