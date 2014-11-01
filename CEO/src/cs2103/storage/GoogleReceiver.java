@@ -79,11 +79,11 @@ public class GoogleReceiver {
 	private void onAuthorization(AuthorizationCodeRequestUrl authorizationUrl) throws IOException{
 	    String url = authorizationUrl.build();
 	    Preconditions.checkNotNull(url);
-	    CommonUtil.print("Please open the following address in your browser:");
-	    CommonUtil.print(url);
+	    CommonUtil.print("Please open the following address in your browser:\n");
+	    CommonUtil.print(url + "\n");
 	    if (CommonUtil.checkSyncSupport()){
 	    	Desktop desktop = Desktop.getDesktop();
-	    	CommonUtil.print("Attempting to open that address in the default browser now...");
+	    	CommonUtil.print("Attempting to open that address in the default browser now...\n");
 	    	desktop.browse(URI.create(url));
 	    } else {
 	    	throw new IOException("Login failed");

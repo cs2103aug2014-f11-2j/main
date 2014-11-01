@@ -40,19 +40,22 @@ public class CommandLineUI {
 		redoStack = new Stack<InfluentialCommand>();
 		option = this.verifyOption(option);
 		this.taskList = TaskList.getInstance(option);
+		Ansi welcomeMsg;
 		switch(option.getValue()){
 		default:
 		case SYNC:
 		case DEFAULT:
-			CommonUtil.print(ansi().fg(GREEN).a(String.format(MESSAGE_WELCOME_FORMAT, MESSAGE_SYNC_ENABLED)).reset());
+			welcomeMsg = ansi().fg(GREEN).a(String.format(MESSAGE_WELCOME_FORMAT, MESSAGE_SYNC_ENABLED));
 			break;
 		case NOSYNC:
-			CommonUtil.print(ansi().fg(RED).a(String.format(MESSAGE_WELCOME_FORMAT, MESSAGE_SYNC_DISABLED)).reset());
+			welcomeMsg = ansi().fg(RED).a(String.format(MESSAGE_WELCOME_FORMAT, MESSAGE_SYNC_DISABLED));
 			break;
 		case TEST:
-			CommonUtil.print(String.format(MESSAGE_WELCOME_FORMAT, MESSAGE_TEST_MODE));
+			welcomeMsg = ansi().a(String.format(MESSAGE_WELCOME_FORMAT, MESSAGE_TEST_MODE));
 			break;
 		}
+		CommonUtil.print(welcomeMsg.a('\n').reset());
+		
 	}
 	
 	public static CommandLineUI getInstance(Option option) throws HandledException, FatalException{
