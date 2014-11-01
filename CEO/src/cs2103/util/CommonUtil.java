@@ -79,7 +79,7 @@ public class CommonUtil {
 	
 	public static void printErrMsg(String errorMsg){
 		if (errorMsg != null && !errorMsg.isEmpty()){
-			print(ansi().fg(RED).a(errorMsg));
+			print(ansi().fg(RED).a(errorMsg).reset());
 		}
 	}
 	

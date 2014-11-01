@@ -44,27 +44,20 @@ public class Add extends InfluentialCommand {
 	public Ansi execute() throws HandledException, FatalException {
 		Task task;
 		Date[] time = getTime(this.parameterList.getTime());
-		String title = this.parameterList.getTitle() == null ? null : this.parameterList.getTitle().getValue();
-		String description = this.parameterList.getDescription() == null ? null : this.parameterList.getDescription().getValue();
-		String location = this.parameterList.getLocation() == null? null : this.parameterList.getLocation().getValue();
-		Recur recurrence = this.parameterList.getRecurrence() == null ? null : this.parameterList.getRecurrence().getValue();
 		if (time[0] == null){
-			task = new FloatingTask(null, null, null, title, null);
+			task = new FloatingTask(null, null);
 		} else if (time[1] == null){
-			task = new DeadlineTask(null, null, null, title, time[0], null);
+			task = new DeadlineTask(null, null, time[0]);
 		} else {
-			task = new PeriodicTask(null, null, null, title, location, time[0], time[1], recurrence);
+			task = new PeriodicTask(null, null, time[0], time[1]);
 		}
-		task.updateDescription(description);
+		task.updateTitle(this.readTitle());
+		task.updateDescription(this.readDescription());
+		task.updateLocation(this.readLocation());
+		task.updateRecurrence(this.readRecurrence());
 		task.updateLastModified(null);
 		task = TaskList.getInstance().addTask(task);
-		if (task == null){
-			return MESSAGE_ADD_FAIL;
-		} else {
-			this.undoBackup = task;
-			this.redoBackup = task;
-			return MESSAGE_ADD.a(task.toDetail());
-		}
+		return this.formatReturnString(task);
 	}
 	
 	private static ArrayList<Parameter> parseQuickAdd(String quickAddString) throws HandledException{
@@ -75,15 +68,9 @@ public class Add extends InfluentialCommand {
 			if (timeIndex > 0) break;
 		}
 		int everyIndex = quickAddString.lastIndexOf("every");
-		if (timeIndex > 0 && everyIndex < timeIndex){
-			Time time = parseQuickTime(quickAddString.substring(timeIndex));
-			if (time == null){
-				parameterList.add(Title.parse(quickAddString));
-			} else {
-				parameterList.add(Title.parse(quickAddString.substring(0, timeIndex)));
-				parameterList.add(time);
-			}
-		} else if (timeIndex > 0 && everyIndex > timeIndex){
+		if (timeIndex < 0) {
+			parameterList.add(Title.parse(quickAddString));
+		} else if (everyIndex > timeIndex){
 			Time time = parseQuickTime(quickAddString.substring(timeIndex, everyIndex));
 			if (time == null){
 				parameterList.add(Title.parse(quickAddString));
@@ -93,7 +80,13 @@ public class Add extends InfluentialCommand {
 				parameterList.add(Recurrence.parse(quickAddString.substring(everyIndex)));
 			}
 		} else {
-			parameterList.add(Title.parse(quickAddString));
+			Time time = parseQuickTime(quickAddString.substring(timeIndex));
+			if (time == null){
+				parameterList.add(Title.parse(quickAddString));
+			} else {
+				parameterList.add(Title.parse(quickAddString.substring(0, timeIndex)));
+				parameterList.add(time);
+			}
 		}
 		return parameterList;
 	}
@@ -112,10 +105,49 @@ public class Add extends InfluentialCommand {
 		if (timeParameter == null){
 			return new Date[2];
 		} else {
-			for (Date date:timeParameter.getValue()){
-				System.out.println(date);
-			}
 			return timeParameter.getValue();
+		}
+	}
+	
+	private Ansi formatReturnString(Task task){
+		if (task == null){
+			return MESSAGE_ADD_FAIL;
+		} else {
+			this.undoBackup = task;
+			this.redoBackup = task;
+			return MESSAGE_ADD.a(task.toDetail());
+		}
+	}
+	
+	private String readTitle() throws HandledException{
+		if (this.parameterList.getTitle() == null){
+			return null;
+		} else {
+			return this.parameterList.getTitle().getValue();
+		}
+	}
+	
+	private String readDescription() throws HandledException{
+		if (this.parameterList.getDescription() == null){
+			return null;
+		} else {
+			return this.parameterList.getDescription().getValue();
+		}
+	}
+	
+	private String readLocation() throws HandledException{
+		if (this.parameterList.getLocation() == null){
+			return null;
+		} else {
+			return this.parameterList.getLocation().getValue();
+		}
+	}
+	
+	private Recur readRecurrence() throws HandledException{
+		if (this.parameterList.getRecurrence() == null){
+			return null;
+		} else {
+			return this.parameterList.getRecurrence().getValue();
 		}
 	}
 	

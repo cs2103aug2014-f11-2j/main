@@ -134,12 +134,15 @@ public class GoogleEngine{
 	
 	private Task parseGTask(com.google.api.services.tasks.model.Task gTask) throws HandledException{
 		CommonUtil.checkNull(gTask, HandledException.ExceptionType.INVALID_TASK_OBJ);
-		Task task;
+		ToDoTask task;
 		if (gTask.getDue() == null){
-			task = new FloatingTask(gTask.getId(), this.readLastModified(gTask), this.readStatus(gTask), gTask.getTitle(), this.readCompleted(gTask));
+			task = new FloatingTask(gTask.getId(), this.readStatus(gTask));
 		} else {
-			task = new DeadlineTask(gTask.getId(), this.readLastModified(gTask), this.readStatus(gTask), gTask.getTitle(), new Date(gTask.getDue().getValue()), this.readCompleted(gTask));
+			task = new DeadlineTask(gTask.getId(), this.readStatus(gTask), new Date(gTask.getDue().getValue()));
 		}
+		task.updateTitle(gTask.getTitle());
+		task.updateCreated(this.readLastModified(gTask));
+		task.updateCompleted(this.readCompleted(gTask));
 		task.updateDescription(gTask.getNotes());
 		task.updateLastModified(this.readLastModified(gTask));
 		return task;
@@ -148,7 +151,11 @@ public class GoogleEngine{
 	private Task parseGEvent(com.google.api.services.calendar.model.Event gEvent) throws HandledException{
 		CommonUtil.checkNull(gEvent, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		Date[] time = this.readTime(gEvent);
-		Task task = new PeriodicTask(gEvent.getId(), this.readCreated(gEvent), this.readStatus(gEvent), gEvent.getSummary(), gEvent.getLocation(), time[0], time[1], this.readRecurrence(gEvent));
+		PeriodicTask task = new PeriodicTask(gEvent.getId(), this.readStatus(gEvent), time[0], time[1]);
+		task.updateTitle(gEvent.getSummary());
+		task.updateCreated(this.readCreated(gEvent));
+		task.updateLocation(gEvent.getLocation());
+		task.updateRecurrence(this.readRecurrence(gEvent));
 		task.updateDescription(gEvent.getDescription());
 		task.updateLastModified(readLastModified(gEvent));
 		return task;

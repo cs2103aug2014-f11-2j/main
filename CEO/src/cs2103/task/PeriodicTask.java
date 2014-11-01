@@ -24,10 +24,8 @@ public class PeriodicTask extends EventTask {
 	private static final String STRING_LOCATION = "Location: ";
 	private static final String STRING_RECUR = "Recurrence: ";
 	
-	public PeriodicTask(String taskUID, Date created, Status status, String title, String location, Date startTime, Date endTime, Recur recurrence) throws HandledException {
-		super(taskUID, created, status, title, startTime, endTime);
-		this.updateLocation(location);
-		this.updateRecurrence(recurrence);
+	public PeriodicTask(String taskUID, Status status, Date startTime, Date endTime) throws HandledException {
+		super(taskUID, status, startTime, endTime);
 	}
 	
 	public String getLocation(){
@@ -63,19 +61,27 @@ public class PeriodicTask extends EventTask {
 	}
 	
 	private FloatingTask toFloating() throws HandledException {
-		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), Status.VTODO_NEEDS_ACTION, this.getTitle(), null);
+		FloatingTask newTask = new FloatingTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION);
+		newTask.updateTitle(this.getTitle());
+		newTask.updateCreated(this.getCreated());
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
 
 	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
-		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getCreated(), Status.VTODO_NEEDS_ACTION, this.getTitle(), dueTime, null);
+		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION, dueTime);
+		newTask.updateTitle(this.getTitle());
+		newTask.updateCreated(this.getCreated());
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
 
 	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
-		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getCreated(), this.getStatus(), this.getTitle(), this.getLocation(), startTime, endTime, this.getRecurrence());
+		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getStatus(), startTime, endTime);
+		newTask.updateTitle(this.getTitle());
+		newTask.updateCreated(this.getCreated());
+		newTask.updateLocation(this.getLocation());
+		newTask.updateRecurrence(this.getRecurrence());
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
@@ -83,7 +89,11 @@ public class PeriodicTask extends EventTask {
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		try {
-			PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getCreated(), this.getStatus(), this.getTitle(), this.getLocation(), this.getStartTime(), this.getEndTime(), this.getRecurrence());
+			PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getStatus(), this.getStartTime(), this.getEndTime());
+			newTask.updateTitle(this.getTitle());
+			newTask.updateCreated(this.getCreated());
+			newTask.updateLocation(this.getLocation());
+			newTask.updateRecurrence(this.getRecurrence());
 			newTask.updateDescription(this.getDescription());
 			newTask.updateLastModified(null);
 			return newTask;

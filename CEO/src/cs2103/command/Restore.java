@@ -45,14 +45,16 @@ public class Restore extends InfluentialCommand {
 	@Override
 	public Ansi execute() throws HandledException, FatalException {
 		CommonUtil.checkNull(this.target, HandledException.ExceptionType.INVALID_TASK_OBJ);
+		Ansi returnString = ansi();
 		this.target.restore();
 		this.target = TaskList.getInstance().updateTask(this.target);
 		if (this.target == null){
-			return ansi().fg(RED).a(String.format(MESSAGE_RESTORE_FAIL, parameterList.getTaskID().getValue())).reset();
+			return returnString.fg(RED).a(String.format(MESSAGE_RESTORE_FAIL, parameterList.getTaskID().getValue())).reset();
 		} else {
 			this.undoBackup = this.target;
 			this.redoBackup = this.target;
-			return ansi().fg(GREEN).a(String.format(MESSAGE_RESTORE, parameterList.getTaskID().getValue())).reset().a(this.target.toDetail());
+			returnString.fg(GREEN).a(String.format(MESSAGE_RESTORE, parameterList.getTaskID().getValue())).reset();
+			return returnString.a(this.target.toDetail());
 		}
 	}
 }

@@ -15,6 +15,7 @@ import cs2103.task.DeadlineTask;
 import cs2103.task.FloatingTask;
 import cs2103.task.PeriodicTask;
 import cs2103.task.Task;
+import cs2103.task.ToDoTask;
 
 import java.util.Collections;
 
@@ -31,6 +32,7 @@ import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.Created;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Version;
@@ -150,44 +152,65 @@ public class StorageEngine implements StorageInterface{
 	}
 	
 	private Task parseVEvent(VEvent component) throws ParseException, FatalException, HandledException{
-		Task task;
-		String componentUID = component.getUid() == null? null:component.getUid().getValue();
-		Date componentCreated = component.getCreated() == null? new Date():component.getCreated().getDateTime();
-		String componentTitle = readTitle(component);
-		Date componentStartTime;
-		Date componentEndTime;
-		if (component.getStartDate() == null || component.getEndDate() == null){
-			throw new FatalException(FatalException.ExceptionType.ILLEGAL_FILE);
-		}else{
-			componentStartTime = component.getStartDate().getDate();
-			componentEndTime = component.getEndDate().getDate();
-		}
-		String componentLocation = readLocation(component);
-		Recur componentRecurrence = readRecur(component);
-		task = new PeriodicTask(componentUID, componentCreated, component.getStatus(), componentTitle, componentLocation, componentStartTime, componentEndTime, componentRecurrence);
+		String componentUID = this.readUid(component);
+		Date componentCreated = this.readCreated(component);
+		Date[] componentPeriod = this.readPeriod(component);
+		PeriodicTask task = new PeriodicTask(componentUID, component.getStatus(), componentPeriod[0], componentPeriod[1]);
+		task.updateCreated(componentCreated);
+		task.updateTitle(this.readTitle(component));
+		task.updateLocation(this.readLocation(component));
+		task.updateRecurrence(this.readRecur(component));
 		task.updateDescription(readDescription(component));
 		task.updateLastModified(component.getLastModified() == null? new Date():component.getLastModified().getDateTime());
 		return task;
 	}
 	
 	private Task parseVToDo(VToDo component) throws ParseException, HandledException, FatalException{
-		Task task;
-		String componentUID = component.getUid() == null? null:component.getUid().getValue();
-		Date componentCreated = component.getCreated() == null? new Date():component.getCreated().getDateTime();
-		String componentTitle = readTitle(component);
+		ToDoTask task;
+		String componentUID = this.readUid(component);
 		if (component.getDue() == null){
-			task = new FloatingTask(componentUID, componentCreated, component.getStatus(), componentTitle, readCompleted(component));
+			task = new FloatingTask(componentUID, component.getStatus());
 		}else{
-			task = new DeadlineTask(componentUID, componentCreated, component.getStatus(), componentTitle, component.getDue().getDate(), readCompleted(component));
+			task = new DeadlineTask(componentUID, component.getStatus(), component.getDue().getDate());
 		}
+		task.updateTitle(this.readTitle(component));
+		task.updateCreated(this.readCreated(component));
 		task.updateDescription(readDescription(component));
+		task.updateCompleted(this.readCompleted(component));
 		task.updateLastModified(component.getLastModified() == null?null:component.getLastModified().getDateTime());
 		return task;
 	}
 	
-	private String readTitle(Component component) throws FatalException{
-		if (component.getProperty(Property.SUMMARY) == null){
+	private Date[] readPeriod(VEvent component) throws FatalException{
+		if (component.getStartDate() == null || component.getEndDate() == null){
 			throw new FatalException(FatalException.ExceptionType.ILLEGAL_FILE);
+		}else{
+			Date[] period = new Date[2];
+			period[0] = component.getStartDate().getDate();
+			period[1] = component.getEndDate().getDate();
+			return period;
+		}
+	}
+	
+	private Date readCreated(Component component) {
+		if (component.getProperty(Property.CREATED) == null){
+			return null;
+		} else {
+			return ((Created) component.getProperty(Property.CREATED)).getDateTime();
+		}
+	}
+	
+	private String readUid(Component component){
+		if (component.getProperty(Property.UID) == null){
+			return null;
+		}else{
+			return component.getProperty(Property.UID).getValue();
+		}
+	}
+	
+	private String readTitle(Component component) {
+		if (component.getProperty(Property.SUMMARY) == null){
+			return "";
 		}else{
 			return component.getProperty(Property.SUMMARY).getValue();
 		}

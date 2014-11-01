@@ -17,8 +17,8 @@ public abstract class EventTask extends Task {
 	
 	private static final long YEAR_IN_MILLIS = 31556952000L;
 
-	public EventTask(String taskUID, Date created, Status status, String title, Date startTime, Date endTime) throws HandledException {
-		super(taskUID, created, title);
+	public EventTask(String taskUID, Status status, Date startTime, Date endTime) throws HandledException {
+		super(taskUID);
 		this.updateTime(startTime, endTime);
 		this.updateStatus(status);
 	}
@@ -31,7 +31,7 @@ public abstract class EventTask extends Task {
 		return this.endTime;
 	}
 	
-	public void updateTime(Date startTime, Date endTime) throws HandledException{
+	protected void updateTime(Date startTime, Date endTime) throws HandledException{
 		if (startTime == null || endTime == null){
 			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
 		} else if (startTime.after(endTime)){

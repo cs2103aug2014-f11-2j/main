@@ -34,13 +34,7 @@ public class Mark extends InfluentialCommand {
 			Task newTask = cloneTask(this.target);
 			newTask.updateCompleted(new Date());
 			newTask = TaskList.getInstance().updateTask(newTask);
-			if (newTask == null){
-				return ansi().fg(RED).a(String.format(MESSAGE_MARK_FAILED, this.parameterList.getTaskID().getValue())).reset();
-			} else {
-				this.undoBackup = this.target;
-				this.redoBackup = newTask;
-				return ansi().fg(GREEN).a(String.format(MESSAGE_MARK, this.parameterList.getTaskID().getValue())).reset().a(newTask.toDetail());
-			}
+			return this.formatReturnString(newTask);
 		}
 	}
 	
@@ -53,6 +47,17 @@ public class Mark extends InfluentialCommand {
 		}
 	}
 	
+	private Ansi formatReturnString(Task newTask) throws HandledException{
+		Ansi returnString = ansi();
+		if (newTask == null){
+			return returnString.fg(RED).a(String.format(MESSAGE_MARK_FAILED, this.parameterList.getTaskID().getValue())).reset();
+		} else {
+			this.undoBackup = this.target;
+			this.redoBackup = newTask;
+			returnString.fg(GREEN).a(String.format(MESSAGE_MARK, this.parameterList.getTaskID().getValue())).reset();
+			return returnString.a(newTask.toDetail());
+		}
+	}
 
 	@Override
 	public InfluentialCommand undo() throws HandledException, FatalException {

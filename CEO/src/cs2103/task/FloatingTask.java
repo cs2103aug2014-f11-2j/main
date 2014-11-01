@@ -10,8 +10,8 @@ import net.fortuna.ical4j.model.property.Status;
 
 public class FloatingTask extends ToDoTask {
 	
-	public FloatingTask(String taskUID, Date created, Status status, String title, Date completed) {
-		super(taskUID, created, status, title, completed);
+	public FloatingTask(String taskUID, Status status) {
+		super(taskUID, status);
 	}
 	
 	@Override
@@ -27,26 +27,37 @@ public class FloatingTask extends ToDoTask {
 	}
 	
 	private FloatingTask toFloating() throws HandledException {
-		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getStatus(), this.getTitle(), this.getCompleted());
+		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getStatus());
+		newTask.updateTitle(this.getTitle());
+		newTask.updateCreated(this.getCreated());
+		newTask.updateCompleted(this.getCompleted());
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
 
 	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
-		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getCreated(), Status.VTODO_NEEDS_ACTION, this.getTitle(), dueTime, this.getCompleted());
+		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION, dueTime);
+		newTask.updateTitle(this.getTitle());
+		newTask.updateCreated(this.getCreated());
+		newTask.updateCompleted(this.getCompleted());
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
 
 	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
-		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getCreated(), Status.VEVENT_CONFIRMED, this.getTitle(), null, startTime, endTime, null);
+		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), Status.VEVENT_CONFIRMED, startTime, endTime);
+		newTask.updateTitle(this.getTitle());
+		newTask.updateCreated(this.getCreated());
 		newTask.updateDescription(this.getDescription());
 		return newTask;
 	}
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getCreated(), this.getStatus(), this.getTitle(), this.getCompleted());
+		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getStatus());
+		newTask.updateTitle(this.getTitle());
+		newTask.updateCreated(this.getCreated());
+		newTask.updateCompleted(this.getCompleted());
 		newTask.updateDescription(this.getDescription());
 		newTask.updateLastModified(null);
 		return newTask;

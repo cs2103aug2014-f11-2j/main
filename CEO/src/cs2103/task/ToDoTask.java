@@ -18,9 +18,8 @@ import net.fortuna.ical4j.model.property.Status;
 public abstract class ToDoTask extends Task {
 	private DateTime completed;
 	
-	public ToDoTask(String taskUID, Date created, Status status, String title, Date completed) {
-		super(taskUID, created, title);
-		this.updateCompleted(completed);
+	public ToDoTask(String taskUID, Status status) {
+		super(taskUID);
 		this.updateStatus(status);
 	}
 	

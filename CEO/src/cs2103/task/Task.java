@@ -31,14 +31,12 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	protected static final long DAY_IN_MILLIS = 86400000L;
 	protected static final Ansi DELETED = ansi().fg(MAGENTA).a("(Deleted Task)\n").reset();
 	
-	public Task(String taskUID, Date created, String title) {
-		this.updateTitle(title);
+	public Task(String taskUID) {
 		if (taskUID == null){
 			this.taskUID = this.generateUid();
 		} else {
 			this.taskUID = taskUID;
 		}
-		this.updateCreated(created);
 	}
 	
 	private String generateUid(){
@@ -55,6 +53,9 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	}
 	
 	public String getTitle(){
+		if (this.title == null){
+			this.title = "";
+		}
 		return this.title;
 	}
 	
@@ -66,6 +67,9 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	}
 	
 	public DateTime getCreated(){
+		if (this.created == null){
+			this.created = new DateTime();
+		}
 		return this.created;
 	}
 	
@@ -81,21 +85,11 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	}
 	
 	public void updateTitle(String title) {
-		if (title == null){
-			this.title = "";
-		} else {
-			this.title = title;
-		}
-		this.updateLastModified(null);
+		this.title = title;
 	}
 	
 	public void updateDescription(String description){
-		if (description == null){
-			this.description = "";
-		} else {
-			this.description = description;
-		}
-		this.updateLastModified(null);
+		this.description = description;
 	}
 	
 	public void updateLastModified(Date date){
@@ -127,7 +121,8 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	}
 	
 	protected Ansi addCommonString(){
-		Ansi returnString = ansi().a(this.getTaskID()).a(". ").fg(YELLOW).a(this.getTitle()).a('\n').reset();
+		Ansi returnString = ansi().fg(YELLOW).a(this.getTaskID()).a(". ").reset();
+		returnString.a(this.getTitle()).bold().a('\n').boldOff().reset();
 		if (this.isDeleted()) returnString.a(DELETED);
 		return returnString;
 	}

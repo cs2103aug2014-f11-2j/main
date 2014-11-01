@@ -19,10 +19,10 @@ public class Show extends QueryCommand {
 	@Override
 	public Ansi execute() throws HandledException, FatalException {
 		CommonUtil.checkNull(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_CMD);
-		return formatShowDetail(TaskList.getInstance().getTaskByID(parameterList.getTaskID().getValue()));
+		return formatReturnString(TaskList.getInstance().getTaskByID(parameterList.getTaskID().getValue()));
 	}
 	
-	private Ansi formatShowDetail(Task task) throws HandledException{
+	private Ansi formatReturnString(Task task) throws HandledException{
 		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		Ansi returnString = ansi().a(String.format(MESSAGE_SHOW_FORMAT, task.getTaskID()));
 		returnString.a(task.toDetail());

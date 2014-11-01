@@ -66,13 +66,7 @@ public class Update extends InfluentialCommand {
 			newTask.updateRecurrence(this.parameterList.getRecurrence().getValue());
 		}
 		newTask = TaskList.getInstance().updateTask(newTask);
-		if (newTask == null){
-			return ansi().fg(RED).a(String.format(MESSAGE_UPDATE_FAIL, this.parameterList.getTaskID().getValue())).reset();
-		} else {
-			this.undoBackup = this.target;
-			this.redoBackup = newTask;
-			return ansi().fg(GREEN).a(String.format(MESSAGE_UPDATE, this.parameterList.getTaskID().getValue())).reset().a(newTask.toDetail());
-		}
+		return formatReturnString(newTask);
 	}
 	
 	private static Task cloneTask(Task task) throws HandledException{
@@ -81,6 +75,18 @@ public class Update extends InfluentialCommand {
 			return newTask;
 		} catch (CloneNotSupportedException e) {
 			throw new HandledException(HandledException.ExceptionType.CLONE_FAILED);
+		}
+	}
+	
+	private Ansi formatReturnString(Task newTask) throws HandledException{
+		Ansi returnString = ansi();
+		if (newTask == null){
+			return returnString.fg(RED).a(String.format(MESSAGE_UPDATE_FAIL, this.parameterList.getTaskID().getValue())).reset();
+		} else {
+			this.undoBackup = this.target;
+			this.redoBackup = newTask;
+			returnString.fg(GREEN).a(String.format(MESSAGE_UPDATE, this.parameterList.getTaskID().getValue())).reset();
+			return returnString.a(newTask.toDetail());
 		}
 	}
 	

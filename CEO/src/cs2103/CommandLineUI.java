@@ -150,7 +150,6 @@ public class CommandLineUI {
 			return ansi().a(e.getErrorMsg());
 		} catch (FatalException e) {
 			CommonUtil.printErrMsg(MESSAGE_FATAL_ERR);
-			System.exit(-1);
 			return null;
 		}
 	}
