@@ -22,11 +22,28 @@ public class Restore extends InfluentialCommand {
 	}
 
 	@Override
+	public Ansi execute() throws HandledException, FatalException {
+		CommonUtil.checkNull(this.target, HandledException.ExceptionType.INVALID_TASK_OBJ);
+		Ansi returnString = ansi();
+		Task updating = cloneTask(this.target);
+		updating.restore();
+		updating = TaskList.getInstance().updateTask(updating);
+		if (this.target == null){
+			return returnString.fg(RED).a(String.format(MESSAGE_RESTORE_FAIL, parameterList.getTaskID().getValue())).reset();
+		} else {
+			this.undoBackup = this.target;
+			this.redoBackup = updating;
+			returnString.fg(GREEN).a(String.format(MESSAGE_RESTORE, parameterList.getTaskID().getValue())).reset();
+			return returnString.a(updating.toDetail());
+		}
+	}
+
+	@Override
 	public InfluentialCommand undo() throws HandledException, FatalException {
 		if (this.undoBackup == null){
 			return null;
 		} else {
-			this.undoBackup.delete();
+			this.undoBackup.updateLastModified(null);
 			TaskList.getInstance().updateTask(this.undoBackup);
 			return this;
 		}
@@ -37,24 +54,9 @@ public class Restore extends InfluentialCommand {
 		if (this.redoBackup == null){
 			return null;
 		} else {
-			this.execute();
+			this.redoBackup.updateLastModified(null);
+			TaskList.getInstance().updateTask(this.redoBackup);
 			return this;
-		}
-	}
-
-	@Override
-	public Ansi execute() throws HandledException, FatalException {
-		CommonUtil.checkNull(this.target, HandledException.ExceptionType.INVALID_TASK_OBJ);
-		Ansi returnString = ansi();
-		this.target.restore();
-		this.target = TaskList.getInstance().updateTask(this.target);
-		if (this.target == null){
-			return returnString.fg(RED).a(String.format(MESSAGE_RESTORE_FAIL, parameterList.getTaskID().getValue())).reset();
-		} else {
-			this.undoBackup = this.target;
-			this.redoBackup = this.target;
-			returnString.fg(GREEN).a(String.format(MESSAGE_RESTORE, parameterList.getTaskID().getValue())).reset();
-			return returnString.a(this.target.toDetail());
 		}
 	}
 }

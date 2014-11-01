@@ -85,13 +85,11 @@ public abstract class EventTask extends Task {
 	@Override
 	public void delete() {
 		this.updateStatus(Status.VEVENT_CANCELLED);
-		this.updateLastModified(null);
 	}
 
 	@Override
 	public void restore() {
 		this.updateStatus(Status.VEVENT_CONFIRMED);
-		this.updateLastModified(null);
 	}
 	
 	@Override
@@ -103,7 +101,6 @@ public abstract class EventTask extends Task {
 		gEvent.setSummary(this.getTitle());
 		gEvent.setDescription(this.getDescription());
 		gEvent.setCreated(new com.google.api.client.util.DateTime(this.getCreated().getTime()));
-		gEvent.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified() == null? new Date().getTime():this.getLastModified().getTime()));
 		gEvent.setStatus("confirmed");
 		gEvent.setStart(dateTimeToEventDateTime(this.getStartTime()));
 		gEvent.setEnd(dateTimeToEventDateTime(this.getEndTime()));

@@ -38,15 +38,6 @@ public class Mark extends InfluentialCommand {
 		}
 	}
 	
-	private static Task cloneTask(Task task) throws HandledException{
-		try {
-			Task newTask = (Task) task.clone();
-			return newTask;
-		} catch (CloneNotSupportedException e) {
-			throw new HandledException(HandledException.ExceptionType.CLONE_FAILED);
-		}
-	}
-	
 	private Ansi formatReturnString(Task newTask) throws HandledException{
 		Ansi returnString = ansi();
 		if (newTask == null){

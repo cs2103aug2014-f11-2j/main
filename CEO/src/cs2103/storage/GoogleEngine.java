@@ -157,7 +157,7 @@ public class GoogleEngine{
 		task.updateLocation(gEvent.getLocation());
 		task.updateRecurrence(this.readRecurrence(gEvent));
 		task.updateDescription(gEvent.getDescription());
-		task.updateLastModified(readLastModified(gEvent));
+		task.updateLastModified(this.readLastModified(gEvent));
 		return task;
 	}
 	
@@ -179,11 +179,13 @@ public class GoogleEngine{
 	
 	private void tryToRemove(Task task) throws IOException{
 		if (task instanceof EventTask){
-			if (this.calendar.events().get(calendarIdentifier, task.getTaskUID()).execute() != null){
+			com.google.api.services.calendar.model.Event gEvent = this.calendar.events().get(calendarIdentifier, task.getTaskUID()).execute();
+			if (gEvent != null && !gEvent.getStatus().equals("cancelled")){
 				this.calendar.events().delete(calendarIdentifier, task.getTaskUID()).execute();
 			}
 		} else if (task instanceof ToDoTask){
-			if (this.tasks.tasks().get(DEFAULT_TASKS, task.getTaskUID()).execute() != null){
+			com.google.api.services.tasks.model.Task gTask = this.tasks.tasks().get(DEFAULT_TASKS, task.getTaskUID()).execute();
+			if (gTask != null && (gTask.getDeleted() == null || !gTask.getDeleted())){
 				this.tasks.tasks().delete(DEFAULT_TASKS, task.getTaskUID()).execute();
 			}
 		}

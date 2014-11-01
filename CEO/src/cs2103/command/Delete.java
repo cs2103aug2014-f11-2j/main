@@ -32,13 +32,15 @@ public class Delete extends InfluentialCommand {
 	@Override
 	public Ansi execute() throws HandledException, FatalException {
 		CommonUtil.checkNull(this.target, HandledException.ExceptionType.INVALID_TASK_OBJ);
+		Task deleting = cloneTask(this.target);
 		this.undoBackup = this.target;
-		this.redoBackup = this.target;
 		if (this.parameterList.getDeleteOption() == null && !this.target.isDeleted()){
-			this.target.delete();
-			TaskList.getInstance().updateTask(this.target);
+			deleting.delete();
+			this.redoBackup = deleting;
+			TaskList.getInstance().updateTask(deleting);
 			return ansi().fg(GREEN).a(String.format(MESSAGE_DELETE, this.parameterList.getTaskID().getValue())).reset();
 		} else {
+			this.redoBackup = deleting;
 			TaskList.getInstance().deleteTask(this.target);
 			return ansi().fg(MAGENTA).a(String.format(MESSAGE_PERMANENTLY_DELETE, this.parameterList.getTaskID().getValue())).reset();
 		}
@@ -49,7 +51,7 @@ public class Delete extends InfluentialCommand {
 		if (this.undoBackup == null){
 			return null;
 		} else {
-			this.undoBackup.restore();
+			this.undoBackup.updateLastModified(null);
 			TaskList.getInstance().updateTask(this.undoBackup);
 			return this;
 		}
@@ -60,7 +62,13 @@ public class Delete extends InfluentialCommand {
 		if (this.redoBackup == null){
 			return null;
 		} else {
-			this.execute();
+			if (this.parameterList.getDeleteOption() == null && !this.redoBackup.isDeleted()){
+				this.redoBackup.updateLastModified(null);
+				TaskList.getInstance().updateTask(this.redoBackup);
+			} else {
+				this.redoBackup.updateLastModified(null);
+				TaskList.getInstance().deleteTask(this.redoBackup);
+			}
 			return this;
 		}
 	}

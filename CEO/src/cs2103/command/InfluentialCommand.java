@@ -10,4 +10,13 @@ public abstract class InfluentialCommand extends Command{
 	
 	public abstract InfluentialCommand undo() throws HandledException, FatalException;
 	public abstract InfluentialCommand redo() throws HandledException, FatalException;
+	
+	protected static Task cloneTask(Task task) throws HandledException{
+		try {
+			Task newTask = (Task) task.clone();
+			return newTask;
+		} catch (CloneNotSupportedException e) {
+			throw new HandledException(HandledException.ExceptionType.CLONE_FAILED);
+		}
+	}
 }

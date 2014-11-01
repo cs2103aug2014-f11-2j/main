@@ -20,14 +20,14 @@ public class CommandLineUI {
 	private static final String MESSAGE_SYNC_ENABLED = "Google Sync is enabled";
 	private static final String MESSAGE_SYNC_DISABLED = "Google Sync is disabled";
 	private static final String MESSAGE_TEST_MODE = "You are now in test mode";
-	private static final String MESSAGE_EXIT = "You have exited CEO. Hope to see you again.";
+	private static final String MESSAGE_EXIT = "You have exited CEO. Hope to see you again.\n";
 	private static final String MESSAGE_USER_PROMPT = "Command me please: ";
 	private static final String MESSAGE_SYNC_PROMPT = "Do you want to enable google sync? y/n:";
-	private static final String MESSAGE_COMMAND_ERROR = "Your input command is invalid, please check your command and try again";
-	private static final String MESSAGE_FATAL_ERR = "A fatal error has occurred, program will now exit. Check log for detail";
-	private static final String MESSAGE_INITIALIZATION_ERROR = "Failed to initialize CEO, program will now exit";
-	private static final String MESSAGE_UNDO_FORMAT = "Successfully undo %1$d operations";
-	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d operations";
+	private static final String MESSAGE_COMMAND_ERROR = "Your input command is invalid, please check your command and try again\n";
+	private static final String MESSAGE_FATAL_ERR = "A fatal error has occurred, program will now exit. Check log for detail\n";
+	private static final String MESSAGE_INITIALIZATION_ERROR = "Failed to initialize CEO, program will now exit\n";
+	private static final String MESSAGE_UNDO_FORMAT = "Successfully undo %1$d operations\n";
+	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d operations\n";
 	
 	private static CommandLineUI commandLine;
 	private TaskList taskList;

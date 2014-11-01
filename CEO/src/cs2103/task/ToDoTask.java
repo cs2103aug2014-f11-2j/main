@@ -65,7 +65,6 @@ public abstract class ToDoTask extends Task {
 	@Override
 	public void delete() {
 		this.updateStatus(Status.VTODO_CANCELLED);
-		this.updateLastModified(null);
 	}
 
 	@Override
@@ -75,7 +74,6 @@ public abstract class ToDoTask extends Task {
 		} else {
 			this.updateStatus(Status.VTODO_COMPLETED);
 		}
-		this.updateLastModified(null);
 	}
 	
 	@Override
@@ -112,7 +110,6 @@ public abstract class ToDoTask extends Task {
 			gTask.setStatus("completed");
 		}
 		gTask.setNotes(this.getDescription());
-		gTask.setUpdated(new com.google.api.client.util.DateTime(this.getLastModified().getTime()));
 	}
 	
 	protected static Ansi completedToString(DateTime completed){

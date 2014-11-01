@@ -281,12 +281,14 @@ public class TaskList {
 			Task updating = null;
 			if (remoteTask == null){
 				updating = this.commitSyncToGoogle(localTask, true);
-			} else if (!remoteTask.isDeleted()){
+				count++;
+			} else {
 				if (remoteTask.getLastModified().before(localTask.getLastModified())){
 					updating = this.commitSyncToGoogle(localTask, false);
+					count++;
 				}
 			}
-			if (this.updateUidInList(localTask, updating)) count++;
+			this.updateUidInList(localTask, updating);
 		}
 		return count;
 	}
@@ -304,15 +306,14 @@ public class TaskList {
 		}
 	}
 	
-	private boolean updateUidInList(Task oldTask, Task newTask) throws HandledException, FatalException{
-		if (newTask == null) return false;
+	private void updateUidInList(Task oldTask, Task newTask) throws HandledException, FatalException{
+		if (newTask == null) return;
 		if (oldTask.equals(newTask)){
 			this.storage.updateTask(newTask);
 		} else {
 			this.storage.deleteTask(oldTask);
 			this.storage.updateTask(newTask);
 		}
-		return true;
 	}
 	
 	private ArrayList<Task> filterList(ArrayList<Task> taskList, boolean deleted){
