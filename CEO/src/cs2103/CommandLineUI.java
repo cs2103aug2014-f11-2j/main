@@ -23,7 +23,7 @@ public class CommandLineUI {
 	private static final String MESSAGE_EXIT = "You have exited CEO. Hope to see you again.";
 	private static final String MESSAGE_USER_PROMPT = "Command me please: ";
 	private static final String MESSAGE_SYNC_PROMPT = "Do you want to enable google sync? y/n:";
-	private static final String MESSAGE_COMMAND_ERROR = "Your input command is invalid, please check your command and try again";
+	private static final String MESSAGE_COMMAND_ERROR = "Your input command is invalid, please check your command and try again\n";
 	private static final String MESSAGE_FATAL_ERR = "A fatal error has occurred, program will now exit. Check log for detail";
 	private static final String MESSAGE_INITIALIZATION_ERROR = "Failed to initialize CEO, program will now exit";
 	private static final String MESSAGE_UNDO_FORMAT = "Successfully undo %1$d operations";
