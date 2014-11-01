@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.Date;
 
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.Status;
 
 import org.junit.Before;
@@ -14,14 +15,15 @@ import cs2103.exception.HandledException;
 import cs2103.storage.TaskList;
 import cs2103.util.TestUtil;
 
-public class FloatingTaskTest extends TaskTest {
-	static FloatingTask ft;
-	String taskUID = null;
+public class FloatingTaskTest extends ToDoTaskTest {
+	private static FloatingTask ft;
+	private final String taskUID = null;
 	Date created = null; 
 	Status status = null;
 	String title = "Testing";
 	String description = "Description";
 	String location = "Location";
+	Recur recurrence = null;
 	Date complete = null;
 
 	protected FloatingTask getConcrete(){
@@ -30,26 +32,18 @@ public class FloatingTaskTest extends TaskTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		ft = new FloatingTask(taskUID, status);
-		ft.updateTitle(title);
-		ft.updateDescription(description);
-		ft.updateLocation(location);
-		ft.updateRecurrence(this.readRecurrence());
+		ft = new FloatingTask(this.taskUID, this.status);
+		ft.updateTitle(this.title);
+		ft.updateDescription(this.description);
+		ft.updateLocation(this.location);
+		ft.updateRecurrence(this.recurrence);
 		ft.updateLastModified(null);
 	}
 	
 	@Test
 	public void testDeadlineTaskConstructor(){
-		testFloatingTaskConstructionOne();
-		testFloatingTaskConstructionTwo();
-	}
-	
-	public void testFloatingTaskConstructionOne() {
-		ft = new FloatingTask(taskUID, created, status, "", complete);
-	}
-	
-	public void testFloatingTaskConstructionTwo() {
-		ft = new FloatingTask(taskUID, created, status, title, complete);
+		ft = new FloatingTask(null, null);
+		assertTrue(true);
 	}
 	
 	@Test

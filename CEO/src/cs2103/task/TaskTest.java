@@ -31,16 +31,19 @@ public abstract class TaskTest {
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 	
-	public void testCheckAlert(Task task){
+	@Test
+	public void testCheckAlert(){
+		Task task = getConcrete();
 		assertFalse(task.checkAlert());
 	}
 		
+	@Test
 	public void testUpdateAndGetLastModified() {
 		Task task = getConcrete();
 		assertTrue(task.getLastModified().equals(new DateTime(new Date())));
-		Date newDate= new DateTime(1000);
-		task.updateLastModified(newDate);
-		assertTrue(task.getLastModified().equals(newDate));
+		Date testDate= new DateTime(1000);
+		task.updateLastModified(testDate);
+		assertTrue(task.getLastModified().equals(testDate));
 	}
 	
 	@Test
