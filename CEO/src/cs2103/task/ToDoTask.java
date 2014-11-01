@@ -2,6 +2,7 @@ package cs2103.task;
 
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
 import org.fusesource.jansi.Ansi;
 
 import com.google.api.client.util.Data;
@@ -122,6 +123,15 @@ public abstract class ToDoTask extends Task {
 			returnString.fg(GREEN).a("Completed");
 		}
 		return returnString.reset();
+	}
+	
+	@Override
+	public boolean matches(String keyword) {
+		if (keyword == null || keyword.isEmpty()){
+			return true;
+		} else {
+			return StringUtils.containsIgnoreCase(this.getTitle(), keyword) || StringUtils.containsIgnoreCase(this.getDescription(), keyword);
+		}
 	}
 	
 	public abstract com.google.api.services.tasks.model.Task toGTask();

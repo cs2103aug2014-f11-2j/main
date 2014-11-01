@@ -2,7 +2,6 @@ package cs2103.task;
 
 import java.util.Date;
 
-import org.apache.commons.lang.StringUtils;
 import org.fusesource.jansi.Ansi;
 import cs2103.exception.HandledException;
 import net.fortuna.ical4j.model.component.VToDo;
@@ -73,19 +72,6 @@ public class FloatingTask extends ToDoTask {
 	@Override
 	public boolean checkPeriod(Date[] time) {
 		return false;
-	}
-	
-	@Override
-	public boolean matches(String keyword) {
-		if (keyword == null || keyword.isEmpty()){
-			return true;
-		} else {
-			if (StringUtils.containsIgnoreCase(this.getTitle(), keyword) || StringUtils.containsIgnoreCase(this.getDescription(), keyword)){
-				return true;
-			} else {
-				return false;
-			}
-		}
 	}
 
 	@Override

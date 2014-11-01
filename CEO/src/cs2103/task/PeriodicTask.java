@@ -195,11 +195,7 @@ public class PeriodicTask extends EventTask {
 		if (keyword == null || keyword.isEmpty()){
 			return true;
 		} else {
-			if (StringUtils.containsIgnoreCase(this.getTitle(), keyword) || StringUtils.containsIgnoreCase(this.getDescription(), keyword) || StringUtils.containsIgnoreCase(this.getLocation(), keyword)){
-				return true;
-			} else {
-				return false;
-			}
+			return StringUtils.containsIgnoreCase(this.getTitle(), keyword) || StringUtils.containsIgnoreCase(this.getDescription(), keyword) || StringUtils.containsIgnoreCase(this.getLocation(), keyword);
 		}
 	}
 	

@@ -9,7 +9,6 @@ import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 
-import org.apache.commons.lang.StringUtils;
 import org.fusesource.jansi.Ansi;
 
 import cs2103.exception.HandledException;
@@ -131,19 +130,6 @@ public class DeadlineTask extends ToDoTask {
 			return this.getDueTime().before(time[0]);
 		} else {
 			return this.getDueTime().after(time[0]) && this.getDueTime().before(time[1]);
-		}
-	}
-
-	@Override
-	public boolean matches(String keyword) {
-		if (keyword == null || keyword.isEmpty()){
-			return true;
-		} else {
-			if (StringUtils.containsIgnoreCase(this.getTitle(), keyword) || StringUtils.containsIgnoreCase(this.getDescription(), keyword)){
-				return true;
-			} else {
-				return false;
-			}
 		}
 	}
 
