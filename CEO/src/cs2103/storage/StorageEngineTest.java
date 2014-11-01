@@ -27,8 +27,15 @@ public class StorageEngineTest {
 	@Test
 	public void testAddNewTask() throws HandledException, FatalException {
 		Task task1 = new FloatingTask(null, null);
+		task1.updateTitle("I feel my body is so light");
+		task1.updateDescription("I have never feel such way before");
 		Task task2 = new DeadlineTask(null, null, new Date());
+		task2.updateTitle("Nothing to be afraid of any more");
+		task2.updateDescription("Because I am no longer alone");
 		Task task3 = new PeriodicTask(null, null, new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis() + 864000L));
+		task3.updateTitle("Tiro Finale");
+		task3.updateDescription("If every Puella Magi will become a witch, why not we die now");
+		task3.updateLocation("Mitakihara");
 		storage.updateTask(task1);
 		storage.updateTask(task2);
 		storage.updateTask(task3);
@@ -71,15 +78,4 @@ public class StorageEngineTest {
 		testList = storage.getTaskList();
 		assertEquals(0, testList.size());
 	}
-	
-	@Test(expected = HandledException.class)
-	public void testNullUpdate() throws HandledException, FatalException{
-		storage.updateTask(null);
-	}
-	
-	@Test(expected = HandledException.class)
-	public void testNullDelete() throws HandledException, FatalException{
-		storage.deleteTask(null);
-	}
-	
 }

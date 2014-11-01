@@ -2,8 +2,6 @@ package cs2103.task;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.fusesource.jansi.Ansi;
@@ -124,18 +122,6 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		Ansi returnString = ansi().fg(YELLOW).a(this.getTaskID()).a(". ").reset();
 		returnString.bold().a(this.getTitle()).a('\n').boldOff().reset();
 		if (this.isDeleted()) returnString.a(DELETED);
-		return returnString;
-	}
-	
-	protected Ansi dateToString(Date date){
-		Ansi returnString = ansi();
-		DateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm a");
-		if (this.checkAlert()){
-			returnString.fg(RED);
-		} else {
-			returnString.fg(GREEN);
-		}
-		returnString.a(format.format(date)).reset();
 		return returnString;
 	}
 	

@@ -1,10 +1,17 @@
 package cs2103.task;
 
+import static org.fusesource.jansi.Ansi.ansi;
+import static org.fusesource.jansi.Ansi.Color.GREEN;
+import static org.fusesource.jansi.Ansi.Color.RED;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
 import org.fusesource.jansi.Ansi;
+
 import cs2103.exception.HandledException;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.component.VToDo;
@@ -88,6 +95,18 @@ public class DeadlineTask extends ToDoTask {
 		Ansi returnString = this.addCommonString();
 		returnString.a("Status: ").a(completedToString(this.getCompleted()));
 		returnString.a("\tDue At: ").a(this.dateToString(this.getDueTime()));
+		return returnString;
+	}
+	
+	protected Ansi dateToString(Date date){
+		Ansi returnString = ansi();
+		DateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+		if (this.checkAlert()){
+			returnString.fg(RED);
+		} else {
+			returnString.fg(GREEN);
+		}
+		returnString.a(format.format(date)).reset();
 		return returnString;
 	}
 	
