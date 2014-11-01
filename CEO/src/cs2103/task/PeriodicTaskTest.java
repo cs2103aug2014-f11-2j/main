@@ -137,12 +137,12 @@ public class PeriodicTaskTest extends EventTaskTest{
 		fail();
 	}
 
-	/*
+	
 	@Test
 	public void testUpdateTimeFromRecur() throws HandledException {
 		PeriodicTask pt2 = pt.updateTimeFromRecur();
 		assertTrue(pt2 == null);
-		recurrence.setFrequency("HOURLY");
+		recurrence.setFrequency(Recur.HOURLY);
 		recurrence.setInterval(1);
 		pt.updateRecurrence(recurrence);
 		pt2 = pt.updateTimeFromRecur();
@@ -158,5 +158,5 @@ public class PeriodicTaskTest extends EventTaskTest{
 		
 	}
 	
-	*/
+	
 }

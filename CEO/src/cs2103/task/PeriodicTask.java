@@ -201,7 +201,7 @@ public class PeriodicTask extends EventTask {
 	
 	public PeriodicTask updateTimeFromRecur() throws HandledException{
 		DateTime now = new DateTime();
-		if (this.getRecurrence() != null && this.getEndTime().before(now)){
+		if (this.getRecurrence() != null && this.getRecurrence().getFrequency() != null && this.getEndTime().before(now)){
 			Date startTime = this.getRecurrence().getNextDate(this.getStartTime(), now);
 			if (startTime == null){
 				return null;
@@ -211,7 +211,8 @@ public class PeriodicTask extends EventTask {
 				this.updateLastModified(null);
 				return this;
 			}
+		} else {
+			return null;
 		}
-		return null;
 	}
 }
