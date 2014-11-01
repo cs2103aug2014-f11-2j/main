@@ -98,10 +98,10 @@ public class DeadlineTask extends ToDoTask {
 	}
 	
 	protected Ansi dateToString(Date date){
-		Ansi returnString = ansi();
+		Ansi returnString = ansi().bold();
 		DateFormat format = new SimpleDateFormat("yyyy/MM/dd");
 		if (this.checkAlert()){
-			returnString.fg(RED).bold();
+			returnString.fg(RED);
 		} else {
 			returnString.fg(GREEN);
 		}
