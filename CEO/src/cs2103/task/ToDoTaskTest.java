@@ -69,7 +69,7 @@ public abstract class ToDoTaskTest extends TaskTest{
 		
 		DateTime testDate = new DateTime();
 		testAnsi = ansi().fg(GREEN).a("Completed").reset(); 
-		assertEquals(testAnsi, ToDoTask.completedToString(testDate));
+		assertTrue(testAnsi.equals(ToDoTask.completedToString(testDate)));
 	}
 	
 	@Test
@@ -94,6 +94,5 @@ public abstract class ToDoTaskTest extends TaskTest{
 		
 		testKeyword = "Testing";
 		assertTrue(!(task.matches(testKeyword)));
-	}
-	
+	}	
 }

@@ -1,6 +1,7 @@
 package cs2103.task;
 
 import static org.fusesource.jansi.Ansi.ansi;
+
 import static org.fusesource.jansi.Ansi.Color.*;
 import static org.junit.Assert.*;
 
@@ -19,14 +20,12 @@ import cs2103.exception.HandledException;
 public abstract class EventTaskTest extends TaskTest{
 
 	@Test
-	public void testGetCompleted(){
+	public void testGetCompleted() throws HandledException{
 		EventTask task = (EventTask) getConcrete();
 		DateTime testStartDate = new DateTime(0);
-		DateTime testEndDate = new DateTime(0);
+		DateTime testEndDate = new DateTime(1);
+		task.updateTime(testStartDate, testEndDate);
 		assertEquals(testEndDate, task.getCompleted());
-		
-		testEndDate = new DateTime(1000);
-		assertEquals(null, task.getCompleted());
 	}
 	
 	@Test
@@ -52,7 +51,7 @@ public abstract class EventTaskTest extends TaskTest{
 		EventTask task = (EventTask) getConcrete();
 		task.restore();
 		assertEquals(Status.VEVENT_CONFIRMED, task.getStatus());
-		assertEquals(null, task.getLastModified());	
+		assertTrue(new DateTime().equals(task.getLastModified()));	
 	}
 
 	@Test
