@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cs2103.exception.HandledException;
+import cs2103.storage.TaskList;
 import cs2103.util.TestUtil;
 
 public class FloatingTaskTest extends TaskTest {
@@ -19,14 +20,24 @@ public class FloatingTaskTest extends TaskTest {
 	Date created = null; 
 	Status status = null;
 	String title = "Testing";
+	String description = "Description";
+	String location = "Location";
 	Date complete = null;
 
+	protected FloatingTask getConcrete(){
+		return ft;
+	}
+	
 	@Before
 	public void setUp() throws Exception {
-		ft = new FloatingTask(taskUID, created, status, title, complete);
-		ft.updateDescription(null);
+		ft = new FloatingTask(taskUID, status);
+		ft.updateTitle(title);
+		ft.updateDescription(description);
+		ft.updateLocation(location);
+		ft.updateRecurrence(this.readRecurrence());
+		ft.updateLastModified(null);
 	}
-
+	
 	@Test
 	public void testDeadlineTaskConstructor(){
 		testFloatingTaskConstructionOne();
