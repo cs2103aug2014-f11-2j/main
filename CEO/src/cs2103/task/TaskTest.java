@@ -20,7 +20,6 @@ public abstract class TaskTest {
 	
 	protected abstract Task getConcrete();
 	
-	public abstract void testCompareTo() throws HandledException;
 	public abstract void testMatches();
 	public abstract void testToSummary();
 	public abstract void testToDetail();
@@ -169,5 +168,11 @@ public abstract class TaskTest {
 		assertEquals(false, task.isDeleted());
 		task.delete();
 		assertEquals(true, task.isDeleted());
+	}
+	
+	@Test
+	public void testCompareTo() throws CloneNotSupportedException{
+		Task task = getConcrete();
+		assertEquals(0, task.compareTo((Task) task.clone()));
 	}
 }

@@ -18,13 +18,11 @@ import cs2103.util.TestUtil;
 public class FloatingTaskTest extends ToDoTaskTest {
 	private static FloatingTask ft;
 	private final String taskUID = null;
-	Date created = null; 
 	Status status = null;
 	String title = "Testing";
 	String description = "Description";
 	String location = "Location";
 	Recur recurrence = null;
-	Date complete = null;
 
 	protected FloatingTask getConcrete(){
 		return ft;
@@ -47,18 +45,64 @@ public class FloatingTaskTest extends ToDoTaskTest {
 	}
 	
 	@Test
-	public void testUpdateAndGetCompleted() {
-		ft.updateCompleted(null);
-		assertEquals(null, ft.getCompleted());
-		Date testDate = new DateTime(1);
-		ft.updateCompleted(testDate);
-		DateTime testDate2 = new DateTime(testDate);
-		assertTrue(ft.getCompleted().equals(testDate2));
+	public void testConvert() throws HandledException {
+		testConvertOne();
+		testConvertToFloating();
+		testConvertToDeadline();
+		testConvertToPeriodic();
 	}
 	
-	@Test
-	public void testConvert() throws HandledException {
-		testConvert(ft);
+	private void testConvertOne() throws HandledException {
+		exception.expect(HandledException.class);
+		Date[] time=null;
+		ft.convert(time);	
+	}
+
+	private void testConvertToFloating() throws HandledException {
+		DateTime[] time = new DateTime[2];
+		time[0] = null;
+		time[1] = null;
+		Task ft2 = ft.convert(time);
+		assertTrue(ft2 instanceof FloatingTask);
+		
+		Task taskExpected = new FloatingTask(null, null);
+		taskExpected.updateTitle(ft.getTitle());
+		taskExpected.updateDescription(ft.getDescription());
+		taskExpected.updateLastModified(ft.getLastModified());
+		taskExpected.updateCompleted(ft.getCompleted());
+		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
+	}
+
+	private void testConvertToDeadline() throws HandledException {	
+		DateTime[] time = new DateTime[2];
+		time[0] = new DateTime(1);
+		time[1] = null;
+		Task ft2 = ft.convert(time);
+		assertTrue(ft2 instanceof DeadlineTask);
+		
+		Task taskExpected = new DeadlineTask(null, null, time[0]);
+		taskExpected.updateTitle(ft.getTitle());
+		taskExpected.updateDescription(ft.getDescription());
+		taskExpected.updateLastModified(ft.getLastModified());
+		taskExpected.updateCompleted(ft.getCompleted());
+		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
+	}
+	
+	private void testConvertToPeriodic() throws HandledException {
+		DateTime[] time = new DateTime[2];
+		time[0] = new DateTime(1);
+		time[1]= new DateTime(2);
+		Task ft2 = ft.convert(time);
+		assertTrue(ft2 instanceof PeriodicTask);
+		
+		Task taskExpected = new PeriodicTask(null, null, time[0], time[1]);
+		taskExpected.updateTitle(ft.getTitle());
+		taskExpected.updateDescription(ft.getDescription());
+		ft.updateLocation(this.location);
+		ft.updateRecurrence(this.recurrence);
+		taskExpected.updateLastModified(ft.getLastModified());
+		taskExpected.updateCompleted(ft.getCompleted());
+		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
 	}
 	
 	@Test
@@ -69,89 +113,11 @@ public class FloatingTaskTest extends ToDoTaskTest {
 
 	@Test
 	public void testToSummary() {
-		assertEquals("0. Testing\nType: Floating\tStatus: Needs Action\n", 
-				ft.toSummary());
+		fail();
 	}
 
 	@Test
 	public void testToDetail() {
-		assertEquals("0. Testing\nType: Floating\tStatus: Needs Action"
-				+ "\nDescription: \n", ft.toDetail());
-		ft.updateDescription("Description");
-		assertEquals("0. Testing\nType: Floating\tStatus: Needs Action"
-				+ "\nDescription: Description\n", ft.toDetail());
-	}
-
-	@Test
-	public void testMatches() {
-		String keyword=null;
-		assertEquals(ft.matches(keyword), true);
-		keyword = "";
-		assertEquals(ft.matches(keyword), true);
-		keyword = "Testing";
-		assertEquals(ft.matches(keyword), true);
-		keyword = "Coding";
-		assertEquals(ft.matches(keyword), false);
-		ft.updateDescription("Coding");
-		assertEquals(ft.matches(keyword), true);
-	}
-
-	@Test
-	public void testUpdateAndGetTaskID() {
-		testUpdateAndGetTaskID(ft);
-	}
-
-	@Test
-	public void testUpdateAndGetTitle() throws HandledException {
-		testUpdateAndGetTitle(ft);
-	}
-
-	@Test
-	public void testUpdateAndGetDescription() {
-		testUpdateAndGetDescription(ft);
-	}
-
-	@Test
-	public void testUpdateAndGetLastModified() {
-		testUpdateAndGetLastModified(ft);
-	}
-
-	@Test
-	public void testCheckAlert() {
-		testCheckAlert(ft);
-	}
-
-	@Override
-	public void testCompareTo() throws HandledException {
-		FloatingTask ft2 = new FloatingTask(taskUID, created, status, title, complete);
-		assertEquals(0, ft.compareTo(ft2));
-	}
-	
-	@Test public void testEquals() throws CloneNotSupportedException, HandledException{
-		testEquals(ft);
-	}
-	
-	@Test
-	public void testUpdateAndGetStatus(){
-		assertEquals(Status.VTODO_NEEDS_ACTION, ft.getStatus());
-		Status testStatus = new Status();
-		ft.updateStatus(testStatus);
-		assertEquals(testStatus, ft.getStatus());
-	}
-
-	@Test
-	public void testDeleteAndIsDelete() {
-		testDeleteAndIsDelete(ft);
-	}
-
-	@Override
-	@Test
-	public void testRestore() {
-		ft.restore();
-		assertEquals(Status.VTODO_NEEDS_ACTION, ft.getStatus());
-		Date testDate = new DateTime(1);
-		ft.updateCompleted(testDate);
-		ft.restore();
-		assertEquals(Status.VTODO_COMPLETED, ft.getStatus());
-	}
+		fail();
+	}	
 }

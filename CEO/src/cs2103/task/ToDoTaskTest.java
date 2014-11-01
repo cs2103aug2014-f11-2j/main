@@ -24,6 +24,7 @@ public abstract class ToDoTaskTest extends TaskTest{
 		ToDoTask task = (ToDoTask) getConcrete();
 		task.updateCompleted(null);
 		assertEquals(null, task.getCompleted());
+		
 		DateTime testDate = new DateTime();
 		task.updateCompleted(testDate);
 		assertTrue(testDate.equals(task.getCompleted()));
@@ -34,7 +35,9 @@ public abstract class ToDoTaskTest extends TaskTest{
 		ToDoTask task = (ToDoTask) getConcrete();
 		task.updateStatus(null);
 		assertEquals(Status.VTODO_NEEDS_ACTION, task.getStatus());
-		String testStatus = "Test Status";
+		
+		Status testStatus = Status.VTODO_COMPLETED;
+		task.updateStatus(testStatus);
 		assertEquals(testStatus, task.getStatus());
 	}
 	
@@ -51,6 +54,7 @@ public abstract class ToDoTaskTest extends TaskTest{
 		task.updateCompleted(null);
 		task.restore();
 		assertEquals(Status.VTODO_NEEDS_ACTION, task.getStatus());
+		
 		DateTime testDate = new DateTime();
 		task.updateCompleted(testDate);
 		task.restore();
@@ -60,12 +64,36 @@ public abstract class ToDoTaskTest extends TaskTest{
 	
 	@Test
 	public void testCompletedToString(){
-		ToDoTask task = (ToDoTask) getConcrete();
-		Ansi testAnsi = ansi().fg(RED).a("Needs Action").reset(); 
-		assertEquals(testAnsi, task.completedToString(null));
+		Ansi testAnsi = ansi().fg(RED).a("Needs Action").reset();
+		assertTrue(testAnsi.equals(ToDoTask.completedToString(null)));
+		
 		DateTime testDate = new DateTime();
 		testAnsi = ansi().fg(GREEN).a("Completed").reset(); 
-		assertEquals(testAnsi, task.completedToString(testDate));
+		assertEquals(testAnsi, ToDoTask.completedToString(testDate));
+	}
+	
+	@Test
+	public void testMatches(){
+		ToDoTask task = (ToDoTask) getConcrete();
+		String testKeyword = null;
+		assertTrue(task.matches(testKeyword));
+		
+		testKeyword = "";
+		assertTrue(task.matches(testKeyword));
+		
+		testKeyword = "teSt";
+		task.updateTitle("Test Title");
+		assertTrue(task.matches(testKeyword));
+		
+		testKeyword = "Testing";
+		assertTrue(!(task.matches(testKeyword)));
+		
+		testKeyword = "DescRiption";
+		task.updateDescription("Test Description");
+		assertTrue(task.matches(testKeyword));
+		
+		testKeyword = "Testing";
+		assertTrue(!(task.matches(testKeyword)));
 	}
 	
 }

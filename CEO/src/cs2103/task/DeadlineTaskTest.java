@@ -1,8 +1,11 @@
 package cs2103.task;
 
 import static org.junit.Assert.*;
+
 import java.util.Date;
+
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.Status;
 
 import org.junit.Before;
@@ -11,19 +14,26 @@ import org.junit.Test;
 import cs2103.exception.HandledException;
 import cs2103.util.TestUtil;
 
-public class DeadlineTaskTest extends TaskTest{
+public class DeadlineTaskTest extends ToDoTaskTest{
 	static DeadlineTask dlt;
 	String taskUID = null;
 	Date created = null; 
 	Status status = null;
 	String title = "Testing";
+	String description = "Description";
+	String location = "Location";
+	Recur recurrence = null;
 	Date complete = null;
-	static Date dueTime = new DateTime(1000);
+	DateTime dueTime = new DateTime(1);
 
 	@Before
 	public void setUp() throws Exception {
-		dlt = new DeadlineTask(taskUID, created, status, title, dueTime, complete);
-		dlt.updateDescription(null);
+		dlt = new DeadlineTask(this.taskUID, this.status, this.dueTime);
+		dlt.updateTitle(this.title);
+		dlt.updateDescription(this.description);
+		dlt.updateLocation(this.location);
+		dlt.updateRecurrence(this.recurrence);
+		dlt.updateLastModified(null);
 	}
 	
 	@Test 
@@ -48,15 +58,6 @@ public class DeadlineTaskTest extends TaskTest{
 		assertTrue(true);	
 	}
 	
-	@Test
-	public void testUpdateAndGetComplete() {
-		dlt.updateCompleted(null);
-		assertEquals(null, dlt.getCompleted());
-		Date testDate = new DateTime();
-		dlt.updateCompleted(testDate);
-		DateTime testDate2 = new DateTime(testDate);
-		assertTrue(dlt.getCompleted().equals(testDate2));
-	}
 
 	@Test
 	public void testUpdateAndGetDueTime() throws HandledException{
@@ -108,59 +109,8 @@ public class DeadlineTaskTest extends TaskTest{
 	}
 
 	@Test
-	public void testMatches() {
-		String keyword = null;
-		assertEquals(dlt.matches(keyword), true);
-		keyword="";
-		assertEquals(dlt.matches(keyword), true);
-		keyword="Testing";
-		assertEquals(dlt.matches(keyword), true);
-		keyword="Coding";
-		assertEquals(dlt.matches(keyword), false);
-		dlt.updateDescription("Coding");
-		assertEquals(dlt.matches(keyword), true);
-	}
-	
-	@Test
-	public void testCompareTo() throws HandledException {
-		DeadlineTask dlt2 = new DeadlineTask(taskUID, created, status, title, dueTime, complete);
-		dlt2.updateDescription(null);
-		assertEquals(0, dlt.compareTo(dlt2));
-	}
-	
-	@Test
 	public void testConvert() throws HandledException {
 		testConvert(dlt);
-	}
-
-	@Test
-	public void testUpdateAndGetTitle() throws HandledException {
-		testUpdateAndGetTitle(dlt);
-	}
-
-	@Test
-	public void testUpdateAndGetDescription() {
-		testUpdateAndGetDescription(dlt);
-	}
-
-	@Test
-	public void testUpdateAndGetTaskID() {
-		testUpdateAndGetTaskID(dlt);
-	}
-
-	@Test
-	public void testUpdateAndGetLastModified() {
-		testUpdateAndGetLastModified(dlt);
-	}
-
-	@Test
-	public void testCheckAlert() {
-		testCheckAlert(dlt);
-	}
-	
-	@Test
-	public void testEquals() throws CloneNotSupportedException, HandledException{
-		testEquals(dlt);
 	}
 
 	@Override
@@ -170,21 +120,5 @@ public class DeadlineTaskTest extends TaskTest{
 		Status testStatus = new Status();
 		dlt.updateStatus(testStatus);
 		assertEquals(testStatus, dlt.getStatus());
-	}
-
-	@Test
-	public void testDeleteAndIsDelete() {
-		testDeleteAndIsDelete(dlt);
-	}
-
-	@Override
-	@Test
-	public void testRestore() {
-		dlt.restore();
-		assertEquals(Status.VTODO_NEEDS_ACTION, dlt.getStatus());
-		Date testDate = new DateTime();
-		dlt.updateCompleted(testDate);
-		dlt.restore();
-		assertEquals(Status.VTODO_COMPLETED, dlt.getStatus());
 	}
 }
