@@ -127,7 +127,7 @@ public class Help extends QueryCommand {
 			 								 "  <Keyword>                   Search title, description and location\n" +
 			 								 "                              for the specified keyword\n" +
 			 								 "  <floating|deadline|         Specify the type of tasks to search\n" +
-			 								 "  periodic|all|trash>         if not specified, only search incomplete tasks\n" +
+			 								 "  periodic|all|trash>         if not specified, search all tasks\n" +
 			 								 "  -complete <true|false>      Specify the complete status you want to search\n" +
 			 								 "  -time <blank>               Search only deadline and periodic tasks\n" +
 			 								 "        <time>                Search deadline and periodic tasks that\n" +

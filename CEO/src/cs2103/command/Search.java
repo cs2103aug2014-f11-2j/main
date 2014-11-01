@@ -60,10 +60,9 @@ public class Search extends QueryCommand {
 			case TRASH:
 				return TaskList.getInstance().getTrashList();
 			case ALL:
-				return TaskList.getInstance().getAllList();
 			case INVALID:
 			default:
-				return TaskList.getInstance().getDefaultList();
+				return TaskList.getInstance().getAllList();
 			}
 		}
 	}
