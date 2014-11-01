@@ -5,55 +5,102 @@ import static org.junit.Assert.*;
 import java.util.Date;
 
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.Status;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import cs2103.exception.HandledException;
+import cs2103.storage.TaskList;
 import cs2103.util.TestUtil;
 
-public class FloatingTaskTest extends TaskTest {
-	static FloatingTask ft;
-	String taskUID = null;
-	Date created = null; 
+public class FloatingTaskTest extends ToDoTaskTest {
+	private static FloatingTask ft;
+	private final String taskUID = null;
 	Status status = null;
 	String title = "Testing";
-	Date complete = null;
+	String description = "Description";
+	String location = "Location";
+	Recur recurrence = null;
 
+	protected FloatingTask getConcrete(){
+		return ft;
+	}
+	
 	@Before
 	public void setUp() throws Exception {
-		ft = new FloatingTask(taskUID, created, status, title, complete);
-		ft.updateDescription(null);
+		ft = new FloatingTask(this.taskUID, this.status);
+		ft.updateTitle(this.title);
+		ft.updateDescription(this.description);
+		ft.updateLocation(this.location);
+		ft.updateRecurrence(this.recurrence);
+		ft.updateLastModified(null);
 	}
-
+	
 	@Test
 	public void testDeadlineTaskConstructor(){
-		testFloatingTaskConstructionOne();
-		testFloatingTaskConstructionTwo();
-	}
-	
-	public void testFloatingTaskConstructionOne() {
-		ft = new FloatingTask(taskUID, created, status, "", complete);
-	}
-	
-	public void testFloatingTaskConstructionTwo() {
-		ft = new FloatingTask(taskUID, created, status, title, complete);
-	}
-	
-	@Test
-	public void testUpdateAndGetCompleted() {
-		ft.updateCompleted(null);
-		assertEquals(null, ft.getCompleted());
-		Date testDate = new DateTime(1);
-		ft.updateCompleted(testDate);
-		DateTime testDate2 = new DateTime(testDate);
-		assertTrue(ft.getCompleted().equals(testDate2));
+		ft = new FloatingTask(null, null);
+		assertTrue(true);
 	}
 	
 	@Test
 	public void testConvert() throws HandledException {
-		testConvert(ft);
+		testConvertException();
+		testConvertToFloating();
+		testConvertToDeadline();
+		testConvertToPeriodic();
+	}
+	
+	private void testConvertException() throws HandledException {
+		exception.expect(HandledException.class);
+		DateTime[] time = null;
+		ft.convert(time);	
+	}
+
+	private void testConvertToFloating() throws HandledException {
+		DateTime[] time = new DateTime[2];
+		time[0] = null;
+		time[1] = null;
+		Task ft2 = ft.convert(time);
+		assertTrue(ft2 instanceof FloatingTask);
+		
+		FloatingTask taskExpected = new FloatingTask(null, ft.getStatus());
+		taskExpected.updateTitle(ft.getTitle());
+		taskExpected.updateDescription(ft.getDescription());
+		taskExpected.updateLastModified(ft.getLastModified());
+		taskExpected.updateCompleted(ft.getCompleted());
+		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
+	}
+
+	private void testConvertToDeadline() throws HandledException {	
+		DateTime[] time = new DateTime[2];
+		time[0] = new DateTime(1);
+		time[1] = null;
+		Task ft2 = ft.convert(time);
+		assertTrue(ft2 instanceof DeadlineTask);
+		
+		DeadlineTask taskExpected = new DeadlineTask(null, null, time[0]);
+		taskExpected.updateTitle(ft.getTitle());
+		taskExpected.updateDescription(ft.getDescription());
+		taskExpected.updateLastModified(ft.getLastModified());
+		taskExpected.updateCompleted(ft.getCompleted());
+		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
+	}
+	
+	private void testConvertToPeriodic() throws HandledException {
+		DateTime[] time = new DateTime[2];
+		time[0] = new DateTime(1);
+		time[1]= new DateTime(2);
+		Task ft2 = ft.convert(time);
+		assertTrue(ft2 instanceof PeriodicTask);
+		
+		PeriodicTask taskExpected = new PeriodicTask(null, null, time[0], time[1]);
+		taskExpected.updateTitle(ft.getTitle());
+		taskExpected.updateDescription(ft.getDescription());
+		taskExpected.updateLastModified(ft.getLastModified());
+		taskExpected.updateCompleted(ft.getCompleted());
+		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
 	}
 	
 	@Test
@@ -64,89 +111,11 @@ public class FloatingTaskTest extends TaskTest {
 
 	@Test
 	public void testToSummary() {
-		assertEquals("0. Testing\nType: Floating\tStatus: Needs Action\n", 
-				ft.toSummary());
+		fail();
 	}
 
 	@Test
 	public void testToDetail() {
-		assertEquals("0. Testing\nType: Floating\tStatus: Needs Action"
-				+ "\nDescription: \n", ft.toDetail());
-		ft.updateDescription("Description");
-		assertEquals("0. Testing\nType: Floating\tStatus: Needs Action"
-				+ "\nDescription: Description\n", ft.toDetail());
-	}
-
-	@Test
-	public void testMatches() {
-		String keyword=null;
-		assertEquals(ft.matches(keyword), true);
-		keyword = "";
-		assertEquals(ft.matches(keyword), true);
-		keyword = "Testing";
-		assertEquals(ft.matches(keyword), true);
-		keyword = "Coding";
-		assertEquals(ft.matches(keyword), false);
-		ft.updateDescription("Coding");
-		assertEquals(ft.matches(keyword), true);
-	}
-
-	@Test
-	public void testUpdateAndGetTaskID() {
-		testUpdateAndGetTaskID(ft);
-	}
-
-	@Test
-	public void testUpdateAndGetTitle() throws HandledException {
-		testUpdateAndGetTitle(ft);
-	}
-
-	@Test
-	public void testUpdateAndGetDescription() {
-		testUpdateAndGetDescription(ft);
-	}
-
-	@Test
-	public void testUpdateAndGetLastModified() {
-		testUpdateAndGetLastModified(ft);
-	}
-
-	@Test
-	public void testCheckAlert() {
-		testCheckAlert(ft);
-	}
-
-	@Override
-	public void testCompareTo() throws HandledException {
-		FloatingTask ft2 = new FloatingTask(taskUID, created, status, title, complete);
-		assertEquals(0, ft.compareTo(ft2));
-	}
-	
-	@Test public void testEquals() throws CloneNotSupportedException, HandledException{
-		testEquals(ft);
-	}
-	
-	@Test
-	public void testUpdateAndGetStatus(){
-		assertEquals(Status.VTODO_NEEDS_ACTION, ft.getStatus());
-		Status testStatus = new Status();
-		ft.updateStatus(testStatus);
-		assertEquals(testStatus, ft.getStatus());
-	}
-
-	@Test
-	public void testDeleteAndIsDelete() {
-		testDeleteAndIsDelete(ft);
-	}
-
-	@Override
-	@Test
-	public void testRestore() {
-		ft.restore();
-		assertEquals(Status.VTODO_NEEDS_ACTION, ft.getStatus());
-		Date testDate = new DateTime(1);
-		ft.updateCompleted(testDate);
-		ft.restore();
-		assertEquals(Status.VTODO_COMPLETED, ft.getStatus());
-	}
+		fail();
+	}	
 }
