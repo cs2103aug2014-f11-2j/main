@@ -3,13 +3,14 @@ package cs2103.util;
 import java.awt.Desktop;
 import java.awt.Desktop.Action;
 import java.io.IOException;
-import java.net.InetAddress;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
+
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
-
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 
@@ -86,8 +87,10 @@ public class CommonUtil {
 	
 	private static boolean checkNetwork(){
 		try {
-			InetAddress ad = InetAddress.getByName("accounts.google.com");
-			return ad.isReachable(5000);
+			URL url = new URL("http://www.google.com");
+			HttpURLConnection urlConnect = (HttpURLConnection)url.openConnection();
+			urlConnect.getContent();
+			return true;
 		} catch (IOException e) {
 			return false;
 		}
