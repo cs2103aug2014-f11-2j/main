@@ -1,5 +1,7 @@
 package cs2103.command;
 
+import static org.fusesource.jansi.Ansi.ansi;
+import static org.fusesource.jansi.Ansi.Color.MAGENTA;
 import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
@@ -32,8 +34,9 @@ public class DeleteTest {
 		ParameterList pl = deleteObj.getParameterList();
 		assertEquals(true,pl.getDeleteOption().getValue());
 		assertEquals(1,pl.getTaskID().getValue());
-		String result = deleteObj.execute();
-		assertEquals("You have permanently deleted task with ID 1",result);
+		String result = deleteObj.execute().toString();
+		assertEquals(ansi().fg(MAGENTA).a("You have permanently deleted task with ID 1\n").reset().toString(),result);
+		
 	}
 	
 	@Test
@@ -42,7 +45,7 @@ public class DeleteTest {
 		addObj.execute();
 		Delete deleteObj = new Delete("1");
 		deleteObj.execute();
-		Task task = new FloatingTask(null, null, null, "tempDelete", null);
+		Task task = new FloatingTask(null, null);
 		task.updateDescription(null);
 		task.updateLastModified(null);
 		for(Task t : TaskList.getInstance().getTrashList()){

@@ -1,5 +1,7 @@
 package cs2103.command;
 
+import static org.fusesource.jansi.Ansi.ansi;
+import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.junit.Assert.*;
 
 import java.util.Date;
@@ -40,9 +42,11 @@ public class MarkTest {
 		Mark markFloating = new Mark("1");
 		ParameterList pl = markFloating.getParameterList();
 		assertEquals(1,pl.getTaskID().getValue());
-		Task ft = new FloatingTask(null, null, null, "floating", d);
+		Task ft = new FloatingTask(null, null);
+		ft.updateTitle("floating");
 		ft.updateDescription(null);
 		ft.updateLastModified(null);
+		ft.updateCompleted(d);
 		markFloating.execute();
 		for(Task t : TaskList.getInstance().getFloatingList()){
 			assertTrue(TestUtil.compareTasks(t, ft));
@@ -56,9 +60,9 @@ public class MarkTest {
 		Mark markPeriodic = new Mark("3");
 		ParameterList pl = markPeriodic.getParameterList();
 		assertEquals(3,pl.getTaskID().getValue());
-		
+		String result = markPeriodic.execute().toString();
 		//unable to replace with compareTask as periodic has no complete flag
-		assertEquals("Failed to mark task 3 as completed",markPeriodic.execute());
+		assertEquals(ansi().fg(RED).a("Task 3 does not support mark operation\n").reset().toString(),result);
 	}
 	
 	@Test
@@ -69,9 +73,11 @@ public class MarkTest {
 		assertEquals(2,pl.getTaskID().getValue());
 		markDeadline.execute();
 		String time ="2014/10/23 20:20";
-		Task pt = new DeadlineTask(null, null, null, "deadline",Time.parse(time).getValue()[0],d);
+		Task pt = new DeadlineTask(null, null, Time.parse(time).getValue()[0]);
+		pt.updateTitle("deadline");
 		pt.updateDescription(null);
 		pt.updateLastModified(null);
+		pt.updateCompleted(d);
 		markDeadline.execute();
 		for(Task t: TaskList.getInstance().getDeadlineList()){
 			TestUtil.compareTasks(t, pt);

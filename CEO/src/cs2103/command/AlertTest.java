@@ -1,5 +1,6 @@
 package cs2103.command;
 
+import static org.fusesource.jansi.Ansi.ansi;
 import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
@@ -9,6 +10,7 @@ import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Option;
 import cs2103.storage.TaskList;
+import cs2103.task.Task;
 
 public class AlertTest {
 	
@@ -21,18 +23,16 @@ public class AlertTest {
 	@Test
 	public void testAlert() throws HandledException, FatalException {
 		
-		Add addobj = new Add("add -title testDeadlineAlert -time 2014/10/23 20:20");
+		Add addobj = new Add("add -title testDeadlineAlert -time 2014/11/02 20:20");
 		addobj.execute();
-		addobj = new Add("add -title testPeriodicAlert -time 2014/10/23 20:20 to 2014/10/25 20:20");
+		addobj = new Add("add -title testPeriodicAlert -time 2014/11/02 20:20 to 2014/11/05 20:20");
 		addobj.execute();
 		Alert alert = new Alert();
-		String result = alert.execute();
-		assertEquals("Tasks due within one day:\n" +
-				"1. testDeadlineAlert\n" +
-				"Type: Deadline	Status: Needs Action	Due At: 23-Oct-2014 20:20:00" +
-				"Tasks start within one day:\n" +
-				"2. testPeriodicAlert\n" +
-				"Type: Periodic\tFrom: 23-Oct-2014 20:20:00 To 25-Oct-2014 20:20:00",result);
+		String result = alert.execute().toString();
+		Task dead = TaskList.getInstance().getDeadlineList().get(0);
+		Task period = TaskList.getInstance().getPeriodicList().get(0);
+		assertEquals(ansi().a("Tasks due within one day:\n").a(dead.toSummary()).a("\n")
+				.a("Tasks start within one day:\n").a(period.toSummary()).a("\n").toString(),result);
 		
 	}
 }

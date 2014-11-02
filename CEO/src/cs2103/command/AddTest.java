@@ -1,5 +1,8 @@
 package cs2103.command;
 
+import static org.fusesource.jansi.Ansi.ansi;
+import static org.fusesource.jansi.Ansi.Color.GREEN;
+import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
@@ -35,9 +38,10 @@ public class AddTest {
 		assertEquals(Recurrence.parse("2d").getValue().toString(), pl.getRecurrence().getValue().toString());
 		addObj.execute();
 		String time = "2014/12/12 20:20  to 2014/12/15 20:20";
-		Task dt = new PeriodicTask(null, null, null, "hello", "earth",Time.parse(time).getValue()[0],
-				Time.parse(time).getValue()[1],Recurrence.parse("2d").getValue());
+		Task dt = new PeriodicTask(null, null, Time.parse(time).getValue()[0], Time.parse(time).getValue()[1]);
+		dt.updateTitle("hello");
 		dt.updateDescription("some description");
+		dt.updateRecurrence(Recurrence.parse("2d").getValue());
 		dt.updateLastModified(null);
 		for(Task t :TaskList.getInstance().getDeadlineList()){
 			assertTrue(TestUtil.compareTasks(t, dt));
@@ -59,13 +63,13 @@ public class AddTest {
 		Add addObj = new Add("-title undo");
 		addObj.execute();
 		addObj.undo();
-		Search s = new Search("all -keyword undo");
-		String result = s.execute();
-		assertEquals("The task list is empty",result);
+		Search s = new Search("undo");
+		String result = s.execute().toString();
+		assertEquals(ansi().fg(RED).a("The task list is empty\n").reset().toString(),result);
 		addObj.redo();
-		result = s.execute();
+		result = s.execute().toString();
+		Task t = TaskList.getInstance().getFloatingList().get(0);
 		addObj.undo();
-		assertEquals("1. undo\n" +
-				"Type: Floating	Status: Needs Action",result);
+		assertEquals(ansi().a(t.toSummary()).a('\n').toString(),result);
 	}
 }
