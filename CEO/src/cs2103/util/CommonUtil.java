@@ -2,9 +2,6 @@ package cs2103.util;
 
 import java.awt.Desktop;
 import java.awt.Desktop.Action;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
@@ -82,21 +79,6 @@ public class CommonUtil {
 	}
 	
 	public static boolean checkSyncSupport(){
-		return checkNetwork() && checkBrowser();
-	}
-	
-	private static boolean checkNetwork(){
-		try {
-			URL url = new URL("http://www.google.com");
-			HttpURLConnection urlConnect = (HttpURLConnection)url.openConnection();
-			urlConnect.getContent();
-			return true;
-		} catch (IOException e) {
-			return false;
-		}
-	}
-	
-	private static boolean checkBrowser(){
 		try{
 			if (Desktop.isDesktopSupported()) {
 				Desktop desktop = Desktop.getDesktop();
@@ -106,7 +88,7 @@ public class CommonUtil {
 			}
 			return false;
 		} catch (InternalError e) {
-			return checkBrowser();
+			return checkSyncSupport();
 		}
 	}
 	
