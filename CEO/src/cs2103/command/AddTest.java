@@ -1,7 +1,6 @@
 package cs2103.command;
 
 import static org.fusesource.jansi.Ansi.ansi;
-import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.junit.Assert.*;
 
