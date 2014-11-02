@@ -150,6 +150,12 @@ public class StorageEngine implements StorageInterface{
 		}
 	}
 	
+	/**
+	 * @param Task
+	 * @return Delete the Task from the file if it does exist
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	@Override
 	public void deleteTask(Task task) throws HandledException, FatalException{
 		if (task != null){
@@ -163,6 +169,11 @@ public class StorageEngine implements StorageInterface{
 		}
 	}
 
+	/**
+	 * @return The most up-to-date Task list
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	@Override
 	public ArrayList<Task> getTaskList() throws FatalException, HandledException{
 		return this.readFromFile();
