@@ -56,11 +56,11 @@ public abstract class EventTaskTest extends TaskTest{
 	@Test
 	public void testDateToString(){
 		EventTask task = (EventTask) getConcrete();
-		DateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm a");
 		DateTime testDate = new DateTime(0);
-		Ansi testAnsi = task.dateToString(testDate);
-		Ansi expectedAnsi = ansi().bold().fg(RED).a(format.format(testDate)).reset();
-		assertEquals(testAnsi.toString(), testAnsi.toString());
+		Ansi test = task.dateToString(testDate);
+		DateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm a");
+		Ansi expected = ansi().bold().fg(GREEN).a(format.format(testDate)).reset();
+		assertEquals(expected.toString(), test.toString());
 	}
 
 	@Test
