@@ -129,12 +129,4 @@ public class FloatingTaskTest extends ToDoTaskTest {
 		test = ft.toSummary();
 		assertEquals(expected.toString(), (test.toString()));
 	}
-
-	@Test
-	public void testToDetail() {
-		Ansi expected = ft.toSummary();
-		expected.a("Description: ").a(ft.getDescription()).a('\n').reset();
-		Ansi test = ft.toDetail();
-		assertEquals(expected.toString(), (test.toString()));
-	}	
 }

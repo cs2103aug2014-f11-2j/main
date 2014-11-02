@@ -1,13 +1,18 @@
 package cs2103.task;
 
+import static org.fusesource.jansi.Ansi.ansi;
+import static org.fusesource.jansi.Ansi.Color.YELLOW;
 import static org.junit.Assert.*;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.Status;
 
+import org.fusesource.jansi.Ansi;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -146,11 +151,11 @@ public class DeadlineTaskTest extends ToDoTaskTest{
 	
 	@Test
 	public void testToSummary() {
-		fail();
-	}
-
-	@Test
-	public void testToDetail() {
-		fail();
+		Ansi expected = ansi().fg(YELLOW).a(dlt.getTaskID()).a(". ").reset();
+		expected.bold().a(dlt.getTitle()).a('\n').boldOff().reset();
+		expected.a("Status: ").a(ToDoTask.completedToString(dlt.getCompleted()));
+		expected.a("\tDue At: ").a(dlt.dateToString(dlt.getDueTime())).a('\n');
+		Ansi test = dlt.toSummary();
+		assertEquals(expected.toString(), test.toString());
 	}
 }

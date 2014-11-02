@@ -3,7 +3,9 @@ package cs2103.task;
 import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.junit.Assert.*;
+
 import org.fusesource.jansi.Ansi;
+
 import static org.fusesource.jansi.Ansi.*;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.property.Status;
@@ -90,4 +92,13 @@ public abstract class ToDoTaskTest extends TaskTest{
 		testKeyword = "Testing";
 		assertTrue(!(task.matches(testKeyword)));
 	}	
+	
+	@Test 
+	public void testToDetail(){
+		ToDoTask task = (ToDoTask) getConcrete();
+		Ansi expected = task.toSummary();
+		expected.a("Description: ").a(task.getDescription()).a('\n').reset();
+		Ansi test = task.toDetail();
+		assertEquals(expected.toString(), (test.toString()));
+	}
 }
