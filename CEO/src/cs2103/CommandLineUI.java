@@ -143,14 +143,14 @@ public class CommandLineUI {
 				break;
 			case INVALID:
 			default:
-				return ansi().a(MESSAGE_COMMAND_ERROR);
+				return ansi().bgBright(RED).a(MESSAGE_COMMAND_ERROR).reset();
 			}
 			if (commandObject instanceof InfluentialCommand){
 				this.undoStack.push((InfluentialCommand) commandObject);
 			}
 			return commandObject.execute();
 		} catch (HandledException e) {
-			return ansi().a(e.getErrorMsg());
+			return ansi().bgBright(RED).a(e.getErrorMsg()).reset();
 		} catch (FatalException e) {
 			CommonUtil.printErrMsg(MESSAGE_FATAL_ERR);
 			return null;
@@ -192,10 +192,10 @@ public class CommandLineUI {
 	private int executeRedo(int steps) throws HandledException, FatalException{
 		int result = 0;
 		while(!this.redoStack.isEmpty() && result < steps){
-			InfluentialCommand undoCommand = redoStack.pop().redo();
-			if (undoCommand != null){
+			InfluentialCommand redoCommand = redoStack.pop().redo();
+			if (redoCommand != null){
 				result++;
-				this.undoStack.push(undoCommand);
+				this.undoStack.push(redoCommand);
 			}
 		}
 		return result;
