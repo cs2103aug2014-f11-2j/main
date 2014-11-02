@@ -150,7 +150,7 @@ public class CommandLineUI {
 			}
 			return commandObject.execute();
 		} catch (HandledException e) {
-			return ansi().bgBright(RED).a(e.getErrorMsg()).reset();
+			return ansi().bgBright(RED).a(e.getErrorMsg()).a('\n').reset();
 		} catch (FatalException e) {
 			CommonUtil.printErrMsg(MESSAGE_FATAL_ERR);
 			return null;
