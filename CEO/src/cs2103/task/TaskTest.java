@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import cs2103.exception.HandledException;
-import cs2103.util.TestUtil;
 
 public abstract class TaskTest {
 	private static final String testDescription = "New Description";

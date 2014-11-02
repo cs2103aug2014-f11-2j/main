@@ -5,8 +5,6 @@ import static org.fusesource.jansi.Ansi.Color.MAGENTA;
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
 import static org.junit.Assert.*;
 
-import java.util.Date;
-
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.Status;
@@ -16,7 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cs2103.exception.HandledException;
-import cs2103.storage.TaskList;
 import cs2103.util.TestUtil;
 
 public class FloatingTaskTest extends ToDoTaskTest {
