@@ -99,6 +99,6 @@ public abstract class ToDoTaskTest extends TaskTest{
 		Ansi expected = task.toSummary();
 		expected.a("Description: ").a(task.getDescription()).a('\n').reset();
 		Ansi test = task.toDetail();
-		assertEquals(expected.toString(), (test.toString()));
+		assertEquals(expected.toString(), test.toString());
 	}
 }

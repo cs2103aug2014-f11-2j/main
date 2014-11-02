@@ -119,7 +119,7 @@ public class FloatingTaskTest extends ToDoTaskTest {
 		expected.bold().a(ft.getTitle()).a('\n').boldOff().reset();
 		expected.a("Status: ").a(ToDoTask.completedToString(ft.getCompleted())).a('\n');
 		Ansi test = ft.toSummary();
-		assertEquals(expected.toString(), (test.toString()));
+		assertEquals(expected.toString(), test.toString());
 		
 		Ansi deletedTest = ansi().fg(MAGENTA).a("(Deleted Task)\n").reset();
 		ft.delete();
@@ -127,6 +127,6 @@ public class FloatingTaskTest extends ToDoTaskTest {
 		expected.bold().a(ft.getTitle()).a('\n').boldOff().reset().a(deletedTest);
 		expected.a("Status: ").a(ToDoTask.completedToString(ft.getCompleted())).a('\n');
 		test = ft.toSummary();
-		assertEquals(expected.toString(), (test.toString()));
+		assertEquals(expected.toString(), test.toString());
 	}
 }

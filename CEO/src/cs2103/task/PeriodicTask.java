@@ -126,7 +126,7 @@ public class PeriodicTask extends EventTask {
 		return returnString.a('\n');
 	}
 	
-	private static Ansi recurToString(Recur recur){
+	static Ansi recurToString(Recur recur){
 		Ansi returnString = ansi().a(STRING_RECUR);
 		returnString.fg(YELLOW).a(recur.getInterval()).a(' ');
 		returnString.a(recur.getFrequency()).reset();
