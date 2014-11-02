@@ -20,13 +20,6 @@ public abstract class TaskTest {
 	
 	protected abstract Task getConcrete();
 	
-	public abstract void testMatches();
-	public abstract void testToSummary();
-	public abstract void testToDetail();
-	public abstract void testClone() throws CloneNotSupportedException;
-	public abstract void testUpdateAndGetStatus();;
-	public abstract void testRestore();
-	
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 	
@@ -70,27 +63,14 @@ public abstract class TaskTest {
 	@Test
 	public void testUpdateAndGetCreated() {
 		Task task = getConcrete();
+		task.updateCreated(null);
+		assertTrue(new DateTime().equals(task.getCreated()));
 		
+		DateTime testDate = new DateTime(1);
+		task.updateCreated(testDate);
+		assertTrue(testDate.equals(task.getCreated()));
 	}
 	
-	@Test
-	public void testUpdateAndGetTaskUID(){
-		Task task = getConcrete();
-	}
-	
-	public void testConvert(Task task) throws HandledException {
-		testConvertOne(task);
-		//testConvertToFloating(task);
-		//testConvertToDeadline(task);
-		//testConvertToPeriodic(task);
-	}
-	
-	public void testConvertOne(Task task) throws HandledException{
-		exception.expect(HandledException.class);
-		Date[] time=null;
-		task.convert(time);	
-	}
-		
 	@Test
 	public void testEquals() throws CloneNotSupportedException, HandledException{
 		Task task = getConcrete();

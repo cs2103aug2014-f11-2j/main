@@ -1,5 +1,8 @@
 package cs2103.task;
 
+import static org.fusesource.jansi.Ansi.ansi;
+import static org.fusesource.jansi.Ansi.Color.MAGENTA;
+import static org.fusesource.jansi.Ansi.Color.YELLOW;
 import static org.junit.Assert.*;
 
 import java.util.Date;
@@ -8,6 +11,7 @@ import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.Status;
 
+import org.fusesource.jansi.Ansi;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -105,17 +109,32 @@ public class FloatingTaskTest extends ToDoTaskTest {
 	
 	@Test
 	public void testClone() throws CloneNotSupportedException {
-			FloatingTask task = (FloatingTask) ft.clone();
-			assertTrue(TestUtil.compareTasks(task,ft));
+		FloatingTask task = (FloatingTask) ft.clone();
+		assertTrue(TestUtil.compareTasks(task,ft));
 	}
 
 	@Test
 	public void testToSummary() {
-		fail();
+		Ansi expected = ansi().fg(YELLOW).a(ft.getTaskID()).a(". ").reset();
+		expected.bold().a(ft.getTitle()).a('\n').boldOff().reset();
+		expected.a("Status: ").a(ToDoTask.completedToString(ft.getCompleted())).a('\n');
+		Ansi test = ft.toSummary();
+		assertEquals(expected.toString(), (test.toString()));
+		
+		Ansi deletedTest = ansi().fg(MAGENTA).a("(Deleted Task)\n").reset();
+		ft.delete();
+		expected = ansi().fg(YELLOW).a(ft.getTaskID()).a(". ").reset();
+		expected.bold().a(ft.getTitle()).a('\n').boldOff().reset().a(deletedTest);
+		expected.a("Status: ").a(ToDoTask.completedToString(ft.getCompleted())).a('\n');
+		test = ft.toSummary();
+		assertEquals(expected.toString(), (test.toString()));
 	}
 
 	@Test
 	public void testToDetail() {
-		fail();
+		Ansi expected = ft.toSummary();
+		expected.a("Description: ").a(ft.getDescription()).a('\n').reset();
+		Ansi test = ft.toDetail();
+		assertEquals(expected.toString(), (test.toString()));
 	}	
 }

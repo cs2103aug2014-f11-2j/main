@@ -79,11 +79,6 @@ public class PeriodicTaskTest extends EventTaskTest{
 	}
 
 	@Test
-	public void testConvert() throws HandledException {
-		testConvert(pt);
-	}
-
-	@Test
 	public void testClone() throws CloneNotSupportedException {
 		PeriodicTask task = (PeriodicTask) pt.clone();
 		assertTrue(TestUtil.compareTasks(task, pt));

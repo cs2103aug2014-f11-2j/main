@@ -3,18 +3,11 @@ package cs2103.task;
 import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.junit.Assert.*;
-
 import org.fusesource.jansi.Ansi;
-
 import static org.fusesource.jansi.Ansi.*;
-import static org.fusesource.jansi.Ansi.Color.*;
-
-import java.util.Date;
-
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.property.Status;
 
-import org.fusesource.jansi.*;
 import org.junit.Test;
 
 public abstract class ToDoTaskTest extends TaskTest{
@@ -64,12 +57,14 @@ public abstract class ToDoTaskTest extends TaskTest{
 	
 	@Test
 	public void testCompletedToString(){
-		Ansi testAnsi = ansi().fg(RED).a("Needs Action").reset();
-		assertTrue(testAnsi.equals(ToDoTask.completedToString(null)));
+		Ansi test = ToDoTask.completedToString(null);
+		Ansi expected = ansi().fg(RED).a("Needs Action").reset();
+		assertTrue(test.toString().equals(expected.toString()));
 		
 		DateTime testDate = new DateTime();
-		testAnsi = ansi().fg(GREEN).a("Completed").reset(); 
-		assertTrue(testAnsi.equals(ToDoTask.completedToString(testDate)));
+		test = ToDoTask.completedToString(testDate);
+		expected = ansi().fg(GREEN).a("Completed").reset(); 
+		assertTrue(test.toString().equals(expected.toString()));
 	}
 	
 	@Test
