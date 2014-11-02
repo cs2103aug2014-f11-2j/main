@@ -42,7 +42,7 @@ public class Help extends QueryCommand {
             								  "  alert\n" +
             								  "  +display approaching deadlines and start times\n\n" +
             								  "  help\n" + 
-            								  "  +display this message";
+            								  "  +display this message\n";
 	public static final String HELP_ADD = "Add usage:\n"+
 										  "  add <Quick add string>\n" +
 										  "      ([-S or --title <title>] [-D or -description <description>]\n" + 

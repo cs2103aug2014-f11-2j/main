@@ -64,7 +64,7 @@ public class CommonUtil {
 	
 	public static void print(Ansi feedback) {
 		if (feedback != null){
-			AnsiConsole.out.print(feedback.reset());
+			AnsiConsole.out.print(feedback);
 		}
 	}
 	

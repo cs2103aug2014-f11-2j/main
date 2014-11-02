@@ -11,8 +11,8 @@ import cs2103.task.DeadlineTask;
 import cs2103.task.PeriodicTask;
 
 public class Alert extends QueryCommand {
-	private static final Ansi MESSAGE_TASKS_DUE = ansi().a("Tasks due within one day:\n");
-	private static final Ansi MESSAGE_TASKS_STARTING = ansi().a("Tasks start within one day:\n");
+	private static final String MESSAGE_TASKS_DUE = "Tasks due within one day:\n";
+	private static final String MESSAGE_TASKS_STARTING = "Tasks start within one day:\n";
 	
 	@Override
 	public Ansi execute() throws HandledException, FatalException {
