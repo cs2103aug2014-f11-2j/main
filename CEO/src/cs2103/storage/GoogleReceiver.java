@@ -27,6 +27,10 @@ import com.google.api.services.tasks.TasksScopes;
 
 import cs2103.util.CommonUtil;
 
+/**
+ * @author Yuri
+ * This class utilizes Google's OAuth2 method to get credentials.
+ */
 public class GoogleReceiver {
 	private static final String APPLICATION_NAME = "cs2103-CEO/1.0";
 	private static final String client_secret = "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"zCMOqFnPqBLS-jLR7q2p1LGt\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"179875106660-efg7a9ehbjv4lcq2pohh1hd1npgdp1fp.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}";
@@ -39,6 +43,11 @@ public class GoogleReceiver {
 	private HttpTransport httpTransport;
 	private AuthStoreFactory dataStoreFactory;
 	
+	/**
+	 * @throws IOException
+	 * @throws GeneralSecurityException
+	 * Use AuthorizationCodeFlow to authorize this program to access data on Google
+	 */
 	public GoogleReceiver() throws IOException, GeneralSecurityException {
 		dataStoreFactory = new AuthStoreFactory();
 		JSON_FACTORY = JacksonFactory.getDefaultInstance();
@@ -68,10 +77,18 @@ public class GoogleReceiver {
 		}
 	}
 	
+	/**
+	 * @return A Google Calendar client
+	 * @throws IOException
+	 */
 	public com.google.api.services.calendar.Calendar getCalendarClient() throws IOException{
 		return new com.google.api.services.calendar.Calendar.Builder(httpTransport, JSON_FACTORY, this.authorize()).setApplicationName(APPLICATION_NAME).build();
 	}
 	
+	/**
+	 * @return A Google Tasks client
+	 * @throws IOException
+	 */
 	public com.google.api.services.tasks.Tasks getTasksClient() throws IOException{
 		return new com.google.api.services.tasks.Tasks.Builder(httpTransport, JSON_FACTORY, this.authorize()).setApplicationName(APPLICATION_NAME).build();
 	}

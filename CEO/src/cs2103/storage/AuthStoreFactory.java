@@ -24,6 +24,11 @@ import com.google.api.client.util.store.DataStore;
 import com.google.api.client.util.store.DataStoreUtils;
 import com.google.api.client.util.store.FileDataStoreFactory;
 
+/**
+ * @author Yuri
+ * This class extends AbstractDataStoreFactory in Google client API library.
+ * Used to create a qualified local data store for Google authentication
+ */
 public class AuthStoreFactory extends AbstractDataStoreFactory {
 	private final File dataDirectory;
 	
