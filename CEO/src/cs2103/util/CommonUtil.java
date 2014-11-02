@@ -70,7 +70,7 @@ public class CommonUtil {
 	
 	public static void printErrMsg(String errorMsg){
 		if (errorMsg != null && !errorMsg.isEmpty()){
-			print(ansi().fgBright(RED).a(errorMsg).a('\n').reset());
+			print(ansi().bold().bg(RED).a(errorMsg).a('\n').reset());
 		}
 	}
 	

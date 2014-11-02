@@ -143,14 +143,14 @@ public class CommandLineUI {
 				break;
 			case INVALID:
 			default:
-				return ansi().bgBright(RED).a(MESSAGE_COMMAND_ERROR).reset();
+				return ansi().bg(RED).a(MESSAGE_COMMAND_ERROR).reset();
 			}
 			if (commandObject instanceof InfluentialCommand){
 				this.undoStack.push((InfluentialCommand) commandObject);
 			}
 			return commandObject.execute();
 		} catch (HandledException e) {
-			return ansi().bgBright(RED).a(e.getErrorMsg()).a('\n').reset();
+			return ansi().bg(RED).a(e.getErrorMsg()).a('\n').reset();
 		} catch (FatalException e) {
 			CommonUtil.printErrMsg(MESSAGE_FATAL_ERR);
 			return null;
