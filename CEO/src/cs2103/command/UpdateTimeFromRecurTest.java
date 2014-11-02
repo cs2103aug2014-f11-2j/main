@@ -1,5 +1,7 @@
 package cs2103.command;
 
+import static org.fusesource.jansi.Ansi.ansi;
+import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
@@ -23,8 +25,9 @@ public class UpdateTimeFromRecurTest {
 	public void testUpdateFromRecur() throws HandledException, FatalException {
 		
 		UpdateTimeFromRecur ufr = new UpdateTimeFromRecur();
-		String result = ufr.execute();
-		assertEquals("Successfully updated 1 recurring tasks",result);
+		String result = ufr.execute().toString();
+		assertEquals(ansi().fg(GREEN).a("Successfully updated 1 recurring tasks\n").reset().toString(),result);
+		
 	}
 
 }

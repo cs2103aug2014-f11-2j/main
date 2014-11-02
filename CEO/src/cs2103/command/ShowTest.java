@@ -1,5 +1,6 @@
 package cs2103.command;
 
+import static org.fusesource.jansi.Ansi.ansi;
 import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
@@ -9,6 +10,7 @@ import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Option;
 import cs2103.storage.TaskList;
+import cs2103.task.Task;
 
 import cs2103.parameters.ParameterList;
 
@@ -26,12 +28,9 @@ public class ShowTest {
 		Show show = new Show("1");
 		ParameterList pl = show.getParameterList();
 		assertEquals(1,pl.getTaskID().getValue());
-		String result = show.execute();
-		assertEquals("The details for Task 1:\n" +
-				"1. testShow\n" +
-				"Type: Periodic	From: 23-Oct-2014 20:20:00 To 25-Oct-2014 10:00:00\n" +
-				"Location: home\n" +
-				"Description: much testing, such title",result);
+		String result = show.execute().toString();
+		Task t = TaskList.getInstance().getPeriodicList().get(0);
+		assertEquals(ansi().a("The details for Task 1:\n").a(t.toDetail()).toString(),result);
 	}
 	
 	@Test(expected = HandledException.class)

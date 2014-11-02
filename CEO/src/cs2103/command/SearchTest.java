@@ -12,7 +12,6 @@ import cs2103.exception.HandledException;
 import cs2103.parameters.Option;
 import cs2103.storage.TaskList;
 import cs2103.task.DeadlineTask;
-import cs2103.task.FloatingTask;
 import cs2103.task.PeriodicTask;
 
 import cs2103.parameters.ParameterList;
@@ -47,7 +46,7 @@ public class SearchTest {
 		Search searchTitle = new Search("homework -time");
 		ParameterList pl = searchTitle.getParameterList();
 		assertEquals("homework",pl.getKeyword().getValue());
-		assertEquals(Value.ALL,pl.getTaskType().getValue());
+		assertEquals(Value.DEFAULT,pl.getTaskType().getValue());
 		String result = searchTitle.execute().toString();
 		Ansi deadTaskHw = null;
 		for(DeadlineTask t : TaskList.getInstance().getDeadlineList()){
@@ -62,16 +61,16 @@ public class SearchTest {
 	@Test
 	public void testSearchPeriodic() throws HandledException, FatalException{
 		
-		Search searchPeriodic = new Search("-type periodic -complete");
-		ParameterList pl = searchPeriodic.getParameterList();
-		assertEquals(Value.PERIODIC,pl.getTaskType().getValue());
-		String result = searchPeriodic.execute().toString();
-		Ansi completedFloating = null;
-		for(FloatingTask t : TaskList.getInstance().getFloatingList()){
+		Search searchDeadline = new Search("-type deadline -complete");
+		ParameterList pl = searchDeadline.getParameterList();
+		assertEquals(Value.DEADLINE,pl.getTaskType().getValue());
+		String result = searchDeadline.execute().toString();
+		Ansi completedDeadline = null;
+		for(DeadlineTask t : TaskList.getInstance().getDeadlineList()){
 			if(t.getCompleted()!=null){
-				completedFloating = t.toSummary();
+				completedDeadline = t.toSummary();
 			}
 		}
-		assertEquals(ansi().a(completedFloating).a("\n").toString(),result);
+		assertEquals(ansi().a(completedDeadline).a("\n").toString(),result);
 	}
 }

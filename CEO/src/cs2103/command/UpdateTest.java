@@ -1,5 +1,6 @@
 package cs2103.command;
 
+import static org.fusesource.jansi.Ansi.ansi;
 import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
@@ -42,9 +43,11 @@ public class UpdateTest {
 		assertNotNull(pl.getRecurrence());
 		updateTitle.execute();
 		
-		Task task = new PeriodicTask(null, null, null, "I was wrong", "earth",Time.parse(time).getValue()[0], 
-				Time.parse(time).getValue()[1], Recurrence.parse("2d").getValue());
+		Task task = new PeriodicTask(null, null, Time.parse(time).getValue()[0], Time.parse(time).getValue()[1]);
 		task.updateDescription("can't remember");
+		task.updateTitle("I was wrong");
+		task.updateLocation("earth");
+		task.updateRecurrence(Recurrence.parse("2d").getValue());
 		task.updateLastModified(null);
 		
 		for(Task t : TaskList.getInstance().getPeriodicList()){
@@ -66,12 +69,12 @@ public class UpdateTest {
 		updateRedo.execute();
 		updateRedo.undo();
 		List list = new List("deadline");
-		String result = list.execute();
-		assertEquals("2. muchness title\n" +
-				"Type: Deadline	Status: Needs Action	Due At: 29-Nov-2014 20:20:00",result);
+		String result = list.execute().toString();
+		Task t = TaskList.getInstance().getDeadlineList().get(0);
+		assertEquals(ansi().a(t.toSummary()).a("\n").toString(),result);
 		updateRedo.redo();
-		result = list.execute();
-		assertEquals("2. much wrong, very title\n" +
-				"Type: Deadline	Status: Needs Action	Due At: 29-Nov-2014 20:20:00",result);
+		t = TaskList.getInstance().getDeadlineList().get(0);
+		result = list.execute().toString();
+		assertEquals(ansi().a(t.toSummary()).a("\n").toString(),result);
 	}
 }
