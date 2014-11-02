@@ -1,5 +1,8 @@
 package cs2103.task;
 
+import static org.fusesource.jansi.Ansi.ansi;
+import static org.fusesource.jansi.Ansi.Color.CYAN;
+import static org.fusesource.jansi.Ansi.Color.YELLOW;
 import static org.junit.Assert.*;
 
 import java.util.Date;
@@ -8,6 +11,7 @@ import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.Status;
 
+import org.fusesource.jansi.Ansi;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -79,11 +83,6 @@ public class PeriodicTaskTest extends EventTaskTest{
 	}
 
 	@Test
-	public void testConvert() throws HandledException {
-		testConvert(pt);
-	}
-
-	@Test
 	public void testClone() throws CloneNotSupportedException {
 		PeriodicTask task = (PeriodicTask) pt.clone();
 		assertTrue(TestUtil.compareTasks(task, pt));
@@ -129,14 +128,33 @@ public class PeriodicTaskTest extends EventTaskTest{
 
 	@Test
 	public void testToSummary() {
-		fail();
+		Ansi expected = ansi().fg(YELLOW).a(pt.getTaskID()).a(". ").reset();
+		expected.bold().a(pt.getTitle()).a('\n').boldOff().reset();
+		expected.a("From: ").a(pt.dateToString(pt.getStartTime())).a(" to ");
+		expected.a(pt.dateToString(pt.getEndTime())).reset();
+		expected.a('\n').a(PeriodicTask.recurToString(pt.getRecurrence())).a('\n');
+		Ansi test = pt.toSummary();
+		assertEquals(expected.toString(), test.toString());
+		
+		pt.updateRecurrence(null);
+		expected = ansi().fg(YELLOW).a(pt.getTaskID()).a(". ").reset();
+		expected.bold().a(pt.getTitle()).a('\n').boldOff().reset();
+		expected.a("From: ").a(pt.dateToString(pt.getStartTime())).a(" to ");
+		expected.a(pt.dateToString(pt.getEndTime())).reset();
+		expected.a('\n');
+		test = pt.toSummary();
+		assertEquals(expected.toString(), test.toString());
 	}
 
 	@Test
 	public void testToDetail() {
-		fail();
+		Ansi expected = pt.toSummary();
+		expected.a("Location: ");
+		expected.fg(CYAN).a(pt.getLocation()).a("\n").reset();
+		expected.a("Description: ").a(pt.getDescription()).reset().a('\n');
+		Ansi test = pt.toDetail();
+		assertEquals(expected.toString(), test.toString());
 	}
-
 	
 	@Test
 	public void testUpdateTimeFromRecur() throws HandledException {
@@ -154,9 +172,6 @@ public class PeriodicTaskTest extends EventTaskTest{
 		Date startDate = (pt.getRecurrence().getNextDate(new DateTime(pt.getStartTime()), now));
 		pt.updateTime((pt.getRecurrence().getNextDate(new DateTime(pt.getStartTime()), now)),
 				new Date(pt.getEndTime().getTime() - pt.getStartTime().getTime() + startDate.getTime()));
-		assertTrue(TestUtil.compareTasks(pt, pt2));	
-		
+		assertTrue(TestUtil.compareTasks(pt, pt2));		
 	}
-	
-	
 }

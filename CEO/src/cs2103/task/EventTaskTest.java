@@ -1,7 +1,6 @@
 package cs2103.task;
 
 import static org.fusesource.jansi.Ansi.ansi;
-
 import static org.fusesource.jansi.Ansi.Color.*;
 import static org.junit.Assert.*;
 
@@ -57,14 +56,11 @@ public abstract class EventTaskTest extends TaskTest{
 	@Test
 	public void testDateToString(){
 		EventTask task = (EventTask) getConcrete();
-		DateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm a");
 		DateTime testDate = new DateTime(0);
-		Ansi testAnsi = ansi().fg(RED).a(format.format(testDate)).reset();
-		assertEquals(testAnsi, task.dateToString(testDate));
-		
-		testDate = new DateTime(100);
-		testAnsi = ansi().fg(GREEN).a(format.format(testDate)).reset();
-		assertEquals(testAnsi, task.dateToString(testDate));
+		Ansi test = task.dateToString(testDate);
+		DateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm a");
+		Ansi expected = ansi().bold().fg(GREEN).a(format.format(testDate)).reset();
+		assertEquals(expected.toString(), test.toString());
 	}
 
 	@Test
