@@ -7,7 +7,7 @@ import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
 
 public abstract class QueryCommand extends Command {
-	private static final Ansi MESSAGE_EMPTY_LIST = ansi().fg(RED).a("The task list is empty\n").reset();
+	private static final Ansi MESSAGE_EMPTY_LIST = ansi().bold().fg(RED).a("The task list is empty\n").reset();
 	
 	protected static <T extends Task> Ansi parseListResponse(ArrayList<T> taskList){
 		if (taskList == null || taskList.size() == 0){

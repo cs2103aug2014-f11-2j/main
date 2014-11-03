@@ -39,6 +39,11 @@ import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.util.CompatibilityHints;
 
+/**
+ * @author Yuri
+ * This class implements StorageInterface
+ * Using iCal4j to read and store iCalendar file complying RFC 2445 iCalendar specification
+ */
 public class StorageEngine implements StorageInterface{
 	private static StorageEngine storage;
 	private net.fortuna.ical4j.model.Calendar calendar;
@@ -54,6 +59,12 @@ public class StorageEngine implements StorageInterface{
 		readFromFile();
 	}
 	
+	/**
+	 * @param file
+	 * @return Return the default instance of StorageEngine for accessing the content in given file
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	public static StorageEngine getInstance(File file) throws HandledException, FatalException{
 		if (storage == null){
 			storage = new StorageEngine(file);
@@ -118,6 +129,12 @@ public class StorageEngine implements StorageInterface{
 		}
 	}
 	
+	/**
+	 * @param Task
+	 * @return Add the Task object into file if a Task with the same UID does not exist, update if it does
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	@Override
 	public void updateTask(Task task) throws HandledException, FatalException{
 		if (task != null){
@@ -133,6 +150,12 @@ public class StorageEngine implements StorageInterface{
 		}
 	}
 	
+	/**
+	 * @param Task
+	 * @return Delete the Task from the file if it does exist
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	@Override
 	public void deleteTask(Task task) throws HandledException, FatalException{
 		if (task != null){
@@ -146,6 +169,11 @@ public class StorageEngine implements StorageInterface{
 		}
 	}
 
+	/**
+	 * @return The most up-to-date Task list
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	@Override
 	public ArrayList<Task> getTaskList() throws FatalException, HandledException{
 		return this.readFromFile();

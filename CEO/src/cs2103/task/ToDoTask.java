@@ -115,9 +115,9 @@ public abstract class ToDoTask extends Task {
 	protected static Ansi completedToString(DateTime completed){
 		Ansi returnString = ansi();
 		if (completed == null){
-			returnString.fg(RED).a("Needs Action");
+			returnString.bold().fg(RED).a("Needs Action");
 		} else {
-			returnString.fg(GREEN).a("Completed");
+			returnString.bold().fg(GREEN).a("Completed");
 		}
 		return returnString.reset();
 	}

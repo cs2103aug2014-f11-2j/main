@@ -19,6 +19,9 @@ public class Restore extends InfluentialCommand {
 		this.parameterList.addParameter(TaskID.parse(command));
 		CommonUtil.checkNull(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_CMD);
 		this.target = TaskList.getInstance().getTaskByID(this.parameterList.getTaskID().getValue());
+		if (!this.target.isDeleted()){
+			throw new HandledException(HandledException.ExceptionType.NOT_DELETED);
+		}
 	}
 
 	@Override
