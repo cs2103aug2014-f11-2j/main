@@ -60,12 +60,12 @@ public abstract class ToDoTaskTest extends TaskTest{
 	@Test
 	public void testCompletedToString(){
 		Ansi test = ToDoTask.completedToString(null);
-		Ansi expected = ansi().fg(RED).a("Needs Action").reset();
+		Ansi expected = ansi().bold().fg(RED).a("Needs Action").reset();
 		assertTrue(test.toString().equals(expected.toString()));
 		
 		DateTime testDate = new DateTime();
 		test = ToDoTask.completedToString(testDate);
-		expected = ansi().fg(GREEN).a("Completed").reset(); 
+		expected = ansi().bold().fg(GREEN).a("Completed").reset(); 
 		assertTrue(test.toString().equals(expected.toString()));
 	}
 	

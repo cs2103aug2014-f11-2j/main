@@ -19,6 +19,10 @@ import cs2103.exception.HandledException;
 import cs2103.task.*;
 import cs2103.util.CommonUtil;
 
+/**
+ * @author Yuri
+ * Read and write Task objects to Google Calendar and Google Tasks
+ */
 public class GoogleEngine{
 	private static GoogleEngine storage;
 	private final GoogleReceiver receiver;
@@ -42,6 +46,10 @@ public class GoogleEngine{
 		}
 	}
 	
+	/**
+	 * @return The default instance of this class
+	 * @throws HandledException
+	 */
 	public static GoogleEngine getInstance() throws HandledException{
 		if (storage == null){
 			storage = new GoogleEngine();
@@ -49,6 +57,12 @@ public class GoogleEngine{
 		return storage;
 	}
 	
+	/**
+	 * @param Task
+	 * @return delete the task from Google Calendar or Google Tasks if it exists
+	 * @throws IOException
+	 * @throws HandledException
+	 */
 	public void deleteTask(Task task) throws IOException, HandledException {
 		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		try {
@@ -64,6 +78,12 @@ public class GoogleEngine{
 		}
 	}
 	
+	/**
+	 * @param Task
+	 * @return Update the Task in Google Calendar or Google Tasks if it exist. Return the update result if available
+	 * @throws IOException
+	 * @throws HandledException
+	 */
 	public Task updateTask(Task task) throws IOException, HandledException{
 		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		try {
@@ -79,6 +99,12 @@ public class GoogleEngine{
 		}
 	}
 
+	/**
+	 * @param Task
+	 * @return Insert the Task into either Google Calendar or Google Tasks. If the task exists, an IOExcpetion will be thrown
+	 * @throws HandledException
+	 * @throws IOException
+	 */
 	public Task addTask(Task task) throws HandledException, IOException {
 		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		try {
@@ -94,6 +120,10 @@ public class GoogleEngine{
 		}
 	}
 
+	/**
+	 * @return Parse the Google Calendar and Google Tasks entries into Task objects and return an ArrayList of them
+	 * @throws HandledException
+	 */
 	public ArrayList<Task> getTaskList() throws HandledException  {
 		ArrayList<Task> taskList = new ArrayList<Task>();
 		for (com.google.api.services.calendar.model.Event gEvent:this.getEvents()){
@@ -105,6 +135,10 @@ public class GoogleEngine{
 		return taskList;
 	}
 	
+	/**
+	 * @throws IOException
+	 * @return update the stored last update time of Google Calendar and Google Tasks list
+	 */
 	public void updateLastUpdated() throws IOException{
 		try {
 			this.tryToGetLastUpdated();
@@ -119,6 +153,11 @@ public class GoogleEngine{
 		}
 	}
 	
+	/**
+	 * @param Task
+	 * @return Return if a sync is necessary, i.e. whether the Google Calendar or Google Tasks list is modified since last sync
+	 * @throws IOException
+	 */
 	public boolean needToSync(Task task) throws IOException{
 		Date calendarLastUpdateSaved = this.calendarLastUpdate;
 		Date taskLastUpdateSaved = this.taskLastUpdate;

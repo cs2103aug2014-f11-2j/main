@@ -121,7 +121,7 @@ public class TaskList {
 		if (taskID > this.tasks.size() || taskID < 1){
 			throw new HandledException(HandledException.ExceptionType.INVALID_TASKID);
 		} else {
-			return this.tasks.get(taskID-1);
+			return this.tasks.get(taskID - 1);
 		}
 	}
 	
@@ -159,28 +159,6 @@ public class TaskList {
 		if (this.google != null){
 			this.commitDeleteToGoogle(task);
 			this.tasks = this.storage.getTaskList();
-		}
-	}
-	
-	public boolean syncWithGoogle(){
-		if (this.google == null) return false;
-		CommonUtil.print(SYNCING);
-		try {
-			ArrayList<Task> googleList = this.google.getTaskList();
-			String sync_from_google = String.format(SYNC_FROM_GOOGLE, syncFromGoogle(googleList));
-			CommonUtil.print(ansi().fg(YELLOW).a(sync_from_google).reset());
-			String sync_to_google = String.format(SYNC_TO_GOOGLE, syncToGoogle(googleList));
-			CommonUtil.print(ansi().fg(YELLOW).a(sync_to_google).reset());
-			this.tasks = this.storage.getTaskList();
-			this.google.updateLastUpdated();
-			return true;
-		} catch (IOException | FatalException | HandledException e) {
-			if (e instanceof IOException){
-				ErrorLogging.getInstance().writeToLog(COMMIT_ERROR, e);
-			}
-			CommonUtil.printErrMsg(SYNC_FAIL);
-			this.google = null;
-			return false;
 		}
 	}
 	
@@ -254,6 +232,28 @@ public class TaskList {
 		this.updateUidInList(task, returnTask);
 		this.google.updateLastUpdated();
 		return returnTask;
+	}
+	
+	private boolean syncWithGoogle(){
+		if (this.google == null) return false;
+		CommonUtil.print(SYNCING);
+		try {
+			ArrayList<Task> googleList = this.google.getTaskList();
+			String sync_from_google = String.format(SYNC_FROM_GOOGLE, syncFromGoogle(googleList));
+			CommonUtil.print(ansi().fg(YELLOW).a(sync_from_google).reset());
+			String sync_to_google = String.format(SYNC_TO_GOOGLE, syncToGoogle(googleList));
+			CommonUtil.print(ansi().fg(YELLOW).a(sync_to_google).reset());
+			this.tasks = this.storage.getTaskList();
+			this.google.updateLastUpdated();
+			return true;
+		} catch (IOException | FatalException | HandledException e) {
+			if (e instanceof IOException){
+				ErrorLogging.getInstance().writeToLog(COMMIT_ERROR, e);
+			}
+			CommonUtil.printErrMsg(SYNC_FAIL);
+			this.google = null;
+			return false;
+		}
 	}
 	
 	private int syncFromGoogle(ArrayList<Task> googleList) throws HandledException, FatalException{

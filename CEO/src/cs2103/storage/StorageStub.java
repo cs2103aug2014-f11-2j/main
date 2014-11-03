@@ -5,6 +5,10 @@ import java.util.Collections;
 
 import cs2103.task.Task;
 
+/**
+ * @author Yuri
+ * This class is used for testing purpose, it will not write the task list into file system
+ */
 public class StorageStub implements StorageInterface {
 	private static StorageStub storage;
 	private ArrayList<Task> tasks;
@@ -20,6 +24,9 @@ public class StorageStub implements StorageInterface {
 		return storage;
 	}
 	
+	/**
+	 * @see cs2103.storage.StorageInterface#deleteTask(cs2103.task.Task)
+	 */
 	@Override
 	public void deleteTask(Task task){
 		Task existing = this.getModifyingTask(task);
@@ -28,12 +35,18 @@ public class StorageStub implements StorageInterface {
 		}
 	}
 	
+	/**
+	 * @see cs2103.storage.StorageInterface#updateTask(cs2103.task.Task)
+	 */
 	@Override
 	public void updateTask(Task task){
 		this.deleteTask(task);
 		this.tasks.add(task);
 	}
 	
+	/**
+	 * @see cs2103.storage.StorageInterface#getTaskList()
+	 */
 	@Override
 	public ArrayList<Task> getTaskList(){
 		sortTasks();

@@ -58,12 +58,8 @@ public class DeadlineTaskTest extends ToDoTaskTest{
 
 	@Test
 	public void testUpdateAndGetDueTime() throws HandledException{
-		DateTime newDate = new DateTime();
-		dlt.updateDueTime(newDate);
+		DateTime newDate = new DateTime(1);
 		assertTrue(dlt.getDueTime().compareTo(newDate) == 0);
-		
-		exception.expect(HandledException.class);
-		dlt.updateDueTime(null);
 	}
 
 	@Test

@@ -28,7 +28,7 @@ public class DeadlineTask extends ToDoTask {
 		return this.dueTime;
 	}
 	
-	public void updateDueTime(Date dueTime) throws HandledException{
+	private void updateDueTime(Date dueTime) throws HandledException{
 		if (dueTime == null){
 			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
 		} else {
