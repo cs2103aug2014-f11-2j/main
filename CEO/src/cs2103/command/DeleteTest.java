@@ -29,7 +29,6 @@ public class DeleteTest {
 		
 		Add addObj = new Add("-title testDelete");
 		addObj.execute();
-		//returns You have successfully added a new task.
 		Delete deleteObj = new Delete("1 -p");
 		ParameterList pl = deleteObj.getParameterList();
 		assertEquals(true,pl.getDeleteOption().getValue());
@@ -39,11 +38,12 @@ public class DeleteTest {
 		
 	}
 	
+	//This test test temp delete with one valid input (taskiD - 1) and one invalid input (param - m)
 	@Test
 	public void testTempDelete() throws HandledException, FatalException{
 		Add addObj = new Add("-title tempDelete");
 		addObj.execute();
-		Delete deleteObj = new Delete("1");
+		Delete deleteObj = new Delete("1 -m");
 		deleteObj.execute();
 		Task task = new FloatingTask(null, null);
 		task.updateDescription(null);
@@ -51,7 +51,6 @@ public class DeleteTest {
 		for(Task t : TaskList.getInstance().getTrashList()){
 			TestUtil.compareTasks(task, t);
 		}
-		//assertEquals("You have moved task with ID 1 to trash",result);
 	}
 	
 	@Test(expected = HandledException.class)
