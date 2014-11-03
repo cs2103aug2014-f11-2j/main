@@ -15,6 +15,7 @@ import cs2103.storage.TaskList;
 import cs2103.parameters.ParameterList;
 import cs2103.parameters.Recurrence;
 import cs2103.parameters.Time;
+import cs2103.task.DeadlineTask;
 import cs2103.task.PeriodicTask;
 import cs2103.task.Task;
 import cs2103.util.TestUtil;
@@ -43,12 +44,42 @@ public class AddTest {
 		dt.updateRecurrence(Recurrence.parse("2d").getValue());
 		dt.updateLastModified(null);
 		for(Task t :TaskList.getInstance().getDeadlineList()){
-			assertTrue(TestUtil.compareTasks(t, dt));
+			if(t.getTitle().equals("hello")){
+				assertTrue(TestUtil.compareTasks(t, dt));
+			}
 		}
-		/*assertEquals("You have successfully added a new task.\n" +
-				"1. hello\n" +
-				"Type: Deadline	Status: Needs Action	Due At: 12-Dec-2014 20:20:00\n" +
-				"Description: some description",result);*/
+	}
+	
+	@Test
+	public void testQuickAddCommand() throws HandledException, FatalException{
+		Add addObj;
+		addObj = new Add("finish cs2105 assignment by next monday");
+		addObj.execute();
+		Task deadlineTask = new DeadlineTask(null,null,Time.parse("next monday").getValue()[0]);
+		deadlineTask.updateTitle("finish cs2105 assignment ");
+		deadlineTask.updateLastModified(null);
+		for(Task t :TaskList.getInstance().getDeadlineList()){
+			if(t.getTitle().contains("cs2105")){
+				assertTrue(TestUtil.compareTasks(t, deadlineTask));
+			}
+		}
+	}
+	
+	//This is a test case that combines multiple valid and invalid inputs
+	@Test
+	public void testAddCommandInvalidParam() throws HandledException, FatalException{
+		Add addObj;
+		addObj = new Add("-tile hello -description was described -plave earth -time 2014/11/12");
+		addObj.execute();
+		Task deadlineTask = new DeadlineTask(null,null,Time.parse("2014/11/12").getValue()[0]);
+		deadlineTask.updateTitle("");
+		deadlineTask.updateLastModified(null);
+		assertNull(addObj.getParameterList().getLocation());
+		for(Task t :TaskList.getInstance().getDeadlineList()){
+			if(t.getTitle().contains("cs2105")){
+				assertTrue(TestUtil.compareTasks(t, deadlineTask));
+			}
+		}
 	}
 	
 	@SuppressWarnings("unused")
@@ -56,7 +87,8 @@ public class AddTest {
 	public void testAddNullCommand() throws HandledException{
 		Add addObj = new Add(null);
 	}
-	
+
+	//tests undo redo function for add command
 	@Test
 	public void testAddUndoRedo() throws HandledException, FatalException{
 		Add addObj = new Add("-title undo");
