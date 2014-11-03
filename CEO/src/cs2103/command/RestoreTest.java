@@ -5,7 +5,6 @@ import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,14 +36,16 @@ public class RestoreTest {
 		String result = r.execute().toString();
 		FloatingTask t = TaskList.getInstance().getFloatingList().get(0);
 		assertEquals(ansi().fg(GREEN).a("You have successfully restored a task with ID 1\n").reset().a(t.toDetail()).toString(),result);
-		
-		d = new Delete("1 -p");
-		d.execute();
-		result = r.execute().toString();
-		assertEquals(ansi().fg(RED).a("Failed to restor the task with ID 1\n").reset().toString(),result);
 	}
 	
-	//This is test case for boundary value
+	@Test(expected = HandledException.class)
+	public void testTaskNotInTrashRestore() throws HandledException, FatalException{
+		Delete d = new Delete("1 -p");
+		d.execute();
+		Restore r = new Restore("1");
+		r.execute().toString();
+	}
+	
 	@Test(expected=HandledException.class)
 	public void testInvalidRestore() throws HandledException, FatalException{
 		Restore r = new Restore("2");

@@ -84,20 +84,4 @@ public class MarkTest {
 		}
 	
 	}
-	
-/*	@Test
-	public void testMarkUndoRedo() throws HandledException, FatalException{
-		Add addObj = new Add("-title undo"); 
-		addObj.execute();
-		addObj.undo();
-		Search s = new Search("all -keyword undo");
-		String result = s.execute();
-		assertEquals("The task list is empty",result);
-		addObj.redo();
-		result = s.execute();
-		assertEquals("4. undo\n" +
-				"Type: Floating	Status: Needs Action",result);
-	}*/
-	
-	
 }
