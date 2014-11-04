@@ -14,19 +14,20 @@ import cs2103.task.Task;
 
 public class AlertTest {
 	
+	//only displays alert for tasks due within one day of testing, 
+	//so strings should be edited when running tests
 	@BeforeClass
 	public static void initialise() throws HandledException, FatalException{
 		TaskList.getInstance(new Option(Option.Value.TEST));
-	}
-	
-	//actual changes based on date, so strings should be edited when running tests
-	@Test
-	public void testAlert() throws HandledException, FatalException {
-		
 		Add addobj = new Add("add -title testDeadlineAlert -time 2014/11/02 20:20");
 		addobj.execute();
 		addobj = new Add("add -title testPeriodicAlert -time 2014/11/02 20:20 to 2014/11/05 20:20");
-		addobj.execute();
+		addobj.execute();	
+	}
+	
+	@Test
+	public void testAlert() throws HandledException, FatalException {
+		
 		Alert alert = new Alert();
 		String result = alert.execute().toString();
 		Task dead = TaskList.getInstance().getDeadlineList().get(0);

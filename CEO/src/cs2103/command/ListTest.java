@@ -28,13 +28,27 @@ public class ListTest {
 		addObj.execute();
 	}
 	
-	
+	//This test checks output for invalid input
 	@Test
 	public void testDefaultlist() throws FatalException, HandledException{
 		
 		List listDefault = new List("hello");
 		ParameterList pl = listDefault.getParameterList();
 		assertEquals(Value.INVALID,pl.getTaskType().getValue());
+		String result = listDefault.execute().toString();
+		Task t = TaskList.getInstance().getFloatingList().get(0);
+		Task t2 = TaskList.getInstance().getDeadlineList().get(0);
+		Task t3 = TaskList.getInstance().getPeriodicList().get(0);
+		assertEquals(ansi().a(t.toSummary()).a("\n").a(t2.toSummary())
+				.a("\n").a(t3.toSummary()).a("\n").toString(),result);
+	}
+	
+	@Test
+	public void testAllist() throws FatalException, HandledException{
+		
+		List listDefault = new List("all");
+		ParameterList pl = listDefault.getParameterList();
+		assertEquals(Value.DEFAULT,pl.getTaskType().getValue());
 		String result = listDefault.execute().toString();
 		Task t = TaskList.getInstance().getFloatingList().get(0);
 		Task t2 = TaskList.getInstance().getDeadlineList().get(0);
