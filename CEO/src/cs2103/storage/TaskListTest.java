@@ -26,11 +26,11 @@ public class TaskListTest {
 		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status  testStatus = new Status("testPeriodic");
 		
-		PeriodicTask testPeriodicTask = new PeriodicTask("testPeriodic", null, testStatus, "testPeriodic", "testlocation", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis() + 864000L), null);
+		PeriodicTask testPeriodicTask = new PeriodicTask("testPeriodic", testStatus, new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis() + 864000L));
 		test.addTask(testPeriodicTask);
 		
 		ArrayList<PeriodicTask> returnTest = test.getPeriodicList();
-		assertTrue(TestUtil.compareTasks(returnTest.get(0),testPeriodicTask));
+		assertEquals(returnTest.get(0).getStatus(), testStatus);
 	}
 
 	@Test
@@ -38,7 +38,7 @@ public class TaskListTest {
 		TaskList testDead = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testStatus");
 		
-		DeadlineTask testTask = new DeadlineTask("testDead", new Date(), testStatus, "testDeadline", new Date(), new Date());
+		DeadlineTask testTask = new DeadlineTask("testDeadline", testStatus, new Date());
 		testDead.addTask(testTask);
 		ArrayList<DeadlineTask> returnTest = testDead.getDeadlineList();
 		assertTrue(TestUtil.compareTasks(returnTest.get(0), testTask));
@@ -49,48 +49,43 @@ public class TaskListTest {
 		TaskList testFloat = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testFloat");
 		
-		FloatingTask testTask = new FloatingTask("testFloat", new Date(), testStatus, "testFloating", new Date());
+		FloatingTask testTask = new FloatingTask("testFloat", testStatus);
 		testFloat.addTask(testTask);
 		ArrayList<FloatingTask> returnTest = testFloat.getFloatingList();
-		assertTrue(TestUtil.compareTasks(returnTest.get(2), testTask));
+		
+		assertTrue(TestUtil.compareTasks(returnTest.get(3), testTask));
 	}
 	
 	@Test
 	public void testGetAllList() throws HandledException, FatalException {
 		TaskList testAll = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testStatus");
-		Date startDate = new Date(System.currentTimeMillis());
-		Date completeDate = new Date(System.currentTimeMillis() + 864000L);
-		
-		Task testAllTask = new FloatingTask("testAll", startDate, testStatus, "testAll", completeDate);
+	
+		Task testAllTask = new FloatingTask("testAll", testStatus);
 		testAll.addTask(testAllTask);
 		
 		ArrayList<Task> test = testAll.getAllList();
-		assertTrue(TestUtil.compareTasks(test.get(4), testAllTask));
+		assertTrue(TestUtil.compareTasks(test.get(5), testAllTask));
 	}
 	
 	@Test
 	public void testGetTaskByID() throws HandledException, FatalException {
 		TaskList testID = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testID");
-		Date createdDate = new Date(System.currentTimeMillis());
 		Date dueDate = new Date(System.currentTimeMillis() + 865000L);
 		
 		
-		DeadlineTask testIDTask = new DeadlineTask("testID", createdDate, testStatus, "testID", new Date(), dueDate);
+		DeadlineTask testIDTask = new DeadlineTask("testID", testStatus, dueDate);
 		testID.addTask(testIDTask);
-		
-		assertTrue(TestUtil.compareTasks(testID.getTaskByID(7), testIDTask));
+		assertTrue(TestUtil.compareTasks(testID.getTaskByID(8), testIDTask));
 	}
 	
 	@Test
 	public void testAddTask() throws HandledException, FatalException {
 		TaskList testAdd = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testAdd");
-		Date startDate = new Date(System.currentTimeMillis());
-		Date completeDate =new Date(System.currentTimeMillis() + 863000L);
 		
-		Task testAddTask = new FloatingTask("testAdd", startDate, testStatus, "testAdd", completeDate);
+		Task testAddTask = new FloatingTask("testAdd", testStatus);
 		testAdd.addTask(testAddTask);
 		ArrayList<Task> returnTest = testAdd.getAllList();
 		assertTrue(TestUtil.compareTasks(returnTest.get(0), testAddTask));
@@ -101,17 +96,13 @@ public class TaskListTest {
 	public void testUpdateTask() throws HandledException, FatalException {
 		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testUpdate");
-		Date startDate = new Date(System.currentTimeMillis());
-		Date completeDate = new Date(System.currentTimeMillis() + 861000L);
-		Date startDate1 = new Date(System.currentTimeMillis());
-		Date completeDate1 = new Date(System.currentTimeMillis() + 867000L);
 		
-		FloatingTask testTask = new FloatingTask("testUpdate", startDate, testStatus, "testUpdate", completeDate);
+		FloatingTask testTask = new FloatingTask("testUpdate", testStatus);
 		test.addTask(testTask);
 		ArrayList<FloatingTask> returnTest = test.getFloatingList();
 		assertTrue(TestUtil.compareTasks(returnTest.get(1), testTask));
 		
-		FloatingTask testTask1 = new FloatingTask("testUpdate", startDate1, testStatus, "testUpdate", completeDate1);
+		FloatingTask testTask1 = new FloatingTask("testUpdate2", testStatus);
 		test.updateTask(testTask1);
 		ArrayList<FloatingTask> returnTest1 = test.getFloatingList();
 		assertTrue(TestUtil.compareTasks(returnTest1.get(1), testTask1));
@@ -124,7 +115,7 @@ public class TaskListTest {
 		Date startDate = new Date(System.currentTimeMillis());
 		Date completeDate = new Date(System.currentTimeMillis() + 861000L);
 		
-		PeriodicTask testTask = new PeriodicTask("testDelete", startDate, testStatus, "testDelete", "testingDelete", startDate,completeDate, null);
+		PeriodicTask testTask = new PeriodicTask("testDelete", testStatus, startDate,completeDate);
 		test.addTask(testTask);
 	
 		test.deleteTask(testTask);
@@ -136,28 +127,25 @@ public class TaskListTest {
 	public void testGetTrashList() throws HandledException, FatalException {
 		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testTrash");
-		Date startDate = new Date(System.currentTimeMillis());
-		Date completeDate = new Date(System.currentTimeMillis() + 869000L);
 		
-		PeriodicTask testTask = new PeriodicTask("testTrash", startDate, testStatus, "testTrash", "testingTrash", startDate,completeDate, null);
+		FloatingTask testTask = new FloatingTask("testTrash", testStatus);
 		test.addTask(testTask);
 		testTask.delete();
 		ArrayList<Task> testTrash = test.getTrashList();
-		assertTrue(TestUtil.compareTasks(testTrash.get(0), testTask));
+		assertEquals(testTrash.get(0).getStatus(), testTask.getStatus());
 	}
 	
 	@Test
 	public void testGetDefaultList() throws HandledException, FatalException {
 		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testDefault");
-		Date startDate = new Date(System.currentTimeMillis());
-		Date completeDate = new Date(System.currentTimeMillis() + 866000L);
 		
-		PeriodicTask testingDefault = new PeriodicTask("testDefault", startDate, testStatus, "testDefault", "testingDefault", startDate,completeDate, null);
+		FloatingTask testingDefault = new FloatingTask("testFloating", testStatus);
 		test.addTask(testingDefault);
 		
 		ArrayList<Task> testDefault = test.getDefaultList();
-		assertTrue(TestUtil.compareTasks(testDefault.get(0), testingDefault));
+		assertTrue(TestUtil.compareTasks(testDefault.get(7), testingDefault));
 	}
 
 }
+
