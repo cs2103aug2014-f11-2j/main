@@ -35,6 +35,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		} else {
 			this.taskUID = taskUID;
 		}
+		this.updateCreated(null);
 	}
 	
 	private String generateUid(){
@@ -65,9 +66,6 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	}
 	
 	public DateTime getCreated(){
-		if (this.created == null){
-			this.created = new DateTime();
-		}
 		return this.created;
 	}
 	

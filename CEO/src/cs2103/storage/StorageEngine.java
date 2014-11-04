@@ -33,6 +33,7 @@ import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Created;
+import net.fortuna.ical4j.model.property.LastModified;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Version;
@@ -181,15 +182,14 @@ public class StorageEngine implements StorageInterface{
 	
 	private Task parseVEvent(VEvent component) throws ParseException, FatalException, HandledException{
 		String componentUID = this.readUid(component);
-		Date componentCreated = this.readCreated(component);
 		Date[] componentPeriod = this.readPeriod(component);
 		PeriodicTask task = new PeriodicTask(componentUID, component.getStatus(), componentPeriod[0], componentPeriod[1]);
-		task.updateCreated(componentCreated);
+		task.updateCreated(this.readCreated(component));
 		task.updateTitle(this.readTitle(component));
 		task.updateLocation(this.readLocation(component));
 		task.updateRecurrence(this.readRecur(component));
-		task.updateDescription(readDescription(component));
-		task.updateLastModified(component.getLastModified() == null? new Date():component.getLastModified().getDateTime());
+		task.updateDescription(this.readDescription(component));
+		task.updateLastModified(this.readLastModified(component));
 		return task;
 	}
 	
@@ -203,9 +203,9 @@ public class StorageEngine implements StorageInterface{
 		}
 		task.updateTitle(this.readTitle(component));
 		task.updateCreated(this.readCreated(component));
-		task.updateDescription(readDescription(component));
+		task.updateDescription(this.readDescription(component));
 		task.updateCompleted(this.readCompleted(component));
-		task.updateLastModified(component.getLastModified() == null?null:component.getLastModified().getDateTime());
+		task.updateLastModified(this.readLastModified(component));
 		return task;
 	}
 	
@@ -225,6 +225,14 @@ public class StorageEngine implements StorageInterface{
 			return null;
 		} else {
 			return ((Created) component.getProperty(Property.CREATED)).getDateTime();
+		}
+	}
+	
+	private Date readLastModified(Component component){
+		if (component.getProperty(Property.LAST_MODIFIED) == null){
+			return null;
+		} else {
+			return ((LastModified) component.getProperty(Property.LAST_MODIFIED)).getDateTime();
 		}
 	}
 	
