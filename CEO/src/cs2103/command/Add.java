@@ -53,6 +53,7 @@ public class Add extends InfluentialCommand {
 		}
 		task.updateTitle(this.readTitle());
 		task.updateDescription(this.readDescription());
+		task.updateCreated(null);
 		task.updateLocation(this.readLocation());
 		task.updateRecurrence(this.readRecurrence());
 		task.updateLastModified(null);
