@@ -108,15 +108,27 @@ public class PeriodicTask extends EventTask {
 	@Override
 	public Ansi toSummary() {
 		Ansi returnString = this.addCommonString();
+		formatStartEndTime(returnString);
+		if (hasRecurrence()){
+			formatRecurrence(returnString);
+		}
+		return returnString;
+	}
+
+	private boolean hasRecurrence() {
+		return this.getRecurrence() != null;
+	}
+
+	private void formatStartEndTime(Ansi returnString) {
 		returnString.a("From: ");
 		returnString.a(this.dateToString(this.getStartTime()));
 		returnString.a(" to ");
 		returnString.a(this.dateToString(this.getEndTime())).reset();
 		returnString.a('\n');
-		if (this.getRecurrence() != null){
-			returnString.a(recurToString(this.getRecurrence())).a('\n');
-		}
-		return returnString;
+	}
+
+	private Ansi formatRecurrence(Ansi returnString) {
+		return returnString.a(recurToString(this.getRecurrence())).a('\n');
 	}
 
 	@Override
@@ -159,7 +171,7 @@ public class PeriodicTask extends EventTask {
 	public VEvent toVEvent() {
 		VEvent vEvent = new VEvent(this.getStartTime(), this.getEndTime(),this.getTitle());
 		this.addCommonProperty(vEvent);
-		if (this.getRecurrence() != null){
+		if (hasRecurrence()){
 			vEvent.getProperties().add(new RRule(this.getRecurrence()));
 		}
 		vEvent.getProperties().add(this.getStatus());
@@ -202,11 +214,15 @@ public class PeriodicTask extends EventTask {
 	
 	@Override
 	public boolean matches(String keyword) {
-		if (keyword == null || keyword.isEmpty()){
+		if (isInvalidKeyword(keyword)){
 			return true;
 		} else {
 			return containsKeywordInTask(keyword);
 		}
+	}
+
+	private boolean isInvalidKeyword(String keyword) {
+		return keyword == null || keyword.isEmpty();
 	}
 
 	private boolean containsKeywordInTask(String keyword) {
@@ -234,12 +250,12 @@ public class PeriodicTask extends EventTask {
 	
 	public PeriodicTask updateTimeFromRecur() throws HandledException{
 		DateTime now = new DateTime();
-		if (this.getRecurrence() != null && this.getRecurrence().getFrequency() != null && this.getEndTime().before(now)){
-			Date startTime = this.getRecurrence().getNextDate(this.getStartTime(), now);
+		if (hasRecurrenceAndFrequency() && endTimeBeforeNow(now)){
+			Date startTime = calculateStartTimeFromRecur(now);
 			if (startTime == null){
 				return null;
 			} else {
-				Date endTime = new Date(this.getEndTime().getTime() - this.getStartTime().getTime() + startTime.getTime());
+				Date endTime = calculateEndTimeFromRecur(startTime);
 				this.updateTime(startTime, endTime);
 				this.updateLastModified(null);
 				return this;
@@ -247,5 +263,22 @@ public class PeriodicTask extends EventTask {
 		} else {
 			return null;
 		}
+	}
+
+	private net.fortuna.ical4j.model.Date calculateStartTimeFromRecur(
+			DateTime now) {
+		return this.getRecurrence().getNextDate(this.getStartTime(), now);
+	}
+
+	private Date calculateEndTimeFromRecur(Date startTime) {
+		return new Date(this.getEndTime().getTime() - this.getStartTime().getTime() + startTime.getTime());
+	}
+
+	private boolean endTimeBeforeNow(DateTime now) {
+		return this.getEndTime().before(now);
+	}
+
+	private boolean hasRecurrenceAndFrequency() {
+		return hasRecurrence() && this.getRecurrence().getFrequency() != null;
 	}
 }
