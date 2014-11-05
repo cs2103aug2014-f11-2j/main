@@ -48,7 +48,7 @@ public class ListTest {
 		
 		List listDefault = new List("all");
 		ParameterList pl = listDefault.getParameterList();
-		assertEquals(Value.DEFAULT,pl.getTaskType().getValue());
+		assertEquals(Value.ALL,pl.getTaskType().getValue());
 		String result = listDefault.execute().toString();
 		Task t = TaskList.getInstance().getFloatingList().get(0);
 		Task t2 = TaskList.getInstance().getDeadlineList().get(0);
