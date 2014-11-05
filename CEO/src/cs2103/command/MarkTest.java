@@ -26,8 +26,8 @@ import cs2103.util.TestUtil;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class MarkTest {
-
 	static Date d = null;
+	
 	@BeforeClass
 	public static void initialise() throws HandledException, FatalException{
 		TaskList.getInstance(new Option(Option.Value.TEST));
@@ -35,7 +35,7 @@ public class MarkTest {
 	}
 	
 	@Test
-	public void floatingTask_MarkTest() throws HandledException, FatalException {
+	public void test1_FloatingTask_Mark() throws HandledException, FatalException {
 		Add addObj = new Add("-title floating");
 		addObj.execute();
 		Mark markFloating = new Mark("1");
@@ -50,11 +50,10 @@ public class MarkTest {
 		for(Task t : TaskList.getInstance().getFloatingList()){
 			assertTrue(TestUtil.compareTasks(t, ft));
 		}
-	
 	}
 	
 	@Test
-	public void periodicTask_MarkTest() throws HandledException, FatalException{
+	public void test3_PeriodicTask_Mark() throws HandledException, FatalException{
 		Add addObj = new Add("-title periodic -time 2014/10/23 20:20 to 2014/10/25 20:20");
 		addObj.execute();
 		Mark markPeriodic = new Mark("3");
@@ -66,7 +65,7 @@ public class MarkTest {
 	}
 	
 	@Test
-	public void deadlineTask_MarkTest() throws HandledException, FatalException{
+	public void test2_DeadlineTask_Mark() throws HandledException, FatalException{
 		Add addObj = new Add("-title deadline -time 2014/10/23 20:20");
 		addObj.execute();
 		Mark markDeadline = new Mark("2");
@@ -83,6 +82,5 @@ public class MarkTest {
 		for(Task t: TaskList.getInstance().getDeadlineList()){
 			TestUtil.compareTasks(t, pt);
 		}
-	
 	}
 }
