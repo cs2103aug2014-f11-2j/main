@@ -15,6 +15,10 @@ import cs2103.util.CommonUtil;
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
 
+/**
+ * @author Zheng Han
+ * Receives the commands from the user
+ */
 public class CommandLineUI {
 	private static final String MESSAGE_WELCOME_FORMAT = "Welcome to the CEO. %1$s";
 	private static final String MESSAGE_SYNC_ENABLED = "Google Sync is enabled";
@@ -58,6 +62,14 @@ public class CommandLineUI {
 		
 	}
 	
+	/**
+	 * Returns an instance of the CommandLineUI class.
+	 * 
+	 * @param option
+	 * @return The instance of the CommandLineUI class
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	public static CommandLineUI getInstance(Option option) throws HandledException, FatalException{
 		if (commandLine == null){
 			commandLine = new CommandLineUI(option);
@@ -66,6 +78,9 @@ public class CommandLineUI {
 		return commandLine;
 	}
 	
+	/**
+	 * @param args
+	 */
 	public static void main(String[] args){
 		CommandLineUI main;
 		try{
@@ -228,6 +243,12 @@ public class CommandLineUI {
 		}
 	}
 	
+	/**
+	 * Carries out the testing of different commands.
+	 * 
+	 * @param testCommandInput
+	 * @return a resultant string from an input command
+	 */
 	public String testCommand(String testCommandInput){
 		return processUserInput(testCommandInput).toString();
 	}
