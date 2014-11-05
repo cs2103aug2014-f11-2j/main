@@ -11,7 +11,6 @@ import net.fortuna.ical4j.model.property.Status;
 import org.junit.Test;
 
 /**
- * @author brianluong
  *	Containing tests for the inherited methods in 
  * 				concrete Task classes: DeadlineTask and FloatingTask
  */
@@ -65,6 +64,10 @@ public abstract class ToDoTaskTest extends TaskTest{
 		assertTrue(test.toString().equals(expected.toString()));
 	}
 	
+	/**
+	 * Matches returns true if the input string is included, regardless
+	 * 				of case, in the title or description fields 
+	 */
 	@Test
 	public void testMatches(){
 		ToDoTask task = (ToDoTask) getConcrete();

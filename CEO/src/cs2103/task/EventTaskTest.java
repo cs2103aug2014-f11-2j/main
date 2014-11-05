@@ -17,6 +17,9 @@ import org.junit.Test;
 
 import cs2103.exception.HandledException;
 
+/**
+ * Containing tests for the inherited methods in concrete Task class PeriodicTask
+ */
 public abstract class EventTaskTest extends TaskTest{
 
 	@Test
@@ -57,6 +60,9 @@ public abstract class EventTaskTest extends TaskTest{
 		assertEquals(expected.toString(), test.toString());
 	}
 
+	/**
+	 * Three different cases to test UpdateTime, getStartTime, and getEndTime methods
+	 */
 	@Test
 	public void testUpdateAndGetStartAndEndTime() throws HandledException {
 		testUpdateAndGetStartAndEndTimeOne();
@@ -64,6 +70,9 @@ public abstract class EventTaskTest extends TaskTest{
 		testUpdateAndGetStartAndEndTimeThree();
 	}
 	
+	/**
+	 * Case 1: Invalid input, throwing error
+	 */
 	private void testUpdateAndGetStartAndEndTimeOne() throws HandledException {
 		EventTask task = (EventTask) getConcrete();
 		exception.expect(HandledException.class);
@@ -72,6 +81,9 @@ public abstract class EventTaskTest extends TaskTest{
 		task.updateTime(date1, date2);
 	}
 
+	/**
+	 * Case 2: Start time after end time, throwing error
+	 */
 	private void testUpdateAndGetStartAndEndTimeTwo() throws HandledException {
 		EventTask task = (EventTask) getConcrete();
 		exception.expect(HandledException.class);
@@ -80,6 +92,9 @@ public abstract class EventTaskTest extends TaskTest{
 		task.updateTime(date1, date2);
 	}
 	
+	/**
+	 * Case 3: Successful Update 
+	 */
 	private void testUpdateAndGetStartAndEndTimeThree() throws HandledException {
 		EventTask task = (EventTask) getConcrete();
 		DateTime date1 = new DateTime(1);

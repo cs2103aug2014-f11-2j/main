@@ -14,7 +14,6 @@ import org.junit.rules.ExpectedException;
 import cs2103.exception.HandledException;
 
 /**
- * @author brianluong
  * Containing tests for the inherited methods in 
  * 				concrete Task classes: DeadlineTask, FloatingTask, and PeriodicTask
  */
@@ -24,6 +23,11 @@ public abstract class TaskTest {
 	private static final String testTitle = "New Title";
 	private static final int testTaskID = 1;
 	
+	/**
+	 * Called in the beginning of every JUnit test that is inherited from 
+	 * 							an Abstract JUnit Test class
+	 * Obtains a concrete object to run JUnit test
+	 */
 	protected abstract Task getConcrete();
 	
 	@Rule
@@ -111,7 +115,7 @@ public abstract class TaskTest {
 	
 	@Test
 	public void testDeleteAndIsDeleted(){
-		ToDoTask task = (ToDoTask) getConcrete();
+		Task task = (Task) getConcrete();
 		task.delete();
 		assertTrue(task.isDeleted());
 	}
