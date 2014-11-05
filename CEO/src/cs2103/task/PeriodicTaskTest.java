@@ -1,6 +1,8 @@
 //@author A0128478R
 package cs2103.task;
 
+
+// oops forgot to do convert
 import static org.fusesource.jansi.Ansi.ansi;
 import static org.fusesource.jansi.Ansi.Color.CYAN;
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
@@ -145,6 +147,67 @@ public class PeriodicTaskTest extends EventTaskTest{
 		
 		pt.updateLocation("New LOcation");
 		assertEquals(pt.matches(keyword), true);
+	}
+	
+	@Test
+	public void testConvert() throws HandledException {
+		testConvertException();
+		testConvertToFloating();
+		testConvertToDeadline();
+		testConvertToPeriodic();
+	}
+	
+	private void testConvertException() throws HandledException {
+		exception.expect(HandledException.class);
+		DateTime[] time = null;
+		pt.convert(time);	
+	}
+	
+	private void testConvertToFloating() throws HandledException {
+		DateTime[] time = new DateTime[2];
+		time[0] = null;
+		time[1] = null;
+		Task pt2 = pt.convert(time);
+		assertTrue(pt2 instanceof FloatingTask);
+		
+		Task taskExpected = new FloatingTask(pt.getTaskUID(), Status.VTODO_NEEDS_ACTION);
+		taskExpected.updateTitle(pt.getTitle());
+		taskExpected.updateDescription(pt.getDescription());
+		taskExpected.updateLastModified(pt.getLastModified());
+		taskExpected.updateCompleted(pt.getCompleted());
+		assertTrue(TestUtil.compareTasks(pt2, taskExpected));
+	}
+
+	private void testConvertToDeadline() throws HandledException {	
+		DateTime[] time = new DateTime[2];
+		time[0] = new DateTime(1);
+		time[1] = null;
+		Task ft2 = pt.convert(time);
+		assertTrue(ft2 instanceof DeadlineTask);
+		
+		DeadlineTask taskExpected = new DeadlineTask(pt.getTaskUID(), Status.VTODO_NEEDS_ACTION, time[0]);
+		taskExpected.updateTitle(pt.getTitle());
+		taskExpected.updateDescription(pt.getDescription());
+		taskExpected.updateLastModified(pt.getLastModified());
+		taskExpected.updateCompleted(pt.getCompleted());
+		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
+	}
+	
+	private void testConvertToPeriodic() throws HandledException {
+		DateTime[] time = new DateTime[2];
+		time[0] = new DateTime(1);
+		time[1]= new DateTime(2);
+		Task ft2 = pt.convert(time);
+		assertTrue(ft2 instanceof PeriodicTask);
+		
+		PeriodicTask taskExpected = new PeriodicTask(pt.getTaskUID(), pt.getStatus(), time[0], time[1]);
+		taskExpected.updateTitle(pt.getTitle());
+		taskExpected.updateDescription(pt.getDescription());
+		taskExpected.updateLocation(pt.getLocation());
+		taskExpected.updateRecurrence(pt.getRecurrence());
+		taskExpected.updateLastModified(pt.getLastModified());
+		taskExpected.updateCompleted(pt.getCompleted());
+		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
 	}
 
 	@Test
