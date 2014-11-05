@@ -1,5 +1,8 @@
+//@author A0128478R
 package cs2103.task;
 
+
+// oops forgot to do convert
 import static org.fusesource.jansi.Ansi.ansi;
 import static org.fusesource.jansi.Ansi.Color.CYAN;
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
@@ -42,8 +45,12 @@ public class PeriodicTaskTest extends EventTaskTest{
 		pt.updateLocation(this.location);
 		pt.updateLastModified(null);
 		pt.updateRecurrence(this.recurrence);
+		System.out.println(recurrence.getFrequency());
 	}
 
+	/**
+	 * Three different cases to test PeriodicTask constructor
+	 */
 	@Test 
 	public void testPeriodicTaskConstructor() throws HandledException{
 		testPeriodicTaskConstructionOne();
@@ -51,11 +58,17 @@ public class PeriodicTaskTest extends EventTaskTest{
 		testPeriodicTaskConstructionThree();
 	}
 		
+	/**
+	 * Case 1: Invalid input times
+	 */
 	public void testPeriodicTaskConstructionOne() throws HandledException {
 		exception.expect(HandledException.class);
 		pt = new PeriodicTask(this.taskUID, this.status, null, null);
 	}
 	
+	/**
+	 * Case 2: Invalid input times
+	 */
 	public void testPeriodicTaskConstructionTwo() throws HandledException {
 		exception.expect(HandledException.class);
 		DateTime newStartTime = new DateTime(1);
@@ -63,6 +76,9 @@ public class PeriodicTaskTest extends EventTaskTest{
 		pt = new PeriodicTask(this.taskUID, this.status, newStartTime, newEndTime);
 	}
 
+	/**
+	 * Case 3: Successful Creation
+	 */
 	public void testPeriodicTaskConstructionThree() throws HandledException {
 		pt = new PeriodicTask(this.taskUID, this.status, this.startTime, this.endTime);
 		assertTrue(true);
@@ -89,6 +105,9 @@ public class PeriodicTaskTest extends EventTaskTest{
 		
 	}
 
+	/**
+	 * Check if Periodic Task should be alerted to user
+	 */
 	@Test
 	public void testCheckPeriod() {
 		Date[] time = new Date[2];
@@ -101,7 +120,11 @@ public class PeriodicTaskTest extends EventTaskTest{
 		time[1] = new DateTime(2);
 		assertEquals(pt.checkPeriod(time), true);
 	}
-
+	
+	/**
+	 * Matches returns true if the input string is included, regardless
+	 * 				of case, in the title, description, and location fields 
+	 */
 	@Test
 	public void testMatches() {
 		String keyword = null;
@@ -124,6 +147,67 @@ public class PeriodicTaskTest extends EventTaskTest{
 		
 		pt.updateLocation("New LOcation");
 		assertEquals(pt.matches(keyword), true);
+	}
+	
+	@Test
+	public void testConvert() throws HandledException {
+		testConvertException();
+		testConvertToFloating();
+		testConvertToDeadline();
+		testConvertToPeriodic();
+	}
+	
+	private void testConvertException() throws HandledException {
+		exception.expect(HandledException.class);
+		DateTime[] time = null;
+		pt.convert(time);	
+	}
+	
+	private void testConvertToFloating() throws HandledException {
+		DateTime[] time = new DateTime[2];
+		time[0] = null;
+		time[1] = null;
+		Task pt2 = pt.convert(time);
+		assertTrue(pt2 instanceof FloatingTask);
+		
+		Task taskExpected = new FloatingTask(pt.getTaskUID(), Status.VTODO_NEEDS_ACTION);
+		taskExpected.updateTitle(pt.getTitle());
+		taskExpected.updateDescription(pt.getDescription());
+		taskExpected.updateLastModified(pt.getLastModified());
+		taskExpected.updateCompleted(pt.getCompleted());
+		assertTrue(TestUtil.compareTasks(pt2, taskExpected));
+	}
+
+	private void testConvertToDeadline() throws HandledException {	
+		DateTime[] time = new DateTime[2];
+		time[0] = new DateTime(1);
+		time[1] = null;
+		Task ft2 = pt.convert(time);
+		assertTrue(ft2 instanceof DeadlineTask);
+		
+		DeadlineTask taskExpected = new DeadlineTask(pt.getTaskUID(), Status.VTODO_NEEDS_ACTION, time[0]);
+		taskExpected.updateTitle(pt.getTitle());
+		taskExpected.updateDescription(pt.getDescription());
+		taskExpected.updateLastModified(pt.getLastModified());
+		taskExpected.updateCompleted(pt.getCompleted());
+		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
+	}
+	
+	private void testConvertToPeriodic() throws HandledException {
+		DateTime[] time = new DateTime[2];
+		time[0] = new DateTime(1);
+		time[1]= new DateTime(2);
+		Task ft2 = pt.convert(time);
+		assertTrue(ft2 instanceof PeriodicTask);
+		
+		PeriodicTask taskExpected = new PeriodicTask(pt.getTaskUID(), pt.getStatus(), time[0], time[1]);
+		taskExpected.updateTitle(pt.getTitle());
+		taskExpected.updateDescription(pt.getDescription());
+		taskExpected.updateLocation(pt.getLocation());
+		taskExpected.updateRecurrence(pt.getRecurrence());
+		taskExpected.updateLastModified(pt.getLastModified());
+		taskExpected.updateCompleted(pt.getCompleted());
+		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
 	}
 
 	@Test
@@ -156,22 +240,33 @@ public class PeriodicTaskTest extends EventTaskTest{
 		assertEquals(expected.toString(), test.toString());
 	}
 	
+	/**
+	 * Two different test cases to see if a task can correctly update based on its recurrence
+	 */
 	@Test
 	public void testUpdateTimeFromRecur() throws HandledException {
+		testUpdateTimeFromRecurOne();
+		testUpdateTimeFromRecurTwo();
+	}
+	
+	/**
+	 * Recurrence is non null
+	 */
+	private void testUpdateTimeFromRecurOne() throws HandledException {
 		PeriodicTask pt2 = pt.updateTimeFromRecur();
 		assertTrue(pt2 == null);
 		recurrence.setFrequency(Recur.HOURLY);
-		recurrence.setInterval(1);
 		pt.updateRecurrence(recurrence);
 		pt2 = pt.updateTimeFromRecur();
 		assertTrue(TestUtil.compareTasks(pt, pt2));
+	}
 		
-		pt.updateTime(new DateTime(0), new DateTime(1));
-		pt2 = pt.updateTimeFromRecur();
-		DateTime now = new DateTime();
-		Date startDate = (pt.getRecurrence().getNextDate(new DateTime(pt.getStartTime()), now));
-		pt.updateTime((pt.getRecurrence().getNextDate(new DateTime(pt.getStartTime()), now)),
-				new Date(pt.getEndTime().getTime() - pt.getStartTime().getTime() + startDate.getTime()));
-		assertTrue(TestUtil.compareTasks(pt, pt2));		
+	/**
+	 * Recurrence is null
+	 */
+	private void testUpdateTimeFromRecurTwo() throws HandledException {
+		pt.updateRecurrence(null);
+		PeriodicTask pt2 = pt.updateTimeFromRecur();
+		assertTrue(pt2 == null);
 	}
 }

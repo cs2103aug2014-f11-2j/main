@@ -27,37 +27,35 @@ public class FloatingTask extends ToDoTask {
 	
 	private FloatingTask toFloating() throws HandledException {
 		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getStatus());
+		updateNewTask(newTask);
+		return newTask;
+	}
+
+	private void updateNewTask(Task newTask) {
 		newTask.updateTitle(this.getTitle());
 		newTask.updateCreated(this.getCreated());
-		newTask.updateCompleted(this.getCompleted());
 		newTask.updateDescription(this.getDescription());
-		return newTask;
+		if (!(newTask instanceof PeriodicTask)) {
+			newTask.updateCompleted(this.getCompleted());
+		}
 	}
 
 	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
 		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION, dueTime);
-		newTask.updateTitle(this.getTitle());
-		newTask.updateCreated(this.getCreated());
-		newTask.updateCompleted(this.getCompleted());
-		newTask.updateDescription(this.getDescription());
+		updateNewTask(newTask);
 		return newTask;
 	}
 
 	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
 		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), Status.VEVENT_CONFIRMED, startTime, endTime);
-		newTask.updateTitle(this.getTitle());
-		newTask.updateCreated(this.getCreated());
-		newTask.updateDescription(this.getDescription());
+		updateNewTask(newTask);
 		return newTask;
 	}
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getStatus());
-		newTask.updateTitle(this.getTitle());
-		newTask.updateCreated(this.getCreated());
-		newTask.updateCompleted(this.getCompleted());
-		newTask.updateDescription(this.getDescription());
+		updateNewTask(newTask);
 		newTask.updateLastModified(null);
 		return newTask;
 	}
@@ -65,8 +63,12 @@ public class FloatingTask extends ToDoTask {
 	@Override
 	public Ansi toSummary() {
 		Ansi returnString = this.addCommonString();
-		returnString.a("Status: ").a(completedToString(this.getCompleted()));
-		return returnString.a('\n');
+		formatStatus(returnString);
+		return returnString;
+	}
+
+	private void formatStatus(Ansi returnString) {
+		returnString.a("Status: ").a(completedToString(this.getCompleted())).a('\n');
 	}
 	
 	@Override

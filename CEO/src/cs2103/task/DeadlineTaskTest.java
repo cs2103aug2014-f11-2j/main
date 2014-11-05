@@ -1,3 +1,4 @@
+//@author A0128478R
 package cs2103.task;
 
 import org.fusesource.jansi.Ansi;
@@ -40,17 +41,26 @@ public class DeadlineTaskTest extends ToDoTaskTest{
 		dlt.updateLastModified(null);
 	}
 	
+	/**
+	 * Three different cases to test DeadlineTask constructor
+	 */
 	@Test 
 	public void testDeadlineTaskConstructor() throws HandledException{
 		testDeadlineTaskConstructionOne();
 		testDeadlineTaskConstructionTwo();
 	}
 		
+	/**
+	 * Case 1: Invalid date
+	 */
 	public void testDeadlineTaskConstructionOne() throws HandledException {
 		exception.expect(HandledException.class);
 		dlt = new DeadlineTask(this.taskUID, this.status, null);
 	}
 	
+	/**
+	 * Case 2: Successful Construction 
+	 */
 	public void testDeadlineTaskConstructionTwo() throws HandledException {
 		dlt = new DeadlineTask(this.taskUID, this.status, null);
 		assertTrue(true);
@@ -62,6 +72,9 @@ public class DeadlineTaskTest extends ToDoTaskTest{
 		assertTrue(dlt.getDueTime().compareTo(newDate) == 0);
 	}
 
+	/**
+	 * Check if DeadlineTask should be alerted to user
+	 */
 	@Test
 	public void testCheckPeriod() {
 		DateTime[] time = new DateTime[2];
@@ -96,7 +109,7 @@ public class DeadlineTaskTest extends ToDoTaskTest{
 		Task ft2 = dlt.convert(time);
 		assertTrue(ft2 instanceof FloatingTask);
 		
-		Task taskExpected = new FloatingTask(null, null);
+		Task taskExpected = new FloatingTask(dlt.getTaskUID(), Status.VTODO_NEEDS_ACTION);
 		taskExpected.updateTitle(dlt.getTitle());
 		taskExpected.updateDescription(dlt.getDescription());
 		taskExpected.updateLastModified(dlt.getLastModified());
@@ -111,7 +124,7 @@ public class DeadlineTaskTest extends ToDoTaskTest{
 		Task ft2 = dlt.convert(time);
 		assertTrue(ft2 instanceof DeadlineTask);
 		
-		DeadlineTask taskExpected = new DeadlineTask(null, dlt.getStatus(), time[0]);
+		DeadlineTask taskExpected = new DeadlineTask(dlt.getTaskUID(), dlt.getStatus(), time[0]);
 		taskExpected.updateTitle(dlt.getTitle());
 		taskExpected.updateDescription(dlt.getDescription());
 		taskExpected.updateLastModified(dlt.getLastModified());
@@ -126,7 +139,7 @@ public class DeadlineTaskTest extends ToDoTaskTest{
 		Task ft2 = dlt.convert(time);
 		assertTrue(ft2 instanceof PeriodicTask);
 		
-		PeriodicTask taskExpected = new PeriodicTask(null, null, time[0], time[1]);
+		PeriodicTask taskExpected = new PeriodicTask(dlt.getTaskUID(), Status.VEVENT_CONFIRMED, time[0], time[1]);
 		taskExpected.updateTitle(dlt.getTitle());
 		taskExpected.updateDescription(dlt.getDescription());
 		taskExpected.updateLastModified(dlt.getLastModified());

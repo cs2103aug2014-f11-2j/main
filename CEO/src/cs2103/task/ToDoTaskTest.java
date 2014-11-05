@@ -1,17 +1,19 @@
+//@author A0128478R
 package cs2103.task;
 
 import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.junit.Assert.*;
-
 import org.fusesource.jansi.Ansi;
-
 import static org.fusesource.jansi.Ansi.*;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.property.Status;
-
 import org.junit.Test;
 
+/**
+ *	Containing tests for the inherited methods in 
+ * 				concrete Task classes: DeadlineTask and FloatingTask
+ */
 public abstract class ToDoTaskTest extends TaskTest{
 
 	@Test
@@ -34,13 +36,6 @@ public abstract class ToDoTaskTest extends TaskTest{
 		Status testStatus = Status.VTODO_COMPLETED;
 		task.updateStatus(testStatus);
 		assertEquals(testStatus, task.getStatus());
-	}
-	
-	@Test
-	public void testDeleteAndIsDeleted(){
-		ToDoTask task = (ToDoTask) getConcrete();
-		task.delete();
-		assertTrue(task.isDeleted());
 	}
 	
 	@Test
@@ -69,6 +64,10 @@ public abstract class ToDoTaskTest extends TaskTest{
 		assertTrue(test.toString().equals(expected.toString()));
 	}
 	
+	/**
+	 * Matches returns true if the input string is included, regardless
+	 * 				of case, in the title or description fields 
+	 */
 	@Test
 	public void testMatches(){
 		ToDoTask task = (ToDoTask) getConcrete();

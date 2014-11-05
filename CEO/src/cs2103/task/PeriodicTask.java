@@ -62,40 +62,37 @@ public class PeriodicTask extends EventTask {
 	
 	private FloatingTask toFloating() throws HandledException {
 		FloatingTask newTask = new FloatingTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION);
-		newTask.updateTitle(this.getTitle());
-		newTask.updateCreated(this.getCreated());
-		newTask.updateDescription(this.getDescription());
+		updateNewTask(newTask);
 		return newTask;
 	}
 
 	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
 		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION, dueTime);
-		newTask.updateTitle(this.getTitle());
-		newTask.updateCreated(this.getCreated());
-		newTask.updateDescription(this.getDescription());
+		updateNewTask(newTask);
 		return newTask;
 	}
 
 	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
 		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getStatus(), startTime, endTime);
+		updateNewTask(newTask);
+		return newTask;
+	}
+	
+	private void updateNewTask(Task newTask) {
+		if (newTask instanceof PeriodicTask) {
+			newTask.updateLocation(this.getLocation());
+			newTask.updateRecurrence(this.getRecurrence());
+		}
 		newTask.updateTitle(this.getTitle());
 		newTask.updateCreated(this.getCreated());
-		newTask.updateLocation(this.getLocation());
-		newTask.updateRecurrence(this.getRecurrence());
 		newTask.updateDescription(this.getDescription());
-		return newTask;
 	}
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		try {
 			PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getStatus(), this.getStartTime(), this.getEndTime());
-			newTask.updateTitle(this.getTitle());
-			newTask.updateCreated(this.getCreated());
-			newTask.updateLocation(this.getLocation());
-			newTask.updateRecurrence(this.getRecurrence());
-			newTask.updateDescription(this.getDescription());
-			newTask.updateLastModified(null);
+			updateClone(newTask);
 			return newTask;
 		} catch (HandledException e) {
 			throw new CloneNotSupportedException();
@@ -103,27 +100,52 @@ public class PeriodicTask extends EventTask {
 		
 	}
 
+	private void updateClone(PeriodicTask newTask) {
+		updateNewTask(newTask);
+		newTask.updateLastModified(null);
+	}
+
 	@Override
 	public Ansi toSummary() {
 		Ansi returnString = this.addCommonString();
+		formatStartEndTime(returnString);
+		if (hasRecurrence()){
+			formatRecurrence(returnString);
+		}
+		return returnString;
+	}
+
+	private boolean hasRecurrence() {
+		return this.getRecurrence() != null;
+	}
+
+	private void formatStartEndTime(Ansi returnString) {
 		returnString.a("From: ");
 		returnString.a(this.dateToString(this.getStartTime()));
 		returnString.a(" to ");
 		returnString.a(this.dateToString(this.getEndTime())).reset();
 		returnString.a('\n');
-		if (this.getRecurrence() != null){
-			returnString.a(recurToString(this.getRecurrence())).a('\n');
-		}
-		return returnString;
+	}
+
+	private Ansi formatRecurrence(Ansi returnString) {
+		return returnString.a(recurToString(this.getRecurrence())).a('\n');
 	}
 
 	@Override
 	public Ansi toDetail() {
 		Ansi returnString = this.toSummary();
+		formatLocation(returnString);
+		formatDescription(returnString);
+		return returnString;
+	}
+
+	private void formatLocation(Ansi returnString) {
 		returnString.a(STRING_LOCATION);
 		returnString.fg(CYAN).a(this.getLocation()).a("\n").reset();
-		returnString.a(STRING_DESCRIPTION).a(this.getDescription()).reset();
-		return returnString.a('\n');
+	}
+	
+	private void formatDescription(Ansi returnString) {
+		returnString.a(STRING_DESCRIPTION).a(this.getDescription()).reset().a('\n');
 	}
 	
 	static Ansi recurToString(Recur recur){
@@ -149,7 +171,7 @@ public class PeriodicTask extends EventTask {
 	public VEvent toVEvent() {
 		VEvent vEvent = new VEvent(this.getStartTime(), this.getEndTime(),this.getTitle());
 		this.addCommonProperty(vEvent);
-		if (this.getRecurrence() != null){
+		if (hasRecurrence()){
 			vEvent.getProperties().add(new RRule(this.getRecurrence()));
 		}
 		vEvent.getProperties().add(this.getStatus());
@@ -192,21 +214,48 @@ public class PeriodicTask extends EventTask {
 	
 	@Override
 	public boolean matches(String keyword) {
-		if (keyword == null || keyword.isEmpty()){
+		if (isInvalidKeyword(keyword)){
 			return true;
 		} else {
-			return StringUtils.containsIgnoreCase(this.getTitle(), keyword) || StringUtils.containsIgnoreCase(this.getDescription(), keyword) || StringUtils.containsIgnoreCase(this.getLocation(), keyword);
+			return containsKeywordInTask(keyword);
 		}
+	}
+
+	private boolean isInvalidKeyword(String keyword) {
+		return keyword == null || keyword.isEmpty();
+	}
+
+	private boolean containsKeywordInTask(String keyword) {
+		if (containsKeywordInTitle(keyword)) {
+			return true;
+		} else if (containsKeywordInDescription(keyword)) {
+			return true;
+		} else if (containsKeywordInLocation(keyword)) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean containsKeywordInLocation(String keyword) {
+		return StringUtils.containsIgnoreCase(this.getLocation(), keyword);
+	}
+
+	private boolean containsKeywordInDescription(String keyword) {
+		return StringUtils.containsIgnoreCase(this.getDescription(), keyword);
+	}
+
+	private boolean containsKeywordInTitle(String keyword) {
+		return StringUtils.containsIgnoreCase(this.getTitle(), keyword);
 	}
 	
 	public PeriodicTask updateTimeFromRecur() throws HandledException{
 		DateTime now = new DateTime();
-		if (this.getRecurrence() != null && this.getRecurrence().getFrequency() != null && this.getEndTime().before(now)){
-			Date startTime = this.getRecurrence().getNextDate(this.getStartTime(), now);
+		if (hasRecurrenceAndFrequency() && endTimeBeforeNow(now)){
+			Date startTime = calculateStartTimeFromRecur(now);
 			if (startTime == null){
 				return null;
 			} else {
-				Date endTime = new Date(this.getEndTime().getTime() - this.getStartTime().getTime() + startTime.getTime());
+				Date endTime = calculateEndTimeFromRecur(startTime);
 				this.updateTime(startTime, endTime);
 				this.updateLastModified(null);
 				return this;
@@ -214,5 +263,22 @@ public class PeriodicTask extends EventTask {
 		} else {
 			return null;
 		}
+	}
+
+	private net.fortuna.ical4j.model.Date calculateStartTimeFromRecur(
+			DateTime now) {
+		return this.getRecurrence().getNextDate(this.getStartTime(), now);
+	}
+
+	private Date calculateEndTimeFromRecur(Date startTime) {
+		return new Date(this.getEndTime().getTime() - this.getStartTime().getTime() + startTime.getTime());
+	}
+
+	private boolean endTimeBeforeNow(DateTime now) {
+		return this.getEndTime().before(now);
+	}
+
+	private boolean hasRecurrenceAndFrequency() {
+		return hasRecurrence() && this.getRecurrence().getFrequency() != null;
 	}
 }

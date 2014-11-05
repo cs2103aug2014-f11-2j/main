@@ -16,6 +16,10 @@ import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.Status;
 
+/**
+ * @author brianluong
+ *
+ */
 public class DeadlineTask extends ToDoTask {
 	private DateTime dueTime;
 	
