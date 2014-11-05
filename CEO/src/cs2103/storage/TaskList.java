@@ -17,6 +17,10 @@ import cs2103.util.CommonUtil;
 
 import java.util.Collections;
 
+/**
+ * @author Zheng Han
+ * Compiles the tasks into lists
+ */
 public class TaskList {
 	private static TaskList taskList;
 	private final StorageInterface storage;
@@ -52,6 +56,15 @@ public class TaskList {
 		this.syncWithGoogle();
 	}
 	
+	/**
+	 * Method returns different instances of the TaskList class
+	 * based on the Option arguments.
+	 * 
+	 * @param option
+	 * @return An instance of the TaskList class
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	public static TaskList getInstance(Option option) throws HandledException, FatalException{
 		if (taskList == null){
 			taskList = new TaskList(option);
@@ -59,6 +72,12 @@ public class TaskList {
 		return taskList;
 	}
 	
+	/**
+	 * Method returns an instance of the TaskList class.
+	 * 
+	 * @return An instance of the TaskList class
+	 * @throws FatalException
+	 */
 	public static TaskList getInstance() throws FatalException{
 		if (taskList == null){
 			throw new FatalException(FatalException.ExceptionType.NOT_INITIALIZED);
@@ -67,6 +86,13 @@ public class TaskList {
 		}
 	}
 	
+	/**
+	 * Method returns an ArrayList of periodic tasks.
+	 * 
+	 * @return an ArrayList of PeriodicTask objects
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	public ArrayList<PeriodicTask> getPeriodicList() throws HandledException, FatalException{
 		ArrayList<PeriodicTask> returnList = new ArrayList<PeriodicTask>();
 		for (Task task:this.getAllList()){
@@ -78,6 +104,13 @@ public class TaskList {
 		return returnList;
 	}
 	
+	/**
+	 * Method returns an ArrayList of Deadline tasks.
+	 * 
+	 * @return an ArrayList of DeadlineTask objects
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	public ArrayList<DeadlineTask> getDeadlineList() throws HandledException, FatalException{
 		ArrayList<DeadlineTask> returnList = new ArrayList<DeadlineTask>();
 		for (Task task:this.getAllList()){
@@ -89,6 +122,13 @@ public class TaskList {
 		return returnList;
 	}
 	
+	/**
+	 * Method returns an ArrayList of floating tasks.
+	 * 
+	 * @return an ArrayList of FloatingTask objects
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	public ArrayList<FloatingTask> getFloatingList() throws HandledException, FatalException{
 		ArrayList<FloatingTask> returnList = new ArrayList<FloatingTask>();
 		for (Task task:this.getAllList()){
@@ -99,10 +139,21 @@ public class TaskList {
 		return returnList;
 	}
 	
+	/**
+	 * Method returns an ArrayList of deleted tasks.
+	 * 
+	 * @return an ArrayList of Task objects
+	 */
 	public ArrayList<Task> getTrashList(){
 		return this.filterList(this.tasks, true);
 	}
 	
+	/**
+	 * Method returns an ArrayList of default tasks.
+	 * 
+	 * @return an ArrayList of Task objects.
+	 * @throws HandledException
+	 */
 	public ArrayList<Task> getDefaultList() throws HandledException{
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for (Task task:this.getAllList()){
@@ -113,10 +164,23 @@ public class TaskList {
 		return returnList;
 	}
 	
+	/**
+	 * Method returns an ArrayList of all task types.
+	 * 
+	 * @return an ArrayList of Task objects
+	 * @throws HandledException
+	 */
 	public ArrayList<Task> getAllList() throws HandledException{
 		return this.filterList(this.tasks, false);
 	}
 	
+	/**
+	 * Method returns a Task object based on the integer argument.
+	 * 
+	 * @param taskID
+	 * @return a Task object based on the taskID parameter
+	 * @throws HandledException
+	 */
 	public Task getTaskByID(int taskID) throws HandledException{
 		if (taskID > this.tasks.size() || taskID < 1){
 			throw new HandledException(HandledException.ExceptionType.INVALID_TASKID);
@@ -125,6 +189,14 @@ public class TaskList {
 		}
 	}
 	
+	/**
+	 * Method adds the Task argument to the storage component.
+	 * 
+	 * @param task
+	 * @return a Task object based on the Task argument
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	public Task addTask(Task task) throws HandledException, FatalException{
 		this.storage.updateTask(task);
 		this.tasks = this.storage.getTaskList();
@@ -139,6 +211,14 @@ public class TaskList {
 		return returnTask;
 	}
 	
+	/**
+	 * Updates the Task object in the storage based on the Task argument.
+	 * 
+	 * @param task
+	 * @return a Task object based on the Task argument
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	public Task updateTask(Task task) throws HandledException, FatalException{
 		this.storage.updateTask(task);
 		this.tasks = this.storage.getTaskList();
@@ -153,6 +233,13 @@ public class TaskList {
 		return returnTask;
 	}
 	
+	/**
+	 * Deletes a Task object from storage based on the Task argument.
+	 * 
+	 * @param task
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	public void deleteTask(Task task) throws HandledException, FatalException{
 		this.storage.deleteTask(task);
 		this.tasks = this.storage.getTaskList();
@@ -162,6 +249,13 @@ public class TaskList {
 		}
 	}
 	
+	/**
+	 * Returns a true value if the system manages to sync with google,
+	 * false otherwise.
+	 * 
+	 * @return a boolean value based on whether the system is able to sync with google
+	 * @throws HandledException
+	 */
 	public boolean manualSync() throws HandledException {
 		if (this.google == null) {
 			this.google = GoogleEngine.getInstance();
@@ -169,6 +263,9 @@ public class TaskList {
 		return this.syncWithGoogle();
 	}
 	
+	/**
+	 * Disables the system's connection with google.
+	 */
 	public void disableSync(){
 		this.google = null;
 	}
