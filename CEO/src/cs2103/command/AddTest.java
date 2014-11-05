@@ -66,17 +66,18 @@ public class AddTest {
 	}
 	
 	//This is a test case that combines multiple valid and invalid inputs
-	@Test
+	@Test(expected=HandledException.class)
 	public void testAddCommandInvalidParam() throws HandledException, FatalException{
 		Add addObj;
 		addObj = new Add("-tile hello -description was described -plave earth -time 2014/11/12");
 		addObj.execute();
 		Task deadlineTask = new DeadlineTask(null,null,Time.parse("2014/11/12").getValue()[0]);
-		deadlineTask.updateTitle("");
 		deadlineTask.updateLastModified(null);
+		deadlineTask.updateDescription("was described");
+		deadlineTask.updateTitle("");
 		assertNull(addObj.getParameterList().getLocation());
 		for(Task t :TaskList.getInstance().getDeadlineList()){
-			if(t.getTitle().contains("cs2105")){
+			if(t.getDescription().contains("was")){
 				assertTrue(TestUtil.compareTasks(t, deadlineTask));
 			}
 		}
@@ -96,7 +97,7 @@ public class AddTest {
 		addObj.undo();
 		Search s = new Search("undo");
 		String result = s.execute().toString();
-		assertEquals(ansi().fg(RED).a("The task list is empty\n").reset().toString(),result);
+		assertEquals(ansi().bold().fg(RED).a("The task list is empty\n").reset().toString(),result);
 		addObj.redo();
 		result = s.execute().toString();
 		Task t = TaskList.getInstance().getFloatingList().get(0);

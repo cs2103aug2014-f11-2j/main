@@ -19,11 +19,12 @@ public class HandledException extends Exception {
 	private static final String LOGIN_FAIL = "Unable to get Credential from Google, Google Sync is disabled";
 	private static final String SYNC_FAIL = "Unable to sync your data with Google, Google Sync is disabled";
 	private static final String NOT_DELETED = "The task you are trying to restore is not in the trash bin!";
+	private static final String NO_TITLE = "You must specify a title for the task!";
 	private final String errorMsg;
 	
 	public static enum ExceptionType{
 		INVALID_TASKID, INVALID_TASK_OBJ, INVALID_TASK_TYPE, INVALID_TIME, END_BEFORE_START, TASK_NOT_EXIST, INVALID_PARA, 
-		INVALID_CMD, INVALID_COMPLETE, LESS_THAN_ONE_PARA, CLONE_FAILED, UNEXPECTED_ERR, LOGIN_FAIL, SYNC_FAIL, NOT_DELETED;
+		INVALID_CMD, INVALID_COMPLETE, LESS_THAN_ONE_PARA, CLONE_FAILED, UNEXPECTED_ERR, LOGIN_FAIL, SYNC_FAIL, NOT_DELETED, NO_TITLE;
 	}
 	
 	public HandledException(ExceptionType exceptionType){
@@ -68,6 +69,8 @@ public class HandledException extends Exception {
 			return SYNC_FAIL;
 		case NOT_DELETED:
 			return NOT_DELETED;
+		case NO_TITLE:
+			return NO_TITLE;
 		default:
 			return null;
 		}

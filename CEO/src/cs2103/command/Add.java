@@ -121,7 +121,7 @@ public class Add extends InfluentialCommand {
 	
 	private String readTitle() throws HandledException{
 		if (this.parameterList.getTitle() == null){
-			return null;
+			throw new HandledException(HandledException.ExceptionType.NO_TITLE);
 		} else {
 			return this.parameterList.getTitle().getValue();
 		}

@@ -7,7 +7,9 @@ import static org.junit.Assert.*;
 import java.util.Date;
 
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
@@ -21,24 +23,21 @@ import cs2103.task.FloatingTask;
 import cs2103.task.Task;
 import cs2103.util.TestUtil;
 
-public class MarkTest {
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class MarkTest {
 	static Date d = null;
+	
 	@BeforeClass
 	public static void initialise() throws HandledException, FatalException{
 		TaskList.getInstance(new Option(Option.Value.TEST));
-		Add addObj = new Add("-title floating");
-		addObj.execute();
-		addObj = new Add("-title deadline -time 2014/10/23 20:20");
-		addObj.execute();
-		addObj = new Add("-title periodic -time 2014/10/23 20:20 to 2014/10/25 20:20");
-		addObj.execute();
 		d = new Date();
 	}
 	
 	@Test
-	public void testMarkFloating() throws HandledException, FatalException {
-		
+	public void test1_FloatingTask_Mark() throws HandledException, FatalException {
+		Add addObj = new Add("-title floating");
+		addObj.execute();
 		Mark markFloating = new Mark("1");
 		ParameterList pl = markFloating.getParameterList();
 		assertEquals(1,pl.getTaskID().getValue());
@@ -51,12 +50,12 @@ public class MarkTest {
 		for(Task t : TaskList.getInstance().getFloatingList()){
 			assertTrue(TestUtil.compareTasks(t, ft));
 		}
-	
 	}
 	
 	@Test
-	public void testMarkPeriodic() throws HandledException, FatalException{
-		
+	public void test3_PeriodicTask_Mark() throws HandledException, FatalException{
+		Add addObj = new Add("-title periodic -time 2014/10/23 20:20 to 2014/10/25 20:20");
+		addObj.execute();
 		Mark markPeriodic = new Mark("3");
 		ParameterList pl = markPeriodic.getParameterList();
 		assertEquals(3,pl.getTaskID().getValue());
@@ -66,8 +65,9 @@ public class MarkTest {
 	}
 	
 	@Test
-	public void testMarkDeadline() throws HandledException, FatalException{
-		
+	public void test2_DeadlineTask_Mark() throws HandledException, FatalException{
+		Add addObj = new Add("-title deadline -time 2014/10/23 20:20");
+		addObj.execute();
 		Mark markDeadline = new Mark("2");
 		ParameterList pl = markDeadline.getParameterList();
 		assertEquals(2,pl.getTaskID().getValue());
@@ -82,6 +82,5 @@ public class MarkTest {
 		for(Task t: TaskList.getInstance().getDeadlineList()){
 			TestUtil.compareTasks(t, pt);
 		}
-	
 	}
 }

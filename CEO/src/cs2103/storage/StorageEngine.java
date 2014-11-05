@@ -61,8 +61,8 @@ public class StorageEngine implements StorageInterface{
 	}
 	
 	/**
+	 * Return the default instance of StorageEngine for accessing the content in given file
 	 * @param file
-	 * @return Return the default instance of StorageEngine for accessing the content in given file
 	 * @throws HandledException
 	 * @throws FatalException
 	 */
@@ -131,8 +131,8 @@ public class StorageEngine implements StorageInterface{
 	}
 	
 	/**
+	 * Add the Task object into file if a Task with the same UID does not exist, update if it does
 	 * @param Task
-	 * @return Add the Task object into file if a Task with the same UID does not exist, update if it does
 	 * @throws HandledException
 	 * @throws FatalException
 	 */
@@ -152,8 +152,8 @@ public class StorageEngine implements StorageInterface{
 	}
 	
 	/**
+	 * Delete the Task from the file if it does exist
 	 * @param Task
-	 * @return Delete the Task from the file if it does exist
 	 * @throws HandledException
 	 * @throws FatalException
 	 */

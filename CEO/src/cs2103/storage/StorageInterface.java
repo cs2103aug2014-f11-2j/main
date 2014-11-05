@@ -8,15 +8,15 @@ import cs2103.task.Task;
 
 public interface StorageInterface {
 	/**
+	 * Delete the task from storage
 	 * @param Task
-	 * @return Delete the task from storage
 	 * @throws HandledException
 	 * @throws FatalException
 	 */
 	public void deleteTask(Task task) throws HandledException, FatalException;
 	/**
-	 * @param task
-	 * @return Add the Task object into file if a Task with the same UID does not exist, update if it does
+	 * Add the Task object into file if a Task with the same UID does not exist, update if it does
+	 * @param Task
 	 * @throws HandledException
 	 * @throws FatalException
 	 */

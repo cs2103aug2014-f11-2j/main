@@ -19,9 +19,9 @@ public class AlertTest {
 	@BeforeClass
 	public static void initialise() throws HandledException, FatalException{
 		TaskList.getInstance(new Option(Option.Value.TEST));
-		Add addobj = new Add("add -title testDeadlineAlert -time 2014/11/02 20:20");
+		Add addobj = new Add("add -title testDeadlineAlert -time 2014/11/06 20:20");
 		addobj.execute();
-		addobj = new Add("add -title testPeriodicAlert -time 2014/11/02 20:20 to 2014/11/05 20:20");
+		addobj = new Add("add -title testPeriodicAlert -time 2014/11/06 20:20 to 2014/11/07 20:20");
 		addobj.execute();	
 	}
 	
