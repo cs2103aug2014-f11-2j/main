@@ -62,23 +62,23 @@ public class PeriodicTask extends EventTask {
 	
 	private FloatingTask toFloating() throws HandledException {
 		FloatingTask newTask = new FloatingTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION);
-		updateConvertedTask(newTask);
+		updateNewTask(newTask);
 		return newTask;
 	}
 
 	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
 		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION, dueTime);
-		updateConvertedTask(newTask);
+		updateNewTask(newTask);
 		return newTask;
 	}
 
 	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
 		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getStatus(), startTime, endTime);
-		updateConvertedTask(newTask);
+		updateNewTask(newTask);
 		return newTask;
 	}
 	
-	private void updateConvertedTask(Task newTask) {
+	private void updateNewTask(Task newTask) {
 		if (newTask instanceof PeriodicTask) {
 			newTask.updateLocation(this.getLocation());
 			newTask.updateRecurrence(this.getRecurrence());
@@ -101,11 +101,7 @@ public class PeriodicTask extends EventTask {
 	}
 
 	private void updateClone(PeriodicTask newTask) {
-		newTask.updateTitle(this.getTitle());
-		newTask.updateCreated(this.getCreated());
-		newTask.updateLocation(this.getLocation());
-		newTask.updateRecurrence(this.getRecurrence());
-		newTask.updateDescription(this.getDescription());
+		updateNewTask(newTask);
 		newTask.updateLastModified(null);
 	}
 
@@ -126,10 +122,18 @@ public class PeriodicTask extends EventTask {
 	@Override
 	public Ansi toDetail() {
 		Ansi returnString = this.toSummary();
+		formatLocation(returnString);
+		formatDescription(returnString);
+		return returnString;
+	}
+
+	private void formatLocation(Ansi returnString) {
 		returnString.a(STRING_LOCATION);
 		returnString.fg(CYAN).a(this.getLocation()).a("\n").reset();
-		returnString.a(STRING_DESCRIPTION).a(this.getDescription()).reset();
-		return returnString.a('\n');
+	}
+	
+	private void formatDescription(Ansi returnString) {
+		returnString.a(STRING_DESCRIPTION).a(this.getDescription()).reset().a('\n');
 	}
 	
 	static Ansi recurToString(Recur recur){
@@ -201,8 +205,31 @@ public class PeriodicTask extends EventTask {
 		if (keyword == null || keyword.isEmpty()){
 			return true;
 		} else {
-			return StringUtils.containsIgnoreCase(this.getTitle(), keyword) || StringUtils.containsIgnoreCase(this.getDescription(), keyword) || StringUtils.containsIgnoreCase(this.getLocation(), keyword);
+			return containsKeywordInTask(keyword);
 		}
+	}
+
+	private boolean containsKeywordInTask(String keyword) {
+		if (containsKeywordInTitle(keyword)) {
+			return true;
+		} else if (containsKeywordInDescription(keyword)) {
+			return true;
+		} else if (containsKeywordInLocation(keyword)) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean containsKeywordInLocation(String keyword) {
+		return StringUtils.containsIgnoreCase(this.getLocation(), keyword);
+	}
+
+	private boolean containsKeywordInDescription(String keyword) {
+		return StringUtils.containsIgnoreCase(this.getDescription(), keyword);
+	}
+
+	private boolean containsKeywordInTitle(String keyword) {
+		return StringUtils.containsIgnoreCase(this.getTitle(), keyword);
 	}
 	
 	public PeriodicTask updateTimeFromRecur() throws HandledException{
