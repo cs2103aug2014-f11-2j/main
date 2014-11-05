@@ -11,8 +11,20 @@ import static org.fusesource.jansi.Ansi.Color.*;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 
+/**
+ * @author Zheng Han
+ * Carries out the basic utilities in CEO
+ */
 public class CommonUtil {
-	
+	/**
+	 * Splits the first word from the rest of the string argument
+	 * and returns an array which contains this first word and
+	 * the rest of the string.
+	 * 
+	 * @param parameterString
+	 * @return an array which contains the split up String
+	 * @throws HandledException
+	 */
 	public static String[] splitFirstWord(String parameterString) throws HandledException{
 		checkNull(parameterString, HandledException.ExceptionType.INVALID_CMD);
 		String[] result = new String[2];
@@ -27,6 +39,13 @@ public class CommonUtil {
 		return result;
 	}
 	
+	/**
+	 * Parse an integer from the string argument and returns this integer.
+	 * 
+	 * @param parameter
+	 * @return the parsed integer from the String parameter
+	 * @throws HandledException
+	 */
 	public static int parseIntegerParameter(String parameter) throws HandledException {
 		checkNull(parameter, HandledException.ExceptionType.INVALID_PARA);
 		parameter = parameter.trim();
@@ -37,14 +56,38 @@ public class CommonUtil {
 		}
 	}
 	
+	/**
+	 * Checks if the Object argument is a null object. Throws a 
+	 * HandledException if Object argument is null.
+	 *  
+	 * @param obj
+	 * @param expectedException
+	 * @throws HandledException
+	 */
 	public static void checkNull(Object obj, HandledException.ExceptionType expectedException) throws HandledException{
 		if (obj == null) throw new HandledException(expectedException);
 	}
 	
+	/**
+	 * Checks if the Object argument is a null object. Throws a 
+	 * FatalException if Object argument is a null object.
+	 * 
+	 * @param obj
+	 * @param expectedException
+	 * @throws FatalException
+	 */
 	public static void checkNull(Object obj, FatalException.ExceptionType expectedException) throws FatalException {
 		if (obj == null) throw new FatalException(expectedException);
 	}
-
+	
+	/**
+	 * Removes the dash character from the String argument and returns the
+	 * resultant String argument.
+	 * 
+	 * @param parameterString
+	 * @return parameterString with the front dash removed
+	 * @throws HandledException
+	 */
 	public static String removeDash(String parameterString) throws HandledException{
 		checkNull(parameterString, HandledException.ExceptionType.INVALID_PARA);
 		if (parameterString.startsWith("-")){
@@ -54,30 +97,59 @@ public class CommonUtil {
 		}
 	}
 	
+	/**
+	 * Prints the String argument in ANSI format if the String
+	 * argument is not a null object and is not an empty String.
+	 * 
+	 * @param feedback
+	 */
 	public static void print(String feedback){
 		if (feedback != null && !feedback.isEmpty()){
 			print(ansi().a(feedback));
 		}
 	}
 	
+	/**
+	 * Prints the Ansi argument if the Ansi argument is not a
+	 * null object.
+	 * 
+	 * @param feedback
+	 */
 	public static void print(Ansi feedback) {
 		if (feedback != null){
 			AnsiConsole.out.print(feedback);
 		}
 	}
 	
+	/**
+	 * Prints the error message from the String argument if the String
+	 * argument is not a null object and is not an empty String.
+	 * 
+	 * @param errorMsg
+	 */
 	public static void printErrMsg(String errorMsg){
 		if (errorMsg != null && !errorMsg.isEmpty()){
 			print(ansi().bold().bg(RED).a(errorMsg).a('\n').reset());
 		}
 	}
 	
+	/**
+	 * Prints the String argument if it is not a null object
+	 * and if it is not an empty String.
+	 * 
+	 * @param prompt
+	 */
 	public static void printPrompt(String prompt){
 		if (prompt != null && !prompt.isEmpty()){
 			System.out.print(prompt);
 		}
 	}
 	
+	/**
+	 * Checks to see if the system supports google sync.
+	 * 
+	 * @return a true value if system supports google sync false otherwise
+	 */
 	public static boolean checkSyncSupport(){
 		try{
 			if (Desktop.isDesktopSupported()) {
@@ -92,6 +164,9 @@ public class CommonUtil {
 		}
 	}
 	
+	/**
+	 * This method clears the user display
+	 */
 	public static void clearConsole(){
 		try{
 			if (System.getProperty("os.name").contains("Windows")){
