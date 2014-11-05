@@ -30,7 +30,7 @@ public class CommandLineUITest {
 	private static final String MESSAGE_INVALID_ID = "Your input task ID is not valid, please check your input and try again!\n";
 	private static final String MESSAGE_NULL_ERROR = "Your input command contains error, please check your input and try again!";
 	private static final String MESSAGE_MARK = "Successfully marked task %1$d as completed\n";
-	private static final String MESSAGE_MARK_SUCCESS = "Successfully marked task 2 as completed";
+	private static final String MESSAGE_MARK_SUCCESS = "Successfully marked task 4 as completed";
 	public static final Ansi HELP_DEFAULT = ansi().fg(YELLOW).a("CEO Usage:\n").reset()
 			  								.bold().a("  add <Quick add string>\n" +
 			  								"      ([-S or --title <title>] [-D or -description <description>]\n" + 
@@ -166,29 +166,29 @@ public class CommandLineUITest {
 
 	private static final String MESSAGE_REDO_SUCCESS = "Successfully redo 0 operations\n";
 	private static final String MESSAGE_UNDO_SUCCESS = "Successfully undo 1 operations\n";
-	private static final String MESSAGE_SHOW_SUCCESS = "The details for Task 2:\n";
-	private static final String MESSAGE_SHOW_SUCCESS_1 = ansi().a(MESSAGE_SHOW_SUCCESS).fg(YELLOW).a("2. ").reset().bold().a("get rich \n").boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a('\t').a("Due At: ").bold().fg(GREEN).a("2015/06/05").reset().a("\nDescription: \n").reset().toString();
+	private static final String MESSAGE_SHOW_SUCCESS = "The details for Task 1:\n";
+	private static final String MESSAGE_SHOW_SUCCESS_1 = ansi().a(MESSAGE_SHOW_SUCCESS).fg(YELLOW).a("1. ").reset().bold().a("Play basketball \n").boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a('\t').a("Due At: ").bold().fg(GREEN).a("2014/12/15").reset().a("\nDescription: \n").reset().toString();
 	
 	@Test
-	public void testInvalidCommand() throws HandledException, FatalException {
+	public void test6_InvalidCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String invalidTest = test.testCommand("‐title submit ‐description IVLE ‐location NUS ‐time 2014/09/09 23:59 2014/09/08 00:00 to 2014/09/09 23:59");
 		assertEquals(invalidTest, ansi().bg(RED).a(MESSAGE_COMMAND_ERROR).reset().toString());
 	}	
 	
 	@Test(expected= NullPointerException.class)
-	public void testExitCommand() throws NullPointerException, HandledException, FatalException {
+	public void test4_ExitCommand() throws NullPointerException, HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		assertNull(test.testCommand("exit"));
 	}
 		
 	@Test
-	public void testAddCommand() throws HandledException, FatalException {
+	public void test1_AddCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String addTest = test.testCommand("add Submit homework on 21 December 2014 at 6pm");
 		String[] separatedTest = addTest.split("\n");
 		Ansi returnString = ansi().fg(GREEN).a(MESSAGE_ADD);
-		Ansi returnString1 = ansi().fg(YELLOW).a("1").a(". ").reset();
+		Ansi returnString1 = ansi().fg(YELLOW).a("2").a(". ").reset();
 		returnString1.bold().a("Submit homework ").a('\n').boldOff().reset();
 		returnString.a(returnString1);
 		String[] separated = returnString.toString().split("\n");
@@ -200,18 +200,18 @@ public class CommandLineUITest {
 	}
 		
 	@Test
-	public void testUpdateCommand() throws HandledException, FatalException {
+	public void test14_UpdateCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		test.testCommand("add Submit test cases on 27 December 2014 at 7pm");
-		String updateTest = test.testCommand("Update 2 -title Submit nothing");
+		String updateTest = test.testCommand("Update 1 -title Submit nothing");
 	
 ;		Ansi returnString = ansi();
-		returnString.fg(GREEN).a(String.format(MESSAGE_UPDATE, 2)).reset();
-		Ansi returnString1 = ansi().fg(YELLOW).a("3").a(". ").reset();
+		returnString.fg(GREEN).a(String.format(MESSAGE_UPDATE, 1)).reset();
+		Ansi returnString1 = ansi().fg(YELLOW).a("1").a(". ").reset();
 		returnString1.bold().a("Submit nothing").a('\n').boldOff().reset();
 		
 		returnString.a(returnString1);
-		returnString.a(ansi().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2015/06/05").reset().toString());
+		returnString.a(ansi().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/27").reset().toString());
 		returnString.a("\nDescription: \n").reset();
 		assertEquals(updateTest, returnString.toString());
 		
@@ -220,14 +220,14 @@ public class CommandLineUITest {
 	}
 	
 	@Test
-	public void testSearchCommand() throws HandledException, FatalException {
+	public void test11_SearchCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String searchTest = test.testCommand("search periodic");
 		assertEquals(ansi().bold().fg(RED).a("The task list is empty\n").reset().toString(), searchTest);
 	}
 	
 	@Test
-	public void testDeleteCommand() throws HandledException, FatalException {
+	public void test2_DeleteCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		test.testCommand("add -title write test cases -description write test cases for CS2103 -location eclipse -time 2014/08/08/00:00 to 2014/09/09/23:59 -recurring 2d2");
 		String deleteTest = test.testCommand("delete 1");
@@ -238,42 +238,43 @@ public class CommandLineUITest {
 	}
 	
 	@Test
-	public void testEmptyCommand() throws HandledException, FatalException {
+	public void test3_EmptyCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String emptyTest = test.testCommand("");
 		assertEquals(emptyTest, ansi().bg(RED).a(MESSAGE_COMMAND_ERROR).reset().toString());
 	}
 	
 	@Test
-	public void testNullCommand() throws HandledException, FatalException {
+	public void test9_NullCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String nullTest = test.testCommand(null);
 		assertEquals(ansi().bg(RED).a(MESSAGE_NULL_ERROR).a('\n').reset().toString(), nullTest);
 	}
 	
 	@Test
-	public void testMarkCommand() throws HandledException, FatalException {
+	public void test8_MarkCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		test.testCommand("add get rich on 5 June 2015 at 6pm");
-		String markTest = test.testCommand("mark 2");
+		String markTest = test.testCommand("mark 4");
+
 
 		String[] separatedTest = markTest.split("\n");
 		
-		Ansi returnString1 = ansi().fg(GREEN).a(String.format(MESSAGE_MARK, 2)).reset();
-		Ansi returnString= ansi().fg(YELLOW).a("3").a(". ").reset();
-		returnString1.a(returnString.bold().a("Submit homework "));
-		
+		Ansi returnString1 = ansi().fg(GREEN).a(String.format(MESSAGE_MARK, 4)).reset();
+		Ansi returnString= ansi().fg(YELLOW).a("4").a(". ").reset();
+		returnString1.a(returnString.bold().a("get rich "));
 		String[] result1 = returnString1.toString().split("\n");
 		assertEquals(Array.get(separatedTest, 0), ansi().fg(GREEN).a(MESSAGE_MARK_SUCCESS).toString());
 		assertEquals(Array.get(separatedTest, 1), Array.get(result1, 1));
-		assertEquals(Array.get(separatedTest, 3), ansi().reset().a("Status: ").bold().fg(GREEN).a("Completed").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/21").reset().toString());
+		assertEquals(Array.get(separatedTest, 2), ansi().boldOff().reset().a("Status: ").bold().fg(GREEN).a("Completed").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2015/06/05").reset().toString());
+		assertEquals(Array.get(separatedTest, 3), ansi().a("Description: ").toString());
 		
 		String invalidMark = test.testCommand("mark 23");
 		assertEquals(invalidMark, ansi().bg(RED).a(MESSAGE_INVALID_ID).reset().toString());
 	}
 	
 	@Test 
-	public void testRedoCommand() throws HandledException, FatalException {
+	public void test10_RedoCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String redoTest = test.testCommand("redo 1");
 		assertEquals(redoTest, ansi().fg(GREEN).a(MESSAGE_REDO_SUCCESS).reset().toString());
@@ -281,38 +282,38 @@ public class CommandLineUITest {
 	}
 	
 	@Test
-	public void testUndoCommand() throws HandledException, FatalException {
+	public void test13_UndoCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String undoTest = test.testCommand("undo 1");
 		assertEquals(undoTest, ansi().fg(GREEN).a(MESSAGE_UNDO_SUCCESS).reset().toString());
 	}
 	
 	@Test
-	public void testListCommand() throws HandledException, FatalException {
+	public void test7_ListCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String listTest = test.testCommand("list");
 		String[] separatedTest = listTest.split("\n");
 		Ansi returnString1 = ansi().fg(YELLOW).a("1").a(". ").reset();
-		returnString1.bold().a("write test cases").a('\n').boldOff().reset();
-		returnString1.a(ansi().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/08/08").reset().toString());
+		returnString1.bold().a("Submit homework ").a('\n').boldOff().reset();
+		returnString1.a(ansi().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/21").reset().toString());
 		String[] separated = returnString1.toString().split("\n");
 		assertEquals(Array.get(separatedTest, 0), Array.get(separated, 0));
 		assertEquals(Array.get(separatedTest, 1), Array.get(separated, 1));
 	}
 	
 	@Test
-	public void testShowCommand() throws HandledException, FatalException {
+	public void test12_ShowCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String showTest1 = test.testCommand("show 10");
 		assertEquals(showTest1, ansi().bg(RED).a(MESSAGE_INVALID_ID).reset().toString());
 		
 		test.testCommand("add Play basketball on 15 December 2014 at 7pm");
-		String showTest2 = test.testCommand("show 2");
+		String showTest2 = test.testCommand("show 1");
 		assertEquals(showTest2, MESSAGE_SHOW_SUCCESS_1);
 	}
 	
 	@Test
-	public void testHelpCommand() throws HandledException, FatalException {
+	public void test5_HelpCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String helpTest = test.testCommand("help");
 		assertEquals(helpTest, HELP_DEFAULT.toString());
