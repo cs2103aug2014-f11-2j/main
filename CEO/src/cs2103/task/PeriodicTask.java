@@ -62,45 +62,51 @@ public class PeriodicTask extends EventTask {
 	
 	private FloatingTask toFloating() throws HandledException {
 		FloatingTask newTask = new FloatingTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION);
-		newTask.updateTitle(this.getTitle());
-		newTask.updateCreated(this.getCreated());
-		newTask.updateDescription(this.getDescription());
+		updateConvertedTask(newTask);
 		return newTask;
 	}
 
 	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
 		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION, dueTime);
-		newTask.updateTitle(this.getTitle());
-		newTask.updateCreated(this.getCreated());
-		newTask.updateDescription(this.getDescription());
+		updateConvertedTask(newTask);
 		return newTask;
 	}
 
 	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
 		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getStatus(), startTime, endTime);
+		updateConvertedTask(newTask);
+		return newTask;
+	}
+	
+	private void updateConvertedTask(Task newTask) {
+		if (newTask instanceof PeriodicTask) {
+			newTask.updateLocation(this.getLocation());
+			newTask.updateRecurrence(this.getRecurrence());
+		}
 		newTask.updateTitle(this.getTitle());
 		newTask.updateCreated(this.getCreated());
-		newTask.updateLocation(this.getLocation());
-		newTask.updateRecurrence(this.getRecurrence());
 		newTask.updateDescription(this.getDescription());
-		return newTask;
 	}
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		try {
 			PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getStatus(), this.getStartTime(), this.getEndTime());
-			newTask.updateTitle(this.getTitle());
-			newTask.updateCreated(this.getCreated());
-			newTask.updateLocation(this.getLocation());
-			newTask.updateRecurrence(this.getRecurrence());
-			newTask.updateDescription(this.getDescription());
-			newTask.updateLastModified(null);
+			updateClone(newTask);
 			return newTask;
 		} catch (HandledException e) {
 			throw new CloneNotSupportedException();
 		}
 		
+	}
+
+	private void updateClone(PeriodicTask newTask) {
+		newTask.updateTitle(this.getTitle());
+		newTask.updateCreated(this.getCreated());
+		newTask.updateLocation(this.getLocation());
+		newTask.updateRecurrence(this.getRecurrence());
+		newTask.updateDescription(this.getDescription());
+		newTask.updateLastModified(null);
 	}
 
 	@Override
