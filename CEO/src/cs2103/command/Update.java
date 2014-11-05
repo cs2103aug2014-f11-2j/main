@@ -51,6 +51,7 @@ public class Update extends InfluentialCommand {
 			newTask = this.target.update(this.parameterList.getTime().getValue());
 		}
 		if (this.parameterList.getTitle() != null){
+			CommonUtil.checkNull(this.parameterList.getTitle().getValue(), HandledException.ExceptionType.NO_TITLE);
 			newTask.updateTitle(this.parameterList.getTitle().getValue());
 		}
 		if (this.parameterList.getDescription() != null){
