@@ -15,10 +15,6 @@ import org.junit.Test;
 import cs2103.exception.HandledException;
 import cs2103.util.TestUtil;
 
-/**
- * @author brianluong
- *
- */
 public class DeadlineTaskTest extends ToDoTaskTest{
 	static DeadlineTask dlt;
 	String taskUID = null;
@@ -45,17 +41,26 @@ public class DeadlineTaskTest extends ToDoTaskTest{
 		dlt.updateLastModified(null);
 	}
 	
+	/**
+	 * Three different cases to test DeadlineTask constructor
+	 */
 	@Test 
 	public void testDeadlineTaskConstructor() throws HandledException{
 		testDeadlineTaskConstructionOne();
 		testDeadlineTaskConstructionTwo();
 	}
 		
+	/**
+	 * Case 1: Invalid date
+	 */
 	public void testDeadlineTaskConstructionOne() throws HandledException {
 		exception.expect(HandledException.class);
 		dlt = new DeadlineTask(this.taskUID, this.status, null);
 	}
 	
+	/**
+	 * Case 2: Successful Construction 
+	 */
 	public void testDeadlineTaskConstructionTwo() throws HandledException {
 		dlt = new DeadlineTask(this.taskUID, this.status, null);
 		assertTrue(true);
@@ -67,6 +72,9 @@ public class DeadlineTaskTest extends ToDoTaskTest{
 		assertTrue(dlt.getDueTime().compareTo(newDate) == 0);
 	}
 
+	/**
+	 * Check if DeadlineTask should be alerted to user
+	 */
 	@Test
 	public void testCheckPeriod() {
 		DateTime[] time = new DateTime[2];
