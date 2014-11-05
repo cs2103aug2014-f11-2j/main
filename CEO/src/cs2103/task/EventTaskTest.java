@@ -1,3 +1,4 @@
+//@author A0128478R
 package cs2103.task;
 
 import static org.fusesource.jansi.Ansi.ansi;
@@ -38,13 +39,6 @@ public abstract class EventTaskTest extends TaskTest{
 		assertEquals(testStatus, task.getStatus());
 	}
 	
-	@Test
-	public void testDeleteAndIsDeleted() {
-		EventTask task = (EventTask) getConcrete();
-		task.delete();
-		assertTrue(task.isDeleted());
-	}
-
 	@Test
 	public void testRestore() {
 		EventTask task = (EventTask) getConcrete();

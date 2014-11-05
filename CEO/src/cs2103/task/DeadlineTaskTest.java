@@ -1,3 +1,4 @@
+//@author A0128478R
 package cs2103.task;
 
 import org.fusesource.jansi.Ansi;
@@ -14,6 +15,10 @@ import org.junit.Test;
 import cs2103.exception.HandledException;
 import cs2103.util.TestUtil;
 
+/**
+ * @author brianluong
+ *
+ */
 public class DeadlineTaskTest extends ToDoTaskTest{
 	static DeadlineTask dlt;
 	String taskUID = null;

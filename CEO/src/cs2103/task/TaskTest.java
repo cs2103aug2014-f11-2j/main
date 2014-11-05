@@ -1,3 +1,4 @@
+//@author A0128478R
 package cs2103.task;
 
 import static org.junit.Assert.*;
@@ -12,6 +13,12 @@ import org.junit.rules.ExpectedException;
 
 import cs2103.exception.HandledException;
 
+/**
+ * @author brianluong
+ * Containing tests for the inherited methods in 
+ * 				concrete Task classes: DeadlineTask, FloatingTask, and PeriodicTask
+ */
+
 public abstract class TaskTest {
 	private static final String testDescription = "New Description";
 	private static final String testTitle = "New Title";
@@ -21,7 +28,7 @@ public abstract class TaskTest {
 	
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
-	
+
 	@Test
 	public void testCheckAlert(){
 		Task task = getConcrete();
@@ -32,6 +39,7 @@ public abstract class TaskTest {
 	public void testUpdateAndGetLastModified() {
 		Task task = getConcrete();
 		assertTrue(task.getLastModified().equals(new DateTime(new Date())));
+		
 		Date testDate= new DateTime(1000);
 		task.updateLastModified(testDate);
 		assertTrue(task.getLastModified().equals(testDate));
@@ -70,6 +78,10 @@ public abstract class TaskTest {
 		assertTrue(testDate.equals(task.getCreated()));
 	}
 	
+	/**
+	 * Variable dummyTask is a task (never used in other test cases) used as 
+	 * 				comparison to test method Equals
+	 */
 	@Test
 	public void testEquals() throws CloneNotSupportedException, HandledException{
 		Task task = getConcrete();
@@ -77,6 +89,7 @@ public abstract class TaskTest {
 		assertEquals(false, task.equals(o));
 		o = (String) "Testing";
 		assertEquals(false, task.equals(o));
+		
 		FloatingTask dummyTask = new FloatingTask(null, null);
 		assertFalse(task.equals(dummyTask));
 		assertTrue(task.equals(task.clone()));
@@ -94,5 +107,12 @@ public abstract class TaskTest {
 	public void testCompareTo() throws CloneNotSupportedException{
 		Task task = getConcrete();
 		assertEquals(0, task.compareTo((Task) task.clone()));
+	}
+	
+	@Test
+	public void testDeleteAndIsDeleted(){
+		ToDoTask task = (ToDoTask) getConcrete();
+		task.delete();
+		assertTrue(task.isDeleted());
 	}
 }
