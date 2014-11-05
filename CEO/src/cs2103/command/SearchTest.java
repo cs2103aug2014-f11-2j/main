@@ -1,6 +1,7 @@
 package cs2103.command;
 
 import static org.fusesource.jansi.Ansi.ansi;
+import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.junit.Assert.*;
 
 import org.fusesource.jansi.Ansi;
@@ -13,7 +14,6 @@ import cs2103.parameters.Option;
 import cs2103.storage.TaskList;
 import cs2103.task.DeadlineTask;
 import cs2103.task.PeriodicTask;
-
 import cs2103.parameters.ParameterList;
 import cs2103.parameters.TaskType.Value;
 
@@ -72,5 +72,12 @@ public class SearchTest {
 			}
 		}
 		assertEquals(ansi().a(completedDeadline).a("\n").toString(),result);
+	}
+	
+	@Test
+	public void testSearchNonExistent() throws HandledException, FatalException{
+		Search searchNonExistent = new Search("presentation");
+		String result = searchNonExistent.execute().toString();
+		assertEquals(ansi().bold().fg(RED).a("The task list is empty\n").reset().toString(),result);
 	}
 }
