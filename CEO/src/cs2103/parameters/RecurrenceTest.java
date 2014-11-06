@@ -15,6 +15,12 @@ public class RecurrenceTest {
 		Recurrence rec = Recurrence.parse("2d");
 		assertEquals("RECURRENCE",rec.getType());
 		assertEquals("FREQ=DAILY;INTERVAL=2",rec.getValue().toString());
+		
+		rec = Recurrence.parse("abc");
+		assertNull(rec.getValue());
+		
+		rec = Recurrence.parse(null);
+		assertNull(rec);
 	}
 
 }
