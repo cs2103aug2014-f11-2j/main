@@ -25,23 +25,14 @@ public class FloatingTask extends ToDoTask {
 		}
 	}
 	
-	private FloatingTask toFloating() throws HandledException {
-		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getStatus());
+	private ToDoTask toFloating() throws HandledException {
+		ToDoTask newTask = new FloatingTask(this.getTaskUID(), this.getStatus());
 		updateNewTask(newTask);
 		return newTask;
 	}
 
-	private void updateNewTask(Task newTask) {
-		newTask.updateTitle(this.getTitle());
-		newTask.updateCreated(this.getCreated());
-		newTask.updateDescription(this.getDescription());
-		if (!(newTask instanceof PeriodicTask)) {
-			newTask.updateCompleted(this.getCompleted());
-		}
-	}
-
-	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
-		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION, dueTime);
+	private ToDoTask toDeadline(Date dueTime) throws HandledException {
+		ToDoTask newTask = new DeadlineTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION, dueTime);
 		updateNewTask(newTask);
 		return newTask;
 	}
@@ -54,9 +45,8 @@ public class FloatingTask extends ToDoTask {
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getStatus());
-		updateNewTask(newTask);
-		newTask.updateLastModified(null);
+		ToDoTask newTask = new FloatingTask(this.getTaskUID(), this.getStatus());
+		updateClone(newTask);
 		return newTask;
 	}
 
@@ -67,10 +57,6 @@ public class FloatingTask extends ToDoTask {
 		return returnString;
 	}
 
-	private void formatStatus(Ansi returnString) {
-		returnString.a("Status: ").a(completedToString(this.getCompleted())).a('\n');
-	}
-	
 	@Override
 	public boolean checkPeriod(Date[] time) {
 		return false;

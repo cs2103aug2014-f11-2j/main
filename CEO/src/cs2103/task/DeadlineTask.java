@@ -52,41 +52,29 @@ public class DeadlineTask extends ToDoTask {
 		}
 	}
 	
-	private FloatingTask toFloating() throws HandledException {
-		FloatingTask newTask = new FloatingTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION);
-		newTask.updateTitle(this.getTitle());
-		newTask.updateCreated(this.getCreated());
-		newTask.updateCompleted(this.getCompleted());
-		newTask.updateDescription(this.getDescription());
+	private ToDoTask toFloating() throws HandledException {
+		ToDoTask newTask = new FloatingTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION);
+		updateNewTask(newTask);
 		return newTask;
 	}
 
-	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
-		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getStatus(), dueTime);
-		newTask.updateTitle(this.getTitle());
-		newTask.updateCreated(this.getCreated());
-		newTask.updateCompleted(this.getCompleted());
-		newTask.updateDescription(this.getDescription());
+	private ToDoTask toDeadline(Date dueTime) throws HandledException {
+		ToDoTask newTask = new DeadlineTask(this.getTaskUID(), this.getStatus(), dueTime);
+		updateNewTask(newTask);
 		return newTask;
 	}
 
 	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
 		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), Status.VEVENT_CONFIRMED, startTime, endTime);
-		newTask.updateTitle(this.getTitle());
-		newTask.updateCreated(this.getCreated());
-		newTask.updateDescription(this.getDescription());
+		updateNewTask(newTask);
 		return newTask;
 	}
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		try {
-			DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getStatus(), this.getDueTime());
-			newTask.updateTitle(this.getTitle());
-			newTask.updateCreated(this.getCreated());
-			newTask.updateCompleted(this.getCompleted());
-			newTask.updateDescription(this.getDescription());
-			newTask.updateLastModified(null);
+			ToDoTask newTask = new DeadlineTask(this.getTaskUID(), this.getStatus(), this.getDueTime());
+			updateClone(newTask);
 			return newTask;
 		} catch (HandledException e) {
 			throw new CloneNotSupportedException();
@@ -96,13 +84,22 @@ public class DeadlineTask extends ToDoTask {
 	@Override
 	public Ansi toSummary() {
 		Ansi returnString = this.addCommonString();
-		returnString.a("Status: ").a(completedToString(this.getCompleted()));
-		returnString.a("\tDue At: ").a(this.dateToString(this.getDueTime()));
-		return returnString.a('\n');
+		formatStatus(returnString);
+		formatDueTime(returnString);
+		return returnString;
+	}
+
+	private void formatDueTime(Ansi returnString) {
+		returnString.a("\tDue At: ").a(this.dateToString(this.getDueTime())).a('\n');
 	}
 	
 	protected Ansi dateToString(Date date){
 		Ansi returnString = ansi().bold();
+		formatDate(date, returnString);
+		return returnString;
+	}
+
+	private void formatDate(Date date, Ansi returnString) {
 		DateFormat format = new SimpleDateFormat("yyyy/MM/dd");
 		if (this.checkAlert()){
 			returnString.fg(RED);
@@ -110,7 +107,6 @@ public class DeadlineTask extends ToDoTask {
 			returnString.fg(GREEN);
 		}
 		returnString.a(format.format(date)).reset();
-		return returnString;
 	}
 	
 	public static sortComparator getComparator(){

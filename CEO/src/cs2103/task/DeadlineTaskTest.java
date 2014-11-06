@@ -27,7 +27,7 @@ public class DeadlineTaskTest extends ToDoTaskTest{
 	Date complete = null;
 	DateTime dueTime = new DateTime(1);
 	
-	protected DeadlineTask getConcrete(){
+	protected ToDoTask getConcrete(){
 		return dlt;
 	}
 
@@ -124,7 +124,7 @@ public class DeadlineTaskTest extends ToDoTaskTest{
 		Task ft2 = dlt.convert(time);
 		assertTrue(ft2 instanceof DeadlineTask);
 		
-		DeadlineTask taskExpected = new DeadlineTask(dlt.getTaskUID(), dlt.getStatus(), time[0]);
+		ToDoTask taskExpected = new DeadlineTask(dlt.getTaskUID(), dlt.getStatus(), time[0]);
 		taskExpected.updateTitle(dlt.getTitle());
 		taskExpected.updateDescription(dlt.getDescription());
 		taskExpected.updateLastModified(dlt.getLastModified());
@@ -149,7 +149,7 @@ public class DeadlineTaskTest extends ToDoTaskTest{
 	
 	@Test
 	public void testClone() throws CloneNotSupportedException {
-		DeadlineTask task = (DeadlineTask) dlt.clone();
+		ToDoTask task = (ToDoTask) dlt.clone();
 		assertTrue(TestUtil.compareTasks(task, dlt));
 	}
 	

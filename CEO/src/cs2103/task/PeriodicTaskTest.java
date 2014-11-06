@@ -185,7 +185,7 @@ public class PeriodicTaskTest extends EventTaskTest{
 		Task ft2 = pt.convert(time);
 		assertTrue(ft2 instanceof DeadlineTask);
 		
-		DeadlineTask taskExpected = new DeadlineTask(pt.getTaskUID(), Status.VTODO_NEEDS_ACTION, time[0]);
+		ToDoTask taskExpected = new DeadlineTask(pt.getTaskUID(), Status.VTODO_NEEDS_ACTION, time[0]);
 		taskExpected.updateTitle(pt.getTitle());
 		taskExpected.updateDescription(pt.getDescription());
 		taskExpected.updateLastModified(pt.getLastModified());

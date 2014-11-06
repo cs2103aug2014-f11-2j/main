@@ -94,7 +94,7 @@ public abstract class TaskTest {
 		o = (String) "Testing";
 		assertEquals(false, task.equals(o));
 		
-		FloatingTask dummyTask = new FloatingTask(null, null);
+		ToDoTask dummyTask = new FloatingTask(null, null);
 		assertFalse(task.equals(dummyTask));
 		assertTrue(task.equals(task.clone()));
 	}

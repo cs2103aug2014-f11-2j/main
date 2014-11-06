@@ -18,7 +18,7 @@ import cs2103.exception.HandledException;
 import cs2103.util.TestUtil;
 
 public class FloatingTaskTest extends ToDoTaskTest {
-	private static FloatingTask ft;
+	private static ToDoTask ft;
 	private final String taskUID = null;
 	Status status = null;
 	String title = "Testing";
@@ -26,7 +26,7 @@ public class FloatingTaskTest extends ToDoTaskTest {
 	String location = "Location";
 	Recur recurrence = null;
 
-	protected FloatingTask getConcrete(){
+	protected ToDoTask getConcrete(){
 		return ft;
 	}
 	
@@ -67,7 +67,7 @@ public class FloatingTaskTest extends ToDoTaskTest {
 		Task ft2 = ft.convert(time);
 		assertTrue(ft2 instanceof FloatingTask);
 		
-		FloatingTask taskExpected = new FloatingTask(ft.getTaskUID(), ft.getStatus());
+		ToDoTask taskExpected = new FloatingTask(ft.getTaskUID(), ft.getStatus());
 		taskExpected.updateTitle(ft.getTitle());
 		taskExpected.updateDescription(ft.getDescription());
 		taskExpected.updateLastModified(ft.getLastModified());
@@ -82,7 +82,7 @@ public class FloatingTaskTest extends ToDoTaskTest {
 		Task ft2 = ft.convert(time);
 		assertTrue(ft2 instanceof DeadlineTask);
 		
-		DeadlineTask taskExpected = new DeadlineTask(ft.getTaskUID(), Status.VTODO_NEEDS_ACTION, time[0]);
+		ToDoTask taskExpected = new DeadlineTask(ft.getTaskUID(), Status.VTODO_NEEDS_ACTION, time[0]);
 		taskExpected.updateTitle(ft.getTitle());
 		taskExpected.updateDescription(ft.getDescription());
 		taskExpected.updateLastModified(ft.getLastModified());
@@ -107,7 +107,7 @@ public class FloatingTaskTest extends ToDoTaskTest {
 	
 	@Test
 	public void testClone() throws CloneNotSupportedException {
-		FloatingTask task = (FloatingTask) ft.clone();
+		ToDoTask task = (ToDoTask) ft.clone();
 		assertTrue(TestUtil.compareTasks(task,ft));
 	}
 

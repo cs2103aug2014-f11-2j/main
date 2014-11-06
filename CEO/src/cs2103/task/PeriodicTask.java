@@ -60,14 +60,14 @@ public class PeriodicTask extends EventTask {
 		}
 	}
 	
-	private FloatingTask toFloating() throws HandledException {
-		FloatingTask newTask = new FloatingTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION);
+	private ToDoTask toFloating() throws HandledException {
+		ToDoTask newTask = new FloatingTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION);
 		updateNewTask(newTask);
 		return newTask;
 	}
 
-	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
-		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION, dueTime);
+	private ToDoTask toDeadline(Date dueTime) throws HandledException {
+		ToDoTask newTask = new DeadlineTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION, dueTime);
 		updateNewTask(newTask);
 		return newTask;
 	}
@@ -214,14 +214,14 @@ public class PeriodicTask extends EventTask {
 	
 	@Override
 	public boolean matches(String keyword) {
-		if (isInvalidKeyword(keyword)){
+		if (isEmptyKeyword(keyword)){
 			return true;
 		} else {
 			return containsKeywordInTask(keyword);
 		}
 	}
 
-	private boolean isInvalidKeyword(String keyword) {
+	private boolean isEmptyKeyword(String keyword) {
 		return keyword == null || keyword.isEmpty();
 	}
 
