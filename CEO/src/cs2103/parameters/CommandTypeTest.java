@@ -18,6 +18,10 @@ public class CommandTypeTest {
 		
 		ct = CommandType.parse("hello");
 		assertEquals(Value.INVALID,ct.getValue());
+		
+		ct = CommandType.parse(null);
+		assertEquals(Value.INVALID,ct.getValue());
+
 	}
 
 }

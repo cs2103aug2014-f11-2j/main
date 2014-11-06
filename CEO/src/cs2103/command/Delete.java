@@ -19,6 +19,12 @@ public class Delete extends InfluentialCommand {
 	private static final String MESSAGE_PERMANENTLY_DELETE = "You have permanently deleted task with ID %1$d\n";
 	private Task target;
 	
+	/**
+	 * Creates an instance of Delete from user input command
+	 * @param command
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	public Delete(String command) throws HandledException, FatalException{
 		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> parameterQueue = separateCommand(command);

@@ -18,6 +18,10 @@ public class Location implements Parameter {
 		return type;
 	}
 	
+	/**
+	 * @param location
+	 * @return Location option from String location, or null if location is null
+	 */
 	public static Location parse(String location){
 		if (location == null){
 			return null;

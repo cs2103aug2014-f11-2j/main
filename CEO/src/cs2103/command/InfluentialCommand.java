@@ -8,7 +8,18 @@ public abstract class InfluentialCommand extends Command{
 	protected Task undoBackup;
 	protected Task redoBackup;
 	
+	/**
+	 * @return Command object of caller casted as InfluentialCommand
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	public abstract InfluentialCommand undo() throws HandledException, FatalException;
+	
+	/**
+	 * @return Command object of caller casted as InfluentialCommand
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	public abstract InfluentialCommand redo() throws HandledException, FatalException;
 	
 	protected static Task cloneTask(Task task) throws HandledException{

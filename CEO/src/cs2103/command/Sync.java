@@ -14,6 +14,11 @@ public class Sync extends InfluentialCommand {
 	private static final Ansi FAILURE = ansi().fg(RED).a("Fail to sync your data with Google\n").reset();
 	private static final Ansi DISABLED = ansi().fg(MAGENTA).a("You have disabled sync with Google\n").reset();
 	
+	/**
+	 * Creates an instance of sync from user input
+	 * @param command
+	 * @throws HandledException
+	 */
 	public Sync(String command) throws HandledException {
 		if (command != null){
 			this.parameterList.addParameter(Option.parse(new String[]{CommonUtil.removeDash(command)}));

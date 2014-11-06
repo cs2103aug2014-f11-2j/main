@@ -8,10 +8,16 @@ public class CommandType implements Parameter {
 		ADD, LIST, SHOW, DELETE, UPDATE, EXIT, UNDO, REDO, HELP, SEARCH, QUICK, ALERT, MARK, RESTORE, SYNC, INVALID;
 	}
 	
+	/**
+	 * @param value
+	 */
 	public CommandType(Value value){
 		this.value = value;
 	}
 	
+	/**
+	 * @return Value enumerator of CommandType
+	 */
 	public Value getValue(){
 		return this.value;
 	}
@@ -21,10 +27,18 @@ public class CommandType implements Parameter {
 		return type;
 	}
 	
+	/**
+	 * @param commandTypeString
+	 * @return CommandType object of String commandTypeString
+	 */
 	public static CommandType parse(String commandTypeString){
 		return new CommandType(parseTaskType(commandTypeString));
 	}
 	
+	/**
+	 * @param commandTypeString
+	 * @return Value enumerator of String commandTypeString
+	 */
 	private static Value parseTaskType(String commandTypeString){
 		if (commandTypeString == null){
 			return Value.INVALID;

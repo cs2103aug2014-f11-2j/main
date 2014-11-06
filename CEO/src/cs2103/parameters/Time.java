@@ -13,6 +13,9 @@ public class Time implements Parameter {
 		this.time = time;
 	}
 	
+	/**
+	 * @return Date Array from Time
+	 */
 	public Date[] getValue(){
 		return this.time;
 	}
@@ -22,6 +25,10 @@ public class Time implements Parameter {
 		return type;
 	}
 
+	/**
+	 * @param timeString
+	 * @return Time object from String timeString
+	 */
 	public static Time parse(String timeString){
 		if (timeString == null){
 			return null;
@@ -30,6 +37,11 @@ public class Time implements Parameter {
 		}
 	}
 	
+	/**
+	 * @param timeString
+	 * @return Date Array from String timeString, contains only one Date object if timeString contains only one date(DeadlineTask),  
+	 * contains two Date objects if timeString contains two dates(PeriodicTask)
+	 */
 	private static Date[] parseTime(String timeString){
 		Date[] time = new Date[2];
 		if (timeString != null){

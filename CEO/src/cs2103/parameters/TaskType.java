@@ -22,10 +22,18 @@ public class TaskType implements Parameter {
 		return type;
 	}
 	
+	/**
+	 * @param taskTypeString
+	 * @return TaskType object from String taskTypeString
+	 */
 	public static TaskType parse(String taskTypeString){
 		return new TaskType(parseTaskType(taskTypeString));
 	}
 	
+	/**
+	 * @param taskTypeString
+	 * @return Value enumerator of taskTypeString
+	 */
 	private static Value parseTaskType(String taskTypeString){
 		if (taskTypeString == null || taskTypeString.isEmpty()){
 			return Value.DEFAULT;

@@ -7,10 +7,13 @@ import org.junit.Test;
 public class KeywordTest {
 
 	@Test
-	public void test() {
+	public void testKeyword() {
 		Keyword kw = Keyword.parse("Utown");
 		assertEquals("Utown", kw.getValue());
 		assertEquals("KEYWORD",kw.getType());
+		
+		kw = Keyword.parse(null);
+		assertNull(kw);
 	}
 
 }

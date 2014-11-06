@@ -12,10 +12,16 @@ public class Recurrence implements Parameter {
 	public static final String type = "RECURRENCE";
 	private final Recur recur;
 	
+	/**
+	 * @param recur
+	 */
 	public Recurrence(Recur recur){
 		this.recur = recur;
 	}
 	
+	/**
+	 * @return Recur object of Recurrence
+	 */
 	public Recur getValue(){
 		return this.recur;
 	}
@@ -25,6 +31,11 @@ public class Recurrence implements Parameter {
 		return type;
 	}
 	
+	/**
+	 * @param recurrenceString
+	 * @return Recurrence object of String recurrenceString
+	 * @throws HandledException
+	 */
 	public static Recurrence parse(String recurrenceString) throws HandledException{
 		if (recurrenceString == null){
 			return null;
@@ -33,6 +44,11 @@ public class Recurrence implements Parameter {
 		}
 	}
 	
+	/**
+	 * @param recurrenceString
+	 * @return Recur object from String recurrenceString, or null if String recurrenceString does not specify a correct recurring period
+	 * @throws HandledException
+	 */
 	private static Recur stringToRecur(String recurrenceString) throws HandledException{
 		int interval = parseInterval(recurrenceString);
 		if (interval == 0){
@@ -50,6 +66,11 @@ public class Recurrence implements Parameter {
 		}
 	}
 	
+	/**
+	 * @param recurrenceString
+	 * @return int value of recurrence period, or 1 if recurrence period cannot be found
+	 * @throws HandledException
+	 */
 	private static int parseInterval(String recurrenceString) throws HandledException{
 		Pattern p = Pattern.compile("([0-9]+)");
 		Matcher m = p.matcher(recurrenceString);
@@ -61,6 +82,11 @@ public class Recurrence implements Parameter {
 		}
 	}
 	
+	/**
+	 * @param recurrenceString
+	 * @return String time counter(hourly, daily etc) for recurrence, or null if time counter cannot be found
+	 * @throws HandledException
+	 */
 	private static String parseFrequency(String recurrenceString) throws HandledException{
 		Pattern p = Pattern.compile("([A-Za-z]+)");
 		Matcher m = p.matcher(recurrenceString);

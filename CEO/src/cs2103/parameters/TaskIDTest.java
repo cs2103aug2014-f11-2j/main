@@ -10,8 +10,11 @@ public class TaskIDTest {
 
 	@Test
 	public void test() throws HandledException {
-		TaskID tid = TaskID.parse("2");
-		assertEquals(2,tid.getValue());
+		TaskID tid = TaskID.parse("1");
+		assertEquals(1,tid.getValue());
+		
+		tid = TaskID.parse(null);
+		assertNull(tid);
 	}
 
 }

@@ -12,6 +12,7 @@ public class TaskTypeTest {
 	public void testTaskType() {
 		TaskType taskType = TaskType.parse("deadline");
 		assertEquals(Value.DEADLINE,taskType.getValue());
+		
 		taskType = TaskType.parse(null);
 		assertEquals(Value.INVALID,taskType.getValue());
 	}

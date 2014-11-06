@@ -19,6 +19,11 @@ import cs2103.util.CommonUtil;
 
 public class Search extends QueryCommand {
 	
+	/**
+	 * Creates an instance of Search from user input
+	 * @param command
+	 * @throws HandledException
+	 */
 	public Search(String command) throws HandledException{
 		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> parameterQueue = separateCommand(command);
@@ -46,6 +51,12 @@ public class Search extends QueryCommand {
 		return parseListResponse(searchList);
 	}
 	
+	/**
+	 * @param taskType
+	 * @return ArrayList of Task objects filtered by taskType
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	private ArrayList<Task> getInitialList(TaskType taskType) throws HandledException, FatalException{
 		if (taskType == null){
 			return TaskList.getInstance().getDefaultList();
@@ -67,6 +78,10 @@ public class Search extends QueryCommand {
 		}
 	}
 	
+	/**
+	 * @param tasks
+	 * @return ArrayList of Tasks from ArrayList of child classes of Task
+	 */
 	private static <T extends Task> ArrayList<Task> toTaskList(ArrayList<T> tasks){
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for (Task task:tasks){
@@ -75,6 +90,11 @@ public class Search extends QueryCommand {
 		return returnList;
 	}
 	
+	/**
+	 * @param searchList
+	 * @param time
+	 * @return ArrayList of tasks that are not floating
+	 */
 	private static ArrayList<Task> filterTime(ArrayList<Task> searchList, Date[] time){
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		if (searchList != null){
@@ -87,6 +107,11 @@ public class Search extends QueryCommand {
 		return returnList;
 	}
 	
+	/**
+	 * @param searchList
+	 * @param complete
+	 * @return ArrayList of Task that are completed
+	 */
 	private static ArrayList<Task> filterComplete(ArrayList<Task> searchList, boolean complete){
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		if (searchList != null){
@@ -99,6 +124,11 @@ public class Search extends QueryCommand {
 		return returnList;
 	}
 	
+	/**
+	 * @param searchList
+	 * @param keywordString
+	 * @return ArrayList of Task that contain keywordString
+	 */
 	private static ArrayList<Task> filterKeyword(ArrayList<Task> searchList, String keywordString) {
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		if (searchList != null){

@@ -10,6 +10,9 @@ public class Option implements Parameter {
 	}
 	private final Value value;
 	
+	/**
+	 * @param value
+	 */
 	public Option(Value value){
 		this.value = value;
 	}
@@ -19,14 +22,27 @@ public class Option implements Parameter {
 		return type;
 	}
 	
+	/**
+	 * @return Value enumerator for Option
+	 */
 	public Value getValue(){
 		return this.value;
 	}
 	
+	/**
+	 * @param optionString
+	 * @return Option object from String array optionString
+	 * @throws HandledException
+	 */
 	public static Option parse(String[] optionString) throws HandledException{
 		return new Option(parseOption(optionString));
 	}
 	
+	/**
+	 * @param optionString
+	 * @return Value enumerator that matches the String option in 1st index of String array optionString
+	 * @throws HandledException
+	 */
 	private static Value parseOption(String[] optionString) throws HandledException{
 		if (optionString == null || optionString.length < 1){
 			return Value.DEFAULT;

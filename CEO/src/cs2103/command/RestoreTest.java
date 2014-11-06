@@ -63,12 +63,14 @@ public class RestoreTest {
 		r.undo();
 		List l = new List("all");
 		String result = l.execute().toString();
-		assertEquals(ansi().fg(RED).a("The task list is empty\n").reset().toString(),result);
+		assertEquals(ansi().bold().fg(RED).a("The task list is empty\n").reset().toString(),result);
 		
 		r.redo();
 		Task t = TaskList.getInstance().getFloatingList().get(0);
 		
 		result = l.execute().toString();
+		d = new Delete("1 -p");
+		d.execute();
 		assertEquals(ansi().a(t.toSummary()).a("\n").toString(),result);
 	}
 

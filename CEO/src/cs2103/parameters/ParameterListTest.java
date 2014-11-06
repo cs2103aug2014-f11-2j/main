@@ -2,12 +2,18 @@ package cs2103.parameters;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+
 import org.junit.Test;
 
 import cs2103.exception.HandledException;
 
 public class ParameterListTest {
 
+	/**
+	 * Test adding and retrieving of parameters in ParameterList
+	 * @throws HandledException
+	 */
 	@Test
 	public void testParameter() throws HandledException {
 		ParameterList pl = new ParameterList();
@@ -17,12 +23,16 @@ public class ParameterListTest {
 		pl.addParameter(TaskID.parse("1"));
 		pl.addParameter(Keyword.parse("nus"));
 		pl.addParameter(Complete.parse("false"));
-		pl.addParameter(Time.parse("2014/10/29 20:20"));
-		pl.addParameter(TaskType.parse("Deadline"));
-		pl.addParameter(Recurrence.parse("2d"));
-		pl.addParameter(Option.parse("test".split(" ")));
 		
-		assertEquals(10,pl.getParameterCount());
+		ArrayList<Parameter> pArrayList = new ArrayList<Parameter>();
+		
+		pArrayList.add(Time.parse("2014/10/29 20:20"));
+		pArrayList.add(TaskType.parse("Deadline"));
+		pArrayList.add(Recurrence.parse("2d"));
+		
+		pl.addAllParameters(pArrayList);
+		
+		assertEquals(9,pl.getParameterCount());
 		assertEquals(Title.parse("title").getValue(),pl.getTitle().getValue());
 		assertEquals(Location.parse("location").getValue(),pl.getLocation().getValue());
 		assertEquals(TaskID.parse("1").getValue(),pl.getTaskID().getValue());
@@ -31,7 +41,6 @@ public class ParameterListTest {
 		assertEquals(Time.parse("2014/10/29 20:20").getValue()[0].toString(),pl.getTime().getValue()[0].toString());
 		assertEquals(TaskType.parse("Deadline").getValue(),pl.getTaskType().getValue());
 		assertEquals(Recurrence.parse("2d").getValue().toString(),pl.getRecurrence().getValue().toString());
-		//assertEquals(Option.parse("test".split(" ")),pl.Option);	can't find option in ParameterList
 	}
 
 }

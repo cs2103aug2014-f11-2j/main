@@ -23,6 +23,11 @@ public class Alert extends QueryCommand {
 		return returnString;
 	}
 	
+	/**Returns list of DeadlineTask due within a day
+	 * @return ArrayList of DeadlineTasks
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	private ArrayList<DeadlineTask> alertDeadline() throws HandledException, FatalException{
 		ArrayList<DeadlineTask> taskList = TaskList.getInstance().getDeadlineList();
 		ArrayList<DeadlineTask> returnList = new ArrayList<DeadlineTask>();
@@ -34,6 +39,12 @@ public class Alert extends QueryCommand {
 		return returnList;
 	}
 
+	/**
+	 * Returns list of PeriodicTask due starting within one day
+	 * @return ArrayList of PeriodicTask
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	private ArrayList<PeriodicTask> alertPeriodic() throws HandledException, FatalException{
 		ArrayList<PeriodicTask> taskList = TaskList.getInstance().getPeriodicList();
 		ArrayList<PeriodicTask> returnList = new ArrayList<PeriodicTask>();

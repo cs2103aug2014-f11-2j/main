@@ -7,10 +7,16 @@ public class Complete implements Parameter {
 	public static final String[] allowedLiteral = {"C", "complete", "status"};
 	private final boolean complete;
 	
+	/**
+	 * @param complete
+	 */
 	public Complete(boolean complete){
 		this.complete = complete;
 	}
 	
+	/**
+	 * @return boolean value of Complete object
+	 */
 	public boolean getValue(){
 		return this.complete;
 	}
@@ -20,6 +26,11 @@ public class Complete implements Parameter {
 		return type;
 	}
 	
+	/**
+	 * @param completeString
+	 * @return Complete object for String completeString, or null if completeString is null
+	 * @throws HandledException
+	 */
 	public static Complete parse(String completeString) throws HandledException{
 		if (completeString == null){
 			return null;
@@ -28,6 +39,11 @@ public class Complete implements Parameter {
 		}
 	}
 	
+	/**
+	 * @param complete
+	 * @return boolean value of String complete
+	 * @throws HandledException
+	 */
 	private static boolean parseComplete(String complete) throws HandledException {
 		if (complete.equals("")){
 			return true;

@@ -141,6 +141,10 @@ public class Help extends QueryCommand {
 	public static final Ansi HELP_MARK = ansi().bold().a("Mark has no extra options\n" +
 			 							   "Example: mark 2\n").reset();
 	
+	/**
+	 * Creates an instance of Help from String command
+	 * @param command
+	 */
 	public Help(String command){
 		this.parameterList.addParameter(CommandType.parse(command));
 	}
