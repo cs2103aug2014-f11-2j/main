@@ -17,6 +17,7 @@ public class Restore extends InfluentialCommand {
 	
 	
 	/**
+	 * Creates an instance of Restore from user input
 	 * @param command
 	 * @throws HandledException
 	 * @throws FatalException

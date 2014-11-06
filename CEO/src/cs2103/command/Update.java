@@ -26,6 +26,7 @@ public class Update extends InfluentialCommand {
 	private Task target;
 	
 	/**
+	 * Creates an instance of update from user input
 	 * @param command
 	 * @throws HandledException
 	 * @throws FatalException

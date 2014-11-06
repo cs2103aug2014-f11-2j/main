@@ -20,6 +20,7 @@ public class Mark extends InfluentialCommand {
 	private Task target;
 	
 	/**
+	 * Creates an instance of Mark from user input
 	 * @param command
 	 * @throws HandledException
 	 * @throws FatalException

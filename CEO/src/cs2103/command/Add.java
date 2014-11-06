@@ -27,6 +27,7 @@ public class Add extends InfluentialCommand {
 	private static final String[] allowedQuickTimeLiteral = {"from", "by", "on", "in", "at"};
 	
 	/**
+	 * Creates an instance of Add using the string that the user entered
 	 * @param command
 	 * @throws HandledException
 	 */
@@ -65,6 +66,7 @@ public class Add extends InfluentialCommand {
 	}
 	
 	/**
+	 * Extracts parameters and respective values from quick add strings
 	 * @param quickAddString
 	 * @return ArrayList of Parameter object from user input (quickAddString)
 	 * @throws HandledException

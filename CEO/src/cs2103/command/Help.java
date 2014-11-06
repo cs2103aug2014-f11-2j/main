@@ -142,6 +142,7 @@ public class Help extends QueryCommand {
 			 							   "Example: mark 2\n").reset();
 	
 	/**
+	 * Creates an instance of Help from String command
 	 * @param command
 	 */
 	public Help(String command){

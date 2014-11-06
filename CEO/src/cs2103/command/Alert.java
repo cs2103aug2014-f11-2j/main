@@ -23,8 +23,8 @@ public class Alert extends QueryCommand {
 		return returnString;
 	}
 	
-	/**
-	 * @return ArrayList of deadlineTasks due within a day
+	/**Returns list of DeadlineTask due within a day
+	 * @return ArrayList of DeadlineTasks
 	 * @throws HandledException
 	 * @throws FatalException
 	 */
@@ -40,7 +40,8 @@ public class Alert extends QueryCommand {
 	}
 
 	/**
-	 * @return ArrayList of periodicTask starting within a day
+	 * Returns list of PeriodicTask due starting within one day
+	 * @return ArrayList of PeriodicTask
 	 * @throws HandledException
 	 * @throws FatalException
 	 */

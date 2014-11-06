@@ -20,6 +20,7 @@ public class Delete extends InfluentialCommand {
 	private Task target;
 	
 	/**
+	 * Creates an instance of Delete from user input command
 	 * @param command
 	 * @throws HandledException
 	 * @throws FatalException

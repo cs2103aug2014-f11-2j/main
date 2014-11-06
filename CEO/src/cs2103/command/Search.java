@@ -20,6 +20,7 @@ import cs2103.util.CommonUtil;
 public class Search extends QueryCommand {
 	
 	/**
+	 * Creates an instance of Search from user input
 	 * @param command
 	 * @throws HandledException
 	 */

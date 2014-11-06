@@ -13,6 +13,7 @@ public class Show extends QueryCommand {
 	private static final String MESSAGE_SHOW_FORMAT = "The details for Task %1$d:\n";
 	
 	/**
+	 * Creates an instance of Show from user input
 	 * @param command
 	 * @throws HandledException
 	 */

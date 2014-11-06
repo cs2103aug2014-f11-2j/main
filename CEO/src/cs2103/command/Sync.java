@@ -15,6 +15,7 @@ public class Sync extends InfluentialCommand {
 	private static final Ansi DISABLED = ansi().fg(MAGENTA).a("You have disabled sync with Google\n").reset();
 	
 	/**
+	 * Creates an instance of sync from user input
 	 * @param command
 	 * @throws HandledException
 	 */
