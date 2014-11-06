@@ -40,7 +40,7 @@ public class Option implements Parameter {
 	
 	/**
 	 * @param optionString
-	 * @return Value enumerator that matches the String option in 2nd index of String array optionString
+	 * @return Value enumerator that matches the String option in 1st index of String array optionString
 	 * @throws HandledException
 	 */
 	private static Value parseOption(String[] optionString) throws HandledException{
