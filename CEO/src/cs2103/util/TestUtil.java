@@ -2,7 +2,20 @@ package cs2103.util;
 
 import cs2103.task.*;
 
+/**
+ * @author Zheng Han
+ * Used for testing by comparing tasks
+ */
 public class TestUtil {
+	
+	/**
+	 * Compares the Task objects if they are similar, returns true, 
+	 * false otherwise.
+	 * 
+	 * @param task1
+	 * @param task2
+	 * @return a true value if Task arguments are similar, returns false otherwise
+	 */
 	public static boolean compareTasks(Task task1, Task task2){
 		if (task1 == null || task2 == null) return false;
 		if (!task1.getTitle().equals(task2.getTitle())) return false;
