@@ -26,6 +26,10 @@ public class Add extends InfluentialCommand {
 	private static final String MESSAGE_ADD_FAIL = "Fail to add a new task.\n";
 	private static final String[] allowedQuickTimeLiteral = {"from", "by", "on", "in", "at"};
 	
+	/**
+	 * @param command
+	 * @throws HandledException
+	 */
 	public Add(String command) throws HandledException{
 		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> parameterQueue = separateCommand(command);
@@ -60,6 +64,11 @@ public class Add extends InfluentialCommand {
 		return this.formatReturnString(task);
 	}
 	
+	/**
+	 * @param quickAddString
+	 * @return ArrayList of Parameter object from user input (quickAddString)
+	 * @throws HandledException
+	 */
 	private static ArrayList<Parameter> parseQuickAdd(String quickAddString) throws HandledException{
 		ArrayList<Parameter> parameterList = new ArrayList<Parameter>();
 		int timeIndex = -1;
@@ -91,6 +100,10 @@ public class Add extends InfluentialCommand {
 		return parameterList;
 	}
 	
+	/**
+	 * @param timeString
+	 * @return Time object from String timeString
+	 */
 	private static Time parseQuickTime(String timeString){
 		Time time = Time.parse(timeString);
 		Date[] timeArray = getTime(time);
@@ -101,6 +114,10 @@ public class Add extends InfluentialCommand {
 		}
 	}
 	
+	/**
+	 * @param timeParameter
+	 * @return Date array from Time timeParameter
+	 */
 	private static Date[] getTime(Time timeParameter){
 		if (timeParameter == null){
 			return new Date[2];
@@ -109,6 +126,10 @@ public class Add extends InfluentialCommand {
 		}
 	}
 	
+	/**
+	 * @param task
+	 * @return Ansi formatted String for Add object
+	 */
 	private Ansi formatReturnString(Task task){
 		if (task == null){
 			return ansi().bold().fg(RED).a(MESSAGE_ADD_FAIL).reset();
@@ -119,6 +140,10 @@ public class Add extends InfluentialCommand {
 		}
 	}
 	
+	/**
+	 * @return String value of title that is entered by user
+	 * @throws HandledException
+	 */
 	private String readTitle() throws HandledException{
 		if (this.parameterList.getTitle() == null){
 			throw new HandledException(HandledException.ExceptionType.NO_TITLE);
@@ -127,6 +152,10 @@ public class Add extends InfluentialCommand {
 		}
 	}
 	
+	/**
+	 * @return String value of description that is entered by user
+	 * @throws HandledException
+	 */
 	private String readDescription() throws HandledException{
 		if (this.parameterList.getDescription() == null){
 			return null;
@@ -135,6 +164,10 @@ public class Add extends InfluentialCommand {
 		}
 	}
 	
+	/**
+	 * @return String value of location that is entered by user
+	 * @throws HandledException
+	 */
 	private String readLocation() throws HandledException{
 		if (this.parameterList.getLocation() == null){
 			return null;
@@ -143,6 +176,10 @@ public class Add extends InfluentialCommand {
 		}
 	}
 	
+	/**
+	 * @return Recur object from recurrence string entered by user
+	 * @throws HandledException
+	 */
 	private Recur readRecurrence() throws HandledException{
 		if (this.parameterList.getRecurrence() == null){
 			return null;

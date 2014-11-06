@@ -15,6 +15,12 @@ public class Restore extends InfluentialCommand {
 	private static final String MESSAGE_RESTORE_FAIL = "Failed to restor the task with ID %1$d\n";
 	private Task target;
 	
+	
+	/**
+	 * @param command
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	public Restore(String command) throws HandledException, FatalException {
 		this.parameterList.addParameter(TaskID.parse(command));
 		CommonUtil.checkNull(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_CMD);
@@ -23,7 +29,7 @@ public class Restore extends InfluentialCommand {
 			throw new HandledException(HandledException.ExceptionType.NOT_DELETED);
 		}
 	}
-
+	
 	@Override
 	public Ansi execute() throws HandledException, FatalException {
 		CommonUtil.checkNull(this.target, HandledException.ExceptionType.INVALID_TASK_OBJ);

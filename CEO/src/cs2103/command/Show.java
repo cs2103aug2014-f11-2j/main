@@ -12,6 +12,10 @@ import cs2103.util.CommonUtil;
 public class Show extends QueryCommand {
 	private static final String MESSAGE_SHOW_FORMAT = "The details for Task %1$d:\n";
 	
+	/**
+	 * @param command
+	 * @throws HandledException
+	 */
 	public Show(String command) throws HandledException{
 		this.parameterList.addParameter(TaskID.parse(command));
 	}
@@ -22,6 +26,11 @@ public class Show extends QueryCommand {
 		return formatReturnString(TaskList.getInstance().getTaskByID(parameterList.getTaskID().getValue()));
 	}
 	
+	/**
+	 * @param task
+	 * @return Ansi formatted string result
+	 * @throws HandledException
+	 */
 	private Ansi formatReturnString(Task task) throws HandledException{
 		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		Ansi returnString = ansi().a(String.format(MESSAGE_SHOW_FORMAT, task.getTaskID()));

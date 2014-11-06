@@ -25,6 +25,11 @@ public class Update extends InfluentialCommand {
 	private static final String MESSAGE_UPDATE_FAIL = "Fail to update task with ID %1$d\n";
 	private Task target;
 	
+	/**
+	 * @param command
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	public Update(String command) throws HandledException, FatalException{
 		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> parameterQueue = separateCommand(command);
@@ -70,6 +75,11 @@ public class Update extends InfluentialCommand {
 		return formatReturnString(newTask);
 	}
 	
+	/**
+	 * @param newTask
+	 * @return Ansi formmated string result for Update class
+	 * @throws HandledException
+	 */
 	private Ansi formatReturnString(Task newTask) throws HandledException{
 		Ansi returnString = ansi();
 		if (newTask == null){

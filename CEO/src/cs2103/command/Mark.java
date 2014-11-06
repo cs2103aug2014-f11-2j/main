@@ -19,6 +19,11 @@ public class Mark extends InfluentialCommand {
 	private static final String MESSAGE_MARK_NOTSUPPORTED = "Task %1$d does not support mark operation\n";
 	private Task target;
 	
+	/**
+	 * @param command
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	public Mark(String command) throws HandledException, FatalException{
 		this.parameterList.addParameter(TaskID.parse(command));
 		CommonUtil.checkNull(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_TASKID);
@@ -38,6 +43,11 @@ public class Mark extends InfluentialCommand {
 		}
 	}
 	
+	/**
+	 * @param newTask
+	 * @return Ansi formatted result string for Mark command
+	 * @throws HandledException
+	 */
 	private Ansi formatReturnString(Task newTask) throws HandledException{
 		Ansi returnString = ansi();
 		if (newTask == null){

@@ -10,6 +10,9 @@ import cs2103.util.CommonUtil;
 
 public class List extends QueryCommand {
 	
+	/**
+	 * @param command
+	 */
 	public List(String command){
 		this.parameterList.addParameter(TaskType.parse(command));
 	}
