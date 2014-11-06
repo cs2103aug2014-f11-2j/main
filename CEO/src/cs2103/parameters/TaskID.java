@@ -11,6 +11,9 @@ public class TaskID implements Parameter {
 		this.taskID = taskID;
 	}
 	
+	/**
+	 * @return int value of taskID
+	 */
 	public int getValue(){
 		return this.taskID;
 	}
@@ -20,6 +23,11 @@ public class TaskID implements Parameter {
 		return type;
 	}
 	
+	/**
+	 * @param taskIDString
+	 * @return TaskID object from String taskIDString, or null if taskIDString is null
+	 * @throws HandledException
+	 */
 	public static TaskID parse(String taskIDString) throws HandledException{
 		if (taskIDString == null){
 			return null;
