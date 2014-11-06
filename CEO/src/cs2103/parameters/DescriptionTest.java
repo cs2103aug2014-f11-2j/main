@@ -12,6 +12,9 @@ public class DescriptionTest {
 		assertEquals("this is another desc",d.getValue());
 		assertEquals("DESCRIPTION",d.getType());
 		
+		d = Description.parse(null);
+		assertNull(d);
+		
 	}
 
 }

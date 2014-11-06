@@ -14,6 +14,9 @@ public class CompleteTest {
 		assertFalse(c.getValue());
 		c = Complete.parse("true");
 		assertTrue(c.getValue());
+		
+		c = Complete.parse("");
+		assertTrue(c.getValue());
 	}
 	
 	@SuppressWarnings("unused")
