@@ -105,9 +105,9 @@ public abstract class ToDoTask extends Task {
 		}
 	}
 	
-	protected void addGTaskProperty(com.google.api.services.tasks.model.Task gTask){
+	protected void addGTaskProperty(com.google.api.services.tasks.model.Task gTask) {
 		gTask.setTitle(this.getTitle());
-		if (this.getCompleted() == null){
+		if (this.getCompleted() == null) {
 			gTask.setCompleted(Data.NULL_DATE_TIME);
 			gTask.setStatus("needsAction");
 		} else {
@@ -117,14 +117,14 @@ public abstract class ToDoTask extends Task {
 		gTask.setNotes(this.getDescription());
 	}
 	
-	protected static Ansi completedToString(DateTime completed){
+	protected static Ansi completedToString(DateTime completed) {
 		Ansi returnString = ansi();
 		formatCompleted(completed, returnString);
 		return returnString.reset();
 	}
 
 	private static void formatCompleted(DateTime completed, Ansi returnString) {
-		if (completed == null){
+		if (completed == null) {
 			returnString.bold().fg(RED).a("Needs Action");
 		} else {
 			returnString.bold().fg(GREEN).a("Completed");
@@ -133,7 +133,7 @@ public abstract class ToDoTask extends Task {
 	
 	@Override
 	public boolean matches(String keyword) {
-		if (isEmptyKeyword(keyword)){
+		if (isEmptyKeyword(keyword)) {
 			return true;
 		} else {
 			return containsKeywordInTask(keyword);

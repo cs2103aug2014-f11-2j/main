@@ -55,13 +55,24 @@ public abstract class ToDoTaskTest extends TaskTest{
 	@Test
 	public void testCompletedToString(){
 		Ansi test = ToDoTask.completedToString(null);
-		Ansi expected = ansi().bold().fg(RED).a("Needs Action").reset();
+		Ansi expected = generateCompletedToStringExpectedNeedsAction();
 		assertTrue(test.toString().equals(expected.toString()));
 		
 		DateTime testDate = new DateTime();
 		test = ToDoTask.completedToString(testDate);
-		expected = ansi().bold().fg(GREEN).a("Completed").reset(); 
+		expected = generateCompletedToStringExpectedCompleted(); 
 		assertTrue(test.toString().equals(expected.toString()));
+	}
+
+	private Ansi generateCompletedToStringExpectedCompleted() {
+		Ansi expected;
+		expected = ansi().bold().fg(GREEN).a("Completed").reset();
+		return expected;
+	}
+
+	private Ansi generateCompletedToStringExpectedNeedsAction() {
+		Ansi expected = ansi().bold().fg(RED).a("Needs Action").reset();
+		return expected;
 	}
 	
 	/**
@@ -71,33 +82,62 @@ public abstract class ToDoTaskTest extends TaskTest{
 	@Test
 	public void testMatches(){
 		ToDoTask task = (ToDoTask) getConcrete();
+		testMatchesHelper(task);
+	}
+
+	private void testMatchesHelper(ToDoTask task) {
+		testMatchesEmptySearch(task);
+		testMatchesTitle(task);
+		testMatchesFail(task);
+		testMatchesDescription(task);
+	}
+
+	private void testMatchesEmptySearch(ToDoTask task) {
 		String testKeyword = null;
 		assertTrue(task.matches(testKeyword));
 		
 		testKeyword = "";
 		assertTrue(task.matches(testKeyword));
-		
+	}
+
+	private void testMatchesFail(ToDoTask task) {
+		String testKeyword;
+		testKeyword = "Testing";
+		assertTrue(!(task.matches(testKeyword)));
+	}
+
+	private void testMatchesTitle(ToDoTask task) {
+		String testKeyword;
 		testKeyword = "teSt";
 		task.updateTitle("Test Title");
 		assertTrue(task.matches(testKeyword));
-		
-		testKeyword = "Testing";
-		assertTrue(!(task.matches(testKeyword)));
-		
+	}
+
+	private void testMatchesDescription(ToDoTask task) {
+		String testKeyword;
 		testKeyword = "DescRiption";
 		task.updateDescription("Test Description");
 		assertTrue(task.matches(testKeyword));
-		
-		testKeyword = "Testing";
-		assertTrue(!(task.matches(testKeyword)));
 	}	
 	
 	@Test 
 	public void testToDetail(){
 		ToDoTask task = (ToDoTask) getConcrete();
-		Ansi expected = task.toSummary();
-		expected.a("Description: ").a(task.getDescription()).a('\n').reset();
+		Ansi expected = generateDetailExpected(task);
 		Ansi test = task.toDetail();
 		assertEquals(expected.toString(), test.toString());
+	}
+
+	private Ansi generateDetailExpected(ToDoTask task) {
+		Ansi expected = task.toSummary();
+		expected.a("Description: ").a(task.getDescription()).a('\n').reset();
+		return expected;
+	}
+
+	protected void updateTaskExpected(Task taskExpected) {
+		taskExpected.updateTitle(taskExpected.getTitle());
+		taskExpected.updateDescription(taskExpected.getDescription());
+		taskExpected.updateLastModified(taskExpected.getLastModified());
+		taskExpected.updateCompleted(taskExpected.getCompleted());
 	}
 }

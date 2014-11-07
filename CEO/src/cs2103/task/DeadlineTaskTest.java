@@ -110,10 +110,7 @@ public class DeadlineTaskTest extends ToDoTaskTest{
 		assertTrue(ft2 instanceof FloatingTask);
 		
 		Task taskExpected = new FloatingTask(dlt.getTaskUID(), Status.VTODO_NEEDS_ACTION);
-		taskExpected.updateTitle(dlt.getTitle());
-		taskExpected.updateDescription(dlt.getDescription());
-		taskExpected.updateLastModified(dlt.getLastModified());
-		taskExpected.updateCompleted(dlt.getCompleted());
+		updateTaskExpected(taskExpected);
 		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
 	}
 
@@ -125,10 +122,7 @@ public class DeadlineTaskTest extends ToDoTaskTest{
 		assertTrue(ft2 instanceof DeadlineTask);
 		
 		ToDoTask taskExpected = new DeadlineTask(dlt.getTaskUID(), dlt.getStatus(), time[0]);
-		taskExpected.updateTitle(dlt.getTitle());
-		taskExpected.updateDescription(dlt.getDescription());
-		taskExpected.updateLastModified(dlt.getLastModified());
-		taskExpected.updateCompleted(dlt.getCompleted());
+		updateTaskExpected(taskExpected);
 		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
 	}
 	
@@ -140,10 +134,7 @@ public class DeadlineTaskTest extends ToDoTaskTest{
 		assertTrue(ft2 instanceof PeriodicTask);
 		
 		PeriodicTask taskExpected = new PeriodicTask(dlt.getTaskUID(), Status.VEVENT_CONFIRMED, time[0], time[1]);
-		taskExpected.updateTitle(dlt.getTitle());
-		taskExpected.updateDescription(dlt.getDescription());
-		taskExpected.updateLastModified(dlt.getLastModified());
-		taskExpected.updateCompleted(dlt.getCompleted());
+		updateTaskExpected(taskExpected);
 		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
 	}
 	

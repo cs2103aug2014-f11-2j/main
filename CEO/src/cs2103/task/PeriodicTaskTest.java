@@ -212,32 +212,48 @@ public class PeriodicTaskTest extends EventTaskTest{
 
 	@Test
 	public void testToSummary() {
-		Ansi expected = ansi().fg(YELLOW).a(pt.getTaskID()).a(". ").reset();
-		expected.bold().a(pt.getTitle()).a('\n').boldOff().reset();
-		expected.a("From: ").a(pt.dateToString(pt.getStartTime())).a(" to ");
-		expected.a(pt.dateToString(pt.getEndTime())).reset();
-		expected.a('\n').a(PeriodicTask.recurToString(pt.getRecurrence())).a('\n');
+		Ansi expected = generateSummaryExpected();
 		Ansi test = pt.toSummary();
 		assertEquals(expected.toString(), test.toString());
 		
 		pt.updateRecurrence(null);
+		expected = generateSummaryExpectedNullRecurrence();
+		test = pt.toSummary();
+		assertEquals(expected.toString(), test.toString());
+	}
+
+	private Ansi generateSummaryExpectedNullRecurrence() {
+		Ansi expected;
 		expected = ansi().fg(YELLOW).a(pt.getTaskID()).a(". ").reset();
 		expected.bold().a(pt.getTitle()).a('\n').boldOff().reset();
 		expected.a("From: ").a(pt.dateToString(pt.getStartTime())).a(" to ");
 		expected.a(pt.dateToString(pt.getEndTime())).reset();
 		expected.a('\n');
-		test = pt.toSummary();
-		assertEquals(expected.toString(), test.toString());
+		return expected;
+	}
+
+	private Ansi generateSummaryExpected() {
+		Ansi expected = ansi().fg(YELLOW).a(pt.getTaskID()).a(". ").reset();
+		expected.bold().a(pt.getTitle()).a('\n').boldOff().reset();
+		expected.a("From: ").a(pt.dateToString(pt.getStartTime())).a(" to ");
+		expected.a(pt.dateToString(pt.getEndTime())).reset();
+		expected.a('\n').a(PeriodicTask.recurToString(pt.getRecurrence())).a('\n');
+		return expected;
 	}
 
 	@Test
 	public void testToDetail() {
+		Ansi expected = generateDetailExpected();
+		Ansi test = pt.toDetail();
+		assertEquals(expected.toString(), test.toString());
+	}
+
+	private Ansi generateDetailExpected() {
 		Ansi expected = pt.toSummary();
 		expected.a("Location: ");
 		expected.fg(CYAN).a(pt.getLocation()).a("\n").reset();
 		expected.a("Description: ").a(pt.getDescription()).reset().a('\n');
-		Ansi test = pt.toDetail();
-		assertEquals(expected.toString(), test.toString());
+		return expected;
 	}
 	
 	/**

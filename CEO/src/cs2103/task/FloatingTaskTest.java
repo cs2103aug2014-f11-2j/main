@@ -18,7 +18,7 @@ import cs2103.exception.HandledException;
 import cs2103.util.TestUtil;
 
 public class FloatingTaskTest extends ToDoTaskTest {
-	private static ToDoTask ft;
+	static ToDoTask ft;
 	private final String taskUID = null;
 	Status status = null;
 	String title = "Testing";
@@ -68,10 +68,7 @@ public class FloatingTaskTest extends ToDoTaskTest {
 		assertTrue(ft2 instanceof FloatingTask);
 		
 		ToDoTask taskExpected = new FloatingTask(ft.getTaskUID(), ft.getStatus());
-		taskExpected.updateTitle(ft.getTitle());
-		taskExpected.updateDescription(ft.getDescription());
-		taskExpected.updateLastModified(ft.getLastModified());
-		taskExpected.updateCompleted(ft.getCompleted());
+		updateTaskExpected(taskExpected);
 		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
 	}
 
@@ -83,10 +80,7 @@ public class FloatingTaskTest extends ToDoTaskTest {
 		assertTrue(ft2 instanceof DeadlineTask);
 		
 		ToDoTask taskExpected = new DeadlineTask(ft.getTaskUID(), Status.VTODO_NEEDS_ACTION, time[0]);
-		taskExpected.updateTitle(ft.getTitle());
-		taskExpected.updateDescription(ft.getDescription());
-		taskExpected.updateLastModified(ft.getLastModified());
-		taskExpected.updateCompleted(ft.getCompleted());
+		updateTaskExpected(taskExpected);
 		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
 	}
 	
@@ -98,13 +92,10 @@ public class FloatingTaskTest extends ToDoTaskTest {
 		assertTrue(ft2 instanceof PeriodicTask);
 		
 		PeriodicTask taskExpected = new PeriodicTask(ft.getTaskUID(), Status.VEVENT_CONFIRMED, time[0], time[1]);
-		taskExpected.updateTitle(ft.getTitle());
-		taskExpected.updateDescription(ft.getDescription());
-		taskExpected.updateLastModified(ft.getLastModified());
-		taskExpected.updateCompleted(ft.getCompleted());
+		updateTaskExpected(taskExpected);
 		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
 	}
-	
+
 	@Test
 	public void testClone() throws CloneNotSupportedException {
 		ToDoTask task = (ToDoTask) ft.clone();
@@ -113,18 +104,29 @@ public class FloatingTaskTest extends ToDoTaskTest {
 
 	@Test
 	public void testToSummary() {
-		Ansi expected = ansi().fg(YELLOW).a(ft.getTaskID()).a(". ").reset();
-		expected.bold().a(ft.getTitle()).a('\n').boldOff().reset();
-		expected.a("Status: ").a(ToDoTask.completedToString(ft.getCompleted())).a('\n');
+		Ansi expected = generateSummaryExpected();
 		Ansi test = ft.toSummary();
 		assertEquals(expected.toString(), test.toString());
-		
-		Ansi deletedTest = ansi().fg(MAGENTA).a("(Deleted Task)\n").reset();
+
 		ft.delete();
+		expected = generateSummaryExpectedDeleted();
+		test = ft.toSummary();
+		assertEquals(expected.toString(), test.toString());
+	}
+
+	private Ansi generateSummaryExpectedDeleted() {
+		Ansi expected;
+		Ansi deletedTest = ansi().fg(MAGENTA).a("(Deleted Task)\n").reset();
 		expected = ansi().fg(YELLOW).a(ft.getTaskID()).a(". ").reset();
 		expected.bold().a(ft.getTitle()).a('\n').boldOff().reset().a(deletedTest);
 		expected.a("Status: ").a(ToDoTask.completedToString(ft.getCompleted())).a('\n');
-		test = ft.toSummary();
-		assertEquals(expected.toString(), test.toString());
+		return expected;
+	}
+
+	private Ansi generateSummaryExpected() {
+		Ansi expected = ansi().fg(YELLOW).a(ft.getTaskID()).a(". ").reset();
+		expected.bold().a(ft.getTitle()).a('\n').boldOff().reset();
+		expected.a("Status: ").a(ToDoTask.completedToString(ft.getCompleted())).a('\n');
+		return expected;
 	}
 }
