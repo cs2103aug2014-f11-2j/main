@@ -1,3 +1,4 @@
+//@author A0110906R
 package cs2103;
 
 import java.util.Scanner;
@@ -12,6 +13,7 @@ import cs2103.parameters.CommandType;
 import cs2103.parameters.Option;
 import cs2103.storage.TaskList;
 import cs2103.util.CommonUtil;
+import cs2103.util.Logger;
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
 
@@ -32,14 +34,21 @@ public class CommandLineUI {
 	private static final String MESSAGE_INITIALIZATION_ERROR = "Failed to initialize CEO, program will now exit\n";
 	private static final String MESSAGE_UNDO_FORMAT = "Successfully undo %1$d operations\n";
 	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d operations\n";
+	private static final String LOG_INITIALIZE = "Initializing CommandLineUI instance";
+	private static final String LOG_TEST_COMMANDLINE = "Testing CommandLineUI class";
+	private static final String LOG_REDO = "Successfully redo %1$d operations";
+	private static final String LOG_UNDO = "Successfully undo %1$d operations";
 	
 	private static CommandLineUI commandLine;
 	private TaskList taskList;
 	private Stack<InfluentialCommand> undoStack;
 	private Stack<InfluentialCommand> redoStack;
 	private Scanner scanner = new Scanner(System.in);
+	private final Logger logger;
 	
 	private CommandLineUI(Option option) throws HandledException, FatalException{
+		this.logger = Logger.getInstance();
+		this.logger.writeLog(LOG_INITIALIZE);
 		undoStack = new Stack<InfluentialCommand>();
 		redoStack = new Stack<InfluentialCommand>();
 		option = this.verifyOption(option);
@@ -181,6 +190,7 @@ public class CommandLineUI {
 		} else {
 			result = executeUndo(CommonUtil.parseIntegerParameter(steps));
 		}
+		this.logger.writeLog(String.format(LOG_UNDO, result));
 		return ansi().fg(GREEN).a(String.format(MESSAGE_UNDO_FORMAT, result)).reset();
 	}
 	
@@ -203,6 +213,7 @@ public class CommandLineUI {
 		} else {
 			result = executeRedo(CommonUtil.parseIntegerParameter(steps));
 		}
+		this.logger.writeLog(String.format(LOG_REDO, result));
 		return ansi().fg(GREEN).a(String.format(MESSAGE_REDO_FORMAT, result)).reset();
 	}
 	
@@ -253,6 +264,7 @@ public class CommandLineUI {
 	 * @return a resultant string from an input command
 	 */
 	public String testCommand(String testCommandInput){
+		this.logger.writeLog(LOG_TEST_COMMANDLINE);
 		return processUserInput(testCommandInput).toString();
 	}
 }
