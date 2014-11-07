@@ -192,9 +192,9 @@ public class GoogleEngine {
 	
 	private Task parseGTask(com.google.api.services.tasks.model.Task gTask) throws HandledException {
 		CommonUtil.checkNull(gTask, HandledException.ExceptionType.INVALID_TASK_OBJ);
-		String[] descriptionAndDueTime = this.splitDescriptionAndDueTime(gTask);
+		String[] descriptionAndDueTime = this.splitDescriptionAndDueTime(gTask); //Work around for Google Tasks storing only date but not time
 		String description = descriptionAndDueTime[0];
-		Date dueTime = this.readDueTime(gTask.getDue(), descriptionAndDueTime[1]);
+		Date dueTime = this.readDueTime(gTask.getDue(), descriptionAndDueTime[1]); //Adjust according to time stored in description
 		ToDoTask task;
 		if (dueTime == null) {
 			task = new FloatingTask(gTask.getId(), this.readStatus(gTask));
@@ -227,7 +227,9 @@ public class GoogleEngine {
 	
 	private Task tryToInsert(Task task) throws IOException, HandledException {
 		assert(task != null);
-		if (!task.getStatus().equals(Status.VTODO_CANCELLED)) {
+		if (task.isDeleted()) {
+			return null;
+		} else {
 			Task returnTask;
 			if (task instanceof EventTask) {
 				com.google.api.services.calendar.model.Event insertEvent = ((EventTask) task).toGEvent();
@@ -241,8 +243,6 @@ public class GoogleEngine {
 			assert(task.getCreated() != null);
 			returnTask.updateCreated(task.getCreated());
 			return returnTask;
-		} else {
-			return null;
 		}
 	}
 	
@@ -317,7 +317,7 @@ public class GoogleEngine {
 	
 	private boolean checkConverting(EventTask task) throws IOException {
 		assert(task != null);
-		try{
+		try {
 			return this.tasks.tasks().get(DEFAULT_TASKS, task.getTaskUID()).execute() != null;
 		} catch (GoogleJsonResponseException e) {
 			return false;
@@ -343,7 +343,7 @@ public class GoogleEngine {
 	
 	private boolean checkConverting(ToDoTask task) throws IOException {
 		assert(task != null);
-		try{
+		try {
 			return this.calendar.events().get(calendarIdentifier, task.getTaskUID()).execute() != null;
 		} catch (GoogleJsonResponseException e) {
 			return false;
@@ -415,18 +415,30 @@ public class GoogleEngine {
 		}
 		return time;
 	}
+
+	private com.google.api.client.util.DateTime readEventDateTime(com.google.api.services.calendar.model.EventDateTime edt) {
+		if (edt == null) {
+			return null;
+		} else {
+			if (edt.getDateTime() == null) {
+				return edt.getDate();
+			} else {
+				return edt.getDateTime();
+			}
+		}
+	}
 	
 	private Date readDueTime(com.google.api.client.util.DateTime dueTime, String supplement) {
 		if (dueTime == null) {
 			return null;
 		} else if (supplement == null) {
-			return this.defaultDueTime(dueTime.getValue());
+			return this.getDefaultDueTime(dueTime.getValue());
 		} else {
 			return this.adjustDueTime(dueTime.getValue(), supplement);
 		}
 	}
 	
-	private Date defaultDueTime(long dueTime) {
+	private Date getDefaultDueTime(long dueTime) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeInMillis(dueTime);
 		cal.set(Calendar.HOUR_OF_DAY, 23);
@@ -438,8 +450,10 @@ public class GoogleEngine {
 		Calendar adjusting = Calendar.getInstance();
 		Calendar adjustment = this.parseSupplement(supplement);
 		adjusting.setTimeInMillis(dueTime);
-		adjusting.set(Calendar.HOUR_OF_DAY, adjustment.get(Calendar.HOUR_OF_DAY));
-		adjusting.set(Calendar.MINUTE, adjustment.get(Calendar.MINUTE));
+		if (adjustment != null) {
+			adjusting.set(Calendar.HOUR_OF_DAY, adjustment.get(Calendar.HOUR_OF_DAY));
+			adjusting.set(Calendar.MINUTE, adjustment.get(Calendar.MINUTE));
+		}
 		return new Date(adjusting.getTimeInMillis());
 	}
 	
@@ -452,18 +466,6 @@ public class GoogleEngine {
 			return cal;
 		} else {
 			return null;
-		}
-	}
-	
-	private com.google.api.client.util.DateTime readEventDateTime(com.google.api.services.calendar.model.EventDateTime edt) {
-		if (edt == null) {
-			return null;
-		} else {
-			if (edt.getDateTime() == null) {
-				return edt.getDate();
-			} else {
-				return edt.getDateTime();
-			}
 		}
 	}
 	
