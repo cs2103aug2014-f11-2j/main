@@ -48,7 +48,6 @@ import net.fortuna.ical4j.util.CompatibilityHints;
  * Using iCal4j to read and store iCalendar file complying RFC 2445 iCalendar specification
  */
 public class StorageEngine implements StorageInterface{
-	private static StorageEngine storage;
 	private net.fortuna.ical4j.model.Calendar calendar;
 	private IndexedComponentList indexedComponents;
 	private final File file;
@@ -59,7 +58,7 @@ public class StorageEngine implements StorageInterface{
 	private static final String LOG_UPDATE = "Updating task with UID %1$s to file";
 	private static final String LOG_REMOVE = "Removing task with UID %1$s from file";
 	
-	private StorageEngine(File file) throws HandledException, FatalException {
+	public StorageEngine(File file) throws HandledException, FatalException {
 		this.logger = Logger.getInstance();
 		this.logger.writeLog(LOG_INITIALIZE);
 		if (file == null) {
@@ -68,19 +67,6 @@ public class StorageEngine implements StorageInterface{
 		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION, true);
 		this.file = file;
 		readFromFile();
-	}
-	
-	/**
-	 * Return the default instance of StorageEngine for accessing the content in given file
-	 * @param file
-	 * @throws HandledException
-	 * @throws FatalException
-	 */
-	public static StorageEngine getInstance(File file) throws HandledException, FatalException {
-		if (storage == null) {
-			storage = new StorageEngine(file);
-		}
-		return storage;
 	}
 	
 	private void createNewFile() throws HandledException, FatalException {

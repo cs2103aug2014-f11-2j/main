@@ -22,7 +22,7 @@ public class StorageEngineTest {
 	@Before
 	public void before() throws HandledException, FatalException {
 		file.delete();
-		this.storage = StorageEngine.getInstance(file);
+		this.storage = new StorageEngine(file);
 	}
 	
 	@Test

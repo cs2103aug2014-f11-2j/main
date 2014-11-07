@@ -24,7 +24,7 @@ import java.util.Collections;
  */
 public class TaskList {
 	private static TaskList taskList;
-	private final StorageInterface storage;
+	private StorageInterface storage;
 	private final File dataFile;
 	private GoogleEngine google;
 	private ArrayList<Task> tasks;
@@ -49,10 +49,10 @@ public class TaskList {
 				this.google = null;
 			}
 		case NOSYNC:
-			this.storage = StorageEngine.getInstance(this.dataFile);
+			this.storage = new StorageEngine(this.dataFile);
 			break;
 		case TEST:
-			this.storage = StorageStub.getInstance();
+			this.storage = new StorageStub();
 			break;
 		}
 		this.tasks = this.storage.getTaskList();
@@ -273,13 +273,10 @@ public class TaskList {
 		this.google = null;
 	}
 	
-	/**
-	 * @return a new Test instance of TaskList
-	 * @throws FatalException
-	 * @throws HandledException
-	 */
-	public static TaskList getTestInstance() throws FatalException, HandledException {
-		return new TaskList(new Option(Option.Value.TEST));
+	public void emptyTestList() throws FatalException, HandledException {
+		if (this.storage instanceof StorageStub) {
+			this.storage = new StorageStub();
+		}
 	}
 	
 	private void commitDeleteToGoogle(Task task) throws HandledException {

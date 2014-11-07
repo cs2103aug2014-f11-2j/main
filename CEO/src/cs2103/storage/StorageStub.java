@@ -11,18 +11,10 @@ import cs2103.task.Task;
  * This class is used for testing purpose, it will not write the task list into file system
  */
 public class StorageStub implements StorageInterface {
-	private static StorageStub storage;
 	private ArrayList<Task> tasks;
 	
-	private StorageStub() {
+	public StorageStub() {
 		this.tasks = new ArrayList<Task>();
-	}
-	
-	public static StorageStub getInstance() {
-		if (storage == null){
-			storage = new StorageStub();
-		}
-		return storage;
 	}
 	
 	/**
