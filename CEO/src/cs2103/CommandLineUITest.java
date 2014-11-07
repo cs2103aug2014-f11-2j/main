@@ -1,3 +1,4 @@
+//@author A0110906R
 package cs2103;
 
 import static org.junit.Assert.*;
@@ -167,7 +168,7 @@ public class CommandLineUITest {
 	private static final String MESSAGE_REDO_SUCCESS = "Successfully redo 0 operations\n";
 	private static final String MESSAGE_UNDO_SUCCESS = "Successfully undo 1 operations\n";
 	private static final String MESSAGE_SHOW_SUCCESS = "The details for Task 1:\n";
-	private static final String MESSAGE_SHOW_SUCCESS_1 = ansi().a(MESSAGE_SHOW_SUCCESS).fg(YELLOW).a("1. ").reset().bold().a("Play basketball \n").boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a('\t').a("Due At: ").bold().fg(GREEN).a("2014/12/15").reset().a("\nDescription: \n").reset().toString();
+	private static final String MESSAGE_SHOW_SUCCESS_1 = ansi().a(MESSAGE_SHOW_SUCCESS).fg(YELLOW).a("1. ").reset().bold().a("Play basketball \n").boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a('\t').a("Due At: ").bold().fg(GREEN).a("2014/12/15 07:00 PM").reset().a("\nDescription: \n").reset().toString();
 	
 	@Test
 	public void test6_InvalidCommand() throws HandledException, FatalException {
@@ -194,7 +195,7 @@ public class CommandLineUITest {
 		String[] separated = returnString.toString().split("\n");
 		assertEquals(Array.get(separatedTest, 0), Array.get(separated, 0));
 		assertEquals(Array.get(separatedTest, 1), Array.get(separated, 1));
-		assertEquals(Array.get(separatedTest, 2), ansi().boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/21").reset().toString());
+		assertEquals(Array.get(separatedTest, 2), ansi().boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/21 06:00 PM").reset().toString());
 		assertEquals(Array.get(separatedTest, 3), MESSAGE_ADD_SUCCESS_5);
 		assertEquals(Array.get(separatedTest, 4), ansi().reset().toString());
 	}
@@ -211,7 +212,7 @@ public class CommandLineUITest {
 		returnString1.bold().a("Submit nothing").a('\n').boldOff().reset();
 		
 		returnString.a(returnString1);
-		returnString.a(ansi().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/27").reset().toString());
+		returnString.a(ansi().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/27 07:00 PM").reset().toString());
 		returnString.a("\nDescription: \n").reset();
 		assertEquals(updateTest, returnString.toString());
 		
@@ -266,7 +267,7 @@ public class CommandLineUITest {
 		String[] result1 = returnString1.toString().split("\n");
 		assertEquals(Array.get(separatedTest, 0), ansi().fg(GREEN).a(MESSAGE_MARK_SUCCESS).toString());
 		assertEquals(Array.get(separatedTest, 1), Array.get(result1, 1));
-		assertEquals(Array.get(separatedTest, 2), ansi().boldOff().reset().a("Status: ").bold().fg(GREEN).a("Completed").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2015/06/05").reset().toString());
+		assertEquals(Array.get(separatedTest, 2), ansi().boldOff().reset().a("Status: ").bold().fg(GREEN).a("Completed").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2015/06/05 06:00 PM").reset().toString());
 		assertEquals(Array.get(separatedTest, 3), ansi().a("Description: ").toString());
 		
 		String invalidMark = test.testCommand("mark 23");
@@ -295,7 +296,7 @@ public class CommandLineUITest {
 		String[] separatedTest = listTest.split("\n");
 		Ansi returnString1 = ansi().fg(YELLOW).a("1").a(". ").reset();
 		returnString1.bold().a("Submit homework ").a('\n').boldOff().reset();
-		returnString1.a(ansi().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/21").reset().toString());
+		returnString1.a(ansi().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/21 06:00 PM").reset().toString());
 		String[] separated = returnString1.toString().split("\n");
 		assertEquals(Array.get(separatedTest, 0), Array.get(separated, 0));
 		assertEquals(Array.get(separatedTest, 1), Array.get(separated, 1));
