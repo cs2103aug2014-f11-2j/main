@@ -66,8 +66,8 @@ public class FloatingTask extends ToDoTask {
 	@Override
 	public Ansi toSummary() {
 		Ansi returnString = this.addCommonString();
-		formatStatus(returnString);
-		return returnString;
+		this.formatStatus(returnString);
+		return returnString.a('\n');
 	}
 
 	@Override

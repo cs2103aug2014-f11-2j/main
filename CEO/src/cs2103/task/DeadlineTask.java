@@ -1,11 +1,5 @@
 package cs2103.task;
 
-import static org.fusesource.jansi.Ansi.ansi;
-import static org.fusesource.jansi.Ansi.Color.GREEN;
-import static org.fusesource.jansi.Ansi.Color.RED;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 
@@ -95,27 +89,11 @@ public class DeadlineTask extends ToDoTask {
 		Ansi returnString = this.addCommonString();
 		formatStatus(returnString);
 		formatDueTime(returnString);
-		return returnString;
+		return returnString.a('\n');
 	}
 
 	private void formatDueTime(Ansi returnString) {
-		returnString.a("\tDue At: ").a(this.dateToString(this.getDueTime())).a('\n');
-	}
-	
-	protected Ansi dateToString(Date date){
-		Ansi returnString = ansi().bold();
-		formatDate(date, returnString);
-		return returnString;
-	}
-
-	private void formatDate(Date date, Ansi returnString) {
-		DateFormat format = new SimpleDateFormat("yyyy/MM/dd");
-		if (this.checkAlert()){
-			returnString.fg(RED);
-		} else {
-			returnString.fg(GREEN);
-		}
-		returnString.a(format.format(date)).reset();
+		returnString.a("\tDue At: ").a(this.dateToString(this.getDueTime()));
 	}
 	
 	public static sortComparator getComparator(){

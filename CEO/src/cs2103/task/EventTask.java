@@ -1,14 +1,6 @@
 package cs2103.task;
 
-import static org.fusesource.jansi.Ansi.ansi;
-import static org.fusesource.jansi.Ansi.Color.GREEN;
-import static org.fusesource.jansi.Ansi.Color.RED;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import org.fusesource.jansi.Ansi;
 
 import com.google.api.client.util.Data;
 
@@ -131,18 +123,6 @@ public abstract class EventTask extends Task {
 		eventDateTime.setDate(Data.NULL_DATE_TIME);
 		eventDateTime.setDateTime(new com.google.api.client.util.DateTime(time.getTime()));
 		return eventDateTime;
-	}
-	
-	protected Ansi dateToString(Date date){
-		Ansi returnString = ansi().bold();
-		DateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm a");
-		if (this.checkAlert()){
-			returnString.fg(RED);
-		} else {
-			returnString.fg(GREEN);
-		}
-		returnString.a(format.format(date)).reset();
-		return returnString;
 	}
 	
 	/**

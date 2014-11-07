@@ -192,6 +192,6 @@ public abstract class ToDoTask extends Task {
 	}
 
 	protected void formatStatus(Ansi returnString) {
-		returnString.a("Status: ").a(completedToString(this.getCompleted())).a('\n');
+		returnString.a("Status: ").a(completedToString(this.getCompleted()));
 	}
 }
