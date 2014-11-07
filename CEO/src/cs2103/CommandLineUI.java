@@ -38,6 +38,7 @@ public class CommandLineUI {
 	private static final String LOG_TEST_COMMANDLINE = "Testing CommandLineUI class";
 	private static final String LOG_REDO = "Successfully redo %1$d operations";
 	private static final String LOG_UNDO = "Successfully undo %1$d operations";
+	private static final String LOG_EXIT = "User exited from CEO";
 	
 	private static CommandLineUI commandLine;
 	private TaskList taskList;
@@ -112,6 +113,7 @@ public class CommandLineUI {
 				assert(command != null);
 				Ansi feedback = processUserInput(command);
 				if (feedback == null){
+					this.logger.writeLog(LOG_EXIT);
 					CommonUtil.print(MESSAGE_EXIT);
 					break;
 				} else {
