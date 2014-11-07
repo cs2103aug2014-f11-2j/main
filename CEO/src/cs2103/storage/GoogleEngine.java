@@ -5,8 +5,13 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.ocpsoft.prettytime.nlp.PrettyTimeParser;
 
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.Status;
@@ -34,6 +39,7 @@ public class GoogleEngine {
 	private Date taskLastUpdate;
 	private Date calendarLastUpdate;
 	private static final long DAY_IN_MILLIS = 86400000L;
+	private static final int DUE_STRING_LENGTH = 8;
 	private static final String DEFAULT_TASKS = "@default";
 	private static final String LOG_ADD = "Adding task with UID %1$s to Google";
 	private static final String LOG_UPDATE = "Updating task with UID %1$s to Google";
@@ -186,17 +192,20 @@ public class GoogleEngine {
 	
 	private Task parseGTask(com.google.api.services.tasks.model.Task gTask) throws HandledException {
 		CommonUtil.checkNull(gTask, HandledException.ExceptionType.INVALID_TASK_OBJ);
+		String[] descriptionAndDueTime = this.splitDescriptionAndDueTime(gTask);
+		String description = descriptionAndDueTime[0];
+		Date dueTime = this.readDueTime(gTask.getDue(), descriptionAndDueTime[1]);
 		ToDoTask task;
-		if (gTask.getDue() == null) {
+		if (dueTime == null) {
 			task = new FloatingTask(gTask.getId(), this.readStatus(gTask));
 		} else {
-			task = new DeadlineTask(gTask.getId(), this.readStatus(gTask), new Date(gTask.getDue().getValue()));
+			task = new DeadlineTask(gTask.getId(), this.readStatus(gTask), dueTime);
 		}
 		assert(task != null);
 		task.updateTitle(gTask.getTitle());
 		task.updateCreated(this.readLastModified(gTask));
 		task.updateCompleted(this.readCompleted(gTask));
-		task.updateDescription(gTask.getNotes());
+		task.updateDescription(description);
 		task.updateLastModified(this.readLastModified(gTask));
 		return task;
 	}
@@ -407,6 +416,45 @@ public class GoogleEngine {
 		return time;
 	}
 	
+	private Date readDueTime(com.google.api.client.util.DateTime dueTime, String supplement) {
+		if (dueTime == null) {
+			return null;
+		} else if (supplement == null) {
+			return this.defaultDueTime(dueTime.getValue());
+		} else {
+			return this.adjustDueTime(dueTime.getValue(), supplement);
+		}
+	}
+	
+	private Date defaultDueTime(long dueTime) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(dueTime);
+		cal.set(Calendar.HOUR_OF_DAY, 23);
+		cal.set(Calendar.MINUTE, 59);
+		return new Date(cal.getTimeInMillis());
+	}
+	
+	private Date adjustDueTime(long dueTime, String supplement) {
+		Calendar adjusting = Calendar.getInstance();
+		Calendar adjustment = this.parseSupplement(supplement);
+		adjusting.setTimeInMillis(dueTime);
+		adjusting.set(Calendar.HOUR_OF_DAY, adjustment.get(Calendar.HOUR_OF_DAY));
+		adjusting.set(Calendar.MINUTE, adjustment.get(Calendar.MINUTE));
+		return new Date(adjusting.getTimeInMillis());
+	}
+	
+	private Calendar parseSupplement(String supplement) {
+		assert(supplement != null);
+		java.util.List<Date> dates = new PrettyTimeParser().parse(supplement);
+		if (!dates.isEmpty()){
+			Calendar cal = Calendar.getInstance();
+			cal.setTimeInMillis(dates.get(0).getTime());
+			return cal;
+		} else {
+			return null;
+		}
+	}
+	
 	private com.google.api.client.util.DateTime readEventDateTime(com.google.api.services.calendar.model.EventDateTime edt) {
 		if (edt == null) {
 			return null;
@@ -471,6 +519,22 @@ public class GoogleEngine {
 		} else {
 			return Status.VTODO_NEEDS_ACTION;
 		}
+	}
+	
+	private String[] splitDescriptionAndDueTime(com.google.api.services.tasks.model.Task gTask) {
+		assert(gTask != null);
+		String[] result = new String[2];
+		String description = gTask.getNotes();
+		if (description == null) {
+			return result; 
+		}
+		Pattern p = Pattern.compile("(\n<Due At: \\d+:\\d+ \\w+>)");
+		Matcher m = p.matcher(gTask.getNotes());
+		if (m.find()){
+			result[0] = description.substring(0, m.start()).trim();
+			result[1] = description.substring(m.start() + DUE_STRING_LENGTH , m.end() - 1);
+		}
+		return result;
 	}
 	
 	private List<com.google.api.services.tasks.model.Task> getTasks() throws HandledException {
