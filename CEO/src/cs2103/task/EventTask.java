@@ -27,10 +27,16 @@ public abstract class EventTask extends Task {
 		this.updateStatus(status);
 	}
 	
+	/**
+	 * @return the start time as in RFC2445 iCalendar specification
+	 */
 	public DateTime getStartTime(){
 		return this.startTime;
 	}
 	
+	/**
+	 * @return the end time as in RFC2445 iCalendar specification
+	 */
 	public DateTime getEndTime(){
 		return this.endTime;
 	}
@@ -65,6 +71,9 @@ public abstract class EventTask extends Task {
 		return startTime == null || endTime == null;
 	}
 	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#getCompleted()
+	 */
 	@Override
 	public DateTime getCompleted() {
 		if (this.getEndTime().before(new DateTime())){
@@ -74,11 +83,17 @@ public abstract class EventTask extends Task {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#updateCompleted(java.util.Date)
+	 */
 	@Override
 	public void updateCompleted(Date complete) {
 		return;
 	}
 	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#updateStatus(net.fortuna.ical4j.model.property.Status)
+	 */
 	@Override
 	protected void updateStatus(Status status){
 		if (status == null){
@@ -88,21 +103,33 @@ public abstract class EventTask extends Task {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#isDeleted()
+	 */
 	@Override
 	public boolean isDeleted() {
 		return this.getStatus().equals(Status.VEVENT_CANCELLED);
 	}
 
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#delete()
+	 */
 	@Override
 	public void delete() {
 		this.updateStatus(Status.VEVENT_CANCELLED);
 	}
 
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#restore()
+	 */
 	@Override
 	public void restore() {
 		this.updateStatus(Status.VEVENT_CONFIRMED);
 	}
 	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#toComponent()
+	 */
 	@Override
 	public Component toComponent() {
 		return this.toVEvent();
@@ -126,8 +153,11 @@ public abstract class EventTask extends Task {
 	}
 	
 	/**
-	 * Two methods to generate objects necessary for Google Sync
+	 * @return generate a VEvent object for iCal4j
 	 */
 	protected abstract VEvent toVEvent();
+	/**
+	 * @return generate a Google Calendar event which is needed for Google Sync
+	 */
 	public abstract com.google.api.services.calendar.model.Event toGEvent();
 }

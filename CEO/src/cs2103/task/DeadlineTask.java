@@ -18,6 +18,9 @@ public class DeadlineTask extends ToDoTask {
 		this.updateDueTime(dueTime);
 	}
 	
+	/**
+	 * @return the due time as in RFC2445 iCalendar specification
+	 */
 	public DateTime getDueTime(){
 		return this.dueTime;
 	}
@@ -30,6 +33,9 @@ public class DeadlineTask extends ToDoTask {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#convert(java.util.Date[])
+	 */
 	@Override
 	protected Task convert(Date[] time) throws HandledException {
 		if (isInvalidTime(time)) {
@@ -84,6 +90,9 @@ public class DeadlineTask extends ToDoTask {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#toSummary()
+	 */
 	@Override
 	public Ansi toSummary() {
 		Ansi returnString = this.addCommonString();
@@ -96,6 +105,9 @@ public class DeadlineTask extends ToDoTask {
 		returnString.a("\tDue At: ").a(this.dateToString(this.getDueTime()));
 	}
 	
+	/**
+	 * @return the comparator for sorting
+	 */
 	public static sortComparator getComparator(){
 		return new sortComparator();
 	}
@@ -107,6 +119,9 @@ public class DeadlineTask extends ToDoTask {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#checkPeriod(java.util.Date[])
+	 */
 	@Override
 	public boolean checkPeriod(Date[] time) {
 		if (isNullTimePeriod(time)){
@@ -145,6 +160,9 @@ public class DeadlineTask extends ToDoTask {
 		return this.getDueTime().before(time[0]);
 	}
 
+	/* (non-Javadoc)
+	 * @see cs2103.task.ToDoTask#toVToDo()
+	 */
 	@Override
 	protected VToDo toVToDo() {
 		VToDo vToDo = new VToDo(this.getCreated(), this.getDueTime(), this.getTitle());
@@ -152,6 +170,9 @@ public class DeadlineTask extends ToDoTask {
 		return vToDo;
 	}
 	
+	/* (non-Javadoc)
+	 * @see cs2103.task.ToDoTask#toGTask()
+	 */
 	@Override
 	public com.google.api.services.tasks.model.Task toGTask(){
 		com.google.api.services.tasks.model.Task gTask = new com.google.api.services.tasks.model.Task();

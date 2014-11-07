@@ -37,10 +37,6 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	protected static final long DAY_IN_MILLIS = 86400000L;
 	protected static final Ansi DELETED = ansi().fg(MAGENTA).a("(Deleted Task)\n").reset();
 	
-	
-	/**
-	 * Generated a String taskUID, unique to each Task created
-	 */
 	public Task(String taskUID) {
 		if (taskUID == null){
 			this.taskUID = this.generateUid();
@@ -50,19 +46,31 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		this.updateCreated(null);
 	}
 	
+	/**
+	 * Generated a String taskUID, unique to each Task created
+	 */
 	private String generateUid(){
 		SecureRandom random = new SecureRandom();
 		return new BigInteger(130, random).toString(32);
 	}
 	
+	/**
+	 * @return the temporary Task ID
+	 */
 	public int getTaskID(){
 		return this.taskID;
 	}
 	
+	/**
+	 * @return the unique identifying String of the task object
+	 */
 	public String getTaskUID(){
 		return this.taskUID;
 	}
 	
+	/**
+	 * @return the Title of the Task
+	 */
 	public String getTitle(){
 		if (this.title == null){
 			this.title = "";
@@ -70,6 +78,9 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		return this.title;
 	}
 	
+	/**
+	 * @return the Description of the Task
+	 */
 	public String getDescription(){
 		if (this.description == null){
 			this.description = "";
@@ -77,10 +88,16 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		return this.description;
 	}
 	
+	/**
+	 * @return the created time of the Task
+	 */
 	public DateTime getCreated(){
 		return this.created;
 	}
 	
+	/**
+	 * @return the last modified time of the Task
+	 */
 	public DateTime getLastModified(){
 		if (this.lastModified == null){
 			this.updateLastModified(null);
@@ -88,18 +105,30 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		return this.lastModified;
 	}
 	
+	/**
+	 * @param a temporary task id
+	 */
 	public void updateTaskID(int id){
 		this.taskID = id;
 	}
 	
+	/**
+	 * @param title
+	 */
 	public void updateTitle(String title) {
 		this.title = title;
 	}
 	
+	/**
+	 * @param description
+	 */
 	public void updateDescription(String description){
 		this.description = description;
 	}
 	
+	/**
+	 * @param the last modified time
+	 */
 	public void updateLastModified(Date date){
 		if (date == null){
 			this.lastModified = new DateTime();
@@ -108,6 +137,9 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		}
 	}
 	
+	/**
+	 * @param the created time
+	 */
 	public void updateCreated(Date date){
 		if (date == null){
 			this.created = new DateTime();
@@ -160,7 +192,9 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	}
 	
 	/**
-	 * Changes task updated based on the time
+	 * @param a Date array contains time information
+	 * @return Updated task
+	 * @throws HandledException
 	 */
 	public Task update(Date[] time) throws HandledException{
 		Task returnTask = this.convert(time);
@@ -168,11 +202,29 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		return returnTask;
 	}
 	
+	/**
+	 * @param time completed
+	 */
 	public abstract void updateCompleted(Date complete);
+	/**
+	 * @param location
+	 */
 	public abstract void updateLocation(String location);
+	/**
+	 * @param recurrence
+	 */
 	public abstract void updateRecurrence(Recur recurrence);
+	/**
+	 * @param status as in RFC 2445 iCalendar specification
+	 */
 	protected abstract void updateStatus(Status status);
+	/**
+	 * @return return whether this task is deleted
+	 */
 	public abstract boolean isDeleted();
+	/**
+	 * Indicate this Task is deleted
+	 */
 	public abstract void delete();
 	/**
 	 * Revives a task from delete
@@ -185,19 +237,35 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	protected abstract Task convert(Date[] time) throws HandledException;
 	@Override
 	public abstract Object clone() throws CloneNotSupportedException;
+	/**
+	 * @return Summary Ansi String to be printed
+	 */
 	public abstract Ansi toSummary();
+	/**
+	 * @return Detail Ansi String to be printed
+	 */
 	public abstract Ansi toDetail();
 	/**
-	 * Generates Google component necessary for Google Sync
+	 * @return convert to iCal4j component object to store
 	 */
 	public abstract Component toComponent();
+	/**
+	 * @return return the time the task is completed
+	 */
 	public abstract DateTime getCompleted();
+	/**
+	 * @param a Date array specify the time period for checking
+	 * @return if this task is within the period
+	 */
 	public abstract boolean checkPeriod(Date[] time);
 	/**
 	 * Checks if keyword is contained anywhere within the task
 	 */
 	public abstract boolean matches(String keyword);
 	
+	/**
+	 * @return status as in RFC 2445 iCalendar specification
+	 */
 	public Status getStatus(){
 		return this.status;
 	}

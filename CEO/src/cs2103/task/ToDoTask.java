@@ -29,11 +29,17 @@ public abstract class ToDoTask extends Task {
 		this.updateStatus(status);
 	}
 	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#getCompleted()
+	 */
 	@Override
 	public DateTime getCompleted(){
 		return this.completed;
 	}
 	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#updateCompleted(java.util.Date)
+	 */
 	@Override
 	public void updateCompleted(Date completed){
 		if (completed == null){
@@ -43,6 +49,9 @@ public abstract class ToDoTask extends Task {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#updateStatus(net.fortuna.ical4j.model.property.Status)
+	 */
 	@Override
 	protected void updateStatus(Status status){
 		if (status == null){
@@ -52,26 +61,41 @@ public abstract class ToDoTask extends Task {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#updateLocation(java.lang.String)
+	 */
 	@Override
 	public void updateLocation(String location) {
 		return;
 	}
 
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#updateRecurrence(net.fortuna.ical4j.model.Recur)
+	 */
 	@Override
 	public void updateRecurrence(Recur recurrence) {
 		return;
 	}
 	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#isDeleted()
+	 */
 	@Override
 	public boolean isDeleted() {
 		return this.getStatus().equals(Status.VTODO_CANCELLED);
 	}
 
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#delete()
+	 */
 	@Override
 	public void delete() {
 		this.updateStatus(Status.VTODO_CANCELLED);
 	}
 
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#restore()
+	 */
 	@Override
 	public void restore() {
 		if (this.getCompleted() == null){
@@ -81,11 +105,17 @@ public abstract class ToDoTask extends Task {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#toComponent()
+	 */
 	@Override
 	public Component toComponent() {
 		return this.toVToDo();
 	}
 	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#toDetail()
+	 */
 	@Override
 	public Ansi toDetail() {
 		Ansi returnString = this.toSummary();
@@ -97,9 +127,6 @@ public abstract class ToDoTask extends Task {
 		returnString.a(STRING_DESCRIPTION).a(this.getDescription()).a('\n').reset();
 	}
 	
-	/**
-	 * Adds necessary properties to VToDo, necessary for Google Sync 
-	 */
 	protected void addVToDoProperty(VToDo vToDo){
 		this.addCommonProperty(vToDo);
 		if (this.isDeleted()){
@@ -112,9 +139,6 @@ public abstract class ToDoTask extends Task {
 		}
 	}
 	
-	/**
-	 * Adds necessary properties necessary for sync with Google Task
-	 */
 	protected void addGTaskProperty(com.google.api.services.tasks.model.Task gTask) {
 		gTask.setTitle(this.getTitle());
 		if (this.getCompleted() == null) {
@@ -149,6 +173,9 @@ public abstract class ToDoTask extends Task {
 		return returnString.bold().fg(RED).a("Needs Action");
 	}
 	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#matches(java.lang.String)
+	 */
 	@Override
 	public boolean matches(String keyword) {
 		if (isEmptyKeyword(keyword)) {
@@ -174,6 +201,9 @@ public abstract class ToDoTask extends Task {
 		return keyword == null || keyword.isEmpty();
 	}
 	
+	/**
+	 * @return a Google Task object which is needed for Google Sync
+	 */
 	public abstract com.google.api.services.tasks.model.Task toGTask();
 	protected abstract VToDo toVToDo();
 

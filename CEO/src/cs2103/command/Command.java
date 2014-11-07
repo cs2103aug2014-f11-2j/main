@@ -14,6 +14,11 @@ import cs2103.util.CommonUtil;
 
 public abstract class Command {
 	protected ParameterList parameterList = new ParameterList();
+	/**
+	 * @return Result Ansi to be printed
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
 	public abstract Ansi execute() throws HandledException, FatalException;
 	
 	/**

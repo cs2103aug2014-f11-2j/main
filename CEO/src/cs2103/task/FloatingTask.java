@@ -13,6 +13,9 @@ public class FloatingTask extends ToDoTask {
 		super(taskUID, status);
 	}
 	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#convert(java.util.Date[])
+	 */
 	@Override
 	protected Task convert(Date[] time) throws HandledException {
 		if (isInvalidTime(time)) {
@@ -56,6 +59,9 @@ public class FloatingTask extends ToDoTask {
 		return newTask;
 	}
 
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#clone()
+	 */
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		ToDoTask newTask = new FloatingTask(this.getTaskUID(), this.getStatus());
@@ -63,6 +69,9 @@ public class FloatingTask extends ToDoTask {
 		return newTask;
 	}
 
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#toSummary()
+	 */
 	@Override
 	public Ansi toSummary() {
 		Ansi returnString = this.addCommonString();
@@ -70,11 +79,17 @@ public class FloatingTask extends ToDoTask {
 		return returnString.a('\n');
 	}
 
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#checkPeriod(java.util.Date[])
+	 */
 	@Override
 	public boolean checkPeriod(Date[] time) {
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see cs2103.task.ToDoTask#toVToDo()
+	 */
 	@Override
 	protected VToDo toVToDo() {
 		VToDo vToDo = new VToDo(this.getCreated(), this.getTitle());
@@ -82,6 +97,9 @@ public class FloatingTask extends ToDoTask {
 		return vToDo;
 	}
 	
+	/* (non-Javadoc)
+	 * @see cs2103.task.ToDoTask#toGTask()
+	 */
 	@Override
 	public com.google.api.services.tasks.model.Task toGTask(){
 		com.google.api.services.tasks.model.Task gTask = new com.google.api.services.tasks.model.Task();

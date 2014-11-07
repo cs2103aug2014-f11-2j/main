@@ -28,10 +28,16 @@ public class PeriodicTask extends EventTask {
 		super(taskUID, status, startTime, endTime);
 	}
 	
+	/**
+	 * @return the location String
+	 */
 	public String getLocation(){
 		return this.location;
 	}
 	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#updateLocation(java.lang.String)
+	 */
 	public void updateLocation(String location){
 		if (location == null){
 			this.location = "";
@@ -40,14 +46,23 @@ public class PeriodicTask extends EventTask {
 		}
 	}
 
+	/**
+	 * @return the Recurrence object
+	 */
 	public Recur getRecurrence(){
 		return this.recurrence;
 	}
 	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#updateRecurrence(net.fortuna.ical4j.model.Recur)
+	 */
 	public void updateRecurrence(Recur recurrence){
 		this.recurrence = recurrence;
 	}
 	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#convert(java.util.Date[])
+	 */
 	@Override
 	protected Task convert(Date[] time) throws HandledException {
 		if (isInvalidTime(time)) {
@@ -92,10 +107,8 @@ public class PeriodicTask extends EventTask {
 	}
 	
 	private void updateNewTask(Task newTask) {
-		if (newTask instanceof PeriodicTask) {
-			newTask.updateLocation(this.getLocation());
-			newTask.updateRecurrence(this.getRecurrence());
-		}
+		newTask.updateLocation(this.getLocation());
+		newTask.updateRecurrence(this.getRecurrence());
 		newTask.updateTitle(this.getTitle());
 		newTask.updateCreated(this.getCreated());
 		newTask.updateDescription(this.getDescription());
@@ -110,7 +123,6 @@ public class PeriodicTask extends EventTask {
 		} catch (HandledException e) {
 			throw new CloneNotSupportedException();
 		}
-		
 	}
 
 	private void updateClone(PeriodicTask newTask) {
@@ -161,7 +173,7 @@ public class PeriodicTask extends EventTask {
 		returnString.a(STRING_DESCRIPTION).a(this.getDescription()).reset().a('\n');
 	}
 	
-	static Ansi recurToString(Recur recur){
+	private static Ansi recurToString(Recur recur){
 		Ansi returnString = ansi().a(STRING_RECUR);
 		returnString.fg(YELLOW).a(recur.getInterval()).a(' ');
 		returnString.a(recur.getFrequency()).reset();
@@ -205,6 +217,9 @@ public class PeriodicTask extends EventTask {
 		return gEvent;
 	}
 	
+	/**
+	 * @return the comparator for sorting
+	 */
 	public static sortComparator getComparator(){
 		return new sortComparator();
 	}
@@ -212,7 +227,7 @@ public class PeriodicTask extends EventTask {
 	/**
 	 * Special class to compare Periodic Tasks
 	 */
-	public static class sortComparator implements Comparator<PeriodicTask>{
+	private static class sortComparator implements Comparator<PeriodicTask>{
 		@Override
 		public int compare(PeriodicTask o1, PeriodicTask o2) {
 			return o1.getStartTime().compareTo(o2.getStartTime());
@@ -292,7 +307,7 @@ public class PeriodicTask extends EventTask {
 	/**
 	 * Updates new Times for task based on recurrence
 	 */
-	public PeriodicTask updateTimeFromRecur() throws HandledException{
+	public PeriodicTask updateTimeFromRecur() throws HandledException {
 		DateTime now = new DateTime();
 		if (hasRecurrenceAndFrequency() && endTimeBeforeNow(now)){
 			Date startTime = calculateStartTimeFromRecur(now);
@@ -309,8 +324,7 @@ public class PeriodicTask extends EventTask {
 		}
 	}
 
-	private net.fortuna.ical4j.model.Date calculateStartTimeFromRecur(
-			DateTime now) {
+	private net.fortuna.ical4j.model.Date calculateStartTimeFromRecur(DateTime now) {
 		return this.getRecurrence().getNextDate(this.getStartTime(), now);
 	}
 
