@@ -17,6 +17,10 @@ import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.Completed;
 import net.fortuna.ical4j.model.property.Status;
 
+/**
+ *  Contains inherited methods from Task
+ *  Extends to concrete Task class FloatingTask and DeadlineTask
+ */
 public abstract class ToDoTask extends Task {
 	private DateTime completed;
 	
@@ -93,6 +97,9 @@ public abstract class ToDoTask extends Task {
 		returnString.a(STRING_DESCRIPTION).a(this.getDescription()).a('\n').reset();
 	}
 	
+	/**
+	 * Adds necessary properties to VToDo, necessary for Google Sync 
+	 */
 	protected void addVToDoProperty(VToDo vToDo){
 		this.addCommonProperty(vToDo);
 		if (this.isDeleted()){
@@ -105,6 +112,9 @@ public abstract class ToDoTask extends Task {
 		}
 	}
 	
+	/**
+	 * Adds necessary properties necessary for sync with Google Task
+	 */
 	protected void addGTaskProperty(com.google.api.services.tasks.model.Task gTask) {
 		gTask.setTitle(this.getTitle());
 		if (this.getCompleted() == null) {

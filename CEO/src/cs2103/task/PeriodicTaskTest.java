@@ -1,8 +1,6 @@
 //@author A0128478R
 package cs2103.task;
 
-
-// oops forgot to do convert
 import static org.fusesource.jansi.Ansi.ansi;
 import static org.fusesource.jansi.Ansi.Color.CYAN;
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
@@ -40,12 +38,15 @@ public class PeriodicTaskTest extends EventTaskTest{
 	@Before
 	public void setUp() throws Exception {
 		pt = new PeriodicTask(this.taskUID, this.status, this.startTime, this.endTime);
+		updateNewPeriodicTask();
+	}
+
+	private void updateNewPeriodicTask() {
 		pt.updateTitle(this.title);
 		pt.updateDescription(this.description);
 		pt.updateLocation(this.location);
 		pt.updateLastModified(null);
 		pt.updateRecurrence(this.recurrence);
-		System.out.println(recurrence.getFrequency());
 	}
 
 	/**
@@ -185,12 +186,12 @@ public class PeriodicTaskTest extends EventTaskTest{
 	
 	private void testConvertToPeriodic() throws HandledException {
 		DateTime[] time = generateTimeForConvert("p");
-		Task ft2 = pt.convert(time);
-		assertTrue(ft2 instanceof PeriodicTask);
+		Task testTask = pt.convert(time);
+		assertTrue(testTask instanceof PeriodicTask);
 		
 		PeriodicTask taskExpected = new PeriodicTask(pt.getTaskUID(), pt.getStatus(), time[0], time[1]);
 		updateTaskExpectedPeriodic(taskExpected);
-		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
+		assertTrue(TestUtil.compareTasks(testTask, taskExpected));
 	}
 
 	private void updateTaskExpectedPeriodic(PeriodicTask taskExpected) {
@@ -201,12 +202,19 @@ public class PeriodicTaskTest extends EventTaskTest{
 
 	@Test
 	public void testToSummary() {
+		testToSummaryWithRecurrence();
+		testToSummaryWithoutRecurrence();
+	}
+
+	private void testToSummaryWithoutRecurrence() {
+		Ansi expected = generateSummaryExpectedNullRecurrence();
+		Ansi test = generateSummaryTestNullRecurrence();
+		assertEquals(expected.toString(), test.toString());
+	}
+
+	private void testToSummaryWithRecurrence() {
 		Ansi expected = generateSummaryExpected();
 		Ansi test = generateSummaryTest();
-		assertEquals(expected.toString(), test.toString());
-		
-		expected = generateSummaryExpectedNullRecurrence();
-		test = generateSummaryTestNullRecurrence();
 		assertEquals(expected.toString(), test.toString());
 	}
 
@@ -244,8 +252,12 @@ public class PeriodicTaskTest extends EventTaskTest{
 	@Test
 	public void testToDetail() {
 		Ansi expected = generateDetailExpected();
-		Ansi test = pt.toDetail();
+		Ansi test = generateDetailTest();
 		assertEquals(expected.toString(), test.toString());
+	}
+
+	private Ansi generateDetailTest() {
+		return pt.toDetail();
 	}
 
 	private Ansi generateDetailExpected() {

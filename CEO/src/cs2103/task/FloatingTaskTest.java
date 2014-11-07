@@ -102,12 +102,19 @@ public class FloatingTaskTest extends ToDoTaskTest {
 
 	@Test
 	public void testToSummary() {
+		testToSummaryUndeleted();
+		testToSummaryDeleted();
+	}
+
+	private void testToSummaryDeleted() {
+		Ansi expected = generateSummaryExpectedDeleted();
+		Ansi test = generateSummaryTestDeleted();
+		assertEquals(expected.toString(), test.toString());
+	}
+
+	private void testToSummaryUndeleted() {
 		Ansi expected = generateSummaryExpected();
 		Ansi test = generateSummaryTest();
-		assertEquals(expected.toString(), test.toString());
-
-		expected = generateSummaryExpectedDeleted();
-		test = generateSummaryTestDeleted();
 		assertEquals(expected.toString(), test.toString());
 	}
 

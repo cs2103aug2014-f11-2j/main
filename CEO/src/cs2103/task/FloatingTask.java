@@ -15,14 +15,27 @@ public class FloatingTask extends ToDoTask {
 	
 	@Override
 	protected Task convert(Date[] time) throws HandledException {
-		if (time == null) throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
-		if (time[0] == null && time[1] == null){
+		if (isInvalidTime(time)) {
+			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
+		} else if (isBothTimeNull(time)){
 			return this.toFloating();
-		} else if (time[1] == null){
+		} else if (isFirstTimeNull(time)){
 			return this.toDeadline(time[0]);
 		} else {
 			return this.toPeriodic(time[0], time[1]);
 		}
+	}
+
+	private boolean isInvalidTime(Date[] time) {
+		return time == null;
+	}
+	
+	private boolean isFirstTimeNull(Date[] time) {
+		return time[1] == null;
+	}
+
+	private boolean isBothTimeNull(Date[] time) {
+		return time[0] == null && isFirstTimeNull(time);
 	}
 	
 	private ToDoTask toFloating() throws HandledException {

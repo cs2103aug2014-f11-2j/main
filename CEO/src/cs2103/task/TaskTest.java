@@ -134,7 +134,11 @@ public abstract class TaskTest {
 	@Test
 	public void testCompareTo() throws CloneNotSupportedException{
 		Task task = getConcrete();
-		assertEquals(0, task.compareTo((Task) task.clone()));
+		assertEquals(0, compareToTask(task));
+	}
+
+	private int compareToTask(Task task) throws CloneNotSupportedException {
+		return task.compareTo((Task) task.clone());
 	}
 	
 	@Test
@@ -143,6 +147,7 @@ public abstract class TaskTest {
 		task.delete();
 		assertTrue(task.isDeleted());
 	}
+	
 	protected DateTime[] generateTimeForConvert(String type) {
 		DateTime[] time = new DateTime[2];
 		if (type.equals("f")) {

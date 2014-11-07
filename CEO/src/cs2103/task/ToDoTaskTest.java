@@ -22,12 +22,19 @@ public abstract class ToDoTaskTest extends TaskTest{
 	@Test
 	public void testUpdateAndGetCompleted(){
 		ToDoTask task = (ToDoTask) getConcrete();
-		task.updateCompleted(null);
-		assertEquals(null, task.getCompleted());
-		
+		testUpdateAndGetCompletedNull(task);
+		testUpdateAndGetCompletedWithTime(task);
+	}
+
+	private void testUpdateAndGetCompletedWithTime(ToDoTask task) {
 		DateTime testDate = new DateTime();
 		task.updateCompleted(testDate);
 		assertTrue(testDate.equals(task.getCompleted()));
+	}
+
+	private void testUpdateAndGetCompletedNull(ToDoTask task) {
+		task.updateCompleted(null);
+		assertEquals(null, task.getCompleted());
 	}
 	
 	@Test
@@ -44,36 +51,50 @@ public abstract class ToDoTaskTest extends TaskTest{
 	@Test
 	public void testRestore(){
 		ToDoTask task = (ToDoTask) getConcrete();
-		task.updateCompleted(null);
-		task.restore();
-		assertEquals(Status.VTODO_NEEDS_ACTION, task.getStatus());
-		
+		testRestoreUncompletedTask(task);
+		testRestoreCompletedTask(task);
+	}
+
+	private void testRestoreCompletedTask(ToDoTask task) {
 		DateTime testDate = new DateTime();
 		task.updateCompleted(testDate);
 		task.restore();
 		assertEquals(Status.VTODO_COMPLETED, task.getStatus());
 		assertEquals(new DateTime(), task.getLastModified());
 	}
+
+	private void testRestoreUncompletedTask(ToDoTask task) {
+		task.updateCompleted(null);
+		task.restore();
+		assertEquals(Status.VTODO_NEEDS_ACTION, task.getStatus());
+	}
 	
 	@Test
 	public void testCompletedToString(){
-		Ansi test = ToDoTask.completedToString(null);
-		Ansi expected = generateCompletedToStringExpectedNeedsAction();
-		assertTrue(test.toString().equals(expected.toString()));
-		
+		testCompletedToStringWithoutDate();
+		testCompletedToStringWithDate();
+	}
+
+	private void testCompletedToStringWithDate() {
 		DateTime testDate = new DateTime();
-		test = ToDoTask.completedToString(testDate);
-		expected = generateCompletedToStringExpectedCompleted(); 
+		Ansi test = ToDoTask.completedToString(testDate);
+		Ansi expected = generateCompletedToStringCompleted(); 
 		assertTrue(test.toString().equals(expected.toString()));
 	}
 
-	private Ansi generateCompletedToStringExpectedCompleted() {
+	private void testCompletedToStringWithoutDate() {
+		Ansi test = ToDoTask.completedToString(null);
+		Ansi expected = generateCompletedToStringNeedsAction();
+		assertTrue(test.toString().equals(expected.toString()));
+	}
+
+	private Ansi generateCompletedToStringCompleted() {
 		Ansi expected;
 		expected = ansi().bold().fg(GREEN).a("Completed").reset();
 		return expected;
 	}
 
-	private Ansi generateCompletedToStringExpectedNeedsAction() {
+	private Ansi generateCompletedToStringNeedsAction() {
 		Ansi expected = ansi().bold().fg(RED).a("Needs Action").reset();
 		return expected;
 	}
@@ -127,8 +148,12 @@ public abstract class ToDoTaskTest extends TaskTest{
 	public void testToDetail(){
 		ToDoTask task = (ToDoTask) getConcrete();
 		Ansi expected = generateDetailExpected(task);
-		Ansi test = task.toDetail();
+		Ansi test = generateDetailTest(task);
 		assertEquals(expected.toString(), test.toString());
+	}
+
+	private Ansi generateDetailTest(ToDoTask task) {
+		return task.toDetail();
 	}
 
 	private Ansi generateDetailExpected(ToDoTask task) {

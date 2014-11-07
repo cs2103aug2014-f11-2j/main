@@ -19,6 +19,10 @@ import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.Status;
 
+/**
+ *  Contains inherited methods from Task
+ *  Extends to concrete Task class PeriodicTask
+ */
 public abstract class EventTask extends Task {
 	private DateTime startTime;
 	private DateTime endTime;
@@ -40,18 +44,33 @@ public abstract class EventTask extends Task {
 	}
 	
 	protected void updateTime(Date startTime, Date endTime) throws HandledException{
-		if (startTime == null || endTime == null){
-			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
-		} else if (startTime.after(endTime)){
-			throw new HandledException(HandledException.ExceptionType.END_BEFORE_START);
+		checkInvalidTimes(startTime, endTime);
+		this.startTime = new DateTime(startTime);
+		if (isAntique(startTime, endTime)){
+			this.endTime = new DateTime(startTime.getTime() + YEAR_IN_MILLIS);
 		} else {
-			this.startTime = new DateTime(startTime);
-			if (endTime.getTime() - startTime.getTime() > YEAR_IN_MILLIS){
-				this.endTime = new DateTime(startTime.getTime() + YEAR_IN_MILLIS);
-			} else {
-				this.endTime = new DateTime(endTime);
-			}
+			this.endTime = new DateTime(endTime);
 		}
+		
+	}
+
+	/**
+	 * Checks if time specified is below the range allowed for DateTime class
+	 */
+	private boolean isAntique(Date startTime, Date endTime) {
+		return endTime.getTime() - startTime.getTime() > YEAR_IN_MILLIS;
+	}
+
+	private void checkInvalidTimes(Date startTime, Date endTime) throws HandledException {
+		if (checkTimeNull(startTime, endTime)) {
+			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
+		} else if (startTime.after(endTime)) {
+			throw new HandledException(HandledException.ExceptionType.END_BEFORE_START);
+		}
+	}
+
+	private boolean checkTimeNull(Date startTime, Date endTime) {
+		return startTime == null || endTime == null;
 	}
 	
 	@Override
@@ -126,6 +145,9 @@ public abstract class EventTask extends Task {
 		return returnString;
 	}
 	
+	/**
+	 * Two methods to generate objects necessary for Google Sync
+	 */
 	protected abstract VEvent toVEvent();
 	public abstract com.google.api.services.calendar.model.Event toGEvent();
 }

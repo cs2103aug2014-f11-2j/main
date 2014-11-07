@@ -17,6 +17,11 @@ import net.fortuna.ical4j.model.property.LastModified;
 import net.fortuna.ical4j.model.property.Status;
 import net.fortuna.ical4j.model.property.Uid;
 
+/**
+ * Containing methods for the inherited methods in 
+ * 				concrete Task classes: DeadlineTask, FloatingTask, and PeriodicTask
+ */
+
 public abstract class Task implements Comparable<Task>, Cloneable{;
 	private int taskID;
 	private final String taskUID;
@@ -29,6 +34,10 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	protected static final long DAY_IN_MILLIS = 86400000L;
 	protected static final Ansi DELETED = ansi().fg(MAGENTA).a("(Deleted Task)\n").reset();
 	
+	
+	/**
+	 * Generated a String taskUID, unique to each Task created
+	 */
 	public Task(String taskUID) {
 		if (taskUID == null){
 			this.taskUID = this.generateUid();
@@ -109,13 +118,27 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		return this.getCreated().compareTo(o.getCreated());
 	}
 	
+	/**
+	 * Adds property to component necessary for Google Sync
+	 */
 	protected void addCommonProperty(Component component){
 		component.getProperties().add(new Uid(this.getTaskUID()));
 		component.getProperties().add(new Created(this.getCreated()));
-		component.getProperties().add(new LastModified(this.getLastModified() == null?new DateTime():this.getLastModified()));
+		component.getProperties().add(new LastModified(addLastModified()));
 		component.getProperties().add(new Description(this.getDescription()));
 	}
+
+	private DateTime addLastModified() {
+		if (this.getLastModified() == null) {
+			return new DateTime();
+		} else {
+			return this.getLastModified();
+		}
+	}
 	
+	/**
+	 * Generates the output format used by toSummary and toDetail for all Tasks 
+	 */
 	protected Ansi addCommonString(){
 		Ansi returnString = ansi().fg(YELLOW).a(this.getTaskID()).a(". ").reset();
 		returnString.bold().a(this.getTitle()).a('\n').boldOff().reset();
@@ -133,6 +156,9 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 		}
 	}
 	
+	/**
+	 * Changes task updated based on the time
+	 */
 	public Task update(Date[] time) throws HandledException{
 		Task returnTask = this.convert(time);
 		returnTask.updateLastModified(null);
@@ -145,21 +171,37 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	protected abstract void updateStatus(Status status);
 	public abstract boolean isDeleted();
 	public abstract void delete();
+	/**
+	 * Revives a task from delete
+	 */
 	public abstract void restore();
+	/**
+	 * Used to change one type of task to another type
+	 * Called from an Update of the task
+	 */
 	protected abstract Task convert(Date[] time) throws HandledException;
 	@Override
 	public abstract Object clone() throws CloneNotSupportedException;
 	public abstract Ansi toSummary();
 	public abstract Ansi toDetail();
+	/**
+	 * Generates Google component necessary for Google Sync
+	 */
 	public abstract Component toComponent();
 	public abstract DateTime getCompleted();
 	public abstract boolean checkPeriod(Date[] time);
+	/**
+	 * Checks if keyword is contained anywhere within the task
+	 */
 	public abstract boolean matches(String keyword);
 	
 	public Status getStatus(){
 		return this.status;
 	}
 	
+	/**
+	 * To check whether a Task is in the time frame eligible to be alerted to the user
+	 */
 	public boolean checkAlert() {
 		Date[] time = new Date[2];
 		time[0] = new Date();

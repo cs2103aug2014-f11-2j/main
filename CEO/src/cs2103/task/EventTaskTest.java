@@ -34,12 +34,19 @@ public abstract class EventTaskTest extends TaskTest{
 	@Test
 	public void testUpdateAndGetStatus() {
 		EventTask task = (EventTask) getConcrete();
-		task.updateStatus(null);
-		assertEquals(Status.VEVENT_CONFIRMED, task.getStatus());
-		
+		testUpdateAndGetStatusNull(task);
+		testUpdateAndGetStatusCompleted(task);
+	}
+
+	private void testUpdateAndGetStatusCompleted(EventTask task) {
 		Status testStatus = Status.VTODO_COMPLETED;
 		task.updateStatus(testStatus);
 		assertEquals(testStatus, task.getStatus());
+	}
+
+	private void testUpdateAndGetStatusNull(EventTask task) {
+		task.updateStatus(null);
+		assertEquals(Status.VEVENT_CONFIRMED, task.getStatus());
 	}
 	
 	@Test
