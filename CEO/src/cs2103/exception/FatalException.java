@@ -1,5 +1,7 @@
 package cs2103.exception;
 
+import cs2103.util.Logger;
+
 
 public class FatalException extends Exception {
 	private static final long serialVersionUID = 2812393341801137882L;
@@ -16,8 +18,8 @@ public class FatalException extends Exception {
 	
 	public FatalException(ExceptionType exceptionType) {
 		this.errorMsg = getErrorMsg(exceptionType);
-		ErrorLogging log = ErrorLogging.getInstance();
-		log.writeToLog(this.errorMsg, this);
+		Logger log = Logger.getInstance();
+		log.writeErrLog(this.errorMsg, this);
 	}
 	
 	public String printErrorMsg(){

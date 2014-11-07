@@ -14,19 +14,20 @@ import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
 
-import cs2103.exception.ErrorLogging;
 import cs2103.exception.HandledException;
 import cs2103.task.*;
 import cs2103.util.CommonUtil;
+import cs2103.util.Logger;
 
 /**
  * @author Yuri
  * Read and write Task objects to Google Calendar and Google Tasks
  */
-public class GoogleEngine{
+public class GoogleEngine {
 	private static GoogleEngine storage;
 	private final GoogleReceiver receiver;
 	private final String calendarIdentifier;
+	private final Logger logger;
 	private com.google.api.services.calendar.Calendar calendar;
 	private com.google.api.services.tasks.Tasks tasks;
 	private Date taskLastUpdate;
@@ -36,6 +37,7 @@ public class GoogleEngine{
 	
 	private GoogleEngine() throws HandledException{
 		try {
+			this.logger = Logger.getInstance();
 			this.receiver = new GoogleReceiver();
 			this.calendar = this.receiver.getCalendarClient();
 			this.tasks = this.receiver.getTasksClient();
@@ -426,7 +428,7 @@ public class GoogleEngine{
 				this.tasks = this.receiver.getTasksClient();
 				return this.tasks.tasks().list(DEFAULT_TASKS).setShowDeleted(true).execute().getItems();
 			} catch (IOException e1) {
-				ErrorLogging.getInstance().writeToLog(e1.getMessage(), e1);
+				this.logger.writeErrLog(e1.getMessage(), e1);
 				throw new HandledException(HandledException.ExceptionType.SYNC_FAIL);
 			}
 		}
@@ -440,7 +442,7 @@ public class GoogleEngine{
 				this.calendar = this.receiver.getCalendarClient();
 				return this.calendar.events().list(calendarIdentifier).setShowDeleted(true).execute().getItems();
 			} catch (IOException e1) {
-				ErrorLogging.getInstance().writeToLog(e1.getMessage(), e1);
+				this.logger.writeErrLog(e1.getMessage(), e1);
 				throw new HandledException(HandledException.ExceptionType.SYNC_FAIL);
 			}
 		}
@@ -455,7 +457,7 @@ public class GoogleEngine{
 		    }
 		    throw new HandledException(HandledException.ExceptionType.SYNC_FAIL);
 		} catch (IOException e) {
-			ErrorLogging.getInstance().writeToLog(e.getMessage(), e);
+			this.logger.writeErrLog(e.getMessage(), e);
 			throw new HandledException(HandledException.ExceptionType.SYNC_FAIL);
 		}
 	}

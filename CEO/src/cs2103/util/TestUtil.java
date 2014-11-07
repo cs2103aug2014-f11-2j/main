@@ -16,7 +16,7 @@ public class TestUtil {
 	 * @param task2
 	 * @return a true value if Task arguments are similar, returns false otherwise
 	 */
-	public static boolean compareTasks(Task task1, Task task2){
+	public static boolean compareTasks(Task task1, Task task2) {
 		if (task1 == null || task2 == null) return false;
 		if (!task1.getTitle().equals(task2.getTitle())) return false;
 		if (!task1.getDescription().equals(task2.getDescription())) return false;
@@ -32,7 +32,7 @@ public class TestUtil {
 		}
 	}
 	
-	private static boolean compareToDo(ToDoTask task1, ToDoTask task2){
+	private static boolean compareToDo(ToDoTask task1, ToDoTask task2) {
 		if (task1 == null || task2 == null) return false;
 		if (task1.getCompleted() == null ^ task2.getCompleted() == null) return false;
 		if (task1.getCompleted() != null && task2.getCompleted() != null){
@@ -45,7 +45,7 @@ public class TestUtil {
 		return true;
 	}
 	
-	private static boolean compareEvent(EventTask task1, EventTask task2){
+	private static boolean compareEvent(EventTask task1, EventTask task2) {
 		if (task1 == null || task2 == null) return false;
 		if (task1.getStartTime().getTime() != task2.getStartTime().getTime()) return false;
 		if (task1.getEndTime().getTime() != task2.getEndTime().getTime()) return false;

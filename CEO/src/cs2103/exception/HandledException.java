@@ -1,5 +1,7 @@
 package cs2103.exception;
 
+import cs2103.util.Logger;
+
 
 public class HandledException extends Exception {
 	private static final long serialVersionUID = -6882947317576882981L;
@@ -29,8 +31,8 @@ public class HandledException extends Exception {
 	
 	public HandledException(ExceptionType exceptionType){
 		this.errorMsg = getErrorMsg(exceptionType);
-		ErrorLogging log = ErrorLogging.getInstance();
-		log.writeToLog(this.errorMsg, this);
+		Logger log = Logger.getInstance();
+		log.writeErrLog(this.errorMsg, this);
 	}
 	
 	public String getErrorMsg(){

@@ -1,3 +1,4 @@
+//@author A0116713M
 package cs2103.util;
 
 /**
@@ -19,7 +20,7 @@ public class Console {
 	 #endif
 	 */
 	static {
-		if (System.getProperty("os.arch").contains("64")){
+		if (System.getProperty("os.arch").contains("64")) {
 			System.loadLibrary("lib/ConsoleClear_x64");
 		} else {
 			System.loadLibrary("lib/ConsoleClear_x86");
