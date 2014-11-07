@@ -1,3 +1,4 @@
+//@author A0116713M
 package cs2103.storage;
 
 import java.io.File;
@@ -45,7 +46,7 @@ public class AuthStoreFactory extends AbstractDataStoreFactory {
 		return new FileDataStore<V>(this, dataDirectory, id);
 	}
 	
-	static class FileDataStore<V extends Serializable> extends AbstractDataStore<V>{
+	static class FileDataStore<V extends Serializable> extends AbstractDataStore<V> {
 		private final Lock lock = new ReentrantLock();
 		HashMap<String, byte[]> keyValueMap = Maps.newHashMap();
 	    private final File dataFile;
