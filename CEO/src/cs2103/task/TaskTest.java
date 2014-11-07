@@ -74,29 +74,53 @@ public abstract class TaskTest {
 	@Test
 	public void testUpdateAndGetCreated() {
 		Task task = getConcrete();
-		task.updateCreated(null);
-		assertTrue(new DateTime().equals(task.getCreated()));
-		
+		testUpdateAndGetCreatedNull(task);
+		testUpdateAndGetCreatedNonNull(task);
+	}
+
+	private void testUpdateAndGetCreatedNonNull(Task task) {
 		DateTime testDate = new DateTime(1);
 		task.updateCreated(testDate);
 		assertTrue(testDate.equals(task.getCreated()));
+	}
+
+	private void testUpdateAndGetCreatedNull(Task task) {
+		task.updateCreated(null);
+		assertTrue(new DateTime().equals(task.getCreated()));
+	}
+
+	@Test
+	public void testEquals() throws CloneNotSupportedException, HandledException{
+		Task task = getConcrete();
+		testEqualsNull(task);
+		testEqualsNonTask(task);
+		testEqualsTasks(task);
 	}
 	
 	/**
 	 * Variable dummyTask is a task (never used in other test cases) used as 
 	 * 				comparison to test method Equals
 	 */
-	@Test
-	public void testEquals() throws CloneNotSupportedException, HandledException{
-		Task task = getConcrete();
-		Object o = null;
-		assertEquals(false, task.equals(o));
-		o = (String) "Testing";
-		assertEquals(false, task.equals(o));
-		
-		FloatingTask dummyTask = new FloatingTask(null, null);
+	private void testEqualsTasks(Task task) throws CloneNotSupportedException {
+		Task dummyTask = generateDummyTask();
 		assertFalse(task.equals(dummyTask));
 		assertTrue(task.equals(task.clone()));
+	}
+
+	private void testEqualsNonTask(Task task) {
+		Object o;
+		o = (String) "Testing";
+		assertEquals(false, task.equals(o));
+	}
+
+	private void testEqualsNull(Task task) {
+		Object o = null;
+		assertEquals(false, task.equals(o));
+	}
+
+	private Task generateDummyTask() {
+		Task dummyTask = new FloatingTask(null, null);
+		return dummyTask;
 	}
 	
 	@Test
@@ -110,7 +134,11 @@ public abstract class TaskTest {
 	@Test
 	public void testCompareTo() throws CloneNotSupportedException{
 		Task task = getConcrete();
-		assertEquals(0, task.compareTo((Task) task.clone()));
+		assertEquals(0, compareToTask(task));
+	}
+
+	private int compareToTask(Task task) throws CloneNotSupportedException {
+		return task.compareTo((Task) task.clone());
 	}
 	
 	@Test
@@ -118,5 +146,39 @@ public abstract class TaskTest {
 		Task task = (Task) getConcrete();
 		task.delete();
 		assertTrue(task.isDeleted());
+	}
+	
+	protected DateTime[] generateTimeForConvert(String type) {
+		DateTime[] time = new DateTime[2];
+		if (type.equals("f")) {
+			generateFloatingTaskTime(time);
+		} else if (type.equals("d")) {
+			generateDeadlineTaskTime(time);
+		} else if (type.equals("p")) {
+			generatePeriodicTaskTime(time);
+		}
+		return time;
+	}
+
+	private void generatePeriodicTaskTime(DateTime[] time) {
+		time[0] = new DateTime(1);
+		time[1]= new DateTime(2);
+	}
+
+	private void generateDeadlineTaskTime(DateTime[] time) {
+		time[0] = new DateTime(1);
+		time[1] = null;
+	}
+
+	private void generateFloatingTaskTime(DateTime[] time) {
+		time[0] = null;
+		time[1] = null;
+	}
+	
+	protected void updateTaskExpected(Task taskExpected) {
+		taskExpected.updateTitle(taskExpected.getTitle());
+		taskExpected.updateDescription(taskExpected.getDescription());
+		taskExpected.updateLastModified(taskExpected.getLastModified());
+		taskExpected.updateCompleted(taskExpected.getCompleted());
 	}
 }

@@ -50,24 +50,37 @@ public class PeriodicTask extends EventTask {
 	
 	@Override
 	protected Task convert(Date[] time) throws HandledException {
-		if (time == null) throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
-		if (time[0] == null && time[1] == null){
+		if (isInvalidTime(time)) {
+			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
+		} else if (isBothTimeNull(time)){
 			return this.toFloating();
-		} else if (time[1] == null){
+		} else if (isFirstTimeNull(time)){
 			return this.toDeadline(time[0]);
 		} else {
 			return this.toPeriodic(time[0], time[1]);
 		}
 	}
+
+	private boolean isInvalidTime(Date[] time) {
+		return time == null;
+	}
+
+	private boolean isFirstTimeNull(Date[] time) {
+		return time[1] == null;
+	}
+
+	private boolean isBothTimeNull(Date[] time) {
+		return time[0] == null && isFirstTimeNull(time);
+	}
 	
-	private FloatingTask toFloating() throws HandledException {
-		FloatingTask newTask = new FloatingTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION);
+	private ToDoTask toFloating() throws HandledException {
+		ToDoTask newTask = new FloatingTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION);
 		updateNewTask(newTask);
 		return newTask;
 	}
 
-	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
-		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION, dueTime);
+	private ToDoTask toDeadline(Date dueTime) throws HandledException {
+		ToDoTask newTask = new DeadlineTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION, dueTime);
 		updateNewTask(newTask);
 		return newTask;
 	}
@@ -159,12 +172,16 @@ public class PeriodicTask extends EventTask {
 		if (recur == null){
 			return null;
 		} else {
-			List<String> recurrenceList = new ArrayList<String>();
-			StringBuffer sb = new StringBuffer();
-			sb.append("RRULE:").append(recur.toString());
-			recurrenceList.add(sb.toString());
-			return recurrenceList;
+			return generateRecurrenceList(recur);
 		}
+	}
+
+	private static List<String> generateRecurrenceList(Recur recur) {
+		List<String> recurrenceList = new ArrayList<String>();
+		StringBuffer sb = new StringBuffer();
+		sb.append("RRULE:").append(recur.toString());
+		recurrenceList.add(sb.toString());
+		return recurrenceList;
 	}
 
 	@Override
@@ -192,6 +209,9 @@ public class PeriodicTask extends EventTask {
 		return new sortComparator();
 	}
 
+	/**
+	 * Special class to compare Periodic Tasks
+	 */
 	public static class sortComparator implements Comparator<PeriodicTask>{
 		@Override
 		public int compare(PeriodicTask o1, PeriodicTask o2) {
@@ -201,27 +221,48 @@ public class PeriodicTask extends EventTask {
 
 	@Override
 	public boolean checkPeriod(Date[] time) {
-		if (time == null){
+		if (isNullTimePeriod(time)){
 			return true;
-		} else if (time[0] == null){
-			return true;
-		} else if (time[1] == null){
-			return this.getStartTime().before(time[0]);
+		} else if (isFirstTimeNull(time)){
+			return checkTimeAfterStartTime(time[0]);
 		} else {
-			return this.getStartTime().after(time[0]) && this.getStartTime().before(time[1]);
+			return checkStartTimeBetweenTimes(time);
 		}
+	}
+	
+	private boolean isNullTimePeriod(Date[] time) {
+		if (time == null) {
+			return true;
+		} else if (time[0] == null) {
+			return true;
+		} 
+		return false;
+	}
+
+	/**
+	 * Check if startTime is between time[0] and time[1]
+	 */
+	private boolean checkStartTimeBetweenTimes(Date[] time) {
+		return this.getStartTime().after(time[0]) && this.getStartTime().before(time[1]);
+	}
+
+	/**
+	 * Check if startTime is before time
+	 */
+	private boolean checkTimeAfterStartTime(Date time) {
+		return this.getStartTime().before(time);
 	}
 	
 	@Override
 	public boolean matches(String keyword) {
-		if (isInvalidKeyword(keyword)){
+		if (isEmptyKeyword(keyword)){
 			return true;
 		} else {
 			return containsKeywordInTask(keyword);
 		}
 	}
 
-	private boolean isInvalidKeyword(String keyword) {
+	private boolean isEmptyKeyword(String keyword) {
 		return keyword == null || keyword.isEmpty();
 	}
 
@@ -248,6 +289,9 @@ public class PeriodicTask extends EventTask {
 		return StringUtils.containsIgnoreCase(this.getTitle(), keyword);
 	}
 	
+	/**
+	 * Updates new Times for task based on recurrence
+	 */
 	public PeriodicTask updateTimeFromRecur() throws HandledException{
 		DateTime now = new DateTime();
 		if (hasRecurrenceAndFrequency() && endTimeBeforeNow(now)){

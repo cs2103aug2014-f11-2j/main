@@ -1,8 +1,6 @@
 //@author A0128478R
 package cs2103.task;
 
-
-// oops forgot to do convert
 import static org.fusesource.jansi.Ansi.ansi;
 import static org.fusesource.jansi.Ansi.Color.CYAN;
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
@@ -40,12 +38,15 @@ public class PeriodicTaskTest extends EventTaskTest{
 	@Before
 	public void setUp() throws Exception {
 		pt = new PeriodicTask(this.taskUID, this.status, this.startTime, this.endTime);
+		updateNewPeriodicTask();
+	}
+
+	private void updateNewPeriodicTask() {
 		pt.updateTitle(this.title);
 		pt.updateDescription(this.description);
 		pt.updateLocation(this.location);
 		pt.updateLastModified(null);
 		pt.updateRecurrence(this.recurrence);
-		System.out.println(recurrence.getFrequency());
 	}
 
 	/**
@@ -164,80 +165,107 @@ public class PeriodicTaskTest extends EventTaskTest{
 	}
 	
 	private void testConvertToFloating() throws HandledException {
-		DateTime[] time = new DateTime[2];
-		time[0] = null;
-		time[1] = null;
+		DateTime[] time = generateTimeForConvert("f");
 		Task pt2 = pt.convert(time);
 		assertTrue(pt2 instanceof FloatingTask);
 		
 		Task taskExpected = new FloatingTask(pt.getTaskUID(), Status.VTODO_NEEDS_ACTION);
-		taskExpected.updateTitle(pt.getTitle());
-		taskExpected.updateDescription(pt.getDescription());
-		taskExpected.updateLastModified(pt.getLastModified());
-		taskExpected.updateCompleted(pt.getCompleted());
+		updateTaskExpected(taskExpected);
 		assertTrue(TestUtil.compareTasks(pt2, taskExpected));
 	}
 
 	private void testConvertToDeadline() throws HandledException {	
-		DateTime[] time = new DateTime[2];
-		time[0] = new DateTime(1);
-		time[1] = null;
+		DateTime[] time = generateTimeForConvert("d");
 		Task ft2 = pt.convert(time);
 		assertTrue(ft2 instanceof DeadlineTask);
 		
-		DeadlineTask taskExpected = new DeadlineTask(pt.getTaskUID(), Status.VTODO_NEEDS_ACTION, time[0]);
-		taskExpected.updateTitle(pt.getTitle());
-		taskExpected.updateDescription(pt.getDescription());
-		taskExpected.updateLastModified(pt.getLastModified());
-		taskExpected.updateCompleted(pt.getCompleted());
+		ToDoTask taskExpected = new DeadlineTask(pt.getTaskUID(), Status.VTODO_NEEDS_ACTION, time[0]);
+		updateTaskExpected(taskExpected);
 		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
 	}
 	
 	private void testConvertToPeriodic() throws HandledException {
-		DateTime[] time = new DateTime[2];
-		time[0] = new DateTime(1);
-		time[1]= new DateTime(2);
-		Task ft2 = pt.convert(time);
-		assertTrue(ft2 instanceof PeriodicTask);
+		DateTime[] time = generateTimeForConvert("p");
+		Task testTask = pt.convert(time);
+		assertTrue(testTask instanceof PeriodicTask);
 		
 		PeriodicTask taskExpected = new PeriodicTask(pt.getTaskUID(), pt.getStatus(), time[0], time[1]);
-		taskExpected.updateTitle(pt.getTitle());
-		taskExpected.updateDescription(pt.getDescription());
+		updateTaskExpectedPeriodic(taskExpected);
+		assertTrue(TestUtil.compareTasks(testTask, taskExpected));
+	}
+
+	private void updateTaskExpectedPeriodic(PeriodicTask taskExpected) {
+		updateTaskExpected(taskExpected);
 		taskExpected.updateLocation(pt.getLocation());
 		taskExpected.updateRecurrence(pt.getRecurrence());
-		taskExpected.updateLastModified(pt.getLastModified());
-		taskExpected.updateCompleted(pt.getCompleted());
-		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
 	}
 
 	@Test
 	public void testToSummary() {
-		Ansi expected = ansi().fg(YELLOW).a(pt.getTaskID()).a(". ").reset();
-		expected.bold().a(pt.getTitle()).a('\n').boldOff().reset();
-		expected.a("From: ").a(pt.dateToString(pt.getStartTime())).a(" to ");
-		expected.a(pt.dateToString(pt.getEndTime())).reset();
-		expected.a('\n').a(PeriodicTask.recurToString(pt.getRecurrence())).a('\n');
-		Ansi test = pt.toSummary();
+		testToSummaryWithRecurrence();
+		testToSummaryWithoutRecurrence();
+	}
+
+	private void testToSummaryWithoutRecurrence() {
+		Ansi expected = generateSummaryExpectedNullRecurrence();
+		Ansi test = generateSummaryTestNullRecurrence();
 		assertEquals(expected.toString(), test.toString());
-		
+	}
+
+	private void testToSummaryWithRecurrence() {
+		Ansi expected = generateSummaryExpected();
+		Ansi test = generateSummaryTest();
+		assertEquals(expected.toString(), test.toString());
+	}
+
+	private Ansi generateSummaryTest() {
+		Ansi test = pt.toSummary();
+		return test;
+	}
+
+	private Ansi generateSummaryTestNullRecurrence() {
+		Ansi test;
 		pt.updateRecurrence(null);
+		test = pt.toSummary();
+		return test;
+	}
+
+	private Ansi generateSummaryExpectedNullRecurrence() {
+		Ansi expected;
 		expected = ansi().fg(YELLOW).a(pt.getTaskID()).a(". ").reset();
 		expected.bold().a(pt.getTitle()).a('\n').boldOff().reset();
 		expected.a("From: ").a(pt.dateToString(pt.getStartTime())).a(" to ");
 		expected.a(pt.dateToString(pt.getEndTime())).reset();
 		expected.a('\n');
-		test = pt.toSummary();
-		assertEquals(expected.toString(), test.toString());
+		return expected;
+	}
+
+	private Ansi generateSummaryExpected() {
+		Ansi expected = ansi().fg(YELLOW).a(pt.getTaskID()).a(". ").reset();
+		expected.bold().a(pt.getTitle()).a('\n').boldOff().reset();
+		expected.a("From: ").a(pt.dateToString(pt.getStartTime())).a(" to ");
+		expected.a(pt.dateToString(pt.getEndTime())).reset();
+		expected.a('\n').a(PeriodicTask.recurToString(pt.getRecurrence())).a('\n');
+		return expected;
 	}
 
 	@Test
 	public void testToDetail() {
-		Ansi expected = pt.toSummary();
+		Ansi expected = generateDetailExpected();
+		Ansi test = generateDetailTest();
+		assertEquals(expected.toString(), test.toString());
+	}
+
+	private Ansi generateDetailTest() {
+		return pt.toDetail();
+	}
+
+	private Ansi generateDetailExpected() {
+		Ansi expected = generateSummaryTest();
 		expected.a("Location: ");
 		expected.fg(CYAN).a(pt.getLocation()).a("\n").reset();
 		expected.a("Description: ").a(pt.getDescription()).reset().a('\n');
-		Ansi test = pt.toDetail();
-		assertEquals(expected.toString(), test.toString());
+		return expected;
 	}
 	
 	/**

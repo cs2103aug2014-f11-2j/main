@@ -16,10 +16,6 @@ import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.Status;
 
-/**
- * @author brianluong
- *
- */
 public class DeadlineTask extends ToDoTask {
 	private DateTime dueTime;
 	
@@ -42,51 +38,52 @@ public class DeadlineTask extends ToDoTask {
 
 	@Override
 	protected Task convert(Date[] time) throws HandledException {
-		if (time == null) throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
-		if (time[0] == null && time[1] == null){
+		if (isInvalidTime(time)) {
+			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
+		} else if (isBothTimeNull(time)){
 			return this.toFloating();
-		} else if (time[1] == null){
+		} else if (isFirstTimeNull(time)){
 			return this.toDeadline(time[0]);
 		} else {
 			return this.toPeriodic(time[0], time[1]);
 		}
 	}
+
+	private boolean isInvalidTime(Date[] time) {
+		return time == null;
+	}
 	
-	private FloatingTask toFloating() throws HandledException {
-		FloatingTask newTask = new FloatingTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION);
-		newTask.updateTitle(this.getTitle());
-		newTask.updateCreated(this.getCreated());
-		newTask.updateCompleted(this.getCompleted());
-		newTask.updateDescription(this.getDescription());
+	private boolean isFirstTimeNull(Date[] time) {
+		return isSecondTimeNull(time);
+	}
+
+	private boolean isBothTimeNull(Date[] time) {
+		return time[0] == null && isFirstTimeNull(time);
+	}
+	
+	private ToDoTask toFloating() throws HandledException {
+		ToDoTask newTask = new FloatingTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION);
+		updateNewTask(newTask);
 		return newTask;
 	}
 
-	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
-		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getStatus(), dueTime);
-		newTask.updateTitle(this.getTitle());
-		newTask.updateCreated(this.getCreated());
-		newTask.updateCompleted(this.getCompleted());
-		newTask.updateDescription(this.getDescription());
+	private ToDoTask toDeadline(Date dueTime) throws HandledException {
+		ToDoTask newTask = new DeadlineTask(this.getTaskUID(), this.getStatus(), dueTime);
+		updateNewTask(newTask);
 		return newTask;
 	}
 
 	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
 		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), Status.VEVENT_CONFIRMED, startTime, endTime);
-		newTask.updateTitle(this.getTitle());
-		newTask.updateCreated(this.getCreated());
-		newTask.updateDescription(this.getDescription());
+		updateNewTask(newTask);
 		return newTask;
 	}
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		try {
-			DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), this.getStatus(), this.getDueTime());
-			newTask.updateTitle(this.getTitle());
-			newTask.updateCreated(this.getCreated());
-			newTask.updateCompleted(this.getCompleted());
-			newTask.updateDescription(this.getDescription());
-			newTask.updateLastModified(null);
+			ToDoTask newTask = new DeadlineTask(this.getTaskUID(), this.getStatus(), this.getDueTime());
+			updateClone(newTask);
 			return newTask;
 		} catch (HandledException e) {
 			throw new CloneNotSupportedException();
@@ -96,13 +93,22 @@ public class DeadlineTask extends ToDoTask {
 	@Override
 	public Ansi toSummary() {
 		Ansi returnString = this.addCommonString();
-		returnString.a("Status: ").a(completedToString(this.getCompleted()));
-		returnString.a("\tDue At: ").a(this.dateToString(this.getDueTime()));
-		return returnString.a('\n');
+		formatStatus(returnString);
+		formatDueTime(returnString);
+		return returnString;
+	}
+
+	private void formatDueTime(Ansi returnString) {
+		returnString.a("\tDue At: ").a(this.dateToString(this.getDueTime())).a('\n');
 	}
 	
 	protected Ansi dateToString(Date date){
 		Ansi returnString = ansi().bold();
+		formatDate(date, returnString);
+		return returnString;
+	}
+
+	private void formatDate(Date date, Ansi returnString) {
 		DateFormat format = new SimpleDateFormat("yyyy/MM/dd");
 		if (this.checkAlert()){
 			returnString.fg(RED);
@@ -110,7 +116,6 @@ public class DeadlineTask extends ToDoTask {
 			returnString.fg(GREEN);
 		}
 		returnString.a(format.format(date)).reset();
-		return returnString;
 	}
 	
 	public static sortComparator getComparator(){
@@ -126,15 +131,40 @@ public class DeadlineTask extends ToDoTask {
 
 	@Override
 	public boolean checkPeriod(Date[] time) {
-		if (time == null){
+		if (isNullTimePeriod(time)){
 			return true;
-		} else if (time[0] == null){
-			return true;
-		} else if (time[1] == null){
-			return this.getDueTime().before(time[0]);
+		} else if (isSecondTimeNull(time)){
+			return checkTimeBeforeDueTime(time);
 		} else {
-			return this.getDueTime().after(time[0]) && this.getDueTime().before(time[1]);
+			return checkDueTimeBetweenTimes(time);
 		}
+	}
+
+	private boolean isNullTimePeriod(Date[] time) {
+		if (time == null) {
+			return true;
+		} else if (time[0] == null) {
+			return true;
+		}
+		return false;
+	}
+	
+	private boolean isSecondTimeNull(Date[] time) {
+		return time[1] == null;
+	}
+
+	/**
+	 * Check if dueTime is between time[0] and time[1]
+	 */
+	private boolean checkDueTimeBetweenTimes(Date[] time) {
+		return this.getDueTime().after(time[0]) && this.getDueTime().before(time[1]);
+	}
+
+	/**
+	 * Check if dueTime is before time
+	 */
+	private boolean checkTimeBeforeDueTime(Date[] time) {
+		return this.getDueTime().before(time[0]);
 	}
 
 	@Override

@@ -15,33 +15,37 @@ public class FloatingTask extends ToDoTask {
 	
 	@Override
 	protected Task convert(Date[] time) throws HandledException {
-		if (time == null) throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
-		if (time[0] == null && time[1] == null){
+		if (isInvalidTime(time)) {
+			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
+		} else if (isBothTimeNull(time)){
 			return this.toFloating();
-		} else if (time[1] == null){
+		} else if (isFirstTimeNull(time)){
 			return this.toDeadline(time[0]);
 		} else {
 			return this.toPeriodic(time[0], time[1]);
 		}
 	}
+
+	private boolean isInvalidTime(Date[] time) {
+		return time == null;
+	}
 	
-	private FloatingTask toFloating() throws HandledException {
-		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getStatus());
+	private boolean isFirstTimeNull(Date[] time) {
+		return time[1] == null;
+	}
+
+	private boolean isBothTimeNull(Date[] time) {
+		return time[0] == null && isFirstTimeNull(time);
+	}
+	
+	private ToDoTask toFloating() throws HandledException {
+		ToDoTask newTask = new FloatingTask(this.getTaskUID(), this.getStatus());
 		updateNewTask(newTask);
 		return newTask;
 	}
 
-	private void updateNewTask(Task newTask) {
-		newTask.updateTitle(this.getTitle());
-		newTask.updateCreated(this.getCreated());
-		newTask.updateDescription(this.getDescription());
-		if (!(newTask instanceof PeriodicTask)) {
-			newTask.updateCompleted(this.getCompleted());
-		}
-	}
-
-	private DeadlineTask toDeadline(Date dueTime) throws HandledException {
-		DeadlineTask newTask = new DeadlineTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION, dueTime);
+	private ToDoTask toDeadline(Date dueTime) throws HandledException {
+		ToDoTask newTask = new DeadlineTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION, dueTime);
 		updateNewTask(newTask);
 		return newTask;
 	}
@@ -54,9 +58,8 @@ public class FloatingTask extends ToDoTask {
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		FloatingTask newTask = new FloatingTask(this.getTaskUID(), this.getStatus());
-		updateNewTask(newTask);
-		newTask.updateLastModified(null);
+		ToDoTask newTask = new FloatingTask(this.getTaskUID(), this.getStatus());
+		updateClone(newTask);
 		return newTask;
 	}
 
@@ -67,10 +70,6 @@ public class FloatingTask extends ToDoTask {
 		return returnString;
 	}
 
-	private void formatStatus(Ansi returnString) {
-		returnString.a("Status: ").a(completedToString(this.getCompleted())).a('\n');
-	}
-	
 	@Override
 	public boolean checkPeriod(Date[] time) {
 		return false;

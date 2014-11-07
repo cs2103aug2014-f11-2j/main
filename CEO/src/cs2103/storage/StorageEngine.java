@@ -184,7 +184,7 @@ public class StorageEngine implements StorageInterface{
 			Component existing = this.indexedComponents.getComponent(task.getTaskUID());
 			if (existing == null) {
 				throw new HandledException(HandledException.ExceptionType.TASK_NOT_EXIST);
-			}else{
+			} else {
 				this.calendar.getComponents().remove(existing);
 			}
 			writeToFile();
@@ -219,7 +219,7 @@ public class StorageEngine implements StorageInterface{
 		assert(component != null);
 		ToDoTask task;
 		String componentUID = this.readUid(component);
-		if (component.getDue() == null){
+		if (component.getDue() == null) {
 			task = new FloatingTask(componentUID, component.getStatus());
 		}else{
 			task = new DeadlineTask(componentUID, component.getStatus(), component.getDue().getDate());

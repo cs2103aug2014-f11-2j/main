@@ -17,6 +17,10 @@ import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.Completed;
 import net.fortuna.ical4j.model.property.Status;
 
+/**
+ *  Contains inherited methods from Task
+ *  Extends to concrete Task class FloatingTask and DeadlineTask
+ */
 public abstract class ToDoTask extends Task {
 	private DateTime completed;
 	
@@ -85,10 +89,17 @@ public abstract class ToDoTask extends Task {
 	@Override
 	public Ansi toDetail() {
 		Ansi returnString = this.toSummary();
-		returnString.a(STRING_DESCRIPTION).a(this.getDescription()).a('\n').reset();
+		formatDescription(returnString);
 		return returnString;
 	}
+
+	private void formatDescription(Ansi returnString) {
+		returnString.a(STRING_DESCRIPTION).a(this.getDescription()).a('\n').reset();
+	}
 	
+	/**
+	 * Adds necessary properties to VToDo, necessary for Google Sync 
+	 */
 	protected void addVToDoProperty(VToDo vToDo){
 		this.addCommonProperty(vToDo);
 		if (this.isDeleted()){
@@ -101,9 +112,12 @@ public abstract class ToDoTask extends Task {
 		}
 	}
 	
-	protected void addGTaskProperty(com.google.api.services.tasks.model.Task gTask){
+	/**
+	 * Adds necessary properties necessary for sync with Google Task
+	 */
+	protected void addGTaskProperty(com.google.api.services.tasks.model.Task gTask) {
 		gTask.setTitle(this.getTitle());
-		if (this.getCompleted() == null){
+		if (this.getCompleted() == null) {
 			gTask.setCompleted(Data.NULL_DATE_TIME);
 			gTask.setStatus("needsAction");
 		} else {
@@ -113,25 +127,71 @@ public abstract class ToDoTask extends Task {
 		gTask.setNotes(this.getDescription());
 	}
 	
-	protected static Ansi completedToString(DateTime completed){
+	protected static Ansi completedToString(DateTime completed) {
 		Ansi returnString = ansi();
-		if (completed == null){
-			returnString.bold().fg(RED).a("Needs Action");
-		} else {
-			returnString.bold().fg(GREEN).a("Completed");
-		}
+		formatCompleted(completed, returnString);
 		return returnString.reset();
+	}
+
+	private static void formatCompleted(DateTime completed, Ansi returnString) {
+		if (completed == null) {
+			formatCompletedNeedsAction(returnString);
+		} else {
+			formatCompletedIsCompleted(returnString);
+		}
+	}
+
+	private static Ansi formatCompletedIsCompleted(Ansi returnString) {
+		return returnString.bold().fg(GREEN).a("Completed");
+	}
+
+	private static Ansi formatCompletedNeedsAction(Ansi returnString) {
+		return returnString.bold().fg(RED).a("Needs Action");
 	}
 	
 	@Override
 	public boolean matches(String keyword) {
-		if (keyword == null || keyword.isEmpty()){
+		if (isEmptyKeyword(keyword)) {
 			return true;
 		} else {
-			return StringUtils.containsIgnoreCase(this.getTitle(), keyword) || StringUtils.containsIgnoreCase(this.getDescription(), keyword);
+			return containsKeywordInTask(keyword);
 		}
+	}
+
+	private boolean containsKeywordInTask(String keyword) {
+		return containsKeywordInTitle(keyword) || containsKeywordInDescription(keyword);
+	}
+
+	private boolean containsKeywordInDescription(String keyword) {
+		return StringUtils.containsIgnoreCase(this.getDescription(), keyword);
+	}
+
+	private boolean containsKeywordInTitle(String keyword) {
+		return StringUtils.containsIgnoreCase(this.getTitle(), keyword);
+	}
+	
+	private boolean isEmptyKeyword(String keyword) {
+		return keyword == null || keyword.isEmpty();
 	}
 	
 	public abstract com.google.api.services.tasks.model.Task toGTask();
 	protected abstract VToDo toVToDo();
+
+	protected void updateNewTask(Task newTask) {
+		newTask.updateTitle(this.getTitle());
+		newTask.updateCreated(this.getCreated());
+		newTask.updateDescription(this.getDescription());
+		if (!(newTask instanceof PeriodicTask)) {
+			newTask.updateCompleted(this.getCompleted());
+		}
+	}
+
+	protected void updateClone(ToDoTask newTask) {
+		updateNewTask(newTask);
+		newTask.updateLastModified(null);
+	}
+
+	protected void formatStatus(Ansi returnString) {
+		returnString.a("Status: ").a(completedToString(this.getCompleted())).a('\n');
+	}
 }

@@ -2,13 +2,17 @@
 package cs2103.task;
 
 import org.fusesource.jansi.Ansi;
+
 import static org.fusesource.jansi.Ansi.ansi;
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
 import static org.junit.Assert.*;
+
 import java.util.Date;
+
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.Status;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,7 +31,7 @@ public class DeadlineTaskTest extends ToDoTaskTest{
 	Date complete = null;
 	DateTime dueTime = new DateTime(1);
 	
-	protected DeadlineTask getConcrete(){
+	protected ToDoTask getConcrete(){
 		return dlt;
 	}
 
@@ -103,63 +107,57 @@ public class DeadlineTaskTest extends ToDoTaskTest{
 	}
 	
 	private void testConvertToFloating() throws HandledException {
-		DateTime[] time = new DateTime[2];
-		time[0] = null;
-		time[1] = null;
+		DateTime[] time = generateTimeForConvert("f");
 		Task ft2 = dlt.convert(time);
 		assertTrue(ft2 instanceof FloatingTask);
 		
 		Task taskExpected = new FloatingTask(dlt.getTaskUID(), Status.VTODO_NEEDS_ACTION);
-		taskExpected.updateTitle(dlt.getTitle());
-		taskExpected.updateDescription(dlt.getDescription());
-		taskExpected.updateLastModified(dlt.getLastModified());
-		taskExpected.updateCompleted(dlt.getCompleted());
+		updateTaskExpected(taskExpected);
 		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
 	}
 
 	private void testConvertToDeadline() throws HandledException {	
-		DateTime[] time = new DateTime[2];
-		time[0] = new DateTime(1);
-		time[1] = null;
+		DateTime[] time = generateTimeForConvert("d");
 		Task ft2 = dlt.convert(time);
 		assertTrue(ft2 instanceof DeadlineTask);
 		
-		DeadlineTask taskExpected = new DeadlineTask(dlt.getTaskUID(), dlt.getStatus(), time[0]);
-		taskExpected.updateTitle(dlt.getTitle());
-		taskExpected.updateDescription(dlt.getDescription());
-		taskExpected.updateLastModified(dlt.getLastModified());
-		taskExpected.updateCompleted(dlt.getCompleted());
+		ToDoTask taskExpected = new DeadlineTask(dlt.getTaskUID(), dlt.getStatus(), time[0]);
+		updateTaskExpected(taskExpected);
 		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
 	}
 	
 	private void testConvertToPeriodic() throws HandledException {
-		DateTime[] time = new DateTime[2];
-		time[0] = new DateTime(1);
-		time[1]= new DateTime(2);
+		DateTime[] time = generateTimeForConvert("p");
 		Task ft2 = dlt.convert(time);
 		assertTrue(ft2 instanceof PeriodicTask);
 		
 		PeriodicTask taskExpected = new PeriodicTask(dlt.getTaskUID(), Status.VEVENT_CONFIRMED, time[0], time[1]);
-		taskExpected.updateTitle(dlt.getTitle());
-		taskExpected.updateDescription(dlt.getDescription());
-		taskExpected.updateLastModified(dlt.getLastModified());
-		taskExpected.updateCompleted(dlt.getCompleted());
+		updateTaskExpected(taskExpected);
 		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
 	}
 	
 	@Test
 	public void testClone() throws CloneNotSupportedException {
-		DeadlineTask task = (DeadlineTask) dlt.clone();
+		ToDoTask task = (ToDoTask) dlt.clone();
 		assertTrue(TestUtil.compareTasks(task, dlt));
 	}
 	
 	@Test
 	public void testToSummary() {
+		Ansi expected = generateSummaryExpected();
+		Ansi test = generateSummaryTest();
+		assertEquals(expected.toString(), test.toString());
+	}
+
+	private Ansi generateSummaryTest() {
+		return dlt.toSummary();
+	}
+
+	private Ansi generateSummaryExpected() {
 		Ansi expected = ansi().fg(YELLOW).a(dlt.getTaskID()).a(". ").reset();
 		expected.bold().a(dlt.getTitle()).a('\n').boldOff().reset();
-		expected.a("Status: ").a(ToDoTask.completedToString(dlt.getCompleted()));
+		expected.a("Status: ").a(ToDoTask.completedToString(dlt.getCompleted())).a('\n');
 		expected.a("\tDue At: ").a(dlt.dateToString(dlt.getDueTime())).a('\n');
-		Ansi test = dlt.toSummary();
-		assertEquals(expected.toString(), test.toString());
+		return expected;
 	}
 }

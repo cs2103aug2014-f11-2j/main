@@ -34,12 +34,19 @@ public abstract class EventTaskTest extends TaskTest{
 	@Test
 	public void testUpdateAndGetStatus() {
 		EventTask task = (EventTask) getConcrete();
-		task.updateStatus(null);
-		assertEquals(Status.VEVENT_CONFIRMED, task.getStatus());
-		
+		testUpdateAndGetStatusNull(task);
+		testUpdateAndGetStatusCompleted(task);
+	}
+
+	private void testUpdateAndGetStatusCompleted(EventTask task) {
 		Status testStatus = Status.VTODO_COMPLETED;
 		task.updateStatus(testStatus);
 		assertEquals(testStatus, task.getStatus());
+	}
+
+	private void testUpdateAndGetStatusNull(EventTask task) {
+		task.updateStatus(null);
+		assertEquals(Status.VEVENT_CONFIRMED, task.getStatus());
 	}
 	
 	@Test
@@ -54,10 +61,20 @@ public abstract class EventTaskTest extends TaskTest{
 	public void testDateToString(){
 		EventTask task = (EventTask) getConcrete();
 		DateTime testDate = new DateTime(0);
+		Ansi test = generateDateToStringTest(task, testDate);
+		Ansi expected = generateDateToStringExpected(testDate);
+		assertEquals(expected.toString(), test.toString());
+	}
+
+	private Ansi generateDateToStringTest(EventTask task, DateTime testDate) {
 		Ansi test = task.dateToString(testDate);
+		return test;
+	}
+
+	private Ansi generateDateToStringExpected(DateTime testDate) {
 		DateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm a");
 		Ansi expected = ansi().bold().fg(GREEN).a(format.format(testDate)).reset();
-		assertEquals(expected.toString(), test.toString());
+		return expected;
 	}
 
 	/**
