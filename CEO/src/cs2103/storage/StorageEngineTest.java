@@ -1,3 +1,4 @@
+//@author A0116713M
 package cs2103.storage;
 
 import static org.junit.Assert.*;
@@ -19,7 +20,7 @@ public class StorageEngineTest {
 	File file = new File("Test.ics");
 	
 	@Before
-	public void before() throws HandledException, FatalException{
+	public void before() throws HandledException, FatalException {
 		file.delete();
 		this.storage = StorageEngine.getInstance(file);
 	}
@@ -41,7 +42,7 @@ public class StorageEngineTest {
 		storage.updateTask(task3);
 		ArrayList<Task> testList = storage.getTaskList();
 		assertEquals(3, testList.size());
-		for (Task task:testList){
+		for (Task task:testList) {
 			if (task.equals(task1)) assertTrue(TestUtil.compareTasks(task, task1));
 			if (task.equals(task2)) assertTrue(TestUtil.compareTasks(task, task2));
 			if (task.equals(task3)) assertTrue(TestUtil.compareTasks(task, task3));
@@ -49,20 +50,20 @@ public class StorageEngineTest {
 	}
 	
 	@Test
-	public void testUpdateTask() throws HandledException, FatalException{
+	public void testUpdateTask() throws HandledException, FatalException {
 		ArrayList<Task> testList = storage.getTaskList();
 		ArrayList<Task> expectedList = new ArrayList<Task>();
-		for (Task task:testList){
+		for (Task task:testList) {
 			expectedList.add(task);
 		}
-		for (Task task:expectedList){
+		for (Task task:expectedList) {
 			task.updateTitle(task.getTaskUID());
 			storage.updateTask(task);
 		}
 		testList = storage.getTaskList();
 		for (Task task:testList){
-			for (Task expected:expectedList){
-				if (expected.equals(task)){
+			for (Task expected:expectedList) {
+				if (expected.equals(task)) {
 					assertTrue(TestUtil.compareTasks(task, expected));
 				}
 			}
@@ -70,9 +71,9 @@ public class StorageEngineTest {
 	}
 	
 	@Test
-	public void testDeleteTask() throws FatalException, HandledException{
+	public void testDeleteTask() throws FatalException, HandledException {
 		ArrayList<Task> testList = storage.getTaskList();
-		for (Task task:testList){
+		for (Task task:testList) {
 			storage.deleteTask(task);
 		}
 		testList = storage.getTaskList();

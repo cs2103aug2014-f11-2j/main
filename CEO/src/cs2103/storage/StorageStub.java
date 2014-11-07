@@ -1,3 +1,4 @@
+//@author A0116713M
 package cs2103.storage;
 
 import java.util.ArrayList;
@@ -13,11 +14,11 @@ public class StorageStub implements StorageInterface {
 	private static StorageStub storage;
 	private ArrayList<Task> tasks;
 	
-	private StorageStub(){
+	private StorageStub() {
 		this.tasks = new ArrayList<Task>();
 	}
 	
-	public static StorageStub getInstance(){
+	public static StorageStub getInstance() {
 		if (storage == null){
 			storage = new StorageStub();
 		}
@@ -28,9 +29,9 @@ public class StorageStub implements StorageInterface {
 	 * @see cs2103.storage.StorageInterface#deleteTask(cs2103.task.Task)
 	 */
 	@Override
-	public void deleteTask(Task task){
+	public void deleteTask(Task task) {
 		Task existing = this.getModifyingTask(task);
-		if (existing != null){
+		if (existing != null) {
 			this.tasks.remove(existing);
 		}
 	}
@@ -39,7 +40,7 @@ public class StorageStub implements StorageInterface {
 	 * @see cs2103.storage.StorageInterface#updateTask(cs2103.task.Task)
 	 */
 	@Override
-	public void updateTask(Task task){
+	public void updateTask(Task task) {
 		this.deleteTask(task);
 		this.tasks.add(task);
 	}
@@ -48,15 +49,15 @@ public class StorageStub implements StorageInterface {
 	 * @see cs2103.storage.StorageInterface#getTaskList()
 	 */
 	@Override
-	public ArrayList<Task> getTaskList(){
+	public ArrayList<Task> getTaskList() {
 		sortTasks();
 		return this.tasks;
 	}
 	
-	private void sortTasks(){
+	private void sortTasks() {
 		Collections.sort(this.tasks);
 		int count=0;
-		for (Task task:this.tasks){
+		for (Task task:this.tasks) {
 			count++;
 			task.updateTaskID(count);
 		}

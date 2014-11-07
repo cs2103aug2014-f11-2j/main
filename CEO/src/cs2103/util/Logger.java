@@ -56,7 +56,8 @@ public class Logger {
 		PrintWriter pw = null;
 		try {
 			pw = new PrintWriter(new BufferedWriter(new FileWriter(this.log, true)));
-			pw.println(new Date());
+			pw.print(new Date());
+			pw.print(":\t");
 			pw.println(logMsg);
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -1,3 +1,4 @@
+//@author A0116713M
 package cs2103.storage;
 
 import java.awt.Desktop;
@@ -26,6 +27,7 @@ import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.tasks.TasksScopes;
 
 import cs2103.util.CommonUtil;
+import cs2103.util.Logger;
 
 /**
  * @author Yuri
@@ -35,6 +37,8 @@ public class GoogleReceiver {
 	private static final String APPLICATION_NAME = "cs2103-CEO/1.0";
 	private static final String client_secret = "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"zCMOqFnPqBLS-jLR7q2p1LGt\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"179875106660-efg7a9ehbjv4lcq2pohh1hd1npgdp1fp.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}";
 	private static final String userId = "user";
+	private static final String LOGIN_LOG = "Trying to authorize for Google Sync";
+	private final Logger logger;
 	private final JsonFactory JSON_FACTORY;
 	private final Collection<String> scopes;
 	private final GoogleClientSecrets clientSecrets;
@@ -49,31 +53,33 @@ public class GoogleReceiver {
 	 * Use AuthorizationCodeFlow to authorize this program to access data on Google
 	 */
 	public GoogleReceiver() throws IOException, GeneralSecurityException {
-		dataStoreFactory = new AuthStoreFactory();
-		JSON_FACTORY = JacksonFactory.getDefaultInstance();
-		httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-	    scopes = new ArrayList<String>();
-	    scopes.add(CalendarScopes.CALENDAR);
-	    scopes.add(TasksScopes.TASKS);
-	    receiver = new LocalServerReceiver();
-	    clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(new ByteArrayInputStream(client_secret.getBytes())));
-	    flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, clientSecrets, scopes).setDataStoreFactory(dataStoreFactory).build();
+		this.logger = Logger.getInstance();
+		this.dataStoreFactory = new AuthStoreFactory();
+		this.JSON_FACTORY = JacksonFactory.getDefaultInstance();
+		this.httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+	    this.scopes = new ArrayList<String>();
+	    this.scopes.add(CalendarScopes.CALENDAR);
+	    this.scopes.add(TasksScopes.TASKS);
+	    this.receiver = new LocalServerReceiver();
+	    this.clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(new ByteArrayInputStream(client_secret.getBytes())));
+	    this.flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, clientSecrets, scopes).setDataStoreFactory(dataStoreFactory).build();
 	    this.authorize();
 	}
 	
-	private Credential authorize() throws IOException{
+	private Credential authorize() throws IOException {
 		try{
-			Credential credential = flow.loadCredential(userId);
+			Credential credential = this.flow.loadCredential(userId);
 			if (credential != null && (credential.getRefreshToken() != null || credential.getExpiresInSeconds() > 60)) {
 				return credential;
 			}
-			String redirectUri = receiver.getRedirectUri();
+			this.logger.writeLog(LOGIN_LOG);
+			String redirectUri = this.receiver.getRedirectUri();
 			onAuthorization(flow.newAuthorizationUrl().setRedirectUri(redirectUri));
-			String code = receiver.waitForCode();
-			TokenResponse response = flow.newTokenRequest(code).setRedirectUri(redirectUri).execute();
-			return flow.createAndStoreCredential(response, userId);
+			String code = this.receiver.waitForCode();
+			TokenResponse response = this.flow.newTokenRequest(code).setRedirectUri(redirectUri).execute();
+			return this.flow.createAndStoreCredential(response, userId);
 		} finally {
-			receiver.stop();
+			this.receiver.stop();
 		}
 	}
 	
@@ -82,7 +88,7 @@ public class GoogleReceiver {
 	 * @throws IOException
 	 */
 	public com.google.api.services.calendar.Calendar getCalendarClient() throws IOException{
-		return new com.google.api.services.calendar.Calendar.Builder(httpTransport, JSON_FACTORY, this.authorize()).setApplicationName(APPLICATION_NAME).build();
+		return new com.google.api.services.calendar.Calendar.Builder(this.httpTransport, this.JSON_FACTORY, this.authorize()).setApplicationName(APPLICATION_NAME).build();
 	}
 	
 	/**
@@ -90,7 +96,7 @@ public class GoogleReceiver {
 	 * @throws IOException
 	 */
 	public com.google.api.services.tasks.Tasks getTasksClient() throws IOException{
-		return new com.google.api.services.tasks.Tasks.Builder(httpTransport, JSON_FACTORY, this.authorize()).setApplicationName(APPLICATION_NAME).build();
+		return new com.google.api.services.tasks.Tasks.Builder(this.httpTransport, this.JSON_FACTORY, this.authorize()).setApplicationName(APPLICATION_NAME).build();
 	}
 	
 	private void onAuthorization(AuthorizationCodeRequestUrl authorizationUrl) throws IOException{
@@ -98,7 +104,7 @@ public class GoogleReceiver {
 	    Preconditions.checkNotNull(url);
 	    CommonUtil.print("Please open the following address in your browser:\n");
 	    CommonUtil.print(url + "\n");
-	    if (CommonUtil.checkSyncSupport()){
+	    if (CommonUtil.checkSyncSupport()) {
 	    	Desktop desktop = Desktop.getDesktop();
 	    	CommonUtil.print("Attempting to open that address in the default browser now...\n");
 	    	desktop.browse(URI.create(url));

@@ -38,11 +38,13 @@ public class GoogleEngine {
 	private static final String LOG_ADD = "Adding task with UID %1$s to Google";
 	private static final String LOG_UPDATE = "Updating task with UID %1$s to Google";
 	private static final String LOG_REMOVE = "Removing task with UID %1$s from Google";
+	private static final String LOG_INITIALIZE = "Initializing GoogleEngine";
 	private static final String RRULE_PREFIX = "RRULE:";
 	
 	private GoogleEngine() throws HandledException {
 		try {
 			this.logger = Logger.getInstance();
+			this.logger.writeLog(LOG_INITIALIZE);
 			this.receiver = new GoogleReceiver();
 			this.calendar = this.receiver.getCalendarClient();
 			this.tasks = this.receiver.getTasksClient();
@@ -215,6 +217,7 @@ public class GoogleEngine {
 	}
 	
 	private Task tryToInsert(Task task) throws IOException, HandledException {
+		assert(task != null);
 		if (!task.getStatus().equals(Status.VTODO_CANCELLED)) {
 			Task returnTask;
 			if (task instanceof EventTask) {
@@ -234,12 +237,13 @@ public class GoogleEngine {
 		}
 	}
 	
-	private void tryToRemove(Task task) throws IOException{
+	private void tryToRemove(Task task) throws IOException {
+		assert(task != null);
 		if (task instanceof EventTask){
-			if (!this.checkRemoved((EventTask) task)){
+			if (!this.checkRemoved((EventTask) task)) {
 				this.calendar.events().delete(calendarIdentifier, task.getTaskUID()).execute();
 			}
-		} else if (task instanceof ToDoTask){
+		} else if (task instanceof ToDoTask) {
 			if (this.checkRemoved((ToDoTask) task)){
 				this.tasks.tasks().delete(DEFAULT_TASKS, task.getTaskUID()).execute();
 			}
@@ -247,6 +251,7 @@ public class GoogleEngine {
 	}
 	
 	private boolean checkRemoved(EventTask task) throws IOException {
+		assert(task != null);
 		try {
 			com.google.api.services.calendar.model.Event gEvent = this.calendar.events().get(calendarIdentifier, task.getTaskUID()).execute();
 			return gEvent == null || gEvent.getStatus().equals("cancelled");
@@ -256,6 +261,7 @@ public class GoogleEngine {
 	}
 	
 	private boolean checkRemoved(ToDoTask task) throws IOException {
+		assert(task != null);
 		try {
 			com.google.api.services.tasks.model.Task gTask = this.tasks.tasks().get(DEFAULT_TASKS, task.getTaskUID()).execute();
 			return gTask == null || (gTask.getDeleted() != null && gTask.getDeleted());
@@ -264,15 +270,16 @@ public class GoogleEngine {
 		}
 	}
 	
-	private Task tryToUpdate(Task task) throws IOException, HandledException{
+	private Task tryToUpdate(Task task) throws IOException, HandledException {
+		assert(task != null);
 		if (task.isDeleted()){
 			this.tryToRemove(task);
 			return null;
 		} else {
 			Task returnTask;
-			if (task instanceof EventTask){
+			if (task instanceof EventTask) {
 				returnTask = this.executeUpdate((EventTask) task); 
-			} else if (task instanceof ToDoTask){
+			} else if (task instanceof ToDoTask) {
 				returnTask = this.executeUpdate((ToDoTask) task);
 			} else {
 				return null;
@@ -282,7 +289,8 @@ public class GoogleEngine {
 		}
 	}
 	
-	private Task executeUpdate(EventTask task) throws IOException, HandledException{
+	private Task executeUpdate(EventTask task) throws IOException, HandledException {
+		assert(task != null);
 		if (this.checkConverting(task)) {
 			this.tasks.tasks().delete(DEFAULT_TASKS, task.getTaskUID()).execute();
 			return this.tryToInsert(task);
@@ -299,6 +307,7 @@ public class GoogleEngine {
 	}
 	
 	private boolean checkConverting(EventTask task) throws IOException {
+		assert(task != null);
 		try{
 			return this.tasks.tasks().get(DEFAULT_TASKS, task.getTaskUID()).execute() != null;
 		} catch (GoogleJsonResponseException e) {
@@ -306,13 +315,14 @@ public class GoogleEngine {
 		}
 	}
 	
-	private Task executeUpdate(ToDoTask task) throws IOException, HandledException{
+	private Task executeUpdate(ToDoTask task) throws IOException, HandledException {
+		assert(task != null);
 		if (this.checkConverting(task)) {
 			this.calendar.events().delete(calendarIdentifier, task.getTaskUID()).execute();
 			return this.tryToInsert(task);
 		} else {
 			com.google.api.services.tasks.model.Task gTask = this.tasks.tasks().get(DEFAULT_TASKS, task.getTaskUID()).execute();
-			if (gTask == null){
+			if (gTask == null) {
 				return this.tryToInsert(task);
 			} else {
 				com.google.api.services.tasks.model.Task newGTask = task.toGTask();
@@ -323,6 +333,7 @@ public class GoogleEngine {
 	}
 	
 	private boolean checkConverting(ToDoTask task) throws IOException {
+		assert(task != null);
 		try{
 			return this.calendar.events().get(calendarIdentifier, task.getTaskUID()).execute() != null;
 		} catch (GoogleJsonResponseException e) {
@@ -330,52 +341,58 @@ public class GoogleEngine {
 		}
 	}
 
-	private void tryToGetLastUpdated() throws IOException{
+	private void tryToGetLastUpdated() throws IOException {
 		this.calendarLastUpdate =  new Date(this.calendar.events().list(calendarIdentifier).setShowDeleted(true).execute().getUpdated().getValue());
 		this.taskLastUpdate = new Date(this.tasks.tasklists().get(DEFAULT_TASKS).execute().getUpdated().getValue());
 	}
 	
-	private int readSequence(com.google.api.services.calendar.model.Event gEvent){
-		if (gEvent.getSequence() == null){
+	private int readSequence(com.google.api.services.calendar.model.Event gEvent) {
+		assert(gEvent != null);
+		if (gEvent.getSequence() == null) {
 			return 2;
 		} else {
 			return gEvent.getSequence() + 1;
 		}
 	}
 	
-	private Date readCompleted(com.google.api.services.tasks.model.Task gTask){
-		if (gTask.getCompleted() == null){
+	private Date readCompleted(com.google.api.services.tasks.model.Task gTask) {
+		assert(gTask != null);
+		if (gTask.getCompleted() == null) {
 			return null;
 		} else {
 			return new Date(gTask.getCompleted().getValue());
 		}
 	}
 	
-	private Date readLastModified(com.google.api.services.tasks.model.Task gTask){
-		if (gTask.getUpdated() == null){
+	private Date readLastModified(com.google.api.services.tasks.model.Task gTask) {
+		assert(gTask != null);
+		if (gTask.getUpdated() == null) {
 			return new Date();
 		} else {
 			return new Date(gTask.getUpdated().getValue());
 		}
 	}
 	
-	private Date readLastModified(com.google.api.services.calendar.model.Event gEvent){
-		if (gEvent.getUpdated() == null){
+	private Date readLastModified(com.google.api.services.calendar.model.Event gEvent) {
+		assert(gEvent != null);
+		if (gEvent.getUpdated() == null) {
 			return new Date();
 		} else {
 			return new Date(gEvent.getUpdated().getValue());
 		}
 	}
 	
-	private Date readCreated(com.google.api.services.calendar.model.Event gEvent){
-		if (gEvent.getCreated() == null){
+	private Date readCreated(com.google.api.services.calendar.model.Event gEvent) {
+		assert(gEvent != null);
+		if (gEvent.getCreated() == null) {
 			return new Date();
 		} else {
 			return new Date(gEvent.getCreated().getValue());
 		}
 	}
 	
-	private Date[] readTime(com.google.api.services.calendar.model.Event gEvent) throws HandledException{
+	private Date[] readTime(com.google.api.services.calendar.model.Event gEvent) throws HandledException {
+		assert(gEvent != null);
 		Date[] time = new Date[2];
 		CommonUtil.checkNull(gEvent.getStart(), HandledException.ExceptionType.INVALID_TIME);
 		com.google.api.client.util.DateTime startTime = this.readEventDateTime(gEvent.getStart());
@@ -390,8 +407,8 @@ public class GoogleEngine {
 		return time;
 	}
 	
-	private com.google.api.client.util.DateTime readEventDateTime(com.google.api.services.calendar.model.EventDateTime edt){
-		if (edt == null){
+	private com.google.api.client.util.DateTime readEventDateTime(com.google.api.services.calendar.model.EventDateTime edt) {
+		if (edt == null) {
 			return null;
 		} else {
 			if (edt.getDateTime() == null) {
@@ -402,8 +419,9 @@ public class GoogleEngine {
 		}
 	}
 	
-	private Recur readRecurrence(com.google.api.services.calendar.model.Event gEvent){
-		if (gEvent.getRecurrence() == null){
+	private Recur readRecurrence(com.google.api.services.calendar.model.Event gEvent) {
+		assert(gEvent != null);
+		if (gEvent.getRecurrence() == null) {
 			return null;
 		} else {
 			String recurString = getRecurrenceString(gEvent.getRecurrence());
@@ -411,14 +429,15 @@ public class GoogleEngine {
 		}
 	}
 	
-	private String getRecurrenceString(List<String> recurrenceList){
+	private String getRecurrenceString(List<String> recurrenceList) {
+		assert(recurrenceList != null);
 		for (String s: recurrenceList){
 			if (s != null && s.startsWith(RRULE_PREFIX)) return s.substring(RRULE_PREFIX.length());
 		}
 		return null;
 	}
 	
-	private static Recur parseRecurrence(String recurString){
+	private static Recur parseRecurrence(String recurString) {
 		if (recurString == null){
 			return null;
 		} else {
@@ -432,28 +451,31 @@ public class GoogleEngine {
 		}
 	}
 	
-	private Status readStatus(com.google.api.services.calendar.model.Event gEvent){
-		if (gEvent.getStatus() == null){
+	private Status readStatus(com.google.api.services.calendar.model.Event gEvent) {
+		assert(gEvent != null);
+		if (gEvent.getStatus() == null) {
 			return null;
 		} else {
 			return new Status(gEvent.getStatus().toUpperCase());
 		}
 	}
 	
-	private Status readStatus(com.google.api.services.tasks.model.Task gTask){
-		if (gTask.getDeleted() != null && gTask.getDeleted()){
+	private Status readStatus(com.google.api.services.tasks.model.Task gTask) {
+		assert(gTask != null);
+		if (gTask.getDeleted() != null && gTask.getDeleted()) {
 			return Status.VTODO_CANCELLED;
-		} else if (gTask.getStatus() == null){
+		} else if (gTask.getStatus() == null) {
 			return Status.VTODO_NEEDS_ACTION;
-		} else if (gTask.getStatus().equalsIgnoreCase("COMPLETED")){
+		} else if (gTask.getStatus().equalsIgnoreCase("COMPLETED")) {
 			return Status.VTODO_COMPLETED;
 		} else {
 			return Status.VTODO_NEEDS_ACTION;
 		}
 	}
 	
-	private List<com.google.api.services.tasks.model.Task> getTasks() throws HandledException{
+	private List<com.google.api.services.tasks.model.Task> getTasks() throws HandledException {
 		try {
+			assert(this.tasks != null);
 			return this.tasks.tasks().list(DEFAULT_TASKS).setShowDeleted(true).execute().getItems();
 		} catch (IOException e) {
 			try {
@@ -466,8 +488,9 @@ public class GoogleEngine {
 		}
 	}
 	
-	private List<com.google.api.services.calendar.model.Event> getEvents() throws HandledException{
+	private List<com.google.api.services.calendar.model.Event> getEvents() throws HandledException {
 		try {
+			assert(this.calendar != null);
 			return this.calendar.events().list(calendarIdentifier).setShowDeleted(true).execute().getItems();
 		} catch (IOException e) {
 			try {

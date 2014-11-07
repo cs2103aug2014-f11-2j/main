@@ -1,3 +1,4 @@
+//@author A0116713M
 package cs2103.storage;
 
 import static org.junit.Assert.*;
@@ -34,12 +35,12 @@ public class GoogleEngineTest {
 		testTask = (ToDoTask) this.google.updateTask(testTask);
 		assertEquals(completed.getTime(), testTask.getCompleted().getTime());
 		boolean success = false;
-		for (Task task:this.google.getTaskList()){
+		for (Task task:this.google.getTaskList()) {
 			if (!task.isDeleted() && task.equals(testTask)) success = true;
 		}
 		assertTrue(success);
 		this.google.deleteTask(testTask);
-		for (Task task:this.google.getTaskList()){
+		for (Task task:this.google.getTaskList()) {
 			if (!task.isDeleted() && task.equals(testTask)) fail();
 		}
 	}
@@ -82,31 +83,31 @@ public class GoogleEngineTest {
 		assertEquals(startTime.getTime(), testTask.getStartTime().getTime());
 		assertEquals(endTime.getTime(), testTask.getEndTime().getTime());
 		boolean success = false;
-		for (Task task:this.google.getTaskList()){
+		for (Task task:this.google.getTaskList()) {
 			if (!task.isDeleted() && task.equals(testTask)) success = true;
 		}
 		assertTrue(success);
 		this.google.deleteTask(testTask);
-		for (Task task:this.google.getTaskList()){
+		for (Task task:this.google.getTaskList()) {
 			if (!task.isDeleted() && task.equals(testTask)) fail();
 		}
 	}
 	
 	//Test for invalid input
 	@Test(expected = HandledException.class)
-	public void testNullAdd() throws HandledException, IOException{
+	public void testNullAdd() throws HandledException, IOException {
 		this.google.addTask(null);
 	}
 	
 	//Test for invalid input
 	@Test(expected = HandledException.class)
-	public void testNullUpdate() throws HandledException, IOException{
+	public void testNullUpdate() throws HandledException, IOException {
 		this.google.updateTask(null);
 	}
 	
 	//Test for invalid input
 	@Test(expected = HandledException.class)
-	public void testNullDelete() throws HandledException, IOException{
+	public void testNullDelete() throws HandledException, IOException {
 		this.google.deleteTask(null);
 	}
 }

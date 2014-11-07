@@ -1,3 +1,4 @@
+//@author A0116713M
 package cs2103.storage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,6 +17,7 @@ import cs2103.task.FloatingTask;
 import cs2103.task.PeriodicTask;
 import cs2103.task.Task;
 import cs2103.task.ToDoTask;
+import cs2103.util.Logger;
 
 import java.util.Collections;
 
@@ -50,9 +52,17 @@ public class StorageEngine implements StorageInterface{
 	private net.fortuna.ical4j.model.Calendar calendar;
 	private IndexedComponentList indexedComponents;
 	private final File file;
+	private final Logger logger;
+	private static final String LOG_INITIALIZE = "Initializing StorageEngine";
+	private static final String LOG_NEWFILE = "Creating new storage file";
+	private static final String LOG_ADD = "Adding task with UID %1$s to the file";
+	private static final String LOG_UPDATE = "Updating task with UID %1$s to the file";
+	private static final String LOG_REMOVE = "Remove task with UID %1$s from the file";
 	
-	private StorageEngine(File file) throws HandledException, FatalException{
-		if (file == null){
+	private StorageEngine(File file) throws HandledException, FatalException {
+		this.logger = Logger.getInstance();
+		this.logger.writeLog(LOG_INITIALIZE);
+		if (file == null) {
 			throw new FatalException(FatalException.ExceptionType.ILLEGAL_FILE);
 		}
 		CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION, true);
@@ -66,14 +76,15 @@ public class StorageEngine implements StorageInterface{
 	 * @throws HandledException
 	 * @throws FatalException
 	 */
-	public static StorageEngine getInstance(File file) throws HandledException, FatalException{
-		if (storage == null){
+	public static StorageEngine getInstance(File file) throws HandledException, FatalException {
+		if (storage == null) {
 			storage = new StorageEngine(file);
 		}
 		return storage;
 	}
 	
-	private void createNewFile() throws HandledException, FatalException{
+	private void createNewFile() throws HandledException, FatalException {
+		this.logger.writeLog(LOG_NEWFILE);
 		this.calendar = new net.fortuna.ical4j.model.Calendar();
 		this.calendar.getProperties().add(new ProdId("-//cs2103-f11-2j//CEO 0.4//EN"));
 		this.calendar.getProperties().add(Version.VERSION_2_0);
@@ -84,45 +95,50 @@ public class StorageEngine implements StorageInterface{
 		writeToFile();
 	}
 	
-	@SuppressWarnings("unchecked") 
-	private ArrayList<Task> readFromFile() throws FatalException, HandledException{
+	private ArrayList<Task> readFromFile() throws FatalException, HandledException {
 		try{
-			if (!file.exists() || file.length() == 0) {
+			if (!this.file.exists() || this.file.length() == 0) {
 				this.file.delete();
 				this.createNewFile();
 			}
-			FileInputStream fin = new FileInputStream(file);
+			FileInputStream fin = new FileInputStream(this.file);
 			CalendarBuilder builder = new CalendarBuilder();
 			this.calendar = builder.build(fin);
-			ArrayList<Task> taskList = new ArrayList<Task>();
-			for (Iterator<VToDo> i = this.calendar.getComponents(Component.VTODO).iterator(); i.hasNext();){
-				VToDo component = i.next();
-				taskList.add(parseVToDo(component));
-			}
-			for (Iterator<VEvent> i = this.calendar.getComponents(Component.VEVENT).iterator(); i.hasNext();){
-				VEvent component = i.next();
-				taskList.add(parseVEvent(component));
-			}
-			indexedComponents = new IndexedComponentList(calendar.getComponents(), Property.UID);
-			return sortTaskList(taskList);
-		} catch (FileNotFoundException e){
+			this.indexedComponents = new IndexedComponentList(this.calendar.getComponents(), Property.UID);
+			return this.parseTaskList();
+		} catch (FileNotFoundException e) {
 			this.createNewFile();
 			return this.readFromFile();
-		} catch(IOException e){
+		} catch(IOException e) {
 			throw new FatalException(FatalException.ExceptionType.READ_ERROR);
 		} catch (ParseException | ParserException e) {
 			throw new FatalException(FatalException.ExceptionType.ILLEGAL_FILE);
 		}
 	}
+	
+	@SuppressWarnings("unchecked") 
+	private ArrayList<Task> parseTaskList() throws ParseException, HandledException, FatalException {
+		assert(this.calendar != null);
+		ArrayList<Task> taskList = new ArrayList<Task>();
+		for (Iterator<VToDo> i = this.calendar.getComponents(Component.VTODO).iterator(); i.hasNext();) {
+			VToDo component = i.next();
+			taskList.add(parseVToDo(component));
+		}
+		for (Iterator<VEvent> i = this.calendar.getComponents(Component.VEVENT).iterator(); i.hasNext();) {
+			VEvent component = i.next();
+			taskList.add(parseVEvent(component));
+		}
+		return sortTaskList(taskList);
+	}
 
-	private void writeToFile() throws HandledException, FatalException{
+	private void writeToFile() throws HandledException, FatalException {
 		try {
-			calendar.validate();
+			this.calendar.validate();
 			FileOutputStream fout;
-			fout = new FileOutputStream(file);
+			fout = new FileOutputStream(this.file);
 			CalendarOutputter outputter = new CalendarOutputter();
 			outputter.output(this.calendar, fout);
-		} catch (FileNotFoundException e){
+		} catch (FileNotFoundException e) {
 			this.createNewFile();
 			this.writeToFile();
 		} catch (IOException | ValidationException e) {
@@ -137,15 +153,18 @@ public class StorageEngine implements StorageInterface{
 	 * @throws FatalException
 	 */
 	@Override
-	public void updateTask(Task task) throws HandledException, FatalException{
+	public void updateTask(Task task) throws HandledException, FatalException {
 		if (task != null){
+			assert(this.indexedComponents != null);
 			Component updating = task.toComponent();
 			Component existing = this.indexedComponents.getComponent(task.getTaskUID());
-			if (existing == null){
-				calendar.getComponents().add(updating);
-			}else{
-				calendar.getComponents().remove(existing);
-				calendar.getComponents().add(updating);
+			if (existing == null) {
+				this.logger.writeLog(this.formatLogString(LOG_ADD, task));
+				this.calendar.getComponents().add(updating);
+			} else {
+				this.logger.writeLog(this.formatLogString(LOG_UPDATE, task));
+				this.calendar.getComponents().remove(existing);
+				this.calendar.getComponents().add(updating);
 			}
 			writeToFile();
 		}
@@ -158,13 +177,15 @@ public class StorageEngine implements StorageInterface{
 	 * @throws FatalException
 	 */
 	@Override
-	public void deleteTask(Task task) throws HandledException, FatalException{
-		if (task != null){
+	public void deleteTask(Task task) throws HandledException, FatalException {
+		if (task != null) {
+			assert(this.indexedComponents != null);
+			this.logger.writeLog(this.formatLogString(LOG_REMOVE, task));
 			Component existing = this.indexedComponents.getComponent(task.getTaskUID());
-			if (existing == null){
+			if (existing == null) {
 				throw new HandledException(HandledException.ExceptionType.TASK_NOT_EXIST);
 			}else{
-				calendar.getComponents().remove(existing);
+				this.calendar.getComponents().remove(existing);
 			}
 			writeToFile();
 		}
@@ -176,16 +197,17 @@ public class StorageEngine implements StorageInterface{
 	 * @throws FatalException
 	 */
 	@Override
-	public ArrayList<Task> getTaskList() throws FatalException, HandledException{
+	public ArrayList<Task> getTaskList() throws FatalException, HandledException {
 		return this.readFromFile();
 	}
 	
-	private Task parseVEvent(VEvent component) throws ParseException, FatalException, HandledException{
+	private Task parseVEvent(VEvent component) throws ParseException, FatalException, HandledException {
+		assert(component != null);
 		String componentUID = this.readUid(component);
 		Date[] componentPeriod = this.readPeriod(component);
 		PeriodicTask task = new PeriodicTask(componentUID, component.getStatus(), componentPeriod[0], componentPeriod[1]);
-		task.updateCreated(this.readCreated(component));
 		task.updateTitle(this.readTitle(component));
+		task.updateCreated(this.readCreated(component));
 		task.updateLocation(this.readLocation(component));
 		task.updateRecurrence(this.readRecur(component));
 		task.updateDescription(this.readDescription(component));
@@ -193,7 +215,8 @@ public class StorageEngine implements StorageInterface{
 		return task;
 	}
 	
-	private Task parseVToDo(VToDo component) throws ParseException, HandledException, FatalException{
+	private Task parseVToDo(VToDo component) throws ParseException, HandledException, FatalException {
+		assert(component != null);
 		ToDoTask task;
 		String componentUID = this.readUid(component);
 		if (component.getDue() == null){
@@ -203,14 +226,15 @@ public class StorageEngine implements StorageInterface{
 		}
 		task.updateTitle(this.readTitle(component));
 		task.updateCreated(this.readCreated(component));
-		task.updateDescription(this.readDescription(component));
 		task.updateCompleted(this.readCompleted(component));
+		task.updateDescription(this.readDescription(component));
 		task.updateLastModified(this.readLastModified(component));
 		return task;
 	}
 	
-	private Date[] readPeriod(VEvent component) throws FatalException{
-		if (component.getStartDate() == null || component.getEndDate() == null){
+	private Date[] readPeriod(VEvent component) throws FatalException {
+		assert(component != null);
+		if (component.getStartDate() == null || component.getEndDate() == null) {
 			throw new FatalException(FatalException.ExceptionType.ILLEGAL_FILE);
 		}else{
 			Date[] period = new Date[2];
@@ -221,23 +245,26 @@ public class StorageEngine implements StorageInterface{
 	}
 	
 	private Date readCreated(Component component) {
-		if (component.getProperty(Property.CREATED) == null){
+		assert(component != null);
+		if (component.getProperty(Property.CREATED) == null) {
 			return null;
 		} else {
 			return ((Created) component.getProperty(Property.CREATED)).getDateTime();
 		}
 	}
 	
-	private Date readLastModified(Component component){
-		if (component.getProperty(Property.LAST_MODIFIED) == null){
+	private Date readLastModified(Component component) {
+		assert(component != null);
+		if (component.getProperty(Property.LAST_MODIFIED) == null) {
 			return null;
 		} else {
 			return ((LastModified) component.getProperty(Property.LAST_MODIFIED)).getDateTime();
 		}
 	}
 	
-	private String readUid(Component component){
-		if (component.getProperty(Property.UID) == null){
+	private String readUid(Component component) {
+		assert(component != null);
+		if (component.getProperty(Property.UID) == null) {
 			return null;
 		}else{
 			return component.getProperty(Property.UID).getValue();
@@ -245,23 +272,26 @@ public class StorageEngine implements StorageInterface{
 	}
 	
 	private String readTitle(Component component) {
-		if (component.getProperty(Property.SUMMARY) == null){
+		assert(component != null);
+		if (component.getProperty(Property.SUMMARY) == null) {
 			return "";
 		}else{
 			return component.getProperty(Property.SUMMARY).getValue();
 		}
 	}
 	
-	private Date readCompleted(VToDo component){
-		if (component.getDateCompleted() == null){
+	private Date readCompleted(VToDo component) {
+		assert(component != null);
+		if (component.getDateCompleted() == null) {
 			return null;
 		}else{
 			return component.getDateCompleted().getDateTime();
 		}
 	}
 	
-	private Recur readRecur(VEvent component){
-		if (component.getProperty(Property.RRULE) == null){
+	private Recur readRecur(VEvent component) {
+		assert(component != null);
+		if (component.getProperty(Property.RRULE) == null) {
 			return null;
 		}else{
 			RRule rule = (RRule) component.getProperty(Property.RRULE);
@@ -269,29 +299,37 @@ public class StorageEngine implements StorageInterface{
 		}
 	}
 	
-	private String readDescription(Component component){
-		if (component.getProperty(Property.DESCRIPTION) == null){
+	private String readDescription(Component component) {
+		assert(component != null);
+		if (component.getProperty(Property.DESCRIPTION) == null) {
 			return "";
 		}else{
 			return component.getProperty(Property.DESCRIPTION).getValue();
 		}
 	}
 	
-	private String readLocation(VEvent component){
-		if (component.getLocation() == null){
+	private String readLocation(VEvent component) {
+		assert(component != null);
+		if (component.getLocation() == null) {
 			return "";
 		}else{
 			return component.getLocation().getValue();
 		}
 	}
 	
-	private ArrayList<Task> sortTaskList(ArrayList<Task> taskList){
+	private ArrayList<Task> sortTaskList(ArrayList<Task> taskList) {
+		assert(taskList != null);
 		Collections.sort(taskList);
 		int count=0;
-		for (Task task:taskList){
+		for (Task task:taskList) {
 			count++;
 			task.updateTaskID(count);
 		}
 		return taskList;
+	}
+	
+	private String formatLogString(String format, Task task) {
+		assert(task != null);
+		return String.format(format, task.getTaskUID());
 	}
 }
