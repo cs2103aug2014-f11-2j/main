@@ -27,6 +27,7 @@ public class CommonUtil {
 	 */
 	public static String[] splitFirstWord(String parameterString) throws HandledException{
 		checkNull(parameterString, HandledException.ExceptionType.INVALID_CMD);
+		assert(parameterString != null);
 		String[] result = new String[2];
 		int splitIndex = parameterString.indexOf(' ');
 		if (splitIndex == -1){
@@ -48,6 +49,7 @@ public class CommonUtil {
 	 */
 	public static int parseIntegerParameter(String parameter) throws HandledException {
 		checkNull(parameter, HandledException.ExceptionType.INVALID_PARA);
+		assert(parameter != null);
 		parameter = parameter.trim();
 		if (parameter.matches("[0-9]+")){
 			return Integer.parseInt(parameter);
@@ -90,6 +92,7 @@ public class CommonUtil {
 	 */
 	public static String removeDash(String parameterString) throws HandledException{
 		checkNull(parameterString, HandledException.ExceptionType.INVALID_PARA);
+		assert(parameterString != null);
 		if (parameterString.startsWith("-")){
 			return parameterString.substring(1);
 		}else{
@@ -105,6 +108,7 @@ public class CommonUtil {
 	 */
 	public static void print(String feedback){
 		if (feedback != null && !feedback.isEmpty()){
+			assert(feedback != null);
 			print(ansi().a(feedback));
 		}
 	}
@@ -117,6 +121,7 @@ public class CommonUtil {
 	 */
 	public static void print(Ansi feedback) {
 		if (feedback != null){
+			assert(feedback != null);
 			AnsiConsole.out.print(feedback);
 		}
 	}
@@ -129,6 +134,7 @@ public class CommonUtil {
 	 */
 	public static void printErrMsg(String errorMsg){
 		if (errorMsg != null && !errorMsg.isEmpty()){
+			assert(errorMsg != null);
 			print(ansi().bold().bg(RED).a(errorMsg).a('\n').reset());
 		}
 	}
@@ -141,6 +147,7 @@ public class CommonUtil {
 	 */
 	public static void printPrompt(String prompt){
 		if (prompt != null && !prompt.isEmpty()){
+			assert(prompt != null);
 			System.out.print(prompt);
 		}
 	}
