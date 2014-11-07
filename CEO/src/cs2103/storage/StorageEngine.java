@@ -55,9 +55,9 @@ public class StorageEngine implements StorageInterface{
 	private final Logger logger;
 	private static final String LOG_INITIALIZE = "Initializing StorageEngine";
 	private static final String LOG_NEWFILE = "Creating new storage file";
-	private static final String LOG_ADD = "Adding task with UID %1$s to the file";
-	private static final String LOG_UPDATE = "Updating task with UID %1$s to the file";
-	private static final String LOG_REMOVE = "Remove task with UID %1$s from the file";
+	private static final String LOG_ADD = "Adding task with UID %1$s to file";
+	private static final String LOG_UPDATE = "Updating task with UID %1$s to file";
+	private static final String LOG_REMOVE = "Remove task with UID %1$s from file";
 	
 	private StorageEngine(File file) throws HandledException, FatalException {
 		this.logger = Logger.getInstance();
