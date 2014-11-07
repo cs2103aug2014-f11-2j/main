@@ -253,7 +253,7 @@ public class GoogleEngine {
 				this.calendar.events().delete(calendarIdentifier, task.getTaskUID()).execute();
 			}
 		} else if (task instanceof ToDoTask) {
-			if (this.checkRemoved((ToDoTask) task)){
+			if (!this.checkRemoved((ToDoTask) task)){
 				this.tasks.tasks().delete(DEFAULT_TASKS, task.getTaskUID()).execute();
 			}
 		}
