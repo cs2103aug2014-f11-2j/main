@@ -70,6 +70,7 @@ public class TaskList {
 	 */
 	public static TaskList getInstance(Option option) throws HandledException, FatalException {
 		if (taskList == null) {
+			assert(taskList == null);
 			taskList = new TaskList(option);
 		}
 		return taskList;
@@ -83,6 +84,7 @@ public class TaskList {
 	 */
 	public static TaskList getInstance() throws FatalException {
 		if (taskList == null) {
+			assert(taskList == null);
 			throw new FatalException(FatalException.ExceptionType.NOT_INITIALIZED);
 		} else {
 			return taskList;
@@ -161,6 +163,7 @@ public class TaskList {
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for (Task task:this.getAllList()) {
 			if (task.getCompleted() == null) {
+				assert(task.getCompleted() == null);
 				returnList.add(task);
 			}
 		}
@@ -205,6 +208,7 @@ public class TaskList {
 		this.tasks = this.storage.getTaskList();
 		Task returnTask = this.getTaskByTask(task);
 		if (this.google != null) {
+			assert(this.google != null);
 			Task added = this.commitAddToGoogle(task);
 			this.tasks = this.storage.getTaskList();
 			if (added != null) {
@@ -227,9 +231,11 @@ public class TaskList {
 		this.tasks = this.storage.getTaskList();
 		Task returnTask = this.getTaskByTask(task);
 		if (this.google != null) {
+			assert(this.google != null);
 			Task updated = this.commitUpdateToGoogle(task);
 			this.tasks = this.storage.getTaskList();
 			if (updated != null) {
+				assert(updated != null);
 				returnTask = this.getTaskByTask(updated);
 			}
 		}
@@ -247,6 +253,7 @@ public class TaskList {
 		this.storage.deleteTask(task);
 		this.tasks = this.storage.getTaskList();
 		if (this.google != null) {
+			assert(this.google != null);
 			this.commitDeleteToGoogle(task);
 			this.tasks = this.storage.getTaskList();
 		}
@@ -261,6 +268,7 @@ public class TaskList {
 	 */
 	public boolean manualSync() throws HandledException {
 		if (this.google == null) {
+			assert(this.google == null);
 			this.google = GoogleEngine.getInstance();
 		}
 		return this.syncWithGoogle();
@@ -271,6 +279,7 @@ public class TaskList {
 	 */
 	public void disableSync() {
 		this.google = null;
+		assert(this.google == null);
 	}
 	
 	private void commitDeleteToGoogle(Task task) throws HandledException {
@@ -361,6 +370,7 @@ public class TaskList {
 		for (Task remoteTask:googleList) {
 			Task localTask = this.getTaskByTask(remoteTask, this.tasks);
 			if (localTask == null) {
+				assert(localTask == null);
 				if (!remoteTask.isDeleted()) {
 					this.storage.updateTask(remoteTask);
 					count++;
@@ -380,6 +390,7 @@ public class TaskList {
 			Task remoteTask = this.getTaskByTask(localTask, googleList);
 			Task updating = null;
 			if (remoteTask == null) {
+				assert(remoteTask == null);
 				updating = this.commitSyncToGoogle(localTask, true);
 				count++;
 			} else {
