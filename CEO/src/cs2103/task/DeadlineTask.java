@@ -1,7 +1,10 @@
 package cs2103.task;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Locale;
 
 import org.fusesource.jansi.Ansi;
 
@@ -178,6 +181,17 @@ public class DeadlineTask extends ToDoTask {
 		com.google.api.services.tasks.model.Task gTask = new com.google.api.services.tasks.model.Task();
 		this.addGTaskProperty(gTask);
 		gTask.setDue(new com.google.api.client.util.DateTime(this.getDueTime().getTime()));
+		gTask.setNotes(this.formatGTaskDescription());
 		return gTask;
+	}
+	
+	private String formatGTaskDescription() {
+		StringBuffer sb = new StringBuffer();
+		sb.append(this.getDescription());
+		sb.append("\n<Due At: ");
+		DateFormat format = new SimpleDateFormat("hh:mm a", Locale.US);
+		sb.append(format.format(this.getDueTime()));
+		sb.append(">");
+		return sb.toString();
 	}
 }

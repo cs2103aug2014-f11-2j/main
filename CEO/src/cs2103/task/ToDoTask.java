@@ -148,7 +148,6 @@ public abstract class ToDoTask extends Task {
 			gTask.setCompleted(new com.google.api.client.util.DateTime(this.getCompleted().getTime()));
 			gTask.setStatus("completed");
 		}
-		gTask.setNotes(this.getDescription());
 	}
 	
 	protected static Ansi completedToString(DateTime completed) {
@@ -211,9 +210,7 @@ public abstract class ToDoTask extends Task {
 		newTask.updateTitle(this.getTitle());
 		newTask.updateCreated(this.getCreated());
 		newTask.updateDescription(this.getDescription());
-		if (!(newTask instanceof PeriodicTask)) {
-			newTask.updateCompleted(this.getCompleted());
-		}
+		newTask.updateCompleted(this.getCompleted());
 	}
 
 	protected void updateClone(ToDoTask newTask) {

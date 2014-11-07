@@ -5,6 +5,7 @@ import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import org.fusesource.jansi.Ansi;
 
@@ -272,7 +273,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 
 	protected Ansi dateToString(Date date){
 		Ansi returnString = ansi().bold();
-		DateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm a");
+		DateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm a", Locale.US);
 		if (this.checkAlert()){
 			returnString.fg(RED);
 		} else {

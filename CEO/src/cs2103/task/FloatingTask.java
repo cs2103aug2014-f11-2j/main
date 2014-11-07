@@ -104,6 +104,7 @@ public class FloatingTask extends ToDoTask {
 	public com.google.api.services.tasks.model.Task toGTask(){
 		com.google.api.services.tasks.model.Task gTask = new com.google.api.services.tasks.model.Task();
 		this.addGTaskProperty(gTask);
+		gTask.setNotes(this.getDescription());
 		return gTask;
 	}
 }
