@@ -273,6 +273,15 @@ public class TaskList {
 		this.google = null;
 	}
 	
+	/**
+	 * @return a new Test instance of TaskList
+	 * @throws FatalException
+	 * @throws HandledException
+	 */
+	public static TaskList getTestInstance() throws FatalException, HandledException {
+		return new TaskList(new Option(Option.Value.TEST));
+	}
+	
 	private void commitDeleteToGoogle(Task task) throws HandledException {
 		try {
 			if (this.google.needToSync(task)) {
