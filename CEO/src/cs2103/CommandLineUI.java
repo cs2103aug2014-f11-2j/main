@@ -72,6 +72,7 @@ public class CommandLineUI {
 	 */
 	public static CommandLineUI getInstance(Option option) throws HandledException, FatalException{
 		if (commandLine == null){
+			assert(commandLine == null);
 			commandLine = new CommandLineUI(option);
 			assert(commandLine.taskList.getAllList() != null);
 		}
@@ -99,6 +100,7 @@ public class CommandLineUI {
 			String command = scanner.nextLine();
 			CommonUtil.clearConsole();
 			if (command != null && !command.isEmpty()){
+				assert(command != null);
 				Ansi feedback = processUserInput(command);
 				if (feedback == null){
 					CommonUtil.print(MESSAGE_EXIT);
@@ -209,6 +211,7 @@ public class CommandLineUI {
 		while(!this.redoStack.isEmpty() && result < steps){
 			InfluentialCommand redoCommand = redoStack.pop().redo();
 			if (redoCommand != null){
+				assert(redoCommand != null);
 				result++;
 				this.undoStack.push(redoCommand);
 			}
