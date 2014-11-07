@@ -33,6 +33,10 @@ public class FloatingTaskTest extends ToDoTaskTest {
 	@Before
 	public void setUp() throws Exception {
 		ft = new FloatingTask(this.taskUID, this.status);
+		updateNewFloatingTask();
+	}
+
+	private void updateNewFloatingTask() {
 		ft.updateTitle(this.title);
 		ft.updateDescription(this.description);
 		ft.updateLocation(this.location);
@@ -61,9 +65,7 @@ public class FloatingTaskTest extends ToDoTaskTest {
 	}
 
 	private void testConvertToFloating() throws HandledException {
-		DateTime[] time = new DateTime[2];
-		time[0] = null;
-		time[1] = null;
+		DateTime[] time = generateTimeForConvert("f");
 		Task ft2 = ft.convert(time);
 		assertTrue(ft2 instanceof FloatingTask);
 		
@@ -73,9 +75,7 @@ public class FloatingTaskTest extends ToDoTaskTest {
 	}
 
 	private void testConvertToDeadline() throws HandledException {	
-		DateTime[] time = new DateTime[2];
-		time[0] = new DateTime(1);
-		time[1] = null;
+		DateTime[] time = generateTimeForConvert("d");
 		Task ft2 = ft.convert(time);
 		assertTrue(ft2 instanceof DeadlineTask);
 		
@@ -85,9 +85,7 @@ public class FloatingTaskTest extends ToDoTaskTest {
 	}
 	
 	private void testConvertToPeriodic() throws HandledException {
-		DateTime[] time = new DateTime[2];
-		time[0] = new DateTime(1);
-		time[1]= new DateTime(2);
+		DateTime[] time = generateTimeForConvert("p");
 		Task ft2 = ft.convert(time);
 		assertTrue(ft2 instanceof PeriodicTask);
 		
@@ -105,13 +103,23 @@ public class FloatingTaskTest extends ToDoTaskTest {
 	@Test
 	public void testToSummary() {
 		Ansi expected = generateSummaryExpected();
-		Ansi test = ft.toSummary();
+		Ansi test = generateSummaryTest();
 		assertEquals(expected.toString(), test.toString());
 
-		ft.delete();
 		expected = generateSummaryExpectedDeleted();
-		test = ft.toSummary();
+		test = generateSummaryTestDeleted();
 		assertEquals(expected.toString(), test.toString());
+	}
+
+	private Ansi generateSummaryTestDeleted() {
+		Ansi test;
+		ft.delete();
+		test = generateSummaryTest();
+		return test;
+	}
+
+	private Ansi generateSummaryTest() {
+		return ft.toSummary();
 	}
 
 	private Ansi generateSummaryExpectedDeleted() {

@@ -125,10 +125,18 @@ public abstract class ToDoTask extends Task {
 
 	private static void formatCompleted(DateTime completed, Ansi returnString) {
 		if (completed == null) {
-			returnString.bold().fg(RED).a("Needs Action");
+			formatCompletedNeedsAction(returnString);
 		} else {
-			returnString.bold().fg(GREEN).a("Completed");
+			formatCompletedIsCompleted(returnString);
 		}
+	}
+
+	private static Ansi formatCompletedIsCompleted(Ansi returnString) {
+		return returnString.bold().fg(GREEN).a("Completed");
+	}
+
+	private static Ansi formatCompletedNeedsAction(Ansi returnString) {
+		return returnString.bold().fg(RED).a("Needs Action");
 	}
 	
 	@Override

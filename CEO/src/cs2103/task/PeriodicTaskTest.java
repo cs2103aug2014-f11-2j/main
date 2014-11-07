@@ -164,62 +164,62 @@ public class PeriodicTaskTest extends EventTaskTest{
 	}
 	
 	private void testConvertToFloating() throws HandledException {
-		DateTime[] time = new DateTime[2];
-		time[0] = null;
-		time[1] = null;
+		DateTime[] time = generateTimeForConvert("f");
 		Task pt2 = pt.convert(time);
 		assertTrue(pt2 instanceof FloatingTask);
 		
 		Task taskExpected = new FloatingTask(pt.getTaskUID(), Status.VTODO_NEEDS_ACTION);
-		taskExpected.updateTitle(pt.getTitle());
-		taskExpected.updateDescription(pt.getDescription());
-		taskExpected.updateLastModified(pt.getLastModified());
-		taskExpected.updateCompleted(pt.getCompleted());
+		updateTaskExpected(taskExpected);
 		assertTrue(TestUtil.compareTasks(pt2, taskExpected));
 	}
 
 	private void testConvertToDeadline() throws HandledException {	
-		DateTime[] time = new DateTime[2];
-		time[0] = new DateTime(1);
-		time[1] = null;
+		DateTime[] time = generateTimeForConvert("d");
 		Task ft2 = pt.convert(time);
 		assertTrue(ft2 instanceof DeadlineTask);
 		
 		ToDoTask taskExpected = new DeadlineTask(pt.getTaskUID(), Status.VTODO_NEEDS_ACTION, time[0]);
-		taskExpected.updateTitle(pt.getTitle());
-		taskExpected.updateDescription(pt.getDescription());
-		taskExpected.updateLastModified(pt.getLastModified());
-		taskExpected.updateCompleted(pt.getCompleted());
+		updateTaskExpected(taskExpected);
 		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
 	}
 	
 	private void testConvertToPeriodic() throws HandledException {
-		DateTime[] time = new DateTime[2];
-		time[0] = new DateTime(1);
-		time[1]= new DateTime(2);
+		DateTime[] time = generateTimeForConvert("p");
 		Task ft2 = pt.convert(time);
 		assertTrue(ft2 instanceof PeriodicTask);
 		
 		PeriodicTask taskExpected = new PeriodicTask(pt.getTaskUID(), pt.getStatus(), time[0], time[1]);
-		taskExpected.updateTitle(pt.getTitle());
-		taskExpected.updateDescription(pt.getDescription());
+		updateTaskExpectedPeriodic(taskExpected);
+		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
+	}
+
+	private void updateTaskExpectedPeriodic(PeriodicTask taskExpected) {
+		updateTaskExpected(taskExpected);
 		taskExpected.updateLocation(pt.getLocation());
 		taskExpected.updateRecurrence(pt.getRecurrence());
-		taskExpected.updateLastModified(pt.getLastModified());
-		taskExpected.updateCompleted(pt.getCompleted());
-		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
 	}
 
 	@Test
 	public void testToSummary() {
 		Ansi expected = generateSummaryExpected();
-		Ansi test = pt.toSummary();
+		Ansi test = generateSummaryTest();
 		assertEquals(expected.toString(), test.toString());
 		
-		pt.updateRecurrence(null);
 		expected = generateSummaryExpectedNullRecurrence();
-		test = pt.toSummary();
+		test = generateSummaryTestNullRecurrence();
 		assertEquals(expected.toString(), test.toString());
+	}
+
+	private Ansi generateSummaryTest() {
+		Ansi test = pt.toSummary();
+		return test;
+	}
+
+	private Ansi generateSummaryTestNullRecurrence() {
+		Ansi test;
+		pt.updateRecurrence(null);
+		test = pt.toSummary();
+		return test;
 	}
 
 	private Ansi generateSummaryExpectedNullRecurrence() {
@@ -249,7 +249,7 @@ public class PeriodicTaskTest extends EventTaskTest{
 	}
 
 	private Ansi generateDetailExpected() {
-		Ansi expected = pt.toSummary();
+		Ansi expected = generateSummaryTest();
 		expected.a("Location: ");
 		expected.fg(CYAN).a(pt.getLocation()).a("\n").reset();
 		expected.a("Description: ").a(pt.getDescription()).reset().a('\n');

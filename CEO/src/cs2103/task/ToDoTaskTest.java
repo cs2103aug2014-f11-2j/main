@@ -4,10 +4,13 @@ package cs2103.task;
 import static org.fusesource.jansi.Ansi.Color.GREEN;
 import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.junit.Assert.*;
+
 import org.fusesource.jansi.Ansi;
+
 import static org.fusesource.jansi.Ansi.*;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.property.Status;
+
 import org.junit.Test;
 
 /**
@@ -132,12 +135,5 @@ public abstract class ToDoTaskTest extends TaskTest{
 		Ansi expected = task.toSummary();
 		expected.a("Description: ").a(task.getDescription()).a('\n').reset();
 		return expected;
-	}
-
-	protected void updateTaskExpected(Task taskExpected) {
-		taskExpected.updateTitle(taskExpected.getTitle());
-		taskExpected.updateDescription(taskExpected.getDescription());
-		taskExpected.updateLastModified(taskExpected.getLastModified());
-		taskExpected.updateCompleted(taskExpected.getCompleted());
 	}
 }
