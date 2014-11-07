@@ -1,3 +1,4 @@
+//@author A0110906R
 package cs2103.storage;
 
 import java.io.File;
@@ -34,6 +35,10 @@ public class TaskList {
 	private static final String SYNC_FROM_GOOGLE = "Downloaded %1$d tasks from Google\n";
 	private static final String SYNC_TO_GOOGLE = "Uploaded %1$d tasks to Google\n";
 	private static final String SYNC_FAIL = "Unable to sync your data with Google, Google Sync is disabled";
+	private static final String LOG_ADDED_PERIODIC = "Added a periodic task";
+	private static final String LOG_ADDED_DEADLINE = "Added a deadline task";
+	private static final String LOG_ADDED_FLOATING = "Added a floating task";
+	private static final String LOG_ADDED_DEFAULT = "Added a task to default list";
 	
 	private TaskList(Option option) throws FatalException, HandledException {
 		this.dataFile = new File("CEOStore.ics");
@@ -103,6 +108,7 @@ public class TaskList {
 		for (Task task:this.getAllList()) {
 			if (task instanceof PeriodicTask) {
 				returnList.add((PeriodicTask) task);
+				this.logger.writeLog(LOG_ADDED_PERIODIC);
 			}
 		}
 		Collections.sort(returnList, PeriodicTask.getComparator());
@@ -121,6 +127,7 @@ public class TaskList {
 		for (Task task:this.getAllList()) {
 			if (task instanceof DeadlineTask) {
 				returnList.add((DeadlineTask) task);
+				this.logger.writeLog(LOG_ADDED_DEADLINE);
 			}
 		}
 		Collections.sort(returnList, DeadlineTask.getComparator());
@@ -139,6 +146,7 @@ public class TaskList {
 		for (Task task:this.getAllList()) {
 			if (task instanceof FloatingTask) {
 				returnList.add((FloatingTask) task);
+				this.logger.writeLog(LOG_ADDED_FLOATING);
 			}
 		}
 		return returnList;
@@ -165,6 +173,7 @@ public class TaskList {
 			if (task.getCompleted() == null) {
 				assert(task.getCompleted() == null);
 				returnList.add(task);
+				this.logger.writeLog(LOG_ADDED_DEFAULT);
 			}
 		}
 		return returnList;
