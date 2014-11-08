@@ -23,7 +23,6 @@ import cs2103.task.Task;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class AlertTest {
 	
-
 	@BeforeClass
 	public static void initialise() throws HandledException, FatalException{
 		TaskList.getInstance(new Option(Option.Value.TEST));		
@@ -53,8 +52,6 @@ public class AlertTest {
 	
 		assertEquals(ansi().a("Tasks due within one day:\n").bold().fg(RED).a("The task list is empty\n").reset()
 				.a("Tasks start within one day:\n").bold().fg(RED).a("The task list is empty\n").reset().toString(),result);
-
-		
 	}
 	
 	@Test
@@ -96,7 +93,6 @@ public class AlertTest {
 		
 		assertEquals(ansi().a("Tasks due within one day:\n").a(dead.toSummary()).a("\n")
 				.a("Tasks start within one day:\n").a(period.toSummary()).a("\n").toString(),result);
-		
 	}
 	
 	@Test
