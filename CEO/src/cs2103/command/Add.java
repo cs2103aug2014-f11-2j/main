@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.command;
 
 import java.util.ArrayList;
@@ -35,10 +36,10 @@ public class Add extends InfluentialCommand {
 	 * @param command
 	 * @throws HandledException
 	 */
-	public Add(String command) throws HandledException{
+	public Add(String command) throws HandledException {
 		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> parameterQueue = separateCommand(command);
-		if (!command.startsWith("-")){
+		if (!command.startsWith("-")) {
 			this.parameterList.addAllParameters(parseQuickAdd(parameterQueue.poll()));
 		}
 		Map<String, String> parameterMap = separateParameters(parameterQueue);
@@ -55,9 +56,9 @@ public class Add extends InfluentialCommand {
 		Date[] time = getTime(this.parameterList.getTime());
 		assert(time != null);
 		Logger.getInstance().writeLog(this.formatLogString(time));
-		if (time[0] == null){
+		if (time[0] == null) {
 			task = new FloatingTask(null, null);
-		} else if (time[1] == null){
+		} else if (time[1] == null) {
 			task = new DeadlineTask(null, null, time[0]);
 		} else {
 			task = new PeriodicTask(null, null, time[0], time[1]);
@@ -77,19 +78,19 @@ public class Add extends InfluentialCommand {
 	 * @return ArrayList of Parameter object from user input (quickAddString)
 	 * @throws HandledException
 	 */
-	private static ArrayList<Parameter> parseQuickAdd(String quickAddString) throws HandledException{
+	private static ArrayList<Parameter> parseQuickAdd(String quickAddString) throws HandledException {
 		ArrayList<Parameter> parameterList = new ArrayList<Parameter>();
 		int timeIndex = -1;
-		for (String s:allowedQuickTimeLiteral){
+		for (String s:allowedQuickTimeLiteral) {
 			timeIndex = quickAddString.lastIndexOf(s);
 			if (timeIndex > 0) break;
 		}
 		int everyIndex = quickAddString.lastIndexOf("every");
 		if (timeIndex < 0) {
 			parameterList.add(Title.parse(quickAddString));
-		} else if (everyIndex > timeIndex){
+		} else if (everyIndex > timeIndex) {
 			Time time = parseQuickTime(quickAddString.substring(timeIndex, everyIndex));
-			if (time == null){
+			if (time == null) {
 				parameterList.add(Title.parse(quickAddString));
 			} else {
 				parameterList.add(Title.parse(quickAddString.substring(0, timeIndex)));
@@ -98,7 +99,7 @@ public class Add extends InfluentialCommand {
 			}
 		} else {
 			Time time = parseQuickTime(quickAddString.substring(timeIndex));
-			if (time == null){
+			if (time == null) {
 				parameterList.add(Title.parse(quickAddString));
 			} else {
 				parameterList.add(Title.parse(quickAddString.substring(0, timeIndex)));
@@ -112,10 +113,10 @@ public class Add extends InfluentialCommand {
 	 * @param timeString
 	 * @return Time object from String timeString
 	 */
-	private static Time parseQuickTime(String timeString){
+	private static Time parseQuickTime(String timeString) {
 		Time time = Time.parse(timeString);
 		Date[] timeArray = getTime(time);
-		if (timeArray[0] == null && timeArray[1] == null){
+		if (timeArray[0] == null && timeArray[1] == null) {
 			return null;
 		} else {
 			return time;
@@ -126,8 +127,8 @@ public class Add extends InfluentialCommand {
 	 * @param timeParameter
 	 * @return Date array from Time timeParameter
 	 */
-	private static Date[] getTime(Time timeParameter){
-		if (timeParameter == null){
+	private static Date[] getTime(Time timeParameter) {
+		if (timeParameter == null) {
 			return new Date[2];
 		} else {
 			return timeParameter.getValue();
@@ -138,8 +139,8 @@ public class Add extends InfluentialCommand {
 	 * @param task
 	 * @return Ansi formatted String for Add object
 	 */
-	private Ansi formatReturnString(Task task){
-		if (task == null){
+	private Ansi formatReturnString(Task task) {
+		if (task == null) {
 			return ansi().bold().fg(RED).a(MESSAGE_ADD_FAIL).reset();
 		} else {
 			this.undoBackup = task;
@@ -152,8 +153,8 @@ public class Add extends InfluentialCommand {
 	 * @return String value of title that is entered by user
 	 * @throws HandledException
 	 */
-	private String readTitle() throws HandledException{
-		if (this.parameterList.getTitle() == null){
+	private String readTitle() throws HandledException {
+		if (this.parameterList.getTitle() == null) {
 			throw new HandledException(HandledException.ExceptionType.NO_TITLE);
 		} else {
 			return this.parameterList.getTitle().getValue();
@@ -164,8 +165,8 @@ public class Add extends InfluentialCommand {
 	 * @return String value of description that is entered by user
 	 * @throws HandledException
 	 */
-	private String readDescription() throws HandledException{
-		if (this.parameterList.getDescription() == null){
+	private String readDescription() throws HandledException {
+		if (this.parameterList.getDescription() == null) {
 			return null;
 		} else {
 			return this.parameterList.getDescription().getValue();
@@ -177,7 +178,7 @@ public class Add extends InfluentialCommand {
 	 * @throws HandledException
 	 */
 	private String readLocation() throws HandledException {
-		if (this.parameterList.getLocation() == null){
+		if (this.parameterList.getLocation() == null) {
 			return null;
 		} else {
 			return this.parameterList.getLocation().getValue();
@@ -188,8 +189,8 @@ public class Add extends InfluentialCommand {
 	 * @return Recur object from recurrence string entered by user
 	 * @throws HandledException
 	 */
-	private Recur readRecurrence() throws HandledException{
-		if (this.parameterList.getRecurrence() == null){
+	private Recur readRecurrence() throws HandledException {
+		if (this.parameterList.getRecurrence() == null) {
 			return null;
 		} else {
 			return this.parameterList.getRecurrence().getValue();
@@ -216,7 +217,7 @@ public class Add extends InfluentialCommand {
 	
 	@Override
 	public InfluentialCommand undo() throws HandledException, FatalException {
-		if (this.undoBackup == null){
+		if (this.undoBackup == null) {
 			return null;
 		} else {
 			this.undoBackup.updateLastModified(null);
@@ -227,7 +228,7 @@ public class Add extends InfluentialCommand {
 
 	@Override
 	public InfluentialCommand redo() throws HandledException, FatalException {
-		if (this.redoBackup == null){
+		if (this.redoBackup == null) {
 			return null;
 		} else {
 			this.redoBackup.updateLastModified(null);

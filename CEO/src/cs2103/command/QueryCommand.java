@@ -1,3 +1,4 @@
+//@author A0116713M
 package cs2103.command;
 
 import java.util.ArrayList;
@@ -13,12 +14,12 @@ public abstract class QueryCommand extends Command {
 	 * @param taskList
 	 * @return Ansi formatted result string
 	 */
-	protected static <T extends Task> Ansi parseListResponse(ArrayList<T> taskList){
-		if (taskList == null || taskList.size() == 0){
+	protected static <T extends Task> Ansi parseListResponse(ArrayList<T> taskList) {
+		if (taskList == null || taskList.size() == 0) {
 			return MESSAGE_EMPTY_LIST;
 		} else {
 			Ansi returnString = ansi();
-			for (Task task:taskList){
+			for (Task task:taskList) {
 				returnString.a(task.toSummary()).a('\n');
 			}
 			return returnString;

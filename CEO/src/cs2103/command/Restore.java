@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.command;
 
 import org.fusesource.jansi.Ansi;
@@ -41,7 +42,7 @@ public class Restore extends InfluentialCommand {
 		Task updating = cloneTask(this.target);
 		updating.restore();
 		updating = TaskList.getInstance().updateTask(updating);
-		if (this.target == null){
+		if (this.target == null) {
 			return returnString.fg(RED).a(String.format(MESSAGE_RESTORE_FAIL, parameterList.getTaskID().getValue())).reset();
 		} else {
 			this.undoBackup = this.target;
@@ -58,7 +59,7 @@ public class Restore extends InfluentialCommand {
 
 	@Override
 	public InfluentialCommand undo() throws HandledException, FatalException {
-		if (this.undoBackup == null){
+		if (this.undoBackup == null) {
 			return null;
 		} else {
 			this.undoBackup.updateLastModified(null);
@@ -69,7 +70,7 @@ public class Restore extends InfluentialCommand {
 	
 	@Override
 	public InfluentialCommand redo() throws HandledException, FatalException {
-		if (this.redoBackup == null){
+		if (this.redoBackup == null) {
 			return null;
 		} else {
 			this.redoBackup.updateLastModified(null);

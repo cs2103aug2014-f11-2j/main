@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.command;
 
 import java.util.ArrayList;
@@ -17,12 +18,11 @@ public class UpdateTimeFromRecur extends InfluentialCommand {
 	
 	@Override
 	public Ansi execute() throws HandledException, FatalException {
-		
 		int count = 0;
 		ArrayList<PeriodicTask> periodicList = TaskList.getInstance().getPeriodicList();
-		for (PeriodicTask task:periodicList){
+		for (PeriodicTask task:periodicList) {
 			Task newTask = task.updateTimeFromRecur();
-			if (newTask != null){
+			if (newTask != null) {
 				count++;
 				TaskList.getInstance().updateTask(newTask);
 			}

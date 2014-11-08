@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.command;
 
 import org.fusesource.jansi.Ansi;
@@ -145,14 +146,14 @@ public class Help extends QueryCommand {
 	 * Creates an instance of Help from String command
 	 * @param command
 	 */
-	public Help(String command){
+	public Help(String command) {
 		this.parameterList.addParameter(CommandType.parse(command));
 	}
 	
 	@Override
-	public Ansi execute() throws HandledException{
+	public Ansi execute() throws HandledException {
 		CommonUtil.checkNull(this.parameterList.getCommandType(), HandledException.ExceptionType.INVALID_CMD);
-		switch (parameterList.getCommandType().getValue()){
+		switch (parameterList.getCommandType().getValue()) {
 		case LIST:
 			return HELP_LIST;
 		case UPDATE:

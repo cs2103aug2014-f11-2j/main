@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.command;
 
 import java.util.ArrayList;
@@ -32,11 +33,11 @@ public class Alert extends QueryCommand {
 	 * @throws HandledException
 	 * @throws FatalException
 	 */
-	private ArrayList<DeadlineTask> alertDeadline() throws HandledException, FatalException{
+	private ArrayList<DeadlineTask> alertDeadline() throws HandledException, FatalException {
 		ArrayList<DeadlineTask> taskList = TaskList.getInstance().getDeadlineList();
 		ArrayList<DeadlineTask> returnList = new ArrayList<DeadlineTask>();
-		for (DeadlineTask task:taskList){
-			if (task.checkAlert()){
+		for (DeadlineTask task:taskList) {
+			if (task.checkAlert()) {
 				returnList.add(task);
 			}
 		}
@@ -49,11 +50,11 @@ public class Alert extends QueryCommand {
 	 * @throws HandledException
 	 * @throws FatalException
 	 */
-	private ArrayList<PeriodicTask> alertPeriodic() throws HandledException, FatalException{
+	private ArrayList<PeriodicTask> alertPeriodic() throws HandledException, FatalException {
 		ArrayList<PeriodicTask> taskList = TaskList.getInstance().getPeriodicList();
 		ArrayList<PeriodicTask> returnList = new ArrayList<PeriodicTask>();
-		for (PeriodicTask task:taskList){
-			if (task.checkAlert()){
+		for (PeriodicTask task:taskList) {
+			if (task.checkAlert()) {
 				returnList.add(task);
 			}
 		}

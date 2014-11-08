@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.command;
 
 import java.util.Date;
@@ -35,7 +36,7 @@ public class Update extends InfluentialCommand {
 	 * @throws HandledException
 	 * @throws FatalException
 	 */
-	public Update(String command) throws HandledException, FatalException{
+	public Update(String command) throws HandledException, FatalException {
 		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> parameterQueue = separateCommand(command);
 		this.parameterList.addParameter(TaskID.parse(parameterQueue.poll()));
@@ -56,25 +57,24 @@ public class Update extends InfluentialCommand {
 		assert(this.target != null);
 		Logger.getInstance().writeLog(this.formatLogString());
 		Task newTask;
-		if (this.parameterList.getTime() == null){
+		if (this.parameterList.getTime() == null) {
 			newTask = cloneTask(this.target);
 		} else {
 			newTask = this.target.update(this.parameterList.getTime().getValue());
 		}
-		if (this.parameterList.getTitle() != null){
-			CommonUtil.checkNull(this.parameterList.getTitle().getValue(), HandledException.ExceptionType.NO_TITLE);
+		if (this.parameterList.getTitle() != null) {
 			newTask.updateTitle(this.parameterList.getTitle().getValue());
 		}
-		if (this.parameterList.getDescription() != null){
+		if (this.parameterList.getDescription() != null) {
 			newTask.updateDescription(this.parameterList.getDescription().getValue());
 		}
-		if (this.parameterList.getLocation() != null){
+		if (this.parameterList.getLocation() != null) {
 			newTask.updateLocation(this.parameterList.getLocation().getValue());
 		}
-		if (this.parameterList.getComplete() != null){
+		if (this.parameterList.getComplete() != null) {
 			newTask.updateCompleted(this.parameterList.getComplete().getValue()?new Date():null);
 		}
-		if (this.parameterList.getRecurrence() != null){
+		if (this.parameterList.getRecurrence() != null) {
 			newTask.updateRecurrence(this.parameterList.getRecurrence().getValue());
 		}
 		newTask = TaskList.getInstance().updateTask(newTask);
@@ -86,9 +86,9 @@ public class Update extends InfluentialCommand {
 	 * @return Ansi formmated string result for Update class
 	 * @throws HandledException
 	 */
-	private Ansi formatReturnString(Task newTask) throws HandledException{
+	private Ansi formatReturnString(Task newTask) throws HandledException {
 		Ansi returnString = ansi();
-		if (newTask == null){
+		if (newTask == null) {
 			return returnString.fg(RED).a(String.format(MESSAGE_UPDATE_FAIL, this.parameterList.getTaskID().getValue())).reset();
 		} else {
 			this.undoBackup = this.target;
@@ -99,7 +99,7 @@ public class Update extends InfluentialCommand {
 	}
 	
 	private String readTitle() throws HandledException {
-		if (this.parameterList.getTitle() == null){
+		if (this.parameterList.getTitle() == null) {
 			return "null";
 		} else {
 			return this.parameterList.getTitle().getValue();
@@ -107,7 +107,7 @@ public class Update extends InfluentialCommand {
 	}
 	
 	private String readDescription() throws HandledException {
-		if (this.parameterList.getDescription() == null){
+		if (this.parameterList.getDescription() == null) {
 			return "null";
 		} else {
 			return this.parameterList.getDescription().getValue();
@@ -115,7 +115,7 @@ public class Update extends InfluentialCommand {
 	}
 	
 	private String readLocation() throws HandledException {
-		if (this.parameterList.getLocation() == null){
+		if (this.parameterList.getLocation() == null) {
 			return "null";
 		} else {
 			return this.parameterList.getLocation().getValue();
@@ -123,7 +123,7 @@ public class Update extends InfluentialCommand {
 	}
 	
 	private String readComplete() throws HandledException {
-		if (this.parameterList.getComplete() == null){
+		if (this.parameterList.getComplete() == null) {
 			return "null";
 		} else {
 			if (this.parameterList.getComplete().getValue()) {
@@ -146,7 +146,6 @@ public class Update extends InfluentialCommand {
 		}
 	}
 	
-
 	private String formatTimeString(Date[] time) {
 		assert (time != null);
 		return String.format(TIME_FORMAT, this.formatTimeString(time[0]), this.formatTimeString(time[1]));
@@ -175,7 +174,7 @@ public class Update extends InfluentialCommand {
 	
 	@Override
 	public InfluentialCommand undo() throws HandledException, FatalException {
-		if (this.undoBackup == null){
+		if (this.undoBackup == null) {
 			return null;
 		} else {
 			this.undoBackup.updateLastModified(null);
@@ -186,7 +185,7 @@ public class Update extends InfluentialCommand {
 	
 	@Override
 	public InfluentialCommand redo() throws HandledException, FatalException {
-		if (this.redoBackup == null){
+		if (this.redoBackup == null) {
 			return null;
 		} else {
 			this.undoBackup.updateLastModified(null);

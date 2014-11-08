@@ -48,7 +48,7 @@ public class CommandLineUI {
 	private Scanner scanner = new Scanner(System.in);
 	private final Logger logger;
 	
-	private CommandLineUI(Option option) throws HandledException, FatalException{
+	private CommandLineUI(Option option) throws HandledException, FatalException {
 		this.logger = Logger.getInstance();
 		this.logger.writeLog(LOG_INITIALIZE);
 		undoStack = new Stack<InfluentialCommand>();
@@ -56,7 +56,7 @@ public class CommandLineUI {
 		option = this.verifyOption(option);
 		this.taskList = TaskList.getInstance(option);
 		Ansi welcomeMsg;
-		switch(option.getValue()){
+		switch(option.getValue()) {
 		default:
 		case SYNC:
 		case DEFAULT:
@@ -81,8 +81,8 @@ public class CommandLineUI {
 	 * @throws HandledException
 	 * @throws FatalException
 	 */
-	public static CommandLineUI getInstance(Option option) throws HandledException, FatalException{
-		if (commandLine == null){
+	public static CommandLineUI getInstance(Option option) throws HandledException, FatalException {
+		if (commandLine == null) {
 			commandLine = new CommandLineUI(option);
 			assert(commandLine.taskList.getAllList() != null);
 		}
@@ -92,9 +92,9 @@ public class CommandLineUI {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args){
+	public static void main(String[] args) {
 		CommandLineUI main;
-		try{
+		try {
 			main = CommandLineUI.getInstance(Option.parse(args));
 			main.userLoop();
 		} catch (HandledException | FatalException e){
@@ -129,7 +129,7 @@ public class CommandLineUI {
 			String command[] = CommonUtil.splitFirstWord(userInput);
 			CommandType commandType = CommandType.parse(command[0]);
 			Command commandObject;
-			switch (commandType.getValue()){
+			switch (commandType.getValue()) {
 			case LIST:
 				commandObject = new List(command[1]);
 				break;
@@ -173,7 +173,7 @@ public class CommandLineUI {
 			default:
 				return ansi().bg(RED).a(MESSAGE_COMMAND_ERROR).reset();
 			}
-			if (commandObject instanceof InfluentialCommand){
+			if (commandObject instanceof InfluentialCommand) {
 				this.undoStack.push((InfluentialCommand) commandObject);
 			}
 			return commandObject.execute();
@@ -187,7 +187,7 @@ public class CommandLineUI {
 	
 	private Ansi undo(String steps) throws HandledException, FatalException {
 		int result;
-		if (steps == null || steps.isEmpty()){
+		if (steps == null || steps.isEmpty()) {
 			result = executeUndo(1);
 		} else {
 			result = executeUndo(CommonUtil.parseIntegerParameter(steps));
@@ -195,12 +195,12 @@ public class CommandLineUI {
 		return ansi().fg(GREEN).a(String.format(MESSAGE_UNDO_FORMAT, result)).reset();
 	}
 	
-	private int executeUndo(int steps) throws HandledException, FatalException{
+	private int executeUndo(int steps) throws HandledException, FatalException {
 		int result = 0;
 		this.logger.writeLog(String.format(LOG_UNDO, steps));
-		while(!this.undoStack.isEmpty() && result < steps){
+		while(!this.undoStack.isEmpty() && result < steps) {
 			InfluentialCommand undoCommand = undoStack.pop().undo();
-			if (undoCommand != null){
+			if (undoCommand != null) {
 				result++;
 				this.redoStack.push(undoCommand);
 			}
@@ -210,7 +210,7 @@ public class CommandLineUI {
 	
 	private Ansi redo(String steps) throws HandledException, FatalException {
 		int result;
-		if (steps == null || steps.isEmpty()){
+		if (steps == null || steps.isEmpty()) {
 			result = executeRedo(1);
 		} else {
 			result = executeRedo(CommonUtil.parseIntegerParameter(steps));
@@ -218,12 +218,12 @@ public class CommandLineUI {
 		return ansi().fg(GREEN).a(String.format(MESSAGE_REDO_FORMAT, result)).reset();
 	}
 	
-	private int executeRedo(int steps) throws HandledException, FatalException{
+	private int executeRedo(int steps) throws HandledException, FatalException {
 		int result = 0;
 		this.logger.writeLog(String.format(LOG_REDO, steps));
-		while(!this.redoStack.isEmpty() && result < steps){
+		while(!this.redoStack.isEmpty() && result < steps) {
 			InfluentialCommand redoCommand = redoStack.pop().redo();
-			if (redoCommand != null){
+			if (redoCommand != null) {
 				result++;
 				this.undoStack.push(redoCommand);
 			}
@@ -231,9 +231,9 @@ public class CommandLineUI {
 		return result;
 	}
 	
-	private Option verifyOption(Option option) throws HandledException{
-		if (option == null || option.getValue().equals(Option.Value.DEFAULT)){
-			if (CommonUtil.checkSyncSupport()){
+	private Option verifyOption(Option option) throws HandledException {
+		if (option == null || option.getValue().equals(Option.Value.DEFAULT)) {
+			if (CommonUtil.checkSyncSupport()) {
 				return askOption();
 			} else {
 				return new Option(Option.Value.NOSYNC);

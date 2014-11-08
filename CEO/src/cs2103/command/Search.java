@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.command;
 
 import java.util.ArrayList;
@@ -26,10 +27,10 @@ public class Search extends QueryCommand {
 	 * @param command
 	 * @throws HandledException
 	 */
-	public Search(String command) throws HandledException{
+	public Search(String command) throws HandledException {
 		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> parameterQueue = separateCommand(command);
-		if (!command.startsWith("-")){
+		if (!command.startsWith("-")) {
 			this.parameterList.addParameter(Keyword.parse(parameterQueue.poll()));
 		}
 		Map<String, String> parameterMap = separateParameters(parameterQueue);
@@ -61,11 +62,11 @@ public class Search extends QueryCommand {
 	 * @throws HandledException
 	 * @throws FatalException
 	 */
-	private ArrayList<Task> getInitialList(TaskType taskType) throws HandledException, FatalException{
-		if (taskType == null){
+	private ArrayList<Task> getInitialList(TaskType taskType) throws HandledException, FatalException {
+		if (taskType == null) {
 			return TaskList.getInstance().getAllList();
 		} else {
-			switch (taskType.getValue()){
+			switch (taskType.getValue()) {
 			case FLOATING:
 				return toTaskList(TaskList.getInstance().getFloatingList());
 			case DEADLINE:
@@ -86,9 +87,9 @@ public class Search extends QueryCommand {
 	 * @param tasks
 	 * @return ArrayList of Tasks from ArrayList of child classes of Task
 	 */
-	private static <T extends Task> ArrayList<Task> toTaskList(ArrayList<T> tasks){
+	private static <T extends Task> ArrayList<Task> toTaskList(ArrayList<T> tasks) {
 		ArrayList<Task> returnList = new ArrayList<Task>();
-		for (Task task:tasks){
+		for (Task task:tasks) {
 			returnList.add(task);
 		}
 		return returnList;
@@ -99,10 +100,10 @@ public class Search extends QueryCommand {
 	 * @param time
 	 * @return ArrayList of tasks that are not floating
 	 */
-	private static ArrayList<Task> filterTime(ArrayList<Task> searchList, Date[] time){
+	private static ArrayList<Task> filterTime(ArrayList<Task> searchList, Date[] time) {
 		ArrayList<Task> returnList = new ArrayList<Task>();
-		if (searchList != null){
-			for (Task task:searchList){
+		if (searchList != null) {
+			for (Task task:searchList) {
 				if (task.checkPeriod(time)){
 					returnList.add(task);
 				}
@@ -116,11 +117,11 @@ public class Search extends QueryCommand {
 	 * @param complete
 	 * @return ArrayList of Task that are completed
 	 */
-	private static ArrayList<Task> filterComplete(ArrayList<Task> searchList, boolean complete){
+	private static ArrayList<Task> filterComplete(ArrayList<Task> searchList, boolean complete) {
 		ArrayList<Task> returnList = new ArrayList<Task>();
-		if (searchList != null){
+		if (searchList != null) {
 			for (Task task:searchList) {
-				if ((task.getCompleted() != null) == complete){
+				if ((task.getCompleted() != null) == complete) {
 					returnList.add(task);
 				}
 			}
@@ -135,9 +136,9 @@ public class Search extends QueryCommand {
 	 */
 	private static ArrayList<Task> filterKeyword(ArrayList<Task> searchList, String keywordString) {
 		ArrayList<Task> returnList = new ArrayList<Task>();
-		if (searchList != null){
-			for (Task task:searchList){
-				if (task.matches(keywordString)){
+		if (searchList != null) {
+			for (Task task:searchList) {
+				if (task.matches(keywordString)) {
 					returnList.add(task);
 				}
 			}

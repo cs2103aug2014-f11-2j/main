@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.command;
 
 import org.fusesource.jansi.Ansi;
@@ -20,7 +21,7 @@ public class Sync extends InfluentialCommand {
 	 * @throws HandledException
 	 */
 	public Sync(String command) throws HandledException {
-		if (command != null){
+		if (command != null) {
 			this.parameterList.addParameter(Option.parse(new String[]{CommonUtil.removeDash(command)}));
 		}
 	}
@@ -37,7 +38,7 @@ public class Sync extends InfluentialCommand {
 
 	@Override
 	public Ansi execute() throws HandledException, FatalException {
-		if (this.parameterList.getOption() != null && this.parameterList.getOption().getValue().equals(Option.Value.NOSYNC)){
+		if (this.parameterList.getOption() != null && this.parameterList.getOption().getValue().equals(Option.Value.NOSYNC)) {
 			TaskList.getInstance().disableSync();
 			return DISABLED;
 		} else {

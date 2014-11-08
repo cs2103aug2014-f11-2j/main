@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.command;
 
 import java.util.Map;
@@ -28,7 +29,7 @@ public class Delete extends InfluentialCommand {
 	 * @throws HandledException
 	 * @throws FatalException
 	 */
-	public Delete(String command) throws HandledException, FatalException{
+	public Delete(String command) throws HandledException, FatalException {
 		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> parameterQueue = separateCommand(command);
 		this.parameterList.addParameter(TaskID.parse(parameterQueue.poll()));
@@ -45,7 +46,7 @@ public class Delete extends InfluentialCommand {
 		Logger.getInstance().writeLog(this.formatLogString());
 		Task deleting = cloneTask(this.target);
 		this.undoBackup = this.target;
-		if (this.parameterList.getDeleteOption() == null && !this.target.isDeleted()){
+		if (this.parameterList.getDeleteOption() == null && !this.target.isDeleted()) {
 			deleting.delete();
 			this.redoBackup = deleting;
 			TaskList.getInstance().updateTask(deleting);
@@ -68,7 +69,7 @@ public class Delete extends InfluentialCommand {
 
 	@Override
 	public InfluentialCommand undo() throws HandledException, FatalException {
-		if (this.undoBackup == null){
+		if (this.undoBackup == null) {
 			return null;
 		} else {
 			this.undoBackup.updateLastModified(null);
@@ -79,10 +80,10 @@ public class Delete extends InfluentialCommand {
 
 	@Override
 	public InfluentialCommand redo() throws HandledException, FatalException {
-		if (this.redoBackup == null){
+		if (this.redoBackup == null) {
 			return null;
 		} else {
-			if (this.parameterList.getDeleteOption() == null && !this.redoBackup.isDeleted()){
+			if (this.parameterList.getDeleteOption() == null && !this.redoBackup.isDeleted()) {
 				this.redoBackup.updateLastModified(null);
 				TaskList.getInstance().updateTask(this.redoBackup);
 			} else {

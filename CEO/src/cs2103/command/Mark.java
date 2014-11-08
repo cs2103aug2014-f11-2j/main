@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.command;
 
 import java.util.Date;
@@ -28,7 +29,7 @@ public class Mark extends InfluentialCommand {
 	 * @throws HandledException
 	 * @throws FatalException
 	 */
-	public Mark(String command) throws HandledException, FatalException{
+	public Mark(String command) throws HandledException, FatalException {
 		this.parameterList.addParameter(TaskID.parse(command));
 		CommonUtil.checkNull(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_TASKID);
 		this.target = TaskList.getInstance().getTaskByID(this.parameterList.getTaskID().getValue());
@@ -38,7 +39,7 @@ public class Mark extends InfluentialCommand {
 	public Ansi execute() throws HandledException, FatalException {
 		assert(this.target != null);
 		Logger.getInstance().writeLog(this.formatLogString());
-		if (this.target instanceof PeriodicTask){
+		if (this.target instanceof PeriodicTask) {
 			return ansi().fg(RED).a(String.format(MESSAGE_MARK_NOTSUPPORTED, this.parameterList.getTaskID().getValue())).reset();
 		} else {
 			Task newTask = cloneTask(this.target);
@@ -53,9 +54,9 @@ public class Mark extends InfluentialCommand {
 	 * @return Ansi formatted result string for Mark command
 	 * @throws HandledException
 	 */
-	private Ansi formatReturnString(Task newTask) throws HandledException{
+	private Ansi formatReturnString(Task newTask) throws HandledException {
 		Ansi returnString = ansi();
-		if (newTask == null){
+		if (newTask == null) {
 			return returnString.fg(RED).a(String.format(MESSAGE_MARK_FAILED, this.parameterList.getTaskID().getValue())).reset();
 		} else {
 			this.undoBackup = this.target;
@@ -72,7 +73,7 @@ public class Mark extends InfluentialCommand {
 
 	@Override
 	public InfluentialCommand undo() throws HandledException, FatalException {
-		if (this.undoBackup == null){
+		if (this.undoBackup == null) {
 			return null;
 		} else {
 			this.undoBackup.updateLastModified(null);
@@ -83,7 +84,7 @@ public class Mark extends InfluentialCommand {
 	
 	@Override
 	public InfluentialCommand redo() throws HandledException, FatalException {
-		if (this.redoBackup == null){
+		if (this.redoBackup == null) {
 			return null;
 		} else {
 			this.redoBackup.updateLastModified(null);

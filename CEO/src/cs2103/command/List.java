@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.command;
 
 import org.fusesource.jansi.Ansi;
@@ -15,7 +16,7 @@ public class List extends QueryCommand {
 	 * Creates an instance of List from user input
 	 * @param command
 	 */
-	public List(String command){
+	public List(String command) {
 		this.parameterList.addParameter(TaskType.parse(command));
 	}
 	
@@ -23,7 +24,7 @@ public class List extends QueryCommand {
 	public Ansi execute() throws HandledException, FatalException {
 		CommonUtil.checkNull(this.parameterList.getTaskType(), HandledException.ExceptionType.INVALID_CMD);
 		Logger.getInstance().writeLog(this.formatLogString());
-		switch (this.parameterList.getTaskType().getValue()){
+		switch (this.parameterList.getTaskType().getValue()) {
 		case FLOATING:
 			return parseListResponse(TaskList.getInstance().getFloatingList());
 		case DEADLINE:

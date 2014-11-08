@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.command;
 
 import org.fusesource.jansi.Ansi;
@@ -20,7 +21,7 @@ public class Show extends QueryCommand {
 	 * @param command
 	 * @throws HandledException
 	 */
-	public Show(String command) throws HandledException{
+	public Show(String command) throws HandledException {
 		this.parameterList.addParameter(TaskID.parse(command));
 	}
 	
@@ -36,8 +37,8 @@ public class Show extends QueryCommand {
 	 * @return Ansi formatted string result
 	 * @throws HandledException
 	 */
-	private Ansi formatReturnString(Task task) throws HandledException{
-		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
+	private Ansi formatReturnString(Task task) throws HandledException {
+		assert(task != null);
 		Ansi returnString = ansi().a(String.format(MESSAGE_SHOW_FORMAT, task.getTaskID()));
 		returnString.a(task.toDetail());
 		return returnString;
