@@ -23,7 +23,6 @@ import net.fortuna.ical4j.model.property.Status;
 public class PeriodicTask extends EventTask {
 	private String location;
 	private Recur recurrence;
-	private final Logger logger;
 
 	private static final String STRING_LOCATION = "Location: ";
 	private static final String STRING_RECUR = "Recurrence: ";
@@ -31,7 +30,6 @@ public class PeriodicTask extends EventTask {
 	
 	public PeriodicTask(String taskUID, Status status, Date startTime, Date endTime) throws HandledException {
 		super(taskUID, status, startTime, endTime);
-		this.logger = Logger.getInstance();
 	}
 	
 	/**
@@ -326,7 +324,7 @@ public class PeriodicTask extends EventTask {
 			} else {
 				Date endTime = calculateEndTimeFromRecur(startTime);
 				assert(endTime != null);
-				this.logger.writeLog(CommonUtil.formatLogString(LOG_UPDATEFROMRECUR, this));
+				Logger.getInstance().writeLog(CommonUtil.formatLogString(LOG_UPDATEFROMRECUR, this));
 				this.updateTime(startTime, endTime);
 				this.updateLastModified(null);
 				return this;

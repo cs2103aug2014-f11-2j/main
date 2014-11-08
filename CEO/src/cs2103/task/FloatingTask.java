@@ -5,16 +5,12 @@ import java.util.Date;
 import org.fusesource.jansi.Ansi;
 
 import cs2103.exception.HandledException;
-import cs2103.util.Logger;
 import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.Status;
 
 public class FloatingTask extends ToDoTask {
-	private final Logger logger;
-	
 	public FloatingTask(String taskUID, Status status) {
 		super(taskUID, status);
-		this.logger = Logger.getInstance();
 	}
 	
 	/* (non-Javadoc)
