@@ -31,7 +31,7 @@ public class MarkTest {
 	@BeforeClass
 	public static void initialise() throws HandledException, FatalException{
 		TaskList.getInstance(new Option(Option.Value.TEST));
-		d = new Date();
+		
 	}
 	
 	@Test
@@ -39,6 +39,7 @@ public class MarkTest {
 		Add addObj = new Add("-title floating");
 		addObj.execute();
 		Mark markFloating = new Mark("1");
+		d = new Date();
 		ParameterList pl = markFloating.getParameterList();
 		assertEquals(1,pl.getTaskID().getValue());
 		Task ft = new FloatingTask(null, null);
@@ -48,7 +49,10 @@ public class MarkTest {
 		ft.updateCompleted(d);
 		markFloating.execute();
 		for(Task t : TaskList.getInstance().getFloatingList()){
-			assertTrue(TestUtil.compareTasks(t, ft));
+			if(t.getTitle().toString().equals("floating")){
+				assertTrue(TestUtil.compareTasks(t, ft));
+			}
+			
 		}
 	}
 	
@@ -57,6 +61,7 @@ public class MarkTest {
 		Add addObj = new Add("-title periodic -time 2014/10/23 20:20 to 2014/10/25 20:20");
 		addObj.execute();
 		Mark markPeriodic = new Mark("3");
+		d = new Date();
 		ParameterList pl = markPeriodic.getParameterList();
 		assertEquals(3,pl.getTaskID().getValue());
 		String result = markPeriodic.execute().toString();
@@ -69,6 +74,7 @@ public class MarkTest {
 		Add addObj = new Add("-title deadline -time 2014/10/23 20:20");
 		addObj.execute();
 		Mark markDeadline = new Mark("2");
+		d = new Date();
 		ParameterList pl = markDeadline.getParameterList();
 		assertEquals(2,pl.getTaskID().getValue());
 		markDeadline.execute();
@@ -80,7 +86,34 @@ public class MarkTest {
 		pt.updateCompleted(d);
 		markDeadline.execute();
 		for(Task t: TaskList.getInstance().getDeadlineList()){
-			TestUtil.compareTasks(t, pt);
+			assertTrue(TestUtil.compareTasks(t, pt));
+		}
+	}
+	
+	@Test 
+	public void test4_UndoRedoTask_Mark() throws HandledException, FatalException{
+		Add addObj = new Add("-title mark");
+		addObj.execute();
+		Mark markFloating = new Mark("4");
+		d = new Date();
+		markFloating.execute();
+		markFloating.undo();
+		Task ft = new FloatingTask(null, null);
+		ft.updateTitle("mark");
+		ft.updateDescription(null);
+		ft.updateLastModified(null);
+		ft.updateCompleted(d);
+		for(Task t : TaskList.getInstance().getFloatingList()){
+			if(t.getTitle().toString().equals("mark")){
+				assertFalse(TestUtil.compareTasks(t, ft));
+			}
+		}
+		
+		markFloating.redo();
+		for(Task t : TaskList.getInstance().getFloatingList()){
+			if(t.getTitle().toString().equals("mark")){
+				assertTrue(TestUtil.compareTasks(t, ft));
+			}
 		}
 	}
 }

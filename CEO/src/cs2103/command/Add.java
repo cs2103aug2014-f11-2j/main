@@ -42,7 +42,7 @@ public class Add extends InfluentialCommand {
 	 */
 	public Add(String command) throws HandledException{
 		this.logger = Logger.getInstance();
-		this.logger.writeLog(LOG_INITIALIZE);
+		
 		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> parameterQueue = separateCommand(command);
 		if (!command.startsWith("-")){
@@ -59,6 +59,7 @@ public class Add extends InfluentialCommand {
 	@Override
 	public Ansi execute() throws HandledException, FatalException {
 		Task task;
+		this.logger.writeLog(LOG_INITIALIZE);
 		Date[] time = getTime(this.parameterList.getTime());
 		if (time[0] == null){
 			task = new FloatingTask(null, null);
