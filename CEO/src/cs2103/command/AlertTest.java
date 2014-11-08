@@ -1,4 +1,3 @@
-//@author A0112673L
 package cs2103.command;
 
 import static org.fusesource.jansi.Ansi.ansi;
@@ -25,7 +24,7 @@ import cs2103.task.Task;
 public class AlertTest {
 	
 
-	@BeforeClass	
+	@BeforeClass
 	public static void initialise() throws HandledException, FatalException{
 		TaskList.getInstance(new Option(Option.Value.TEST));		
 	}
@@ -69,7 +68,7 @@ public class AlertTest {
 		Date dt_to = new Date();
 		Calendar cDuring_to = Calendar.getInstance(); 
 		cDuring_to.setTime(dt_to); 
-		cDuring_to.add(Calendar.HOUR_OF_DAY, 23);
+		cDuring_to.add(Calendar.DATE, 1);
 		dt_to = cDuring_to.getTime();
 		
 		Date[]deadlineTask_time = new Date[2];
@@ -81,11 +80,13 @@ public class AlertTest {
 		
 		Alert alert = new Alert();
 		Task dead = TaskList.getInstance().getDeadlineList().get(0);
-		dead = dead.update(deadlineTask_time);
-		TaskList.getInstance().updateTask(dead);
+		TaskList.getInstance().updateTask(dead.update(deadlineTask_time));
+		dead = TaskList.getInstance().getDeadlineList().get(0);
+		
 		Task period = TaskList.getInstance().getPeriodicList().get(0);
-		period = period.update(periodicTask_time);
-		TaskList.getInstance().updateTask(period);
+		TaskList.getInstance().updateTask(period.update(periodicTask_time));
+		period = TaskList.getInstance().getPeriodicList().get(0);
+		
 		boolean check = dead.checkAlert();
 		assertTrue(check);
 		check = period.checkAlert();
@@ -103,30 +104,36 @@ public class AlertTest {
 		Date dt = new Date();
 		Calendar cAfter_from = Calendar.getInstance(); 
 		cAfter_from.setTime(dt); 
-		cAfter_from.add(Calendar.DATE, 2);
+		cAfter_from.add(Calendar.HOUR_OF_DAY, 25);
 		dt = cAfter_from.getTime();
 		
 		Date dt_to = new Date();
 		Calendar cAfter_TO = Calendar.getInstance(); 
 		cAfter_TO.setTime(dt_to); 
-		cAfter_TO.add(Calendar.HOUR_OF_DAY, 50);
+		cAfter_TO.add(Calendar.HOUR_OF_DAY, 45);
 		dt_to = cAfter_TO.getTime();
 		
-		Date[]time = new Date[2];
-		time[0] = dt;
-		time[1] = dt_to;
+		Date[]deadlineTask_time = new Date[2];
+		deadlineTask_time[0] = dt;
+	
+		Date[]periodicTask_time = new Date[2];
+		periodicTask_time[0] = dt;
+		periodicTask_time[1] = dt_to;
 		
 		Alert alert = new Alert();
 		
 		Task dead = TaskList.getInstance().getDeadlineList().get(0);
-		dead = dead.update(time);
-		TaskList.getInstance().updateTask(dead);
-		Task period = TaskList.getInstance().getPeriodicList().get(0);
-		period = period.update(time);
-		TaskList.getInstance().updateTask(period);
+		TaskList.getInstance().updateTask(dead.update(deadlineTask_time));
+		dead = TaskList.getInstance().getDeadlineList().get(0);
 		
-		assertFalse(dead.checkAlert());
-		assertFalse(period.checkAlert());
+		Task period = TaskList.getInstance().getPeriodicList().get(0);
+		TaskList.getInstance().updateTask(period.update(periodicTask_time));
+		period = TaskList.getInstance().getPeriodicList().get(0);
+		
+		boolean check = dead.checkAlert();
+		assertFalse(check);
+		check = period.checkAlert();
+		assertFalse(check);
 		String result = alert.execute().toString();
 		assertEquals(ansi().a("Tasks due within one day:\n").bold().fg(RED).a("The task list is empty\n").reset()
 				.a("Tasks start within one day:\n").bold().fg(RED).a("The task list is empty\n").reset().toString(),result);
