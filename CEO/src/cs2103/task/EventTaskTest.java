@@ -8,6 +8,7 @@ import static org.junit.Assert.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.property.Status;
@@ -72,7 +73,7 @@ public abstract class EventTaskTest extends TaskTest{
 	}
 
 	private Ansi generateDateToStringExpected(DateTime testDate) {
-		DateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm a");
+		DateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm a", Locale.US);
 		Ansi expected = ansi().bold().fg(GREEN).a(format.format(testDate)).reset();
 		return expected;
 	}
