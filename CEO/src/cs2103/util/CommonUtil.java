@@ -68,7 +68,7 @@ public class CommonUtil {
 	 * @param expectedException
 	 * @throws HandledException
 	 */
-	public static void checkNull(Object obj, HandledException.ExceptionType expectedException) throws HandledException{
+	public static void checkNull(Object obj, HandledException.ExceptionType expectedException) throws HandledException {
 		if (obj == null) throw new HandledException(expectedException);
 	}
 	
@@ -168,7 +168,7 @@ public class CommonUtil {
 	 * 
 	 * @return a true value if system supports google sync false otherwise
 	 */
-	public static boolean checkSyncSupport(){
+	public static boolean checkSyncSupport() {
 		try{
 			if (Desktop.isDesktopSupported()) {
 				Desktop desktop = Desktop.getDesktop();

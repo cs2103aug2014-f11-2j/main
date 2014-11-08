@@ -1,3 +1,4 @@
+//@author A0128478R
 package cs2103.task;
 
 import java.util.Date;
@@ -20,9 +21,9 @@ public class FloatingTask extends ToDoTask {
 	protected Task convert(Date[] time) throws HandledException {
 		if (isInvalidTime(time)) {
 			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
-		} else if (isBothTimeNull(time)){
+		} else if (isBothTimeNull(time)) {
 			return this.toFloating();
-		} else if (isFirstTimeNull(time)){
+		} else if (isFirstTimeNull(time)) {
 			return this.toDeadline(time[0]);
 		} else {
 			return this.toPeriodic(time[0], time[1]);

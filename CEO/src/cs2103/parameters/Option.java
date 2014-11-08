@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.parameters;
 
 import cs2103.exception.HandledException;
@@ -13,7 +14,7 @@ public class Option implements Parameter {
 	/**
 	 * @param value
 	 */
-	public Option(Value value){
+	public Option(Value value) {
 		this.value = value;
 	}
 	
@@ -25,7 +26,7 @@ public class Option implements Parameter {
 	/**
 	 * @return Value enumerator for Option
 	 */
-	public Value getValue(){
+	public Value getValue() {
 		return this.value;
 	}
 	
@@ -34,7 +35,7 @@ public class Option implements Parameter {
 	 * @return Option object from String array optionString
 	 * @throws HandledException
 	 */
-	public static Option parse(String[] optionString) throws HandledException{
+	public static Option parse(String[] optionString) throws HandledException {
 		return new Option(parseOption(optionString));
 	}
 	
@@ -43,16 +44,16 @@ public class Option implements Parameter {
 	 * @return Value enumerator that matches the String option in 1st index of String array optionString
 	 * @throws HandledException
 	 */
-	private static Value parseOption(String[] optionString) throws HandledException{
-		if (optionString == null || optionString.length < 1){
+	private static Value parseOption(String[] optionString) throws HandledException {
+		if (optionString == null || optionString.length < 1) {
 			return Value.DEFAULT;
 		} else {
 			String option = CommonUtil.removeDash(optionString[0]);
-			if (option.equalsIgnoreCase("nosync") || option.equalsIgnoreCase("no-sync") || option.equalsIgnoreCase("disable-sync") || option.equalsIgnoreCase("disable")){
+			if (option.equalsIgnoreCase("nosync") || option.equalsIgnoreCase("no-sync") || option.equalsIgnoreCase("disable-sync") || option.equalsIgnoreCase("disable")) {
 				return Value.NOSYNC;
-			} else if (option.equalsIgnoreCase("test")){
+			} else if (option.equalsIgnoreCase("test")) {
 				return Value.TEST;
-			} else if (option.equalsIgnoreCase("sync") || option.equalsIgnoreCase("enable-sync") || option.equalsIgnoreCase("enable")){
+			} else if (option.equalsIgnoreCase("sync") || option.equalsIgnoreCase("enable-sync") || option.equalsIgnoreCase("enable")) {
 				return Value.SYNC;
 			} else {
 				return Value.DEFAULT;

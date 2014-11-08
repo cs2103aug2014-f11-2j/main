@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.parameters;
 
 public class Description implements Parameter {
@@ -8,14 +9,14 @@ public class Description implements Parameter {
 	/**
 	 * @param description
 	 */
-	public Description(String description){
+	public Description(String description) {
 		this.description = description;
 	}
 	
 	/**
 	 * @return String description of Description
 	 */
-	public String getValue(){
+	public String getValue() {
 		return this.description;
 	}
 	
@@ -28,8 +29,8 @@ public class Description implements Parameter {
 	 * @param description
 	 * @return Description object of string description, or null if description is null
 	 */
-	public static Description parse(String description){
-		if (description == null){
+	public static Description parse(String description) {
+		if (description == null) {
 			return null;
 		} else {
 			return new Description(description);

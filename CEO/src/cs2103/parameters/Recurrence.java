@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.parameters;
 
 import java.util.regex.Matcher;
@@ -15,14 +16,14 @@ public class Recurrence implements Parameter {
 	/**
 	 * @param recur
 	 */
-	public Recurrence(Recur recur){
+	public Recurrence(Recur recur) {
 		this.recur = recur;
 	}
 	
 	/**
 	 * @return Recur object of Recurrence
 	 */
-	public Recur getValue(){
+	public Recur getValue() {
 		return this.recur;
 	}
 
@@ -36,8 +37,8 @@ public class Recurrence implements Parameter {
 	 * @return Recurrence object of String recurrenceString
 	 * @throws HandledException
 	 */
-	public static Recurrence parse(String recurrenceString) throws HandledException{
-		if (recurrenceString == null){
+	public static Recurrence parse(String recurrenceString) throws HandledException {
+		if (recurrenceString == null) {
 			return null;
 		} else {
 			return new Recurrence(stringToRecur(recurrenceString));
@@ -49,13 +50,13 @@ public class Recurrence implements Parameter {
 	 * @return Recur object from String recurrenceString, or null if String recurrenceString does not specify a correct recurring period
 	 * @throws HandledException
 	 */
-	private static Recur stringToRecur(String recurrenceString) throws HandledException{
+	private static Recur stringToRecur(String recurrenceString) throws HandledException {
 		int interval = parseInterval(recurrenceString);
-		if (interval == 0){
+		if (interval == 0) {
 			return null;
 		} else {
 			String frequency = parseFrequency(recurrenceString);
-			if (frequency == null){
+			if (frequency == null) {
 				return null;
 			} else {
 				Recur recur=new Recur();
@@ -71,10 +72,10 @@ public class Recurrence implements Parameter {
 	 * @return int value of recurrence period, or 1 if recurrence period cannot be found
 	 * @throws HandledException
 	 */
-	private static int parseInterval(String recurrenceString) throws HandledException{
+	private static int parseInterval(String recurrenceString) throws HandledException {
 		Pattern p = Pattern.compile("([0-9]+)");
 		Matcher m = p.matcher(recurrenceString);
-		if (m.find()){
+		if (m.find()) {
 			recurrenceString = recurrenceString.substring(m.start()).trim();
 			return CommonUtil.parseIntegerParameter(m.group(0));
 		} else {
@@ -87,20 +88,20 @@ public class Recurrence implements Parameter {
 	 * @return String time counter(hourly, daily etc) for recurrence, or null if time counter cannot be found
 	 * @throws HandledException
 	 */
-	private static String parseFrequency(String recurrenceString) throws HandledException{
+	private static String parseFrequency(String recurrenceString) throws HandledException {
 		Pattern p = Pattern.compile("([A-Za-z]+)");
 		Matcher m = p.matcher(recurrenceString);
-		while (m.find()){
+		while (m.find()) {
 			String found=m.group(0);
-			if (found.equalsIgnoreCase("h") || found.equalsIgnoreCase("hour") || found.equalsIgnoreCase("hours") || found.equalsIgnoreCase("hourly")){
+			if (found.equalsIgnoreCase("h") || found.equalsIgnoreCase("hour") || found.equalsIgnoreCase("hours") || found.equalsIgnoreCase("hourly")) {
 				return Recur.HOURLY;
-			} else if (found.equalsIgnoreCase("d") || found.equalsIgnoreCase("day") || found.equalsIgnoreCase("days") || found.equalsIgnoreCase("daily")){
+			} else if (found.equalsIgnoreCase("d") || found.equalsIgnoreCase("day") || found.equalsIgnoreCase("days") || found.equalsIgnoreCase("daily")) {
 				return Recur.DAILY;
-			} else if (found.equalsIgnoreCase("w") || found.equalsIgnoreCase("week") || found.equalsIgnoreCase("weeks") || found.equalsIgnoreCase("weekly")){
+			} else if (found.equalsIgnoreCase("w") || found.equalsIgnoreCase("week") || found.equalsIgnoreCase("weeks") || found.equalsIgnoreCase("weekly")) {
 				return Recur.WEEKLY;
-			} else if (found.equalsIgnoreCase("m") || found.equalsIgnoreCase("month") || found.equalsIgnoreCase("months") || found.equalsIgnoreCase("monthly")){
+			} else if (found.equalsIgnoreCase("m") || found.equalsIgnoreCase("month") || found.equalsIgnoreCase("months") || found.equalsIgnoreCase("monthly")) {
 				return Recur.MONTHLY;
-			} else if (found.equalsIgnoreCase("y") || found.equalsIgnoreCase("year") || found.equalsIgnoreCase("years") || found.equalsIgnoreCase("yearly")){
+			} else if (found.equalsIgnoreCase("y") || found.equalsIgnoreCase("year") || found.equalsIgnoreCase("years") || found.equalsIgnoreCase("yearly")) {
 				return Recur.YEARLY;
 			}
 		}

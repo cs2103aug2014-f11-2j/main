@@ -1,3 +1,4 @@
+//@author A0128478R
 package cs2103.task;
 
 import java.text.DateFormat;
@@ -24,12 +25,12 @@ public class DeadlineTask extends ToDoTask {
 	/**
 	 * @return the due time as in RFC2445 iCalendar specification
 	 */
-	public DateTime getDueTime(){
+	public DateTime getDueTime() {
 		return this.dueTime;
 	}
 	
-	private void updateDueTime(Date dueTime) throws HandledException{
-		if (dueTime == null){
+	private void updateDueTime(Date dueTime) throws HandledException {
+		if (dueTime == null) {
 			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
 		} else {
 			this.dueTime = new DateTime(dueTime);
@@ -43,9 +44,9 @@ public class DeadlineTask extends ToDoTask {
 	protected Task convert(Date[] time) throws HandledException {
 		if (isInvalidTime(time)) {
 			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
-		} else if (isBothTimeNull(time)){
+		} else if (isBothTimeNull(time)) {
 			return this.toFloating();
-		} else if (isFirstTimeNull(time)){
+		} else if (isFirstTimeNull(time)) {
 			return this.toDeadline(time[0]);
 		} else {
 			return this.toPeriodic(time[0], time[1]);
@@ -115,11 +116,11 @@ public class DeadlineTask extends ToDoTask {
 	/**
 	 * @return the comparator for sorting
 	 */
-	public static sortComparator getComparator(){
+	public static sortComparator getComparator() {
 		return new sortComparator();
 	}
 	
-	private static class sortComparator implements Comparator<DeadlineTask>{
+	private static class sortComparator implements Comparator<DeadlineTask> {
 		@Override
 		public int compare(DeadlineTask o1, DeadlineTask o2) {
 			return o1.getDueTime().compareTo(o2.getDueTime());
@@ -131,9 +132,9 @@ public class DeadlineTask extends ToDoTask {
 	 */
 	@Override
 	public boolean checkPeriod(Date[] time) {
-		if (isNullTimePeriod(time)){
+		if (isNullTimePeriod(time)) {
 			return true;
-		} else if (isSecondTimeNull(time)){
+		} else if (isSecondTimeNull(time)) {
 			return checkTimeBeforeDueTime(time);
 		} else {
 			return checkDueTimeBetweenTimes(time);
@@ -181,7 +182,7 @@ public class DeadlineTask extends ToDoTask {
 	 * @see cs2103.task.ToDoTask#toGTask()
 	 */
 	@Override
-	public com.google.api.services.tasks.model.Task toGTask(){
+	public com.google.api.services.tasks.model.Task toGTask() {
 		com.google.api.services.tasks.model.Task gTask = new com.google.api.services.tasks.model.Task();
 		this.addGTaskProperty(gTask);
 		gTask.setDue(new com.google.api.client.util.DateTime(this.getDueTime().getTime()));

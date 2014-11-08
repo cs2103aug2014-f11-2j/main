@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.parameters;
 
 public class Keyword implements Parameter {
@@ -7,14 +8,14 @@ public class Keyword implements Parameter {
 	/**
 	 * @param keyword
 	 */
-	public Keyword(String keyword){
+	public Keyword(String keyword) {
 		this.keyword = keyword;
 	}
 	
 	/**
 	 * @return String value of Keyword keyword
 	 */
-	public String getValue(){
+	public String getValue() {
 		return this.keyword;
 	}
 	
@@ -27,8 +28,8 @@ public class Keyword implements Parameter {
 	 * @param keyword
 	 * @return Keyword object of string keyword, or null if keyword is null
 	 */
-	public static Keyword parse(String keyword){
-		if (keyword == null){
+	public static Keyword parse(String keyword) {
+		if (keyword == null) {
 			return null;
 		} else {
 			return new Keyword(keyword);

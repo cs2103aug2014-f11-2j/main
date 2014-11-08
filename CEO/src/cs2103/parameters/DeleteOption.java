@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.parameters;
 
 public class DeleteOption implements Parameter {
@@ -8,14 +9,14 @@ public class DeleteOption implements Parameter {
 	/**
 	 * @param permanent
 	 */
-	public DeleteOption(boolean permanent){
+	public DeleteOption(boolean permanent) {
 		this.permanent = permanent;
 	}
 	
 	/**
 	 * @return boolean value for permanent
 	 */
-	public boolean getValue(){
+	public boolean getValue() {
 		return this.permanent;
 	}
 	
@@ -23,8 +24,8 @@ public class DeleteOption implements Parameter {
 	 * @param permanent
 	 * @return DeleteOption object, or null if permanent is null
 	 */
-	public static DeleteOption parse(String permanent){
-		if (permanent == null){
+	public static DeleteOption parse(String permanent) {
+		if (permanent == null) {
 			return null;
 		} else {
 			return new DeleteOption(true);

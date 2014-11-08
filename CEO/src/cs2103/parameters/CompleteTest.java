@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.parameters;
 
 import static org.junit.Assert.*;
@@ -21,7 +22,7 @@ public class CompleteTest {
 	
 	@SuppressWarnings("unused")
 	@Test (expected = HandledException.class)
-	public void testInvalidString() throws HandledException{
+	public void testInvalidString() throws HandledException {
 		Complete check = Complete.parse("hello");
 	}
 	

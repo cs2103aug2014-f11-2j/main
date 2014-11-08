@@ -1,3 +1,4 @@
+//@author A0128478R
 package cs2103.task;
 
 import java.util.ArrayList;
@@ -35,15 +36,15 @@ public class PeriodicTask extends EventTask {
 	/**
 	 * @return the location String
 	 */
-	public String getLocation(){
+	public String getLocation() {
 		return this.location;
 	}
 	
 	/* (non-Javadoc)
 	 * @see cs2103.task.Task#updateLocation(java.lang.String)
 	 */
-	public void updateLocation(String location){
-		if (location == null){
+	public void updateLocation(String location) {
+		if (location == null) {
 			this.location = "";
 		} else {
 			this.location = location;
@@ -53,14 +54,14 @@ public class PeriodicTask extends EventTask {
 	/**
 	 * @return the Recurrence object
 	 */
-	public Recur getRecurrence(){
+	public Recur getRecurrence() {
 		return this.recurrence;
 	}
 	
 	/* (non-Javadoc)
 	 * @see cs2103.task.Task#updateRecurrence(net.fortuna.ical4j.model.Recur)
 	 */
-	public void updateRecurrence(Recur recurrence){
+	public void updateRecurrence(Recur recurrence) {
 		this.recurrence = recurrence;
 	}
 	
@@ -71,9 +72,9 @@ public class PeriodicTask extends EventTask {
 	protected Task convert(Date[] time) throws HandledException {
 		if (isInvalidTime(time)) {
 			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
-		} else if (isBothTimeNull(time)){
+		} else if (isBothTimeNull(time)) {
 			return this.toFloating();
-		} else if (isFirstTimeNull(time)){
+		} else if (isFirstTimeNull(time)) {
 			return this.toDeadline(time[0]);
 		} else {
 			return this.toPeriodic(time[0], time[1]);
@@ -142,7 +143,7 @@ public class PeriodicTask extends EventTask {
 	public Ansi toSummary() {
 		Ansi returnString = this.addCommonString();
 		formatStartEndTime(returnString);
-		if (hasRecurrence()){
+		if (hasRecurrence()) {
 			formatRecurrence(returnString);
 		}
 		return returnString;
@@ -181,15 +182,15 @@ public class PeriodicTask extends EventTask {
 		returnString.a(STRING_DESCRIPTION).a(this.getDescription()).reset().a('\n');
 	}
 	
-	private static Ansi recurToString(Recur recur){
+	private static Ansi recurToString(Recur recur) {
 		Ansi returnString = ansi().a(STRING_RECUR);
 		returnString.fg(YELLOW).a(recur.getInterval()).a(' ');
 		returnString.a(recur.getFrequency()).reset();
 		return returnString;
 	}
 	
-	private static List<String> recurToGoogle(Recur recur){
-		if (recur == null){
+	private static List<String> recurToGoogle(Recur recur) {
+		if (recur == null) {
 			return null;
 		} else {
 			return generateRecurrenceList(recur);
@@ -208,7 +209,7 @@ public class PeriodicTask extends EventTask {
 	public VEvent toVEvent() {
 		VEvent vEvent = new VEvent(this.getStartTime(), this.getEndTime(),this.getTitle());
 		this.addCommonProperty(vEvent);
-		if (hasRecurrence()){
+		if (hasRecurrence()) {
 			vEvent.getProperties().add(new RRule(this.getRecurrence()));
 		}
 		vEvent.getProperties().add(this.getStatus());
@@ -216,7 +217,7 @@ public class PeriodicTask extends EventTask {
 		return vEvent;
 	}
 	
-	public com.google.api.services.calendar.model.Event toGEvent(){
+	public com.google.api.services.calendar.model.Event toGEvent() {
 		com.google.api.services.calendar.model.Event gEvent = new com.google.api.services.calendar.model.Event();
 		this.addGEventProperty(gEvent);
 		gEvent.setLocation(this.getLocation());
@@ -228,14 +229,14 @@ public class PeriodicTask extends EventTask {
 	/**
 	 * @return the comparator for sorting
 	 */
-	public static sortComparator getComparator(){
+	public static sortComparator getComparator() {
 		return new sortComparator();
 	}
 
 	/**
 	 * Special class to compare Periodic Tasks
 	 */
-	private static class sortComparator implements Comparator<PeriodicTask>{
+	private static class sortComparator implements Comparator<PeriodicTask> {
 		@Override
 		public int compare(PeriodicTask o1, PeriodicTask o2) {
 			return o1.getStartTime().compareTo(o2.getStartTime());
@@ -244,9 +245,9 @@ public class PeriodicTask extends EventTask {
 
 	@Override
 	public boolean checkPeriod(Date[] time) {
-		if (isNullTimePeriod(time)){
+		if (isNullTimePeriod(time)) {
 			return true;
-		} else if (isFirstTimeNull(time)){
+		} else if (isFirstTimeNull(time)) {
 			return checkTimeAfterStartTime(time[0]);
 		} else {
 			return checkStartTimeBetweenTimes(time);
@@ -317,9 +318,9 @@ public class PeriodicTask extends EventTask {
 	 */
 	public PeriodicTask updateTimeFromRecur() throws HandledException {
 		DateTime now = new DateTime();
-		if (hasRecurrenceAndFrequency() && endTimeBeforeNow(now)){
+		if (hasRecurrenceAndFrequency() && endTimeBeforeNow(now)) {
 			Date startTime = calculateStartTimeFromRecur(now);
-			if (startTime == null){
+			if (startTime == null) {
 				return null;
 			} else {
 				Date endTime = calculateEndTimeFromRecur(startTime);

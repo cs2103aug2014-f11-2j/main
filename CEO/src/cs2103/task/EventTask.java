@@ -1,3 +1,4 @@
+//@author A0128478R
 package cs2103.task;
 
 import java.util.Date;
@@ -30,21 +31,21 @@ public abstract class EventTask extends Task {
 	/**
 	 * @return the start time as in RFC2445 iCalendar specification
 	 */
-	public DateTime getStartTime(){
+	public DateTime getStartTime() {
 		return this.startTime;
 	}
 	
 	/**
 	 * @return the end time as in RFC2445 iCalendar specification
 	 */
-	public DateTime getEndTime(){
+	public DateTime getEndTime() {
 		return this.endTime;
 	}
 	
-	protected void updateTime(Date startTime, Date endTime) throws HandledException{
+	protected void updateTime(Date startTime, Date endTime) throws HandledException {
 		checkInvalidTimes(startTime, endTime);
 		this.startTime = new DateTime(startTime);
-		if (isAntique(startTime, endTime)){
+		if (isAntique(startTime, endTime)) {
 			this.endTime = new DateTime(startTime.getTime() + YEAR_IN_MILLIS);
 		} else {
 			this.endTime = new DateTime(endTime);
@@ -99,8 +100,8 @@ public abstract class EventTask extends Task {
 	 * @see cs2103.task.Task#updateStatus(net.fortuna.ical4j.model.property.Status)
 	 */
 	@Override
-	protected void updateStatus(Status status){
-		if (status == null){
+	protected void updateStatus(Status status) {
+		if (status == null) {
 			this.status = Status.VEVENT_CONFIRMED;
 		} else {
 			this.status = status;
@@ -139,7 +140,7 @@ public abstract class EventTask extends Task {
 		return this.toVEvent();
 	}
 	
-	protected void addGEventProperty(com.google.api.services.calendar.model.Event gEvent){
+	protected void addGEventProperty(com.google.api.services.calendar.model.Event gEvent) {
 		assert(gEvent != null);
 		gEvent.setSummary(this.getTitle());
 		gEvent.setDescription(this.getDescription());
@@ -149,7 +150,7 @@ public abstract class EventTask extends Task {
 		gEvent.setEnd(dateTimeToEventDateTime(this.getEndTime()));
 	}
 	
-	private static com.google.api.services.calendar.model.EventDateTime dateTimeToEventDateTime(DateTime time){
+	private static com.google.api.services.calendar.model.EventDateTime dateTimeToEventDateTime(DateTime time) {
 		com.google.api.services.calendar.model.EventDateTime eventDateTime = new com.google.api.services.calendar.model.EventDateTime();
 		eventDateTime.setTimeZone(TimeZone.getDefault().getID());
 		eventDateTime.setDate(Data.NULL_DATE_TIME);

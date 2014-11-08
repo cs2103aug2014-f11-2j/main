@@ -1,3 +1,4 @@
+//@author A0116713M
 package cs2103.parameters;
 
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import cs2103.exception.HandledException;
 public class ParameterList {
 	private Map<String, Parameter> parameterMap;
 	
-	public ParameterList(){
+	public ParameterList() {
 		parameterMap = new HashMap<String, Parameter>();
 	}
 	
@@ -19,11 +20,11 @@ public class ParameterList {
 	 * @return Parameter object that matches String typeString and type
 	 * @throws HandledException
 	 */
-	public <T extends Parameter> T getParameter(String typeString, Class<T> type) throws HandledException{
-		if (this.parameterMap.containsKey(typeString)){
+	public <T extends Parameter> T getParameter(String typeString, Class<T> type) throws HandledException {
+		if (this.parameterMap.containsKey(typeString)) {
 			Parameter parameter = this.parameterMap.get(typeString);
 			assert(parameter != null);
-			if (parameter.getClass() == type){
+			if (parameter.getClass() == type) {
 				return type.cast(parameter);
 			} else {
 				throw new HandledException(HandledException.ExceptionType.INVALID_PARA);
@@ -37,8 +38,8 @@ public class ParameterList {
 	 * Adds parameter into parameterMap
 	 * @param parameter
 	 */
-	public void addParameter(Parameter parameter){
-		if (parameter != null){
+	public void addParameter(Parameter parameter) {
+		if (parameter != null) {
 			parameterMap.put(parameter.getType(), parameter);
 		}
 	}
@@ -47,10 +48,10 @@ public class ParameterList {
 	 * Adds parameters from parameterList to parameterMap
 	 * @param parameterList
 	 */
-	public void addAllParameters(ArrayList<Parameter> parameterList){
-		if (parameterList != null){
-			for (Parameter parameter:parameterList){
-				if (parameter != null){
+	public void addAllParameters(ArrayList<Parameter> parameterList) {
+		if (parameterList != null) {
+			for (Parameter parameter:parameterList) {
+				if (parameter != null) {
 					this.addParameter(parameter);
 				}
 			}
@@ -60,7 +61,7 @@ public class ParameterList {
 	/**
 	 * @return int size of parameterMap
 	 */
-	public int getParameterCount(){
+	public int getParameterCount() {
 		return this.parameterMap.size();
 	}
 	
@@ -68,7 +69,7 @@ public class ParameterList {
 	 * @return Title object from ParameterMap
 	 * @throws HandledException
 	 */
-	public Title getTitle() throws HandledException{
+	public Title getTitle() throws HandledException {
 		return this.getParameter(Title.type, Title.class);
 	}
 	
@@ -76,7 +77,7 @@ public class ParameterList {
 	 * @return Description object from ParameterMap
 	 * @throws HandledException
 	 */
-	public Description getDescription() throws HandledException{
+	public Description getDescription() throws HandledException {
 		return this.getParameter(Description.type, Description.class);
 	}
 	
@@ -84,7 +85,7 @@ public class ParameterList {
 	 * @return Location object from ParameterMap
 	 * @throws HandledException
 	 */
-	public Location getLocation() throws HandledException{
+	public Location getLocation() throws HandledException {
 		return this.getParameter(Location.type, Location.class);
 	}
 	
@@ -92,7 +93,7 @@ public class ParameterList {
 	 * @return Time object from ParameterMap
 	 * @throws HandledException
 	 */
-	public Time getTime() throws HandledException{
+	public Time getTime() throws HandledException {
 		return this.getParameter(Time.type, Time.class);
 	}
 	
@@ -100,7 +101,7 @@ public class ParameterList {
 	 * @return Complete object from ParameterMap
 	 * @throws HandledException
 	 */
-	public Complete getComplete() throws HandledException{
+	public Complete getComplete() throws HandledException {
 		return this.getParameter(Complete.type, Complete.class);
 	}
 	
@@ -108,7 +109,7 @@ public class ParameterList {
 	 * @return Recurrence object from ParameterMap
 	 * @throws HandledException
 	 */
-	public Recurrence getRecurrence() throws HandledException{
+	public Recurrence getRecurrence() throws HandledException {
 		return this.getParameter(Recurrence.type, Recurrence.class);
 	}
 	
@@ -116,11 +117,11 @@ public class ParameterList {
 	 * @return TaskID object from ParameterMap
 	 * @throws HandledException
 	 */
-	public TaskID getTaskID() throws HandledException{
+	public TaskID getTaskID() throws HandledException {
 		return this.getParameter(TaskID.type, TaskID.class);
 	}
 	
-	public TaskType getTaskType() throws HandledException{
+	public TaskType getTaskType() throws HandledException {
 		return this.getParameter(TaskType.type, TaskType.class);
 	}
 	
@@ -128,7 +129,7 @@ public class ParameterList {
 	 * @return CommandType object from ParameterMap
 	 * @throws HandledException
 	 */
-	public CommandType getCommandType() throws HandledException{
+	public CommandType getCommandType() throws HandledException {
 		return this.getParameter(CommandType.type, CommandType.class);
 	}
 	
@@ -136,7 +137,7 @@ public class ParameterList {
 	 * @return Keyword object from ParameterMap
 	 * @throws HandledException
 	 */
-	public Keyword getKeyword() throws HandledException{
+	public Keyword getKeyword() throws HandledException {
 		return this.getParameter(Keyword.type, Keyword.class);
 	}
 	
@@ -144,7 +145,7 @@ public class ParameterList {
 	 * @return Delete object from ParameterMap
 	 * @throws HandledException
 	 */
-	public DeleteOption getDeleteOption() throws HandledException{
+	public DeleteOption getDeleteOption() throws HandledException {
 		return this.getParameter(DeleteOption.type, DeleteOption.class);
 	}
 	
@@ -152,7 +153,7 @@ public class ParameterList {
 	 * @return Option object from ParameterMap
 	 * @throws HandledException
 	 */
-	public Option getOption() throws HandledException{
+	public Option getOption() throws HandledException {
 		return this.getParameter(Option.type, Option.class);
 	}
 }

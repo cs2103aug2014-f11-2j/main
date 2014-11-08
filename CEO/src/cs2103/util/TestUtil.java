@@ -24,9 +24,9 @@ public class TestUtil {
 		if (task1.getCreated().getTime() != task2.getCreated().getTime()) return false;
 		if (!task1.getStatus().equals(task2.getStatus())) return false;
 		if (task1.getLastModified().getTime() != task2.getLastModified().getTime()) return false;
-		if (task1 instanceof ToDoTask && task2 instanceof ToDoTask){
+		if (task1 instanceof ToDoTask && task2 instanceof ToDoTask) {
 			return compareToDo((ToDoTask) task1, (ToDoTask) task2);
-		} else if (task1 instanceof EventTask && task2 instanceof EventTask){
+		} else if (task1 instanceof EventTask && task2 instanceof EventTask) {
 			return compareEvent((EventTask) task1, (EventTask) task2);
 		} else {
 			return false;
@@ -36,11 +36,11 @@ public class TestUtil {
 	private static boolean compareToDo(ToDoTask task1, ToDoTask task2) {
 		if (task1 == null || task2 == null) return false;
 		if (task1.getCompleted() == null ^ task2.getCompleted() == null) return false;
-		if (task1.getCompleted() != null && task2.getCompleted() != null){
+		if (task1.getCompleted() != null && task2.getCompleted() != null) {
 			if (task1.getCompleted().getTime() != task2.getCompleted().getTime()) return false;
 		}
 		if (task1 instanceof DeadlineTask ^ task2 instanceof DeadlineTask) return false;
-		if (task1 instanceof DeadlineTask && task2 instanceof DeadlineTask){
+		if (task1 instanceof DeadlineTask && task2 instanceof DeadlineTask) {
 			if (((DeadlineTask) task1).getDueTime().getTime() != ((DeadlineTask) task2).getDueTime().getTime()) return false;
 		}
 		return true;
@@ -51,10 +51,10 @@ public class TestUtil {
 		if (task1.getStartTime().getTime() != task2.getStartTime().getTime()) return false;
 		if (task1.getEndTime().getTime() != task2.getEndTime().getTime()) return false;
 		if (task1 instanceof PeriodicTask ^ task2 instanceof PeriodicTask) return false;
-		if (task1 instanceof PeriodicTask && task2 instanceof PeriodicTask){
+		if (task1 instanceof PeriodicTask && task2 instanceof PeriodicTask) {
 			if (!((PeriodicTask) task1).getLocation().equals(((PeriodicTask) task2).getLocation())) return false;
 			if (((PeriodicTask) task1).getRecurrence() == null ^ ((PeriodicTask) task2).getRecurrence() == null) return false;
-			if (((PeriodicTask) task1).getRecurrence() != null && ((PeriodicTask) task2).getRecurrence() != null){
+			if (((PeriodicTask) task1).getRecurrence() != null && ((PeriodicTask) task2).getRecurrence() != null) {
 				if (!((PeriodicTask) task1).getRecurrence().toString().equals(((PeriodicTask) task2).getRecurrence().toString())) return false;
 			}
 		}

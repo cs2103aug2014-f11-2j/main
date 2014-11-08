@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.parameters;
 
 public class TaskType implements Parameter {
@@ -9,11 +10,11 @@ public class TaskType implements Parameter {
 		ALL, FLOATING, DEADLINE, PERIODIC, DEFAULT, TRASH, INVALID;
 	}
 	
-	public TaskType(Value value){
+	public TaskType(Value value) {
 		this.value = value;
 	}
 	
-	public Value getValue(){
+	public Value getValue() {
 		return this.value;
 	}
 	
@@ -26,7 +27,7 @@ public class TaskType implements Parameter {
 	 * @param taskTypeString
 	 * @return TaskType object from String taskTypeString
 	 */
-	public static TaskType parse(String taskTypeString){
+	public static TaskType parse(String taskTypeString) {
 		return new TaskType(parseTaskType(taskTypeString));
 	}
 	
@@ -34,19 +35,19 @@ public class TaskType implements Parameter {
 	 * @param taskTypeString
 	 * @return Value enumerator of taskTypeString
 	 */
-	private static Value parseTaskType(String taskTypeString){
-		if (taskTypeString == null || taskTypeString.isEmpty()){
+	private static Value parseTaskType(String taskTypeString) {
+		if (taskTypeString == null || taskTypeString.isEmpty()) {
 			return Value.DEFAULT;
 		}
-		if (taskTypeString.equalsIgnoreCase("all")){
+		if (taskTypeString.equalsIgnoreCase("all")) {
 			return Value.ALL;
-		} else if (taskTypeString.equalsIgnoreCase("floating")){
+		} else if (taskTypeString.equalsIgnoreCase("floating")) {
 			return Value.FLOATING;
-		} else if (taskTypeString.equalsIgnoreCase("deadline")){
+		} else if (taskTypeString.equalsIgnoreCase("deadline")) {
 			return Value.DEADLINE;
-		} else if (taskTypeString.equalsIgnoreCase("periodic")){
+		} else if (taskTypeString.equalsIgnoreCase("periodic")) {
 			return Value.PERIODIC;
-		} else if (taskTypeString.equalsIgnoreCase("trash")){
+		} else if (taskTypeString.equalsIgnoreCase("trash")) {
 			return Value.TRASH;
 		} else {
 			return Value.INVALID;

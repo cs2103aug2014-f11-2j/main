@@ -33,7 +33,7 @@ public abstract class ToDoTask extends Task {
 	 * @see cs2103.task.Task#getCompleted()
 	 */
 	@Override
-	public DateTime getCompleted(){
+	public DateTime getCompleted() {
 		return this.completed;
 	}
 	
@@ -41,8 +41,8 @@ public abstract class ToDoTask extends Task {
 	 * @see cs2103.task.Task#updateCompleted(java.util.Date)
 	 */
 	@Override
-	public void updateCompleted(Date completed){
-		if (completed == null){
+	public void updateCompleted(Date completed) {
+		if (completed == null) {
 			this.completed = null;
 		} else {
 			this.completed = new DateTime(completed);
@@ -53,8 +53,8 @@ public abstract class ToDoTask extends Task {
 	 * @see cs2103.task.Task#updateStatus(net.fortuna.ical4j.model.property.Status)
 	 */
 	@Override
-	protected void updateStatus(Status status){
-		if (status == null){
+	protected void updateStatus(Status status) {
+		if (status == null) {
 			this.status = Status.VTODO_NEEDS_ACTION;
 		} else {
 			this.status = status;
@@ -127,12 +127,12 @@ public abstract class ToDoTask extends Task {
 		returnString.a(STRING_DESCRIPTION).a(this.getDescription()).a('\n').reset();
 	}
 	
-	protected void addVToDoProperty(VToDo vToDo){
+	protected void addVToDoProperty(VToDo vToDo) {
 		assert(vToDo != null);
 		this.addCommonProperty(vToDo);
-		if (this.isDeleted()){
+		if (this.isDeleted()) {
 			vToDo.getProperties().add(Status.VTODO_CANCELLED);
-		} else if (this.getCompleted() == null){
+		} else if (this.getCompleted() == null) {
 			vToDo.getProperties().add(Status.VTODO_NEEDS_ACTION);
 		} else {
 			vToDo.getProperties().add(Status.VTODO_COMPLETED);

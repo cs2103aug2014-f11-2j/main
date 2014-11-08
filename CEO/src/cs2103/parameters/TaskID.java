@@ -1,3 +1,4 @@
+//@author A0112673L
 package cs2103.parameters;
 
 import cs2103.exception.HandledException;
@@ -14,7 +15,7 @@ public class TaskID implements Parameter {
 	/**
 	 * @return int value of taskID
 	 */
-	public int getValue(){
+	public int getValue() {
 		return this.taskID;
 	}
 	
@@ -28,8 +29,8 @@ public class TaskID implements Parameter {
 	 * @return TaskID object from String taskIDString, or null if taskIDString is null
 	 * @throws HandledException
 	 */
-	public static TaskID parse(String taskIDString) throws HandledException{
-		if (taskIDString == null){
+	public static TaskID parse(String taskIDString) throws HandledException {
+		if (taskIDString == null) {
 			return null;
 		} else {
 			return new TaskID(CommonUtil.parseIntegerParameter(taskIDString));

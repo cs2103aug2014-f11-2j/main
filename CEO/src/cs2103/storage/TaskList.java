@@ -44,11 +44,11 @@ public class TaskList {
 		this.dataFile = new File("CEOStore.ics");
 		this.logger = Logger.getInstance();
 		this.logger.writeLog(LOG_INITIALIZE);
-		switch(option.getValue()){
+		switch(option.getValue()) {
 		default:
 		case SYNC:
 		case DEFAULT:
-			try{
+			try {
 				this.google = GoogleEngine.getInstance();
 			} catch (HandledException e) {
 				CommonUtil.printErrMsg(e.getErrorMsg());
@@ -446,7 +446,7 @@ public class TaskList {
 	private ArrayList<Task> filterList(ArrayList<Task> taskList, boolean deleted) {
 		ArrayList<Task> returnList = new ArrayList<Task>();
 		for (Task task:taskList) {
-			if (task.isDeleted() == deleted){
+			if (task.isDeleted() == deleted) {
 				returnList.add(task);
 			}
 		}
