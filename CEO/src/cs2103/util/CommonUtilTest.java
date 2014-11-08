@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import cs2103.exception.HandledException;
 import cs2103.task.FloatingTask;
-import cs2103.task.Task;
+
 
 public class CommonUtilTest {
 	private static final String LOG_ADD = "Adding task with UID %1$s to Google";
