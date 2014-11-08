@@ -178,20 +178,20 @@ public class CommandLineUITest {
 	private static final String MESSAGE_LIST_EMPTY = "The task list is empty\n";
 	
 	@Test
-	public void test6_InvalidCommand() throws HandledException, FatalException {
+	public void test14_InvalidCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String invalidTest = test.testCommand("‐title submit ‐description IVLE ‐location NUS ‐time 2014/09/09 23:59 2014/09/08 00:00 to 2014/09/09 23:59");
 		assertEquals(invalidTest, ansi().bg(RED).a(MESSAGE_COMMAND_ERROR).reset().toString());
 	}	
 	
 	@Test(expected= NullPointerException.class)
-	public void test4_ExitCommand() throws NullPointerException, HandledException, FatalException {
+	public void test12_ExitCommand() throws NullPointerException, HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		assertNull(test.testCommand("exit"));
 	}
 		
 	@Test
-	public void test1_AddCommand() throws HandledException, FatalException {
+	public void test09_AddCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String addTest = test.testCommand("add Submit homework on 21 December 2014 at 6pm");
 		String[] separatedTest = addTest.split("\n");
@@ -208,7 +208,7 @@ public class CommandLineUITest {
 	}
 		
 	@Test
-	public void test14_UpdateCommand() throws HandledException, FatalException {
+	public void test05_UpdateCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		test.testCommand("add Submit test cases on 27 December 2014 at 7pm");
 		String updateTest = test.testCommand("Update 1 -title Submit nothing");
@@ -228,14 +228,14 @@ public class CommandLineUITest {
 	}
 	
 	@Test
-	public void test11_SearchCommand() throws HandledException, FatalException {
+	public void test02_SearchCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String searchTest = test.testCommand("search periodic");
 		assertEquals(ansi().bold().fg(RED).a("The task list is empty\n").reset().toString(), searchTest);
 	}
 	
 	@Test
-	public void test2_DeleteCommand() throws HandledException, FatalException {
+	public void test10_DeleteCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		test.testCommand("add -title write test cases -description write test cases for CS2103 -location eclipse -time 2014/08/08/00:00 to 2014/09/09/23:59 -recurring 2d2");
 		String deleteTest = test.testCommand("delete 1");
@@ -246,25 +246,24 @@ public class CommandLineUITest {
 	}
 	
 	@Test
-	public void test3_EmptyCommand() throws HandledException, FatalException {
+	public void test11_EmptyCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String emptyTest = test.testCommand("");
 		assertEquals(emptyTest, ansi().bg(RED).a(MESSAGE_COMMAND_ERROR).reset().toString());
 	}
 	
 	@Test
-	public void test9_NullCommand() throws HandledException, FatalException {
+	public void test17_NullCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String nullTest = test.testCommand(null);
 		assertEquals(ansi().bg(RED).a(MESSAGE_NULL_ERROR).a('\n').reset().toString(), nullTest);
 	}
 	
 	@Test
-	public void test8_MarkCommand() throws HandledException, FatalException {
+	public void test16_MarkCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		test.testCommand("add get rich on 5 June 2015 at 6pm");
 		String markTest = test.testCommand("mark 4");
-
 
 		String[] separatedTest = markTest.split("\n");
 		
@@ -282,7 +281,7 @@ public class CommandLineUITest {
 	}
 	
 	@Test 
-	public void test10_RedoCommand() throws HandledException, FatalException {
+	public void test01_RedoCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String redoTest = test.testCommand("redo 1");
 		assertEquals(redoTest, ansi().fg(GREEN).a(MESSAGE_REDO_SUCCESS).reset().toString());
@@ -290,14 +289,14 @@ public class CommandLineUITest {
 	}
 	
 	@Test
-	public void test13_UndoCommand() throws HandledException, FatalException {
+	public void test04_UndoCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String undoTest = test.testCommand("undo 1");
 		assertEquals(undoTest, ansi().fg(GREEN).a(MESSAGE_UNDO_SUCCESS).reset().toString());
 	}
 	
 	@Test
-	public void test7_ListCommand() throws HandledException, FatalException {
+	public void test15_ListCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String listTest = test.testCommand("list");
 		String[] separatedTest = listTest.split("\n");
@@ -310,7 +309,7 @@ public class CommandLineUITest {
 	}
 	
 	@Test
-	public void test12_ShowCommand() throws HandledException, FatalException {
+	public void test03_ShowCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String showTest1 = test.testCommand("show 10");
 		assertEquals(showTest1, ansi().bg(RED).a(MESSAGE_INVALID_ID).reset().toString());
@@ -321,7 +320,7 @@ public class CommandLineUITest {
 	}
 	
 	@Test
-	public void test5_HelpCommand() throws HandledException, FatalException {
+	public void test13_HelpCommand() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		String helpTest = test.testCommand("help");
 		assertEquals(helpTest, HELP_DEFAULT.toString());
@@ -355,7 +354,7 @@ public class CommandLineUITest {
 	}
 	
 	@Test
-	public void test15_multiCommand1() throws HandledException, FatalException {
+	public void test06_multiCommand1() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		TaskList testMulti = TaskList.getInstance();
 		testMulti.emptyTestList();
@@ -400,7 +399,7 @@ public class CommandLineUITest {
 	}
 	
 	@Test
-	public void test16_multiCommand2() throws HandledException, FatalException {
+	public void test07_multiCommand2() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		TaskList testMulti = TaskList.getInstance();
 		testMulti.emptyTestList();
@@ -443,7 +442,7 @@ public class CommandLineUITest {
 	}
 	
 	@Test
-	public void test17_multiCommand3() throws HandledException, FatalException {
+	public void test08_multiCommand3() throws HandledException, FatalException {
 		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
 		TaskList testMulti = TaskList.getInstance();
 		testMulti.emptyTestList();
