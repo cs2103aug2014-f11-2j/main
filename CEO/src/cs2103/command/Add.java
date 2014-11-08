@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.fusesource.jansi.Ansi;
+
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
 import net.fortuna.ical4j.model.Recur;
@@ -20,11 +21,19 @@ import cs2103.parameters.Title;
 import cs2103.storage.TaskList;
 import cs2103.task.*;
 import cs2103.util.CommonUtil;
+import cs2103.util.Logger;
 
 public class Add extends InfluentialCommand {
 	private static final String MESSAGE_ADD = "You have successfully added a new task.\n";
 	private static final String MESSAGE_ADD_FAIL = "Fail to add a new task.\n";
 	private static final String[] allowedQuickTimeLiteral = {"from", "by", "on", "in", "at"};
+	private final Logger logger;
+	private static final String LOG_INITIALIZE = "Logging Add";
+	private static final String LOG_DETAILS = "Task Details: \n\t\t"
+			+ "title: %1$s\t"
+			+ "description %2$s\t"
+			+ "location:  %3$s\t"
+			+ "starttime:  %4$s";
 	
 	/**
 	 * Creates an instance of Add using the string that the user entered
@@ -32,6 +41,8 @@ public class Add extends InfluentialCommand {
 	 * @throws HandledException
 	 */
 	public Add(String command) throws HandledException{
+		this.logger = Logger.getInstance();
+		this.logger.writeLog(LOG_INITIALIZE);
 		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> parameterQueue = separateCommand(command);
 		if (!command.startsWith("-")){
@@ -51,10 +62,13 @@ public class Add extends InfluentialCommand {
 		Date[] time = getTime(this.parameterList.getTime());
 		if (time[0] == null){
 			task = new FloatingTask(null, null);
+			this.logger.writeLog("FloatingTask created");
 		} else if (time[1] == null){
 			task = new DeadlineTask(null, null, time[0]);
+			this.logger.writeLog("DeadlineTask created");
 		} else {
 			task = new PeriodicTask(null, null, time[0], time[1]);
+			this.logger.writeLog("PeriodicTask created");
 		}
 		task.updateTitle(this.readTitle());
 		task.updateDescription(this.readDescription());
@@ -62,6 +76,7 @@ public class Add extends InfluentialCommand {
 		task.updateRecurrence(this.readRecurrence());
 		task.updateLastModified(null);
 		task = TaskList.getInstance().addTask(task);
+		this.logger.writeLog(String.format(LOG_DETAILS, this.readTitle(), this.readDescription(), this.readLocation(), time[0], time[1]));
 		return this.formatReturnString(task);
 	}
 	

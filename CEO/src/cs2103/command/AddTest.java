@@ -29,6 +29,7 @@ public class AddTest {
 	
 	@Test
 	public void testAddCorrectCommand() throws HandledException, FatalException {
+		assert(TaskList.getInstance()!=null);
 		Add addObj;
 		addObj = new Add("-title hello -description some description -location earth -time 2014/12/12 20:20 to 2014/12/15 20:20 -recur 2d");
 		ParameterList pl = addObj.getParameterList();
@@ -52,6 +53,7 @@ public class AddTest {
 	
 	@Test
 	public void testQuickAddCommand() throws HandledException, FatalException{
+		assert(TaskList.getInstance()!=null);
 		Add addObj;
 		addObj = new Add("finish cs2105 assignment by next monday");
 		addObj.execute();

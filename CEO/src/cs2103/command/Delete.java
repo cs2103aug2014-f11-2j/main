@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.fusesource.jansi.Ansi;
+
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
 import cs2103.exception.FatalException;
@@ -13,11 +14,14 @@ import cs2103.parameters.TaskID;
 import cs2103.storage.TaskList;
 import cs2103.task.Task;
 import cs2103.util.CommonUtil;
+import cs2103.util.Logger;
 
 public class Delete extends InfluentialCommand {
 	private static final String MESSAGE_DELETE = "You have moved task with ID %1$d to trash\n";
 	private static final String MESSAGE_PERMANENTLY_DELETE = "You have permanently deleted task with ID %1$d\n";
-	private Task target;
+	private Task target;	
+	private final Logger logger;
+	private static final String LOG_INITIALIZE = "Logging Delete";
 	
 	/**
 	 * Creates an instance of Delete from user input command
@@ -26,6 +30,9 @@ public class Delete extends InfluentialCommand {
 	 * @throws FatalException
 	 */
 	public Delete(String command) throws HandledException, FatalException{
+		this.logger = Logger.getInstance();
+		
+		
 		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> parameterQueue = separateCommand(command);
 		this.parameterList.addParameter(TaskID.parse(parameterQueue.poll()));
@@ -33,10 +40,12 @@ public class Delete extends InfluentialCommand {
 		this.parameterList.addParameter(DeleteOption.parse(getParameterString(parameterMap, DeleteOption.allowedLiteral)));
 		CommonUtil.checkNull(this.parameterList.getTaskID(), HandledException.ExceptionType.INVALID_CMD);
 		this.target = TaskList.getInstance().getTaskByID(this.parameterList.getTaskID().getValue());
+
 	}
 	
 	@Override
 	public Ansi execute() throws HandledException, FatalException {
+		this.logger.writeLog(LOG_INITIALIZE);
 		CommonUtil.checkNull(this.target, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		Task deleting = cloneTask(this.target);
 		this.undoBackup = this.target;
@@ -44,10 +53,12 @@ public class Delete extends InfluentialCommand {
 			deleting.delete();
 			this.redoBackup = deleting;
 			TaskList.getInstance().updateTask(deleting);
+			this.logger.writeLog(String.format(MESSAGE_DELETE, this.parameterList.getTaskID().getValue()));
 			return ansi().fg(GREEN).a(String.format(MESSAGE_DELETE, this.parameterList.getTaskID().getValue())).reset();
 		} else {
 			this.redoBackup = deleting;
 			TaskList.getInstance().deleteTask(this.target);
+			this.logger.writeLog(String.format(MESSAGE_PERMANENTLY_DELETE, this.parameterList.getTaskID().getValue()));
 			return ansi().fg(MAGENTA).a(String.format(MESSAGE_PERMANENTLY_DELETE, this.parameterList.getTaskID().getValue())).reset();
 		}
 	}

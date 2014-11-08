@@ -3,19 +3,32 @@ package cs2103.command;
 import java.util.ArrayList;
 
 import org.fusesource.jansi.Ansi;
+
 import static org.fusesource.jansi.Ansi.*;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.storage.TaskList;
 import cs2103.task.DeadlineTask;
 import cs2103.task.PeriodicTask;
+import cs2103.util.Logger;
 
 public class Alert extends QueryCommand {
 	private static final String MESSAGE_TASKS_DUE = "Tasks due within one day:\n";
 	private static final String MESSAGE_TASKS_STARTING = "Tasks start within one day:\n";
+	private static final String LOG_INITIALIZE = "Logging Alert";
+	private final Logger logger;
+	
+	public Alert(){
+		this.logger = Logger.getInstance();
+	}
 	
 	@Override
-	public Ansi execute() throws HandledException, FatalException {
+	public Ansi execute() throws HandledException, FatalException {	
+		this.logger.writeLog(LOG_INITIALIZE);
+		this.logger.writeLog(MESSAGE_TASKS_DUE);
+		this.logger.writeLog(parseListResponse(this.alertDeadline()).toString());
+		this.logger.writeLog(MESSAGE_TASKS_STARTING);
+		this.logger.writeLog(parseListResponse(this.alertPeriodic()).toString());
 		Ansi returnString = ansi().a(MESSAGE_TASKS_DUE);
 		returnString.a(parseListResponse(this.alertDeadline()));
 		returnString.a(MESSAGE_TASKS_STARTING);
