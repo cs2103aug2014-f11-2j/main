@@ -42,7 +42,7 @@ public class SearchTest {
 		
 	@Test
 	public void testSearchKeyword() throws HandledException, FatalException {	
-		
+		assert(TaskList.getInstance()!=null);
 		Search searchTitle = new Search("homework -time");
 		ParameterList pl = searchTitle.getParameterList();
 		assertEquals("homework",pl.getKeyword().getValue());
@@ -60,7 +60,7 @@ public class SearchTest {
 	
 	@Test
 	public void testSearchPeriodic() throws HandledException, FatalException{
-		
+		assert(TaskList.getInstance()!=null);
 		Search searchDeadline = new Search("-type deadline -complete");
 		ParameterList pl = searchDeadline.getParameterList();
 		assertEquals(Value.DEADLINE,pl.getTaskType().getValue());
@@ -76,6 +76,7 @@ public class SearchTest {
 	
 	@Test
 	public void testSearchNonExistent() throws HandledException, FatalException{
+		assert(TaskList.getInstance()!=null);
 		Search searchNonExistent = new Search("presentation");
 		String result = searchNonExistent.execute().toString();
 		assertEquals(ansi().bold().fg(RED).a("The task list is empty\n").reset().toString(),result);

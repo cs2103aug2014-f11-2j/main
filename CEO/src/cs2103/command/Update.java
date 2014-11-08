@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.fusesource.jansi.Ansi;
+
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
 import cs2103.exception.FatalException;
@@ -19,11 +20,15 @@ import cs2103.parameters.Title;
 import cs2103.storage.TaskList;
 import cs2103.task.Task;
 import cs2103.util.CommonUtil;
+import cs2103.util.Logger;
 
 public class Update extends InfluentialCommand {
 	private static final String MESSAGE_UPDATE = "You have updated task with ID %1$d\n";
 	private static final String MESSAGE_UPDATE_FAIL = "Fail to update task with ID %1$d\n";
 	private Task target;
+	private final Logger logger;
+	private static final String LOG_INITIALIZE = "Logging Update";
+	private static final String LOG_UPDATE_RESULTS = "Details of updated Task %1$s: \n %2$s";
 	
 	/**
 	 * Creates an instance of update from user input
@@ -32,6 +37,7 @@ public class Update extends InfluentialCommand {
 	 * @throws FatalException
 	 */
 	public Update(String command) throws HandledException, FatalException{
+		this.logger = Logger.getInstance();
 		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> parameterQueue = separateCommand(command);
 		this.parameterList.addParameter(TaskID.parse(parameterQueue.poll()));
@@ -49,6 +55,7 @@ public class Update extends InfluentialCommand {
 	
 	@Override
 	public Ansi execute() throws HandledException, FatalException {
+		this.logger.writeLog(LOG_INITIALIZE);
 		CommonUtil.checkNull(this.target, HandledException.ExceptionType.INVALID_TASK_OBJ);
 		Task newTask;
 		if (this.parameterList.getTime() == null){
@@ -73,6 +80,7 @@ public class Update extends InfluentialCommand {
 			newTask.updateRecurrence(this.parameterList.getRecurrence().getValue());
 		}
 		newTask = TaskList.getInstance().updateTask(newTask);
+		this.logger.writeLog(String.format(LOG_UPDATE_RESULTS, newTask.getTaskID(),newTask.toDetail()));
 		return formatReturnString(newTask);
 	}
 	

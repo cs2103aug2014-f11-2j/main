@@ -23,7 +23,7 @@ public class SyncTest {
 	
 	@Test
 	public void testEnableSync() throws HandledException, FatalException {
-		assertTrue(CommonUtil.checkSyncSupport());
+		assert(CommonUtil.checkSyncSupport() == true);
 		Sync s = new Sync(null);
 		String result = s.execute().toString();
 		assertEquals(ansi().fg(GREEN).a("Successfully sync your data with Google\n").reset().toString(),result);

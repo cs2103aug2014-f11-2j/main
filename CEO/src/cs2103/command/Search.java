@@ -16,15 +16,18 @@ import cs2103.parameters.Time;
 import cs2103.storage.TaskList;
 import cs2103.task.Task;
 import cs2103.util.CommonUtil;
+import cs2103.util.Logger;
 
 public class Search extends QueryCommand {
-	
+	private final Logger logger;
+	private static final String LOG_INITIALIZE = "Logging Search";
 	/**
 	 * Creates an instance of Search from user input
 	 * @param command
 	 * @throws HandledException
 	 */
 	public Search(String command) throws HandledException{
+		this.logger = Logger.getInstance();
 		CommonUtil.checkNull(command, HandledException.ExceptionType.INVALID_CMD);
 		Queue<String> parameterQueue = separateCommand(command);
 		if (!command.startsWith("-")){
@@ -38,6 +41,7 @@ public class Search extends QueryCommand {
 	
 	@Override
 	public Ansi execute() throws HandledException, FatalException {
+		this.logger.writeLog(LOG_INITIALIZE);
 		ArrayList<Task> searchList = getInitialList(this.parameterList.getTaskType());
 		if (this.parameterList.getKeyword() != null){
 			searchList = filterKeyword(searchList, parameterList.getKeyword().getValue());
@@ -48,6 +52,7 @@ public class Search extends QueryCommand {
 		if (this.parameterList.getComplete() != null){
 			searchList = filterComplete(searchList, parameterList.getComplete().getValue());
 		}
+		this.logger.writeLog("Search Result: \n"+searchList.toString());
 		return parseListResponse(searchList);
 	}
 	
