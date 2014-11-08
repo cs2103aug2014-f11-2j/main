@@ -128,6 +128,7 @@ public abstract class ToDoTask extends Task {
 	}
 	
 	protected void addVToDoProperty(VToDo vToDo){
+		assert(vToDo != null);
 		this.addCommonProperty(vToDo);
 		if (this.isDeleted()){
 			vToDo.getProperties().add(Status.VTODO_CANCELLED);
@@ -140,6 +141,7 @@ public abstract class ToDoTask extends Task {
 	}
 	
 	protected void addGTaskProperty(com.google.api.services.tasks.model.Task gTask) {
+		assert(gTask != null);
 		gTask.setTitle(this.getTitle());
 		if (this.getCompleted() == null) {
 			gTask.setCompleted(Data.NULL_DATE_TIME);

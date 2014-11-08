@@ -9,16 +9,21 @@ import java.util.Locale;
 import org.fusesource.jansi.Ansi;
 
 import cs2103.exception.HandledException;
+import cs2103.util.CommonUtil;
+import cs2103.util.Logger;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.Status;
 
 public class DeadlineTask extends ToDoTask {
 	private DateTime dueTime;
+	private final Logger logger;
+	private static final String LOG_UPDATEDUETIME = "Updating Deadline Task with UID %1$s with new Due Date";
 	
 	public DeadlineTask(String taskUID, Status status, Date dueTime) throws HandledException {
 		super(taskUID, status);
 		this.updateDueTime(dueTime);
+		this.logger = Logger.getInstance();
 	}
 	
 	/**
@@ -32,6 +37,7 @@ public class DeadlineTask extends ToDoTask {
 		if (dueTime == null){
 			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
 		} else {
+			this.logger.writeLog(CommonUtil.formatLogString(LOG_UPDATEDUETIME, this));
 			this.dueTime = new DateTime(dueTime);
 		}
 	}
@@ -66,18 +72,21 @@ public class DeadlineTask extends ToDoTask {
 	
 	private ToDoTask toFloating() throws HandledException {
 		ToDoTask newTask = new FloatingTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION);
+		assert(newTask != null);
 		updateNewTask(newTask);
 		return newTask;
 	}
 
 	private ToDoTask toDeadline(Date dueTime) throws HandledException {
 		ToDoTask newTask = new DeadlineTask(this.getTaskUID(), this.getStatus(), dueTime);
+		assert(newTask != null);
 		updateNewTask(newTask);
 		return newTask;
 	}
 
 	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
 		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), Status.VEVENT_CONFIRMED, startTime, endTime);
+		assert(newTask != null);
 		updateNewTask(newTask);
 		return newTask;
 	}
@@ -86,6 +95,7 @@ public class DeadlineTask extends ToDoTask {
 	public Object clone() throws CloneNotSupportedException {
 		try {
 			ToDoTask newTask = new DeadlineTask(this.getTaskUID(), this.getStatus(), this.getDueTime());
+			assert(newTask != null);
 			updateClone(newTask);
 			return newTask;
 		} catch (HandledException e) {
