@@ -66,18 +66,21 @@ public class DeadlineTask extends ToDoTask {
 	
 	private ToDoTask toFloating() throws HandledException {
 		ToDoTask newTask = new FloatingTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION);
+		assert(newTask != null);
 		updateNewTask(newTask);
 		return newTask;
 	}
 
 	private ToDoTask toDeadline(Date dueTime) throws HandledException {
 		ToDoTask newTask = new DeadlineTask(this.getTaskUID(), this.getStatus(), dueTime);
+		assert(newTask != null);
 		updateNewTask(newTask);
 		return newTask;
 	}
 
 	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
 		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), Status.VEVENT_CONFIRMED, startTime, endTime);
+		assert(newTask != null);
 		updateNewTask(newTask);
 		return newTask;
 	}
@@ -86,6 +89,7 @@ public class DeadlineTask extends ToDoTask {
 	public Object clone() throws CloneNotSupportedException {
 		try {
 			ToDoTask newTask = new DeadlineTask(this.getTaskUID(), this.getStatus(), this.getDueTime());
+			assert(newTask != null);
 			updateClone(newTask);
 			return newTask;
 		} catch (HandledException e) {

@@ -4,10 +4,15 @@ package cs2103.task;
 import org.fusesource.jansi.Ansi;
 
 import static org.fusesource.jansi.Ansi.ansi;
+import static org.fusesource.jansi.Ansi.Color.GREEN;
+import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
 import static org.junit.Assert.*;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
@@ -108,32 +113,32 @@ public class DeadlineTaskTest extends ToDoTaskTest{
 	
 	private void testConvertToFloating() throws HandledException {
 		DateTime[] time = generateTimeForConvert("f");
-		Task ft2 = dlt.convert(time);
-		assertTrue(ft2 instanceof FloatingTask);
+		Task taskTest = dlt.convert(time);
+		assertTrue(taskTest instanceof FloatingTask);
 		
 		Task taskExpected = new FloatingTask(dlt.getTaskUID(), Status.VTODO_NEEDS_ACTION);
 		updateTaskExpected(taskExpected);
-		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
+		assertTrue(TestUtil.compareTasks(taskTest, taskExpected));
 	}
 
 	private void testConvertToDeadline() throws HandledException {	
 		DateTime[] time = generateTimeForConvert("d");
-		Task ft2 = dlt.convert(time);
-		assertTrue(ft2 instanceof DeadlineTask);
+		Task taskTest = dlt.convert(time);
+		assertTrue(taskTest instanceof DeadlineTask);
 		
 		ToDoTask taskExpected = new DeadlineTask(dlt.getTaskUID(), dlt.getStatus(), time[0]);
 		updateTaskExpected(taskExpected);
-		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
+		assertTrue(TestUtil.compareTasks(taskTest, taskExpected));
 	}
 	
 	private void testConvertToPeriodic() throws HandledException {
 		DateTime[] time = generateTimeForConvert("p");
-		Task ft2 = dlt.convert(time);
-		assertTrue(ft2 instanceof PeriodicTask);
+		Task taskTest = dlt.convert(time);
+		assertTrue(taskTest instanceof PeriodicTask);
 		
 		PeriodicTask taskExpected = new PeriodicTask(dlt.getTaskUID(), Status.VEVENT_CONFIRMED, time[0], time[1]);
 		updateTaskExpected(taskExpected);
-		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
+		assertTrue(TestUtil.compareTasks(taskTest, taskExpected));
 	}
 	
 	@Test
@@ -156,8 +161,21 @@ public class DeadlineTaskTest extends ToDoTaskTest{
 	private Ansi generateSummaryExpected() {
 		Ansi expected = ansi().fg(YELLOW).a(dlt.getTaskID()).a(". ").reset();
 		expected.bold().a(dlt.getTitle()).a('\n').boldOff().reset();
-		expected.a("Status: ").a(ToDoTask.completedToString(dlt.getCompleted())).a('\n');
-		expected.a("\tDue At: ").a(dlt.dateToString(dlt.getDueTime())).a('\n');
+		expected.a("Status: ").a(generateStatusExpected(dlt.getCompleted()));
+		expected.a("\tDue At: ").a(generateDateStringExpected(dlt.getDueTime())).a('\n');
 		return expected;
+	}
+	
+	private Ansi generateDateStringExpected(Date date) {
+		Ansi returnString = ansi().bold();
+		DateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm a", Locale.US);	
+		returnString.fg(GREEN).a(format.format(date)).reset();
+		return returnString;
+	}
+	
+	private Ansi generateStatusExpected(DateTime completed) {
+		Ansi returnString = ansi();
+		returnString.bold().fg(RED).a("Needs Action").reset();
+		return returnString;
 	}
 }

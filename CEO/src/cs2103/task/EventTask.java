@@ -76,11 +76,15 @@ public abstract class EventTask extends Task {
 	 */
 	@Override
 	public DateTime getCompleted() {
-		if (this.getEndTime().before(new DateTime())){
+		if (checkEndBeforeNow()){
 			return this.getEndTime();
 		} else {
 			return null;
 		}
+	}
+
+	private boolean checkEndBeforeNow() {
+		return this.getEndTime().before(new DateTime());
 	}
 	
 	/* (non-Javadoc)
@@ -136,6 +140,7 @@ public abstract class EventTask extends Task {
 	}
 	
 	protected void addGEventProperty(com.google.api.services.calendar.model.Event gEvent){
+		assert(gEvent != null);
 		gEvent.setSummary(this.getTitle());
 		gEvent.setDescription(this.getDescription());
 		gEvent.setCreated(new com.google.api.client.util.DateTime(this.getCreated().getTime()));

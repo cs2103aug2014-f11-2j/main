@@ -7,9 +7,12 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.fusesource.jansi.Ansi;
+
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
 import cs2103.exception.HandledException;
+import cs2103.util.CommonUtil;
+import cs2103.util.Logger;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.component.VEvent;
@@ -23,6 +26,7 @@ public class PeriodicTask extends EventTask {
 
 	private static final String STRING_LOCATION = "Location: ";
 	private static final String STRING_RECUR = "Recurrence: ";
+	private static final String LOG_UPDATEFROMRECUR = "Updating Periodic Task with UID %1$s from Recurrence";
 	
 	public PeriodicTask(String taskUID, Status status, Date startTime, Date endTime) throws HandledException {
 		super(taskUID, status, startTime, endTime);
@@ -90,18 +94,21 @@ public class PeriodicTask extends EventTask {
 	
 	private ToDoTask toFloating() throws HandledException {
 		ToDoTask newTask = new FloatingTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION);
+		assert(newTask != null);
 		updateNewTask(newTask);
 		return newTask;
 	}
 
 	private ToDoTask toDeadline(Date dueTime) throws HandledException {
 		ToDoTask newTask = new DeadlineTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION, dueTime);
+		assert(newTask != null);
 		updateNewTask(newTask);
 		return newTask;
 	}
 
 	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
 		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getStatus(), startTime, endTime);
+		assert(newTask != null);
 		updateNewTask(newTask);
 		return newTask;
 	}
@@ -118,6 +125,7 @@ public class PeriodicTask extends EventTask {
 	public Object clone() throws CloneNotSupportedException {
 		try {
 			PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getStatus(), this.getStartTime(), this.getEndTime());
+			assert(newTask != null);
 			updateClone(newTask);
 			return newTask;
 		} catch (HandledException e) {
@@ -315,6 +323,8 @@ public class PeriodicTask extends EventTask {
 				return null;
 			} else {
 				Date endTime = calculateEndTimeFromRecur(startTime);
+				assert(endTime != null);
+				Logger.getInstance().writeLog(CommonUtil.formatLogString(LOG_UPDATEFROMRECUR, this));
 				this.updateTime(startTime, endTime);
 				this.updateLastModified(null);
 				return this;
@@ -325,14 +335,17 @@ public class PeriodicTask extends EventTask {
 	}
 
 	private net.fortuna.ical4j.model.Date calculateStartTimeFromRecur(DateTime now) {
+		assert(now != null);
 		return this.getRecurrence().getNextDate(this.getStartTime(), now);
 	}
 
 	private Date calculateEndTimeFromRecur(Date startTime) {
+		assert(startTime != null);
 		return new Date(this.getEndTime().getTime() - this.getStartTime().getTime() + startTime.getTime());
 	}
 
 	private boolean endTimeBeforeNow(DateTime now) {
+		assert(now != null);
 		return this.getEndTime().before(now);
 	}
 
