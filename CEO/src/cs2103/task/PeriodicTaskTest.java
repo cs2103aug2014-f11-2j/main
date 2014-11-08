@@ -3,10 +3,15 @@ package cs2103.task;
 
 import static org.fusesource.jansi.Ansi.ansi;
 import static org.fusesource.jansi.Ansi.Color.CYAN;
+import static org.fusesource.jansi.Ansi.Color.GREEN;
+import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
 import static org.junit.Assert.*;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
@@ -166,32 +171,32 @@ public class PeriodicTaskTest extends EventTaskTest{
 	
 	private void testConvertToFloating() throws HandledException {
 		DateTime[] time = generateTimeForConvert("f");
-		Task pt2 = pt.convert(time);
-		assertTrue(pt2 instanceof FloatingTask);
+		Task taskTest = pt.convert(time);
+		assertTrue(taskTest instanceof FloatingTask);
 		
 		Task taskExpected = new FloatingTask(pt.getTaskUID(), Status.VTODO_NEEDS_ACTION);
 		updateTaskExpected(taskExpected);
-		assertTrue(TestUtil.compareTasks(pt2, taskExpected));
+		assertTrue(TestUtil.compareTasks(taskTest, taskExpected));
 	}
 
 	private void testConvertToDeadline() throws HandledException {	
 		DateTime[] time = generateTimeForConvert("d");
-		Task ft2 = pt.convert(time);
-		assertTrue(ft2 instanceof DeadlineTask);
+		Task taskTest = pt.convert(time);
+		assertTrue(taskTest instanceof DeadlineTask);
 		
 		ToDoTask taskExpected = new DeadlineTask(pt.getTaskUID(), Status.VTODO_NEEDS_ACTION, time[0]);
 		updateTaskExpected(taskExpected);
-		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
+		assertTrue(TestUtil.compareTasks(taskTest, taskExpected));
 	}
 	
 	private void testConvertToPeriodic() throws HandledException {
 		DateTime[] time = generateTimeForConvert("p");
-		Task testTask = pt.convert(time);
-		assertTrue(testTask instanceof PeriodicTask);
+		Task taskTest = pt.convert(time);
+		assertTrue(taskTest instanceof PeriodicTask);
 		
 		PeriodicTask taskExpected = new PeriodicTask(pt.getTaskUID(), pt.getStatus(), time[0], time[1]);
 		updateTaskExpectedPeriodic(taskExpected);
-		assertTrue(TestUtil.compareTasks(testTask, taskExpected));
+		assertTrue(TestUtil.compareTasks(taskTest, taskExpected));
 	}
 
 	private void updateTaskExpectedPeriodic(PeriodicTask taskExpected) {
@@ -234,8 +239,8 @@ public class PeriodicTaskTest extends EventTaskTest{
 		Ansi expected;
 		expected = ansi().fg(YELLOW).a(pt.getTaskID()).a(". ").reset();
 		expected.bold().a(pt.getTitle()).a('\n').boldOff().reset();
-		expected.a("From: ").a(pt.dateToString(pt.getStartTime())).a(" to ");
-		expected.a(pt.dateToString(pt.getEndTime())).reset();
+		expected.a("From: ").a(generateDateStringExpected(pt.getStartTime())).a(" to ");
+		expected.a(generateDateStringExpected(pt.getEndTime())).reset();
 		expected.a('\n');
 		return expected;
 	}
@@ -243,10 +248,24 @@ public class PeriodicTaskTest extends EventTaskTest{
 	private Ansi generateSummaryExpected() {
 		Ansi expected = ansi().fg(YELLOW).a(pt.getTaskID()).a(". ").reset();
 		expected.bold().a(pt.getTitle()).a('\n').boldOff().reset();
-		expected.a("From: ").a(pt.dateToString(pt.getStartTime())).a(" to ");
-		expected.a(pt.dateToString(pt.getEndTime())).reset();
-		expected.a('\n').a(PeriodicTask.recurToString(pt.getRecurrence())).a('\n');
+		expected.a("From: ").a(generateDateStringExpected(pt.getStartTime())).a(" to ");
+		expected.a(generateDateStringExpected(pt.getEndTime())).reset();
+		expected.a('\n').a(generateRecurExpected(pt.getRecurrence())).a('\n');
 		return expected;
+	}
+	
+	private Ansi generateRecurExpected(Recur recur) {
+		Ansi returnString = ansi().a("Recurrence: ");
+		returnString.fg(YELLOW).a(recur.getInterval()).a(' ');
+		returnString.a(recur.getFrequency()).reset();
+		return returnString;
+	}
+	
+	private Ansi generateDateStringExpected(Date date) {
+		Ansi returnString = ansi().bold();
+		DateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm a", Locale.US);	
+		returnString.fg(GREEN).a(format.format(date)).reset();
+		return returnString;
 	}
 
 	@Test
