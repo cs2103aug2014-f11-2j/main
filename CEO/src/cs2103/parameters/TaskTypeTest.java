@@ -15,7 +15,7 @@ public class TaskTypeTest {
 		assertEquals(Value.DEADLINE,taskType.getValue());
 		
 		taskType = TaskType.parse(null);
-		assertEquals(Value.INVALID,taskType.getValue());
+		assertEquals(Value.DEFAULT,taskType.getValue());
 	}
 
 }
