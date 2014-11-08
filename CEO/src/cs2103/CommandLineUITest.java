@@ -15,6 +15,8 @@ import org.junit.Test;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
 import cs2103.parameters.Option;
+import cs2103.storage.TaskList;
+
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
 
@@ -32,6 +34,7 @@ public class CommandLineUITest {
 	private static final String MESSAGE_NULL_ERROR = "Your input command contains error, please check your input and try again!";
 	private static final String MESSAGE_MARK = "Successfully marked task %1$d as completed\n";
 	private static final String MESSAGE_MARK_SUCCESS = "Successfully marked task 4 as completed";
+	private static final String MESSAGE_MARK_SUCCESS_1 = "Successfully marked task 1 as completed";
 	public static final Ansi HELP_DEFAULT = ansi().fg(YELLOW).a("CEO Usage:\n").reset()
 			  								.bold().a("  add <Quick add string>\n" +
 			  								"      ([-S or --title <title>] [-D or -description <description>]\n" + 
@@ -166,9 +169,13 @@ public class CommandLineUITest {
 										"Example: mark 2\n").reset();
 
 	private static final String MESSAGE_REDO_SUCCESS = "Successfully redo 0 operations\n";
+	private static final String MESSAGE_REDO_SUCCESS_1 = "Successfully redo 1 operations\n";
 	private static final String MESSAGE_UNDO_SUCCESS = "Successfully undo 1 operations\n";
 	private static final String MESSAGE_SHOW_SUCCESS = "The details for Task 1:\n";
 	private static final String MESSAGE_SHOW_SUCCESS_1 = ansi().a(MESSAGE_SHOW_SUCCESS).fg(YELLOW).a("1. ").reset().bold().a("Play basketball \n").boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a('\t').a("Due At: ").bold().fg(GREEN).a("2014/12/15 07:00 PM").reset().a("\nDescription: \n").reset().toString();
+	private static final String MESSAGE_SHOW_SUCCESS_2 = ansi().a(MESSAGE_SHOW_SUCCESS).fg(YELLOW).a("1. ").reset().bold().a("boxing at NUS\n").boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a('\t').a("Due At: ").bold().fg(GREEN).a("2014/12/23 09:00 PM").reset().a("\nDescription: \n").reset().toString();
+	private static final String LESS_THAN_ONE_PARA = "You need to specify at least one parameter\n";
+	private static final String MESSAGE_LIST_EMPTY = "The task list is empty\n";
 	
 	@Test
 	public void test6_InvalidCommand() throws HandledException, FatalException {
@@ -206,7 +213,7 @@ public class CommandLineUITest {
 		test.testCommand("add Submit test cases on 27 December 2014 at 7pm");
 		String updateTest = test.testCommand("Update 1 -title Submit nothing");
 	
-;		Ansi returnString = ansi();
+		Ansi returnString = ansi();
 		returnString.fg(GREEN).a(String.format(MESSAGE_UPDATE, 1)).reset();
 		Ansi returnString1 = ansi().fg(YELLOW).a("1").a(". ").reset();
 		returnString1.bold().a("Submit nothing").a('\n').boldOff().reset();
@@ -345,6 +352,139 @@ public class CommandLineUITest {
 		
 		String helpMarkTest = test.testCommand("help mark");
 		assertEquals(helpMarkTest, HELP_MARK.toString());
+	}
+	
+	@Test
+	public void test15_multiCommand1() throws HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		TaskList testMulti = TaskList.getInstance();
+		testMulti.emptyTestList();
+		
+		String test1 = test.testCommand("add driving test on 16 December 2014 at 7pm");
+		String[] separatedTest1 = test1.split("\n");
+		Ansi returnString = ansi().fg(GREEN).a(MESSAGE_ADD);
+		Ansi returnString1 = ansi().fg(YELLOW).a("1").a(". ").reset();
+		returnString1.bold().a("driving test ").a('\n').boldOff().reset();
+		returnString.a(returnString1);
+		String[] separated1 = returnString.toString().split("\n");
+		assertEquals(Array.get(separatedTest1, 0), Array.get(separated1, 0));
+		assertEquals(Array.get(separatedTest1, 1), Array.get(separated1, 1));
+		assertEquals(Array.get(separatedTest1, 2), ansi().boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/16 07:00 PM").reset().toString());
+		assertEquals(Array.get(separatedTest1, 3), MESSAGE_ADD_SUCCESS_5);
+		assertEquals(Array.get(separatedTest1, 4), ansi().reset().toString());
+		
+		String test2 = test.testCommand("mark 1");
+		String[] separatedTest2 = test2.split("\n");
+		Ansi returnString2 = ansi().fg(GREEN).a(String.format(MESSAGE_MARK, 1)).reset();
+		Ansi returnString3= ansi().fg(YELLOW).a("1").a(". ").reset();
+		returnString2.a(returnString3.bold().a("driving test "));
+		String[] separated2 = returnString2.toString().split("\n");
+		assertEquals(Array.get(separatedTest2, 0), ansi().fg(GREEN).a(MESSAGE_MARK_SUCCESS_1).toString());
+		assertEquals(Array.get(separatedTest2, 1), Array.get(separated2, 1));
+		assertEquals(Array.get(separatedTest2, 2), ansi().boldOff().reset().a("Status: ").bold().fg(GREEN).a("Completed").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/16 07:00 PM").reset().toString());
+		assertEquals(Array.get(separatedTest2, 3), ansi().a("Description: ").toString());
+		
+		String test3 = test.testCommand("undo 1");
+		assertEquals(test3, ansi().fg(GREEN).a(MESSAGE_UNDO_SUCCESS).reset().toString());
+		
+		String test4 = test.testCommand("list");
+		String[] separatedTest3 = test4.split("\n");
+		assertEquals(Array.get(separatedTest3, 0), ansi().fg(YELLOW).a("1. ").reset().bold().a("driving test ").toString());
+		assertEquals(Array.get(separatedTest3, 1), ansi().boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/16 07:00 PM").reset().toString());
+		
+		String test5 = test.testCommand("redo 1");
+		assertEquals(test5, ansi().fg(GREEN).a(MESSAGE_REDO_SUCCESS_1).reset().toString());
+		
+		String test6 = test.testCommand("delete 2");
+		assertEquals(test6, ansi().bg(RED).a(MESSAGE_INVALID_ID).reset().toString());
+	}
+	
+	@Test
+	public void test16_multiCommand2() throws HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		TaskList testMulti = TaskList.getInstance();
+		testMulti.emptyTestList();
+		
+		String test1 = test.testCommand("add boxing at the gym on 23 December 2014 at 9pm");
+		String[] separatedTest1 = test1.split("\n");
+		Ansi returnString = ansi().fg(GREEN).a(MESSAGE_ADD);
+		Ansi returnString1 = ansi().fg(YELLOW).a("1").a(". ").reset();
+		returnString1.bold().a("boxing at the gym ").a('\n').boldOff().reset();
+		returnString.a(returnString1);
+		String[] separated1 = returnString.toString().split("\n");
+		assertEquals(Array.get(separatedTest1, 0), Array.get(separated1, 0));
+		assertEquals(Array.get(separatedTest1, 1), Array.get(separated1, 1));
+		assertEquals(Array.get(separatedTest1, 2), ansi().boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/23 09:00 PM").reset().toString());
+		assertEquals(Array.get(separatedTest1, 3), MESSAGE_ADD_SUCCESS_5);
+		assertEquals(Array.get(separatedTest1, 4), ansi().reset().toString());
+		
+		String test2 = test.testCommand("update -title boxing at NUS");
+		assertEquals(test2, ansi().bg(RED).a(LESS_THAN_ONE_PARA).reset().toString());
+		
+		String test3 = test.testCommand("update 1 -title boxing at NUS");
+		Ansi returnString2 = ansi();
+		returnString2.fg(GREEN).a(String.format(MESSAGE_UPDATE, 1)).reset();
+		Ansi returnString3 = ansi().fg(YELLOW).a("1").a(". ").reset();
+		returnString3.bold().a("boxing at NUS").a('\n').boldOff().reset();
+		
+		returnString2.a(returnString3);
+		returnString2.a(ansi().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/23 09:00 PM").reset().toString());
+		returnString2.a("\nDescription: \n").reset();
+		assertEquals(test3, returnString2.toString());
+		
+		String test4 = test.testCommand("undo 1");
+		assertEquals(test4, ansi().fg(GREEN).a(MESSAGE_UNDO_SUCCESS).reset().toString());
+	
+		String test5 = test.testCommand("redo 1");
+		assertEquals(test5, ansi().fg(GREEN).a(MESSAGE_REDO_SUCCESS_1).reset().toString());
+		
+		String test6 = test.testCommand("show 1");
+		assertEquals(test6, MESSAGE_SHOW_SUCCESS_2);
+	}
+	
+	@Test
+	public void test17_multiCommand3() throws HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		TaskList testMulti = TaskList.getInstance();
+		testMulti.emptyTestList();
+		
+		String test1 = test.testCommand("add reformat laptop on 4 december 2014 at 1pm");
+		String[] separatedTest1 = test1.split("\n");
+		Ansi returnString = ansi().fg(GREEN).a(MESSAGE_ADD);
+		Ansi returnString1 = ansi().fg(YELLOW).a("1").a(". ").reset();
+		returnString1.bold().a("reformat laptop ").a('\n').boldOff().reset();
+		returnString.a(returnString1);
+		String[] separated1 = returnString.toString().split("\n");
+		assertEquals(Array.get(separatedTest1, 0), Array.get(separated1, 0));
+		assertEquals(Array.get(separatedTest1, 1), Array.get(separated1, 1));
+		assertEquals(Array.get(separatedTest1, 2), ansi().boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/04 01:00 PM").reset().toString());
+		assertEquals(Array.get(separatedTest1, 3), MESSAGE_ADD_SUCCESS_5);
+		assertEquals(Array.get(separatedTest1, 4), ansi().reset().toString());
+		
+		String test2 = test.testCommand("update 1 -complete true");
+		Ansi returnString2 = ansi();
+		returnString2.fg(GREEN).a(String.format(MESSAGE_UPDATE, 1)).reset();
+		Ansi returnString3 = ansi().fg(YELLOW).a("1").a(". ").reset();
+		returnString3.bold().a("reformat laptop ").a('\n').boldOff().reset();
+		
+		returnString2.a(returnString3);
+		returnString2.a(ansi().a("Status: ").bold().fg(GREEN).a("Completed").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/04 01:00 PM").reset().toString());
+		returnString2.a("\nDescription: \n").reset();
+		assertEquals(test2, returnString2.toString());
+		
+		String test3 = test.testCommand("undo 1");
+		assertEquals(test3, ansi().fg(GREEN).a(MESSAGE_UNDO_SUCCESS).reset().toString());
+		
+		String test4 = test.testCommand("list");
+		String[] separatedTest3 = test4.split("\n");
+		assertEquals(Array.get(separatedTest3, 0), ansi().fg(YELLOW).a("1. ").reset().bold().a("reformat laptop ").toString());
+		assertEquals(Array.get(separatedTest3, 1), ansi().boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/04 01:00 PM").reset().toString());
+		
+		String test5 = test.testCommand("redo 1");
+		assertEquals(test5, ansi().fg(GREEN).a(MESSAGE_REDO_SUCCESS_1).reset().toString());
+		
+		String test6 = test.testCommand("list");
+		assertEquals(test6, ansi().bold().fg(RED).a(MESSAGE_LIST_EMPTY).reset().toString());
 	}
 }
 
