@@ -103,6 +103,9 @@ public class CommonUtil {
 	}
 	
 	/**
+	 * Formats the String parameter with the Task parameter and returns
+	 * the formatted string.
+	 * 
 	 * @param format
 	 * @param task
 	 * @return a String containing the formatted log information

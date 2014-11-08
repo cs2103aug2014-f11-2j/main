@@ -5,12 +5,20 @@ import static org.junit.Assert.*;
 
 import java.lang.reflect.Array;
 
+import net.fortuna.ical4j.model.property.Status;
+
 import org.junit.Test;
 
 import cs2103.exception.HandledException;
+import cs2103.task.FloatingTask;
+import cs2103.task.Task;
 
 public class CommonUtilTest {
-
+	private static final String LOG_ADD = "Adding task with UID %1$s to Google";
+	private static final String LOG_UPDATE = "Updating task with UID %1$s to Google";
+	private static final String MESSAGE_ADD_SUCCESS = "Adding task with UID testFloat to Google";
+	private static final String MESSAGE_UPDATE_SUCCESS = "Updating task with UID testFloat to Google";
+	
 	@Test(expected = HandledException.class)
 	public void testSplitFirstWord() throws HandledException {
 		String[] testing = CommonUtil.splitFirstWord("testing split");
@@ -73,5 +81,20 @@ public class CommonUtilTest {
 		
 		//test for null string
 		CommonUtil.removeDash(null);
+	}
+	
+	@Test
+	public void testFormatLogString() {
+		Status testLog = new Status("testFormatLogString");
+		FloatingTask testTask = new FloatingTask("testFloat", testLog);
+		
+		String test1 = CommonUtil.formatLogString(LOG_ADD, testTask);
+		assertEquals(test1, MESSAGE_ADD_SUCCESS);
+		
+		String test2 = CommonUtil.formatLogString(LOG_UPDATE, testTask);
+		assertEquals(test2, MESSAGE_UPDATE_SUCCESS);
+		
+		String testEmpty = CommonUtil.formatLogString("", testTask);
+		assertEquals(testEmpty, "");
 	}
 }
