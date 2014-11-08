@@ -3,6 +3,7 @@ package cs2103.command;
 import java.util.Date;
 
 import org.fusesource.jansi.Ansi;
+
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
 import cs2103.exception.FatalException;
@@ -12,12 +13,14 @@ import cs2103.storage.TaskList;
 import cs2103.task.PeriodicTask;
 import cs2103.task.Task;
 import cs2103.util.CommonUtil;
+import cs2103.util.Logger;
 
 public class Mark extends InfluentialCommand {
 	private static final String MESSAGE_MARK = "Successfully marked task %1$d as completed\n";
 	private static final String MESSAGE_MARK_FAILED = "Failed to mark task %1$d as completed\n";
 	private static final String MESSAGE_MARK_NOTSUPPORTED = "Task %1$d does not support mark operation\n";
-	private Task target;
+	private Task target;	
+	private static final String LOG_MARK = "Executing Mark: Parameters: TaskID: %1$d";
 	
 	/**
 	 * Creates an instance of Mark from user input
@@ -33,7 +36,8 @@ public class Mark extends InfluentialCommand {
 
 	@Override
 	public Ansi execute() throws HandledException, FatalException {
-		CommonUtil.checkNull(this.target, HandledException.ExceptionType.INVALID_TASK_OBJ);
+		assert(this.target != null);
+		Logger.getInstance().writeLog(this.formatLogString());
 		if (this.target instanceof PeriodicTask){
 			return ansi().fg(RED).a(String.format(MESSAGE_MARK_NOTSUPPORTED, this.parameterList.getTaskID().getValue())).reset();
 		} else {
@@ -59,6 +63,11 @@ public class Mark extends InfluentialCommand {
 			returnString.fg(GREEN).a(String.format(MESSAGE_MARK, this.parameterList.getTaskID().getValue())).reset();
 			return returnString.a(newTask.toDetail());
 		}
+	}
+	
+	private String formatLogString() throws HandledException {
+		assert(this.parameterList.getTaskID() != null);
+		return String.format(LOG_MARK, this.parameterList.getTaskID().getValue());
 	}
 
 	@Override

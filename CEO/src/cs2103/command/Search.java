@@ -16,9 +16,11 @@ import cs2103.parameters.Time;
 import cs2103.storage.TaskList;
 import cs2103.task.Task;
 import cs2103.util.CommonUtil;
+import cs2103.util.Logger;
 
 public class Search extends QueryCommand {
-	
+	private static final String LOG_SEARCH = "Executing Search: Parameters: keyword: %1$s\tTaskType: %2$s\tcompleted: %3$s\ttime: %4$s";
+	private static final String TIME_FORMAT = "StartTime: %1$s\tEndTime: %2$s";
 	/**
 	 * Creates an instance of Search from user input
 	 * @param command
@@ -38,14 +40,16 @@ public class Search extends QueryCommand {
 	
 	@Override
 	public Ansi execute() throws HandledException, FatalException {
+		Logger.getInstance().writeLog(this.formatLogString());
 		ArrayList<Task> searchList = getInitialList(this.parameterList.getTaskType());
-		if (this.parameterList.getKeyword() != null){
+		assert(searchList != null);
+		if (this.parameterList.getKeyword() != null) {
 			searchList = filterKeyword(searchList, parameterList.getKeyword().getValue());
 		}
-		if (this.parameterList.getTime() != null){
+		if (this.parameterList.getTime() != null) {
 			searchList = filterTime(searchList, parameterList.getTime().getValue());
 		}
-		if (this.parameterList.getComplete() != null){
+		if (this.parameterList.getComplete() != null) {
 			searchList = filterComplete(searchList, parameterList.getComplete().getValue());
 		}
 		return parseListResponse(searchList);
@@ -59,7 +63,7 @@ public class Search extends QueryCommand {
 	 */
 	private ArrayList<Task> getInitialList(TaskType taskType) throws HandledException, FatalException{
 		if (taskType == null){
-			return TaskList.getInstance().getDefaultList();
+			return TaskList.getInstance().getAllList();
 		} else {
 			switch (taskType.getValue()){
 			case FLOATING:
@@ -139,5 +143,58 @@ public class Search extends QueryCommand {
 			}
 		}
 		return returnList;
+	}
+	
+	private String readKeyword() throws HandledException {
+		if (this.parameterList.getKeyword() == null) {
+			return "null";
+		} else {
+			return this.parameterList.getKeyword().getValue();
+		}
+	}
+	
+	private String readTaskType() throws HandledException {
+		if (this.parameterList.getTaskType() == null) {
+			return "null";
+		} else {
+			return this.parameterList.getTaskType().getValue().toString();
+		}
+	}
+	
+	private String readComplete() throws HandledException {
+		if (this.parameterList.getComplete() == null) {
+			return "null";
+		} else {
+			if(this.parameterList.getComplete().getValue()){
+				return "true";
+			} else {
+				return "false";
+			}
+		}
+	}
+	
+	private String formatTimeString(Date[] time) {
+		assert (time != null);
+		return String.format(TIME_FORMAT, this.formatTimeString(time[0]), this.formatTimeString(time[1]));
+	}
+	
+	private String formatTimeString(Date time) {
+		if (time == null) {
+			return "null";
+		} else {
+			return time.toString();
+		}
+	}
+	
+	private String readTime() throws HandledException {
+		if (this.parameterList.getTime() == null) {
+			return "null";
+		} else {
+			return this.formatTimeString(this.parameterList.getTime().getValue());
+		}
+	}
+	
+	private String formatLogString() throws HandledException {
+		return String.format(LOG_SEARCH, this.readKeyword(), this.readTaskType(), this.readComplete(), this.readTime());
 	}
 }

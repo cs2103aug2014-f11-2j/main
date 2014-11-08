@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.fusesource.jansi.Ansi;
+
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
 import net.fortuna.ical4j.model.Recur;
@@ -20,11 +21,14 @@ import cs2103.parameters.Title;
 import cs2103.storage.TaskList;
 import cs2103.task.*;
 import cs2103.util.CommonUtil;
+import cs2103.util.Logger;
 
 public class Add extends InfluentialCommand {
 	private static final String MESSAGE_ADD = "You have successfully added a new task.\n";
 	private static final String MESSAGE_ADD_FAIL = "Fail to add a new task.\n";
 	private static final String[] allowedQuickTimeLiteral = {"from", "by", "on", "in", "at"};
+	private static final String LOG_ADD = "Executing Add: Parameters: title: %1$s\tdescription %2$s\tlocation: %3$s\ttime: %4$s";
+	private static final String TIME_FORMAT = "StartTime: %1$s\tEndTime: %2$s";
 	
 	/**
 	 * Creates an instance of Add using the string that the user entered
@@ -49,6 +53,8 @@ public class Add extends InfluentialCommand {
 	public Ansi execute() throws HandledException, FatalException {
 		Task task;
 		Date[] time = getTime(this.parameterList.getTime());
+		assert(time != null);
+		Logger.getInstance().writeLog(this.formatLogString(time));
 		if (time[0] == null){
 			task = new FloatingTask(null, null);
 		} else if (time[1] == null){
@@ -170,7 +176,7 @@ public class Add extends InfluentialCommand {
 	 * @return String value of location that is entered by user
 	 * @throws HandledException
 	 */
-	private String readLocation() throws HandledException{
+	private String readLocation() throws HandledException {
 		if (this.parameterList.getLocation() == null){
 			return null;
 		} else {
@@ -188,6 +194,24 @@ public class Add extends InfluentialCommand {
 		} else {
 			return this.parameterList.getRecurrence().getValue();
 		}
+	}
+	
+	private String formatTimeString(Date[] time) {
+		assert (time != null);
+		return String.format(TIME_FORMAT, this.formatTimeString(time[0]), this.formatTimeString(time[1]));
+	}
+	
+	private String formatTimeString(Date time) {
+		if (time == null) {
+			return "null";
+		} else {
+			return time.toString();
+		}
+	}
+	
+	private String formatLogString(Date[] time) throws HandledException {
+		assert(time != null);
+		return String.format(LOG_ADD, this.readTitle(), this.readDescription(), this.readLocation(), this.formatTimeString(time));
 	}
 	
 	@Override

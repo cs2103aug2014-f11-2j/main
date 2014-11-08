@@ -26,6 +26,7 @@ public class RestoreTest {
 
 	@Test
 	public void testRestore() throws HandledException, FatalException {
+		assert(TaskList.getInstance()!=null);
 		Add addObj = new Add("add task to be deleted");
 		addObj.execute();
 		Delete d = new Delete("1");
@@ -40,6 +41,7 @@ public class RestoreTest {
 	
 	@Test(expected = HandledException.class)
 	public void testTaskNotInTrashRestore() throws HandledException, FatalException{
+		assert(TaskList.getInstance()!=null);
 		Delete d = new Delete("1 -p");
 		d.execute();
 		Restore r = new Restore("1");

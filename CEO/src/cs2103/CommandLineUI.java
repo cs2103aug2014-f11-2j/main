@@ -38,7 +38,7 @@ public class CommandLineUI {
 	private static final String LOG_READY = "All initializations are done";
 	private static final String LOG_REDO = "Trying to redo %1$d operations";
 	private static final String LOG_UNDO = "Trying to undo %1$d operations";
-	private static final String LOG_COMMAND = "Trying to execute command \"%1$s\"";
+	private static final String LOG_COMMAND = "Input command \"%1$s\"";
 	private static final String LOG_EXIT = "User exited from CEO";
 	
 	private static CommandLineUI commandLine;

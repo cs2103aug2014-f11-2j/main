@@ -3,6 +3,7 @@ package cs2103.command;
 import java.util.ArrayList;
 
 import org.fusesource.jansi.Ansi;
+
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
 import cs2103.exception.FatalException;
@@ -16,6 +17,7 @@ public class UpdateTimeFromRecur extends InfluentialCommand {
 	
 	@Override
 	public Ansi execute() throws HandledException, FatalException {
+		
 		int count = 0;
 		ArrayList<PeriodicTask> periodicList = TaskList.getInstance().getPeriodicList();
 		for (PeriodicTask task:periodicList){

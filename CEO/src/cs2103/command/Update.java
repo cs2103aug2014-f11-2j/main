@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.fusesource.jansi.Ansi;
+
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
 import cs2103.exception.FatalException;
@@ -19,10 +20,13 @@ import cs2103.parameters.Title;
 import cs2103.storage.TaskList;
 import cs2103.task.Task;
 import cs2103.util.CommonUtil;
+import cs2103.util.Logger;
 
 public class Update extends InfluentialCommand {
 	private static final String MESSAGE_UPDATE = "You have updated task with ID %1$d\n";
 	private static final String MESSAGE_UPDATE_FAIL = "Fail to update task with ID %1$d\n";
+	private static final String LOG_UPDATE = "Executing Update: Parameters: TaskID: %1$d\ttitle: %2$s\tdescription %2$s\tlocation: %4$s\ttime: %5$s\trecurrence: %6$s\tcomplete: %7$s";
+	private static final String TIME_FORMAT = "StartTime: %1$s\tEndTime: %2$s";
 	private Task target;
 	
 	/**
@@ -49,7 +53,8 @@ public class Update extends InfluentialCommand {
 	
 	@Override
 	public Ansi execute() throws HandledException, FatalException {
-		CommonUtil.checkNull(this.target, HandledException.ExceptionType.INVALID_TASK_OBJ);
+		assert(this.target != null);
+		Logger.getInstance().writeLog(this.formatLogString());
 		Task newTask;
 		if (this.parameterList.getTime() == null){
 			newTask = cloneTask(this.target);
@@ -91,6 +96,81 @@ public class Update extends InfluentialCommand {
 			returnString.fg(GREEN).a(String.format(MESSAGE_UPDATE, this.parameterList.getTaskID().getValue())).reset();
 			return returnString.a(newTask.toDetail());
 		}
+	}
+	
+	private String readTitle() throws HandledException {
+		if (this.parameterList.getTitle() == null){
+			return "null";
+		} else {
+			return this.parameterList.getTitle().getValue();
+		}
+	}
+	
+	private String readDescription() throws HandledException {
+		if (this.parameterList.getDescription() == null){
+			return "null";
+		} else {
+			return this.parameterList.getDescription().getValue();
+		}
+	}
+	
+	private String readLocation() throws HandledException {
+		if (this.parameterList.getLocation() == null){
+			return "null";
+		} else {
+			return this.parameterList.getLocation().getValue();
+		}
+	}
+	
+	private String readComplete() throws HandledException {
+		if (this.parameterList.getComplete() == null){
+			return "null";
+		} else {
+			if (this.parameterList.getComplete().getValue()) {
+				return "true";
+			} else {
+				return "false";
+			}
+		}
+	}
+	
+	private String readRecurrence() throws HandledException {
+		if (this.parameterList.getRecurrence() == null) {
+			return "null";
+		} else {
+			if (this.parameterList.getRecurrence().getValue() == null) {
+				return "No Recurrence";
+			} else {
+				return this.parameterList.getRecurrence().getValue().toString();
+			}
+		}
+	}
+	
+
+	private String formatTimeString(Date[] time) {
+		assert (time != null);
+		return String.format(TIME_FORMAT, this.formatTimeString(time[0]), this.formatTimeString(time[1]));
+	}
+	
+	private String formatTimeString(Date time) {
+		if (time == null) {
+			return "null";
+		} else {
+			return time.toString();
+		}
+	}
+	
+	private String readTime() throws HandledException {
+		if (this.parameterList.getTime() == null) {
+			return "null";
+		} else {
+			return this.formatTimeString(this.parameterList.getTime().getValue());
+		}
+	}
+	
+	private String formatLogString() throws HandledException {
+		assert(this.parameterList.getTaskID() != null);
+		return String.format(LOG_UPDATE, this.parameterList.getTaskID().getValue(), this.readTitle(), this.readDescription(), this.readLocation(), this.readTime(), this.readRecurrence(), this.readComplete());
 	}
 	
 	@Override

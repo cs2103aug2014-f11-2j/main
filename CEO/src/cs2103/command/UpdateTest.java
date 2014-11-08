@@ -29,7 +29,7 @@ public class UpdateTest {
 
 	@Test
 	public void testUpdate() throws HandledException, FatalException {
-		
+		assert(TaskList.getInstance()!=null);
 		Update updateTitle = new Update("1 -title I was wrong -description can't remember -location earth" +
 				" -time 2014/12/25 20:20 to 2014/12/31 23:59 -recur 2d");
 		
@@ -57,12 +57,14 @@ public class UpdateTest {
 	
 	@Test(expected = HandledException.class)
 	public void testInvalidUpdate() throws HandledException, FatalException{
+		assert(TaskList.getInstance()!=null);
 		Update updateInvalid = new Update("-title this is wrong, so much wrong");
 		updateInvalid.execute();
 	}
 	
 	@Test
 	public void testUpdateRedoUndo() throws HandledException, FatalException{
+		assert(TaskList.getInstance()!=null);
 		Add addObj = new Add("-title muchness title -time 2014/11/29 20:20");
 		addObj.execute();
 		Update updateRedo = new Update("2 -title much wrong, very title");
