@@ -1,3 +1,4 @@
+//@author A0110906R
 package cs2103;
 
 import java.util.Scanner;
@@ -12,6 +13,7 @@ import cs2103.parameters.CommandType;
 import cs2103.parameters.Option;
 import cs2103.storage.TaskList;
 import cs2103.util.CommonUtil;
+import cs2103.util.Logger;
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
 
@@ -32,14 +34,23 @@ public class CommandLineUI {
 	private static final String MESSAGE_INITIALIZATION_ERROR = "Failed to initialize CEO, program will now exit\n";
 	private static final String MESSAGE_UNDO_FORMAT = "Successfully undo %1$d operations\n";
 	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d operations\n";
+	private static final String LOG_INITIALIZE = "Initializing CommandLineUI instance";
+	private static final String LOG_READY = "All initializations are done";
+	private static final String LOG_REDO = "Trying to redo %1$d operations";
+	private static final String LOG_UNDO = "Trying to undo %1$d operations";
+	private static final String LOG_COMMAND = "Trying to execute command \"%1$s\"";
+	private static final String LOG_EXIT = "User exited from CEO";
 	
 	private static CommandLineUI commandLine;
 	private TaskList taskList;
 	private Stack<InfluentialCommand> undoStack;
 	private Stack<InfluentialCommand> redoStack;
 	private Scanner scanner = new Scanner(System.in);
+	private final Logger logger;
 	
 	private CommandLineUI(Option option) throws HandledException, FatalException{
+		this.logger = Logger.getInstance();
+		this.logger.writeLog(LOG_INITIALIZE);
 		undoStack = new Stack<InfluentialCommand>();
 		redoStack = new Stack<InfluentialCommand>();
 		option = this.verifyOption(option);
@@ -59,7 +70,7 @@ public class CommandLineUI {
 			break;
 		}
 		CommonUtil.print(welcomeMsg.a('\n').reset());
-		
+		this.logger.writeLog(LOG_READY);
 	}
 	
 	/**
@@ -98,9 +109,10 @@ public class CommandLineUI {
 			CommonUtil.printPrompt(MESSAGE_USER_PROMPT);
 			String command = scanner.nextLine();
 			CommonUtil.clearConsole();
-			if (command != null && !command.isEmpty()){
+			if (command != null && !command.isEmpty()) {
 				Ansi feedback = processUserInput(command);
-				if (feedback == null){
+				if (feedback == null) {
+					this.logger.writeLog(LOG_EXIT);
 					CommonUtil.print(MESSAGE_EXIT);
 					break;
 				} else {
@@ -113,6 +125,7 @@ public class CommandLineUI {
 	private Ansi processUserInput(String userInput) {
 		try {
 			assert(userInput != null);
+			this.logger.writeLog(String.format(LOG_COMMAND, userInput));
 			String command[] = CommonUtil.splitFirstWord(userInput);
 			CommandType commandType = CommandType.parse(command[0]);
 			Command commandObject;
@@ -184,6 +197,7 @@ public class CommandLineUI {
 	
 	private int executeUndo(int steps) throws HandledException, FatalException{
 		int result = 0;
+		this.logger.writeLog(String.format(LOG_UNDO, steps));
 		while(!this.undoStack.isEmpty() && result < steps){
 			InfluentialCommand undoCommand = undoStack.pop().undo();
 			if (undoCommand != null){
@@ -206,6 +220,7 @@ public class CommandLineUI {
 	
 	private int executeRedo(int steps) throws HandledException, FatalException{
 		int result = 0;
+		this.logger.writeLog(String.format(LOG_REDO, steps));
 		while(!this.redoStack.isEmpty() && result < steps){
 			InfluentialCommand redoCommand = redoStack.pop().redo();
 			if (redoCommand != null){
@@ -228,15 +243,15 @@ public class CommandLineUI {
 		}
 	}
 	
-	private Option askOption(){
+	private Option askOption() {
 		CommonUtil.printPrompt(MESSAGE_SYNC_PROMPT);
 		String answer = null;
 		while(true){
 			answer = this.scanner.nextLine();
-			if (answer != null){
-				if (answer.equalsIgnoreCase("y")){
+			if (answer != null) {
+				if (answer.equalsIgnoreCase("y")) {
 					return new Option(Option.Value.SYNC);
-				} else if (answer.equalsIgnoreCase("n")){
+				} else if (answer.equalsIgnoreCase("n")) {
 					return new Option(Option.Value.NOSYNC);
 				}
 			}
@@ -249,7 +264,7 @@ public class CommandLineUI {
 	 * @param testCommandInput
 	 * @return a resultant string from an input command
 	 */
-	public String testCommand(String testCommandInput){
+	public String testCommand(String testCommandInput) {
 		return processUserInput(testCommandInput).toString();
 	}
 }

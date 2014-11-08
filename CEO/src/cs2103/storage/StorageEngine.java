@@ -17,6 +17,7 @@ import cs2103.task.FloatingTask;
 import cs2103.task.PeriodicTask;
 import cs2103.task.Task;
 import cs2103.task.ToDoTask;
+import cs2103.util.CommonUtil;
 import cs2103.util.Logger;
 
 import java.util.Collections;
@@ -141,10 +142,10 @@ public class StorageEngine implements StorageInterface{
 			Component updating = task.toComponent();
 			Component existing = this.indexedComponents.getComponent(task.getTaskUID());
 			if (existing == null) {
-				this.logger.writeLog(this.formatLogString(LOG_ADD, task));
+				this.logger.writeLog(CommonUtil.formatLogString(LOG_ADD, task));
 				this.calendar.getComponents().add(updating);
 			} else {
-				this.logger.writeLog(this.formatLogString(LOG_UPDATE, task));
+				this.logger.writeLog(CommonUtil.formatLogString(LOG_UPDATE, task));
 				this.calendar.getComponents().remove(existing);
 				this.calendar.getComponents().add(updating);
 			}
@@ -162,7 +163,7 @@ public class StorageEngine implements StorageInterface{
 	public void deleteTask(Task task) throws HandledException, FatalException {
 		if (task != null) {
 			assert(this.indexedComponents != null);
-			this.logger.writeLog(this.formatLogString(LOG_REMOVE, task));
+			this.logger.writeLog(CommonUtil.formatLogString(LOG_REMOVE, task));
 			Component existing = this.indexedComponents.getComponent(task.getTaskUID());
 			if (existing == null) {
 				throw new HandledException(HandledException.ExceptionType.TASK_NOT_EXIST);
@@ -308,10 +309,5 @@ public class StorageEngine implements StorageInterface{
 			task.updateTaskID(count);
 		}
 		return taskList;
-	}
-	
-	private String formatLogString(String format, Task task) {
-		assert(task != null);
-		return String.format(format, task.getTaskUID());
 	}
 }

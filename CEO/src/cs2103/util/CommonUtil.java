@@ -1,3 +1,4 @@
+//@author A0110906R
 package cs2103.util;
 
 import java.awt.Desktop;
@@ -10,6 +11,7 @@ import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
+import cs2103.task.Task;
 
 /**
  * @author Zheng Han
@@ -25,14 +27,15 @@ public class CommonUtil {
 	 * @return an array which contains the split up String
 	 * @throws HandledException
 	 */
-	public static String[] splitFirstWord(String parameterString) throws HandledException{
+	public static String[] splitFirstWord(String parameterString) throws HandledException {
 		checkNull(parameterString, HandledException.ExceptionType.INVALID_CMD);
+		assert(parameterString != null);
 		String[] result = new String[2];
 		int splitIndex = parameterString.indexOf(' ');
-		if (splitIndex == -1){
+		if (splitIndex == -1) {
 			result[0] = parameterString;
 			result[1] = null;
-		}else{
+		} else {
 			result[0] = parameterString.substring(0, splitIndex).trim();
 			result[1] = parameterString.substring(splitIndex).trim();
 		}
@@ -48,8 +51,9 @@ public class CommonUtil {
 	 */
 	public static int parseIntegerParameter(String parameter) throws HandledException {
 		checkNull(parameter, HandledException.ExceptionType.INVALID_PARA);
+		assert(parameter != null);
 		parameter = parameter.trim();
-		if (parameter.matches("[0-9]+")){
+		if (parameter.matches("[0-9]+")) {
 			return Integer.parseInt(parameter);
 		} else {
 			return -1;
@@ -88,13 +92,24 @@ public class CommonUtil {
 	 * @return parameterString with the front dash removed
 	 * @throws HandledException
 	 */
-	public static String removeDash(String parameterString) throws HandledException{
+	public static String removeDash(String parameterString) throws HandledException {
 		checkNull(parameterString, HandledException.ExceptionType.INVALID_PARA);
-		if (parameterString.startsWith("-")){
+		assert(parameterString != null);
+		if (parameterString.startsWith("-")) {
 			return parameterString.substring(1);
 		}else{
 			return parameterString;
 		}
+	}
+	
+	/**
+	 * @param format
+	 * @param task
+	 * @return a String containing the formatted log information
+	 */
+	public static String formatLogString(String format, Task task) {
+		assert(task != null);
+		return String.format(format, task.getTaskUID());
 	}
 	
 	/**
@@ -103,8 +118,8 @@ public class CommonUtil {
 	 * 
 	 * @param feedback
 	 */
-	public static void print(String feedback){
-		if (feedback != null && !feedback.isEmpty()){
+	public static void print(String feedback) {
+		if (feedback != null && !feedback.isEmpty()) {
 			print(ansi().a(feedback));
 		}
 	}
@@ -116,7 +131,7 @@ public class CommonUtil {
 	 * @param feedback
 	 */
 	public static void print(Ansi feedback) {
-		if (feedback != null){
+		if (feedback != null) {
 			AnsiConsole.out.print(feedback);
 		}
 	}
@@ -127,8 +142,8 @@ public class CommonUtil {
 	 * 
 	 * @param errorMsg
 	 */
-	public static void printErrMsg(String errorMsg){
-		if (errorMsg != null && !errorMsg.isEmpty()){
+	public static void printErrMsg(String errorMsg) {
+		if (errorMsg != null && !errorMsg.isEmpty()) {
 			print(ansi().bold().bg(RED).a(errorMsg).a('\n').reset());
 		}
 	}
@@ -139,8 +154,8 @@ public class CommonUtil {
 	 * 
 	 * @param prompt
 	 */
-	public static void printPrompt(String prompt){
-		if (prompt != null && !prompt.isEmpty()){
+	public static void printPrompt(String prompt) {
+		if (prompt != null && !prompt.isEmpty()) {
 			System.out.print(prompt);
 		}
 	}
@@ -167,9 +182,9 @@ public class CommonUtil {
 	/**
 	 * This method clears the user display
 	 */
-	public static void clearConsole(){
+	public static void clearConsole() {
 		try{
-			if (System.getProperty("os.name").contains("Windows")){
+			if (System.getProperty("os.name").contains("Windows")) {
 		        Console.clr();
 			} else {
 				AnsiConsole.out.println(ansi().eraseScreen().reset());

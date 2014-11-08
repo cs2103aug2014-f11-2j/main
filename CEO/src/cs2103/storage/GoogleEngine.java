@@ -80,7 +80,7 @@ public class GoogleEngine {
 	 */
 	public void deleteTask(Task task) throws IOException, HandledException {
 		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
-		this.logger.writeLog(this.formatLogString(LOG_REMOVE, task));
+		this.logger.writeLog(CommonUtil.formatLogString(LOG_REMOVE, task));
 		try {
 			this.tryToRemove(task);
 		} catch (IOException e) {
@@ -102,7 +102,7 @@ public class GoogleEngine {
 	 */
 	public Task updateTask(Task task) throws IOException, HandledException {
 		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
-		this.logger.writeLog(this.formatLogString(LOG_UPDATE, task));
+		this.logger.writeLog(CommonUtil.formatLogString(LOG_UPDATE, task));
 		try {
 			return this.tryToUpdate(task);
 		} catch (IOException e) {
@@ -123,7 +123,7 @@ public class GoogleEngine {
 	 */
 	public Task addTask(Task task) throws HandledException, IOException {
 		CommonUtil.checkNull(task, HandledException.ExceptionType.INVALID_TASK_OBJ);
-		this.logger.writeLog(this.formatLogString(LOG_ADD, task));
+		this.logger.writeLog(CommonUtil.formatLogString(LOG_ADD, task));
 		try {
 			return this.tryToInsert(task);
 		} catch (IOException e) {
@@ -586,10 +586,5 @@ public class GoogleEngine {
 			this.logger.writeErrLog(e.getMessage(), e);
 			throw new HandledException(HandledException.ExceptionType.SYNC_FAIL);
 		}
-	}
-	
-	private String formatLogString(String format, Task task) {
-		assert(task != null);
-		return String.format(format, task.getTaskUID());
 	}
 }
