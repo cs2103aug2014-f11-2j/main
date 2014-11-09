@@ -130,7 +130,7 @@ public class StorageEngine implements StorageInterface{
 	
 	/**
 	 * Add the Task object into file if a Task with the same UID does not exist, update if it does
-	 * @param Task
+	 * @param task
 	 * @throws HandledException
 	 * @throws FatalException
 	 */
@@ -154,7 +154,7 @@ public class StorageEngine implements StorageInterface{
 	
 	/**
 	 * Delete the Task from the file if it does exist
-	 * @param Task
+	 * @param task
 	 * @throws HandledException
 	 * @throws FatalException
 	 */

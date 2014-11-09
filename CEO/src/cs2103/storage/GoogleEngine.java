@@ -73,7 +73,7 @@ public class GoogleEngine {
 	
 	/**
 	 * delete the task from Google Calendar or Google Tasks if it exists
-	 * @param Task
+	 * @param task
 	 * @throws IOException
 	 * @throws HandledException
 	 */
@@ -94,7 +94,7 @@ public class GoogleEngine {
 	
 	/**
 	 * Update the Task in Google Calendar or Google Tasks if it exist. 
-	 * @param Task
+	 * @param task
 	 * @return Return the update result if available
 	 * @throws IOException
 	 * @throws HandledException
@@ -116,7 +116,7 @@ public class GoogleEngine {
 
 	/**
 	 * Insert the Task into either Google Calendar or Google Tasks. If the task exists, an IOExcpetion will be thrown
-	 * @param Task
+	 * @param task
 	 * @throws HandledException
 	 * @throws IOException
 	 */
@@ -168,7 +168,7 @@ public class GoogleEngine {
 	}
 	
 	/**
-	 * @param Task
+	 * @param task
 	 * @return Return if a sync is necessary, i.e. whether the Google Calendar or Google Tasks list is modified since last sync
 	 * @throws IOException
 	 * @throws HandledException 

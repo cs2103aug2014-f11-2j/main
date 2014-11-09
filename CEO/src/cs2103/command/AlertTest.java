@@ -77,11 +77,11 @@ public class AlertTest {
 		
 		Alert alert = new Alert();
 		Task dead = TaskList.getInstance().getDeadlineList().get(0);
-		TaskList.getInstance().updateTask(dead.updateNewTask(deadlineTask_time));
+		TaskList.getInstance().updateTask(dead.getNewTask(deadlineTask_time));
 		dead = TaskList.getInstance().getDeadlineList().get(0);
 		
 		Task period = TaskList.getInstance().getPeriodicList().get(0);
-		TaskList.getInstance().updateTask(period.updateNewTask(periodicTask_time));
+		TaskList.getInstance().updateTask(period.getNewTask(periodicTask_time));
 		period = TaskList.getInstance().getPeriodicList().get(0);
 		
 		boolean check = dead.checkAlert();
@@ -119,11 +119,11 @@ public class AlertTest {
 		Alert alert = new Alert();
 		
 		Task dead = TaskList.getInstance().getDeadlineList().get(0);
-		TaskList.getInstance().updateTask(dead.updateNewTask(deadlineTask_time));
+		TaskList.getInstance().updateTask(dead.getNewTask(deadlineTask_time));
 		dead = TaskList.getInstance().getDeadlineList().get(0);
 		
 		Task period = TaskList.getInstance().getPeriodicList().get(0);
-		TaskList.getInstance().updateTask(period.updateNewTask(periodicTask_time));
+		TaskList.getInstance().updateTask(period.getNewTask(periodicTask_time));
 		period = TaskList.getInstance().getPeriodicList().get(0);
 		
 		boolean check = dead.checkAlert();

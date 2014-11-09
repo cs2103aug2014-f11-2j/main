@@ -108,7 +108,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	}
 	
 	/**
-	 * @param a temporary task id
+	 * @param id
 	 */
 	public void updateTaskID(int id){
 		this.taskID = id;
@@ -129,7 +129,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	}
 	
 	/**
-	 * @param the last modified time
+	 * @param date
 	 */
 	public void updateLastModified(Date date){
 		if (date == null){
@@ -140,7 +140,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	}
 	
 	/**
-	 * @param the created time
+	 * @param date
 	 */
 	public void updateCreated(Date date){
 		if (date == null){
@@ -194,32 +194,19 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	}
 	
 	/**
-	 * @param a Date array contains time information
 	 * @return Updated task
 	 * @throws HandledException
 	 */
-	public Task updateNewTask(Date[] time) throws HandledException{
+	public Task getNewTask(Date[] time) throws HandledException{
 		Task returnTask = this.convert(time);
 		assert(returnTask != null);
 		returnTask.updateLastModified(null);
 		return returnTask;
 	}
 	
-	/**
-	 * @param time completed
-	 */
 	public abstract void updateCompleted(Date complete);
-	/**
-	 * @param location
-	 */
 	public abstract void updateLocation(String location);
-	/**
-	 * @param recurrence
-	 */
 	public abstract void updateRecurrence(Recur recurrence);
-	/**
-	 * @param status as in RFC 2445 iCalendar specification
-	 */
 	protected abstract void updateStatus(Status status);
 	/**
 	 * @return return whether this task is deleted
@@ -257,7 +244,6 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	 */
 	public abstract DateTime getCompleted();
 	/**
-	 * @param a Date array specify the time period for checking
 	 * @return if this task is within the period
 	 */
 	public abstract boolean checkPeriod(Date[] time);

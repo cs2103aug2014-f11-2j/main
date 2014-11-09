@@ -60,7 +60,7 @@ public class Update extends InfluentialCommand {
 		if (this.parameterList.getTime() == null) {
 			newTask = cloneTask(this.target);
 		} else {
-			newTask = this.target.updateNewTask(this.parameterList.getTime().getValue());
+			newTask = this.target.getNewTask(this.parameterList.getTime().getValue());
 		}
 		if (this.parameterList.getTitle() != null) {
 			newTask.updateTitle(this.parameterList.getTitle().getValue());

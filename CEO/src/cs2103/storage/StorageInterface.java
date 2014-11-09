@@ -10,14 +10,14 @@ import cs2103.task.Task;
 public interface StorageInterface {
 	/**
 	 * Delete the task from storage
-	 * @param Task
+	 * @param task
 	 * @throws HandledException
 	 * @throws FatalException
 	 */
 	public void deleteTask(Task task) throws HandledException, FatalException;
 	/**
 	 * Add the Task object into file if a Task with the same UID does not exist, update if it does
-	 * @param Task
+	 * @param task
 	 * @throws HandledException
 	 * @throws FatalException
 	 */
