@@ -79,7 +79,6 @@ public class Add extends InfluentialCommand {
 	 * @throws HandledException
 	 */
 	private static ArrayList<Parameter> parseQuickAdd(String quickAddString) throws HandledException {
-		ArrayList<Parameter> parameterList = new ArrayList<Parameter>();
 		int timeIndex = -1;
 		for (String s:allowedQuickTimeLiteral) {
 			timeIndex = quickAddString.lastIndexOf(s);
@@ -87,26 +86,43 @@ public class Add extends InfluentialCommand {
 		}
 		int everyIndex = quickAddString.lastIndexOf("every");
 		if (timeIndex < 0) {
-			parameterList.add(Title.parse(quickAddString));
+			return getQuickAddParameters(quickAddString);
 		} else if (everyIndex > timeIndex) {
-			Time time = parseQuickTime(quickAddString.substring(timeIndex, everyIndex));
-			if (time == null) {
-				parameterList.add(Title.parse(quickAddString));
-			} else {
-				parameterList.add(Title.parse(quickAddString.substring(0, timeIndex)));
-				parameterList.add(time);
-				parameterList.add(Recurrence.parse(quickAddString.substring(everyIndex)));
-			}
+			return getQuickAddParameters(quickAddString, timeIndex, everyIndex);
 		} else {
-			Time time = parseQuickTime(quickAddString.substring(timeIndex));
-			if (time == null) {
-				parameterList.add(Title.parse(quickAddString));
-			} else {
-				parameterList.add(Title.parse(quickAddString.substring(0, timeIndex)));
-				parameterList.add(time);
-			}
+			return getQuickAddParameters(quickAddString, timeIndex);
 		}
+	}
+	
+	private static ArrayList<Parameter> getQuickAddParameters(String quickAddString) {
+		ArrayList<Parameter> parameterList = new ArrayList<Parameter>();
+		parameterList.add(Title.parse(quickAddString));
 		return parameterList;
+	}
+	
+	private static ArrayList<Parameter> getQuickAddParameters(String quickAddString, int timeIndex) {
+		Time time = parseQuickTime(quickAddString.substring(timeIndex));
+		if (time == null) {
+			return getQuickAddParameters(quickAddString);
+		} else {
+			ArrayList<Parameter> returnList = new ArrayList<Parameter>();
+			returnList.add(Title.parse(quickAddString.substring(0, timeIndex)));
+			returnList.add(time);
+			return returnList;
+		}
+	}
+	
+	private static ArrayList<Parameter> getQuickAddParameters(String quickAddString, int timeIndex, int everyIndex) throws HandledException {
+		Time time = parseQuickTime(quickAddString.substring(timeIndex, everyIndex));
+		if (time == null) {
+			return getQuickAddParameters(quickAddString);
+		} else {
+			ArrayList<Parameter> returnList = new ArrayList<Parameter>();
+			returnList.add(Title.parse(quickAddString.substring(0, timeIndex)));
+			returnList.add(time);
+			returnList.add(Recurrence.parse(quickAddString.substring(everyIndex)));
+			return returnList;
+		}
 	}
 	
 	/**

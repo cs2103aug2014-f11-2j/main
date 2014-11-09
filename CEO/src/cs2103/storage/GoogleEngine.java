@@ -229,19 +229,22 @@ public class GoogleEngine {
 		if (task.isDeleted()) {
 			return null;
 		} else {
-			Task returnTask;
-			if (task instanceof EventTask) {
-				com.google.api.services.calendar.model.Event insertEvent = ((EventTask) task).toGEvent();
-				returnTask = parseGEvent(this.calendar.events().insert(calendarIdentifier, insertEvent).execute());
-			} else if (task instanceof ToDoTask) {
-				com.google.api.services.tasks.model.Task insertTask = ((ToDoTask) task).toGTask();
-				returnTask = parseGTask(this.tasks.tasks().insert(DEFAULT_TASKS, insertTask).execute());
-			} else {
-				return null;
-			}
+			Task returnTask = this.executeInsert(task);
 			assert(task.getCreated() != null);
 			returnTask.updateCreated(task.getCreated());
 			return returnTask;
+		}
+	}
+	
+	private Task executeInsert(Task task) throws HandledException, IOException {
+		if (task instanceof EventTask) {
+			com.google.api.services.calendar.model.Event insertEvent = ((EventTask) task).toGEvent();
+			return parseGEvent(this.calendar.events().insert(calendarIdentifier, insertEvent).execute());
+		} else if (task instanceof ToDoTask) {
+			com.google.api.services.tasks.model.Task insertTask = ((ToDoTask) task).toGTask();
+			return parseGTask(this.tasks.tasks().insert(DEFAULT_TASKS, insertTask).execute());
+		} else {
+			throw new HandledException(HandledException.ExceptionType.INVALID_TASK_OBJ);
 		}
 	}
 	
@@ -284,16 +287,20 @@ public class GoogleEngine {
 			this.tryToRemove(task);
 			return null;
 		} else {
-			Task returnTask;
-			if (task instanceof EventTask) {
-				returnTask = this.executeUpdate((EventTask) task); 
-			} else if (task instanceof ToDoTask) {
-				returnTask = this.executeUpdate((ToDoTask) task);
-			} else {
-				return null;
-			}
+			Task returnTask = this.executeUpdate(task);
+			assert(task.getCreated() != null);
 			returnTask.updateCreated(task.getCreated());
 			return returnTask;
+		}
+	}
+	
+	private Task executeUpdate(Task task) throws HandledException, IOException {
+		if (task instanceof EventTask) {
+			return this.executeUpdate((EventTask) task); 
+		} else if (task instanceof ToDoTask) {
+			return this.executeUpdate((ToDoTask) task);
+		} else {
+			throw new HandledException(HandledException.ExceptionType.INVALID_TASK_OBJ);
 		}
 	}
 	

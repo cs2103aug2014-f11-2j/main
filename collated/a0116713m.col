@@ -86,7 +86,6 @@ public class Add extends InfluentialCommand {
 	 * @throws HandledException
 	 */
 	private static ArrayList<Parameter> parseQuickAdd(String quickAddString) throws HandledException {
-		ArrayList<Parameter> parameterList = new ArrayList<Parameter>();
 		int timeIndex = -1;
 		for (String s:allowedQuickTimeLiteral) {
 			timeIndex = quickAddString.lastIndexOf(s);
@@ -94,26 +93,43 @@ public class Add extends InfluentialCommand {
 		}
 		int everyIndex = quickAddString.lastIndexOf("every");
 		if (timeIndex < 0) {
-			parameterList.add(Title.parse(quickAddString));
+			return getQuickAddParameters(quickAddString);
 		} else if (everyIndex > timeIndex) {
-			Time time = parseQuickTime(quickAddString.substring(timeIndex, everyIndex));
-			if (time == null) {
-				parameterList.add(Title.parse(quickAddString));
-			} else {
-				parameterList.add(Title.parse(quickAddString.substring(0, timeIndex)));
-				parameterList.add(time);
-				parameterList.add(Recurrence.parse(quickAddString.substring(everyIndex)));
-			}
+			return getQuickAddParameters(quickAddString, timeIndex, everyIndex);
 		} else {
-			Time time = parseQuickTime(quickAddString.substring(timeIndex));
-			if (time == null) {
-				parameterList.add(Title.parse(quickAddString));
-			} else {
-				parameterList.add(Title.parse(quickAddString.substring(0, timeIndex)));
-				parameterList.add(time);
-			}
+			return getQuickAddParameters(quickAddString, timeIndex);
 		}
+	}
+	
+	private static ArrayList<Parameter> getQuickAddParameters(String quickAddString) {
+		ArrayList<Parameter> parameterList = new ArrayList<Parameter>();
+		parameterList.add(Title.parse(quickAddString));
 		return parameterList;
+	}
+	
+	private static ArrayList<Parameter> getQuickAddParameters(String quickAddString, int timeIndex) {
+		Time time = parseQuickTime(quickAddString.substring(timeIndex));
+		if (time == null) {
+			return getQuickAddParameters(quickAddString);
+		} else {
+			ArrayList<Parameter> returnList = new ArrayList<Parameter>();
+			returnList.add(Title.parse(quickAddString.substring(0, timeIndex)));
+			returnList.add(time);
+			return returnList;
+		}
+	}
+	
+	private static ArrayList<Parameter> getQuickAddParameters(String quickAddString, int timeIndex, int everyIndex) throws HandledException {
+		Time time = parseQuickTime(quickAddString.substring(timeIndex, everyIndex));
+		if (time == null) {
+			return getQuickAddParameters(quickAddString);
+		} else {
+			ArrayList<Parameter> returnList = new ArrayList<Parameter>();
+			returnList.add(Title.parse(quickAddString.substring(0, timeIndex)));
+			returnList.add(time);
+			returnList.add(Recurrence.parse(quickAddString.substring(everyIndex)));
+			return returnList;
+		}
 	}
 	
 	/**
@@ -1908,19 +1924,22 @@ public class GoogleEngine {
 		if (task.isDeleted()) {
 			return null;
 		} else {
-			Task returnTask;
-			if (task instanceof EventTask) {
-				com.google.api.services.calendar.model.Event insertEvent = ((EventTask) task).toGEvent();
-				returnTask = parseGEvent(this.calendar.events().insert(calendarIdentifier, insertEvent).execute());
-			} else if (task instanceof ToDoTask) {
-				com.google.api.services.tasks.model.Task insertTask = ((ToDoTask) task).toGTask();
-				returnTask = parseGTask(this.tasks.tasks().insert(DEFAULT_TASKS, insertTask).execute());
-			} else {
-				return null;
-			}
+			Task returnTask = this.executeInsert(task);
 			assert(task.getCreated() != null);
 			returnTask.updateCreated(task.getCreated());
 			return returnTask;
+		}
+	}
+	
+	private Task executeInsert(Task task) throws HandledException, IOException {
+		if (task instanceof EventTask) {
+			com.google.api.services.calendar.model.Event insertEvent = ((EventTask) task).toGEvent();
+			return parseGEvent(this.calendar.events().insert(calendarIdentifier, insertEvent).execute());
+		} else if (task instanceof ToDoTask) {
+			com.google.api.services.tasks.model.Task insertTask = ((ToDoTask) task).toGTask();
+			return parseGTask(this.tasks.tasks().insert(DEFAULT_TASKS, insertTask).execute());
+		} else {
+			throw new HandledException(HandledException.ExceptionType.INVALID_TASK_OBJ);
 		}
 	}
 	
@@ -1963,16 +1982,20 @@ public class GoogleEngine {
 			this.tryToRemove(task);
 			return null;
 		} else {
-			Task returnTask;
-			if (task instanceof EventTask) {
-				returnTask = this.executeUpdate((EventTask) task); 
-			} else if (task instanceof ToDoTask) {
-				returnTask = this.executeUpdate((ToDoTask) task);
-			} else {
-				return null;
-			}
+			Task returnTask = this.executeUpdate(task);
+			assert(task.getCreated() != null);
 			returnTask.updateCreated(task.getCreated());
 			return returnTask;
+		}
+	}
+	
+	private Task executeUpdate(Task task) throws HandledException, IOException {
+		if (task instanceof EventTask) {
+			return this.executeUpdate((EventTask) task); 
+		} else if (task instanceof ToDoTask) {
+			return this.executeUpdate((ToDoTask) task);
+		} else {
+			throw new HandledException(HandledException.ExceptionType.INVALID_TASK_OBJ);
 		}
 	}
 	
