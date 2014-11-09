@@ -22,7 +22,6 @@ public class RestoreTest {
 	@BeforeClass
 	public static void initialise() throws HandledException, FatalException{
 		TaskList.getInstance(new Option(Option.Value.TEST)).emptyTestList();;
-		
 	}
 
 	@Test
