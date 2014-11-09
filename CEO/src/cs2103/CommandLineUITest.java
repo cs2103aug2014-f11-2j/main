@@ -10,6 +10,7 @@ import static org.fusesource.jansi.Ansi.Color.*;
 
 import java.lang.reflect.Array;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import cs2103.exception.FatalException;
@@ -176,6 +177,11 @@ public class CommandLineUITest {
 	private static final String MESSAGE_SHOW_SUCCESS_2 = ansi().a(MESSAGE_SHOW_SUCCESS).fg(YELLOW).a("1. ").reset().bold().a("boxing at NUS\n").boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a('\t').a("Due At: ").bold().fg(GREEN).a("2014/12/23 09:00 PM").reset().a("\nDescription: \n").reset().toString();
 	private static final String LESS_THAN_ONE_PARA = "You need to specify at least one parameter\n";
 	private static final String MESSAGE_LIST_EMPTY = "The task list is empty\n";
+	
+	@BeforeClass 
+	public static void initialise() throws HandledException, FatalException{
+		TaskList.getInstance(new Option(Option.Value.TEST)).emptyTestList();
+	}
 	
 	@Test
 	public void test14_InvalidCommand() throws HandledException, FatalException {

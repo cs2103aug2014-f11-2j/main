@@ -17,7 +17,7 @@ public class UpdateTimeFromRecurTest {
 
 	@BeforeClass
 	public static void initialise() throws HandledException, FatalException{
-		TaskList.getInstance(new Option(Option.Value.TEST));
+		TaskList.getInstance(new Option(Option.Value.TEST)).emptyTestList();;
 		Add addObj = new Add("-title updateFromRecur -time 2014/10/18 23:00 to 2014/10/20 23:00 -recur 2d");
 		addObj.execute();
 	}

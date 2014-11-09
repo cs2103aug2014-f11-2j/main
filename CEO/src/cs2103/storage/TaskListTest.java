@@ -8,7 +8,10 @@ import java.util.Date;
 
 import net.fortuna.ical4j.model.property.Status;
 
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import cs2103.exception.FatalException;
 import cs2103.exception.HandledException;
@@ -19,11 +22,15 @@ import cs2103.task.PeriodicTask;
 import cs2103.task.Task;
 import cs2103.util.TestUtil;
 
-
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TaskListTest {
+	@BeforeClass 
+	public static void initialise() throws HandledException, FatalException{
+		TaskList.getInstance(new Option(Option.Value.TEST)).emptyTestList();
+	}
 	
 	@Test
-	public void testGetPeriodicList() throws FatalException, HandledException {
+	public void test10_GetPeriodicList() throws FatalException, HandledException {
 		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status  testStatus = new Status("testPeriodic");
 		
@@ -35,7 +42,7 @@ public class TaskListTest {
 	}
 
 	@Test
-	public void testGetDeadlineList() throws FatalException, HandledException {
+	public void test04_GetDeadlineList() throws FatalException, HandledException {
 		TaskList testDead = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testStatus");
 		
@@ -46,7 +53,7 @@ public class TaskListTest {
 	}
 
 	@Test
-	public void testGetFloatingList() throws HandledException, FatalException {
+	public void test05_GetFloatingList() throws HandledException, FatalException {
 		TaskList testFloat = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testFloat");
 		
@@ -58,7 +65,7 @@ public class TaskListTest {
 	}
 	
 	@Test
-	public void testGetAllList() throws HandledException, FatalException {
+	public void test06_GetAllList() throws HandledException, FatalException {
 		TaskList testAll = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testStatus");
 	
@@ -70,7 +77,7 @@ public class TaskListTest {
 	}
 	
 	@Test
-	public void testGetTaskByID() throws HandledException, FatalException {
+	public void test07_GetTaskByID() throws HandledException, FatalException {
 		TaskList testID = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testID");
 		Date dueDate = new Date(System.currentTimeMillis() + 865000L);
@@ -82,7 +89,7 @@ public class TaskListTest {
 	}
 	
 	@Test
-	public void testAddTask() throws HandledException, FatalException {
+	public void test02_AddTask() throws HandledException, FatalException {
 		TaskList testAdd = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testAdd");
 		
@@ -94,7 +101,7 @@ public class TaskListTest {
 	
 	
 	@Test
-	public void testUpdateTask() throws HandledException, FatalException {
+	public void test03_UpdateTask() throws HandledException, FatalException {
 		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testUpdate");
 		
@@ -110,7 +117,7 @@ public class TaskListTest {
 	}
 
 	@Test
-	public void testDeleteTask() throws HandledException, FatalException {
+	public void test08_DeleteTask() throws HandledException, FatalException {
 		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testDelete");
 		Date startDate = new Date(System.currentTimeMillis());
@@ -125,7 +132,7 @@ public class TaskListTest {
 	}
 	
 	@Test
-	public void testGetTrashList() throws HandledException, FatalException {
+	public void test01_GetTrashList() throws HandledException, FatalException {
 		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testTrash");
 		
@@ -137,7 +144,7 @@ public class TaskListTest {
 	}
 	
 	@Test
-	public void testGetDefaultList() throws HandledException, FatalException {
+	public void test09_GetDefaultList() throws HandledException, FatalException {
 		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
 		Status testStatus = new Status("testDefault");
 		

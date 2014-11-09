@@ -198,7 +198,7 @@ public abstract class Task implements Comparable<Task>, Cloneable{;
 	 * @return Updated task
 	 * @throws HandledException
 	 */
-	public Task update(Date[] time) throws HandledException{
+	public Task updateNewTask(Date[] time) throws HandledException{
 		Task returnTask = this.convert(time);
 		assert(returnTask != null);
 		returnTask.updateLastModified(null);

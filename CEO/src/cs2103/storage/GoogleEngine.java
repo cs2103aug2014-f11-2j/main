@@ -535,6 +535,8 @@ public class GoogleEngine {
 		if (m.find()){
 			result[0] = description.substring(0, m.start()).trim();
 			result[1] = description.substring(m.start() + DUE_STRING_LENGTH , m.end() - 1);
+		} else {
+			result[0] = description;
 		}
 		return result;
 	}

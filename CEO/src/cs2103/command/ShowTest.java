@@ -18,7 +18,7 @@ import cs2103.parameters.ParameterList;
 public class ShowTest {
 	@BeforeClass
 	public static void initialise() throws HandledException, FatalException{
-		TaskList.getInstance(new Option(Option.Value.TEST));
+		TaskList.getInstance(new Option(Option.Value.TEST)).emptyTestList();;
 		Add addObj = new Add("-title testShow -time 2014/10/23 20:20 to 2014/10/25 10:00 -location home -description much testing, such title");
 		addObj.execute();
 	}

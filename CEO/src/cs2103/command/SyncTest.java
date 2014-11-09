@@ -19,12 +19,12 @@ public class SyncTest {
 
 	@BeforeClass
 	public static void initialise() throws HandledException, FatalException{
-		TaskList.getInstance(new Option(Option.Value.TEST));
+		TaskList.getInstance(new Option(Option.Value.TEST)).emptyTestList();;
 	}
 	
 	@Test
 	public void testEnableSync() throws HandledException, FatalException {
-		assert(CommonUtil.checkSyncSupport() == true);
+		assert(CommonUtil.checkSyncSupport());
 		Sync s = new Sync(null);
 		String result = s.execute().toString();
 		assertEquals(ansi().fg(GREEN).a("Successfully sync your data with Google\n").reset().toString(),result);

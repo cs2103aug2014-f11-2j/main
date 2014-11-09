@@ -21,7 +21,7 @@ import cs2103.task.Task;
 public class RestoreTest {
 	@BeforeClass
 	public static void initialise() throws HandledException, FatalException{
-		TaskList.getInstance(new Option(Option.Value.TEST));
+		TaskList.getInstance(new Option(Option.Value.TEST)).emptyTestList();;
 		
 	}
 

@@ -25,7 +25,7 @@ public class AlertTest {
 	
 	@BeforeClass
 	public static void initialise() throws HandledException, FatalException{
-		TaskList.getInstance(new Option(Option.Value.TEST));		
+		TaskList.getInstance(new Option(Option.Value.TEST)).emptyTestList();;		
 	}
 	
 	@Test
@@ -77,11 +77,11 @@ public class AlertTest {
 		
 		Alert alert = new Alert();
 		Task dead = TaskList.getInstance().getDeadlineList().get(0);
-		TaskList.getInstance().updateTask(dead.update(deadlineTask_time));
+		TaskList.getInstance().updateTask(dead.updateNewTask(deadlineTask_time));
 		dead = TaskList.getInstance().getDeadlineList().get(0);
 		
 		Task period = TaskList.getInstance().getPeriodicList().get(0);
-		TaskList.getInstance().updateTask(period.update(periodicTask_time));
+		TaskList.getInstance().updateTask(period.updateNewTask(periodicTask_time));
 		period = TaskList.getInstance().getPeriodicList().get(0);
 		
 		boolean check = dead.checkAlert();
@@ -119,11 +119,11 @@ public class AlertTest {
 		Alert alert = new Alert();
 		
 		Task dead = TaskList.getInstance().getDeadlineList().get(0);
-		TaskList.getInstance().updateTask(dead.update(deadlineTask_time));
+		TaskList.getInstance().updateTask(dead.updateNewTask(deadlineTask_time));
 		dead = TaskList.getInstance().getDeadlineList().get(0);
 		
 		Task period = TaskList.getInstance().getPeriodicList().get(0);
-		TaskList.getInstance().updateTask(period.update(periodicTask_time));
+		TaskList.getInstance().updateTask(period.updateNewTask(periodicTask_time));
 		period = TaskList.getInstance().getPeriodicList().get(0);
 		
 		boolean check = dead.checkAlert();

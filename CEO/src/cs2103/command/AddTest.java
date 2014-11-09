@@ -25,7 +25,7 @@ public class AddTest {
 	
 	@BeforeClass 
 	public static void initialise() throws HandledException, FatalException{
-		TaskList.getInstance(new Option(Option.Value.TEST));
+		TaskList.getInstance(new Option(Option.Value.TEST)).emptyTestList();
 	}
 	
 	@Test
