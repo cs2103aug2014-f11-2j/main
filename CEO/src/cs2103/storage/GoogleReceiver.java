@@ -30,7 +30,6 @@ import cs2103.util.CommonUtil;
 import cs2103.util.Logger;
 
 /**
- * @author Yuri
  * This class utilizes Google's OAuth2 method to get credentials.
  */
 public class GoogleReceiver {

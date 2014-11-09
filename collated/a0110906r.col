@@ -1,0 +1,1822 @@
+//@author: a0110906r
+
+
+
+	/**
+	 * origin: CEO\src\cs2103\CommandLineUI.java
+	 */
+
+package cs2103;
+
+import java.util.Scanner;
+import java.util.Stack;
+
+import org.fusesource.jansi.Ansi;
+
+import cs2103.command.*;
+import cs2103.exception.FatalException;
+import cs2103.exception.HandledException;
+import cs2103.parameters.CommandType;
+import cs2103.parameters.Option;
+import cs2103.storage.TaskList;
+import cs2103.util.CommonUtil;
+import cs2103.util.Logger;
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
+
+public class CommandLineUI {
+	private static final String MESSAGE_WELCOME_FORMAT = "Welcome to the CEO. %1$s";
+	private static final String MESSAGE_SYNC_ENABLED = "Google Sync is enabled";
+	private static final String MESSAGE_SYNC_DISABLED = "Google Sync is disabled";
+	private static final String MESSAGE_TEST_MODE = "You are now in test mode";
+	private static final String MESSAGE_EXIT = "You have exited CEO. Hope to see you again.\n";
+	private static final String MESSAGE_USER_PROMPT = "Command me please: ";
+	private static final String MESSAGE_SYNC_PROMPT = "Do you want to enable google sync? y/n:";
+	private static final String MESSAGE_COMMAND_ERROR = "Your input command is invalid, please check your command and try again\n";
+	private static final String MESSAGE_FATAL_ERR = "A fatal error has occurred, program will now exit. Check log for detail\n";
+	private static final String MESSAGE_INITIALIZATION_ERROR = "Failed to initialize CEO, program will now exit\n";
+	private static final String MESSAGE_UNDO_FORMAT = "Successfully undo %1$d operations\n";
+	private static final String MESSAGE_REDO_FORMAT = "Successfully redo %1$d operations\n";
+	private static final String LOG_INITIALIZE = "Initializing CommandLineUI instance";
+	private static final String LOG_READY = "All initializations are done";
+	private static final String LOG_REDO = "Trying to redo %1$d operations";
+	private static final String LOG_UNDO = "Trying to undo %1$d operations";
+	private static final String LOG_COMMAND = "Input command \"%1$s\"";
+	private static final String LOG_EXIT = "User exited from CEO";
+	
+	private static CommandLineUI commandLine;
+	private TaskList taskList;
+	private Stack<InfluentialCommand> undoStack;
+	private Stack<InfluentialCommand> redoStack;
+	private Scanner scanner = new Scanner(System.in);
+	private final Logger logger;
+	
+	private CommandLineUI(Option option) throws HandledException, FatalException {
+		this.logger = Logger.getInstance();
+		this.logger.writeLog(LOG_INITIALIZE);
+		undoStack = new Stack<InfluentialCommand>();
+		redoStack = new Stack<InfluentialCommand>();
+		option = this.verifyOption(option);
+		this.taskList = TaskList.getInstance(option);
+		Ansi welcomeMsg;
+		switch(option.getValue()) {
+		default:
+		case SYNC:
+		case DEFAULT:
+			welcomeMsg = ansi().fg(GREEN).a(String.format(MESSAGE_WELCOME_FORMAT, MESSAGE_SYNC_ENABLED));
+			break;
+		case NOSYNC:
+			welcomeMsg = ansi().fg(RED).a(String.format(MESSAGE_WELCOME_FORMAT, MESSAGE_SYNC_DISABLED));
+			break;
+		case TEST:
+			welcomeMsg = ansi().a(String.format(MESSAGE_WELCOME_FORMAT, MESSAGE_TEST_MODE));
+			break;
+		}
+		CommonUtil.print(welcomeMsg.a('\n').reset());
+		this.logger.writeLog(LOG_READY);
+	}
+	
+	/**
+	 * Returns an instance of the CommandLineUI class.
+	 * 
+	 * @param option
+	 * @return The instance of the CommandLineUI class
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
+	public static CommandLineUI getInstance(Option option) throws HandledException, FatalException {
+		if (commandLine == null) {
+			commandLine = new CommandLineUI(option);
+			assert(commandLine.taskList.getAllList() != null);
+		}
+		return commandLine;
+	}
+	
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		CommandLineUI main;
+		try {
+			main = CommandLineUI.getInstance(Option.parse(args));
+			main.userLoop();
+		} catch (HandledException | FatalException e){
+			System.err.println(MESSAGE_INITIALIZATION_ERROR);
+		}
+	}
+	
+	private void userLoop() throws HandledException, FatalException {
+		CommonUtil.print(new UpdateTimeFromRecur().execute());
+		CommonUtil.print(new Alert().execute());
+		while (true) {
+			CommonUtil.printPrompt(MESSAGE_USER_PROMPT);
+			String command = scanner.nextLine();
+			CommonUtil.clearConsole();
+			if (command != null && !command.isEmpty()) {
+				Ansi feedback = processUserInput(command);
+				if (feedback == null) {
+					this.logger.writeLog(LOG_EXIT);
+					CommonUtil.print(MESSAGE_EXIT);
+					break;
+				} else {
+					CommonUtil.print(feedback);
+				}
+			}
+		}
+	}
+	
+	private Ansi processUserInput(String userInput) {
+		try {
+			assert(userInput != null);
+			this.logger.writeLog(String.format(LOG_COMMAND, userInput));
+			String command[] = CommonUtil.splitFirstWord(userInput);
+			CommandType commandType = CommandType.parse(command[0]);
+			Command commandObject;
+			switch (commandType.getValue()) {
+			case LIST:
+				commandObject = new List(command[1]);
+				break;
+			case UPDATE:
+				commandObject = new Update(command[1]);
+				break;
+			case EXIT:
+				return null;
+			case ADD:
+				commandObject = new Add(command[1]);
+				break;
+			case DELETE:
+				commandObject = new Delete(command[1]);
+				break;
+			case SHOW:
+				commandObject = new Show(command[1]);
+				break;
+			case UNDO:
+				return undo(command[1]);
+			case REDO:
+				return redo(command[1]);
+			case HELP:
+				commandObject = new Help(command[1]);
+				break;
+			case SEARCH:
+				commandObject = new Search(command[1]);
+				break;
+			case ALERT:
+				commandObject = new Alert();
+				break;
+			case MARK:
+				commandObject = new Mark(command[1]);
+				break;
+			case RESTORE:
+				commandObject = new Restore(command[1]);
+				break;
+			case SYNC:
+				commandObject = new Sync(command[1]);
+				break;
+			case INVALID:
+			default:
+				return ansi().bg(RED).a(MESSAGE_COMMAND_ERROR).reset();
+			}
+			if (commandObject instanceof InfluentialCommand) {
+				this.undoStack.push((InfluentialCommand) commandObject);
+			}
+			return commandObject.execute();
+		} catch (HandledException e) {
+			return ansi().bg(RED).a(e.getErrorMsg()).a('\n').reset();
+		} catch (FatalException e) {
+			CommonUtil.printErrMsg(MESSAGE_FATAL_ERR);
+			return null;
+		}
+	}
+	
+	private Ansi undo(String steps) throws HandledException, FatalException {
+		int result;
+		if (steps == null || steps.isEmpty()) {
+			result = executeUndo(1);
+		} else {
+			result = executeUndo(CommonUtil.parseIntegerParameter(steps));
+		}
+		return ansi().fg(GREEN).a(String.format(MESSAGE_UNDO_FORMAT, result)).reset();
+	}
+	
+	private int executeUndo(int steps) throws HandledException, FatalException {
+		int result = 0;
+		this.logger.writeLog(String.format(LOG_UNDO, steps));
+		while(!this.undoStack.isEmpty() && result < steps) {
+			InfluentialCommand undoCommand = undoStack.pop().undo();
+			if (undoCommand != null) {
+				result++;
+				this.redoStack.push(undoCommand);
+			}
+		}
+		return result;
+	}
+	
+	private Ansi redo(String steps) throws HandledException, FatalException {
+		int result;
+		if (steps == null || steps.isEmpty()) {
+			result = executeRedo(1);
+		} else {
+			result = executeRedo(CommonUtil.parseIntegerParameter(steps));
+		}
+		return ansi().fg(GREEN).a(String.format(MESSAGE_REDO_FORMAT, result)).reset();
+	}
+	
+	private int executeRedo(int steps) throws HandledException, FatalException {
+		int result = 0;
+		this.logger.writeLog(String.format(LOG_REDO, steps));
+		while(!this.redoStack.isEmpty() && result < steps) {
+			InfluentialCommand redoCommand = redoStack.pop().redo();
+			if (redoCommand != null) {
+				result++;
+				this.undoStack.push(redoCommand);
+			}
+		}
+		return result;
+	}
+	
+	private Option verifyOption(Option option) throws HandledException {
+		if (option == null || option.getValue().equals(Option.Value.DEFAULT)) {
+			if (CommonUtil.checkSyncSupport()) {
+				return askOption();
+			} else {
+				return new Option(Option.Value.NOSYNC);
+			}
+		} else {
+			return option;
+		}
+	}
+	
+	private Option askOption() {
+		CommonUtil.printPrompt(MESSAGE_SYNC_PROMPT);
+		String answer = null;
+		while(true){
+			answer = this.scanner.nextLine();
+			if (answer != null) {
+				if (answer.equalsIgnoreCase("y")) {
+					return new Option(Option.Value.SYNC);
+				} else if (answer.equalsIgnoreCase("n")) {
+					return new Option(Option.Value.NOSYNC);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Carries out the testing of different commands.
+	 * 
+	 * @param testCommandInput
+	 * @return a resultant string from an input command
+	 */
+	public String testCommand(String testCommandInput) {
+		return processUserInput(testCommandInput).toString();
+	}
+}
+
+	// End of segment: CEO\src\cs2103\CommandLineUI.java
+
+
+
+
+
+	/**
+	 * origin: CEO\src\cs2103\CommandLineUITest.java
+	 */
+
+package cs2103;
+
+import static org.junit.Assert.*;
+
+import org.fusesource.jansi.Ansi;
+
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
+
+import java.lang.reflect.Array;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import cs2103.exception.FatalException;
+import cs2103.exception.HandledException;
+import cs2103.parameters.Option;
+import cs2103.storage.TaskList;
+
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
+
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class CommandLineUITest {
+	
+	private static final String MESSAGE_DELETE = "You have moved task with ID %1$d to trash\n";
+	private static final String MESSAGE_COMMAND_ERROR = "Your input command is invalid, please check your command and try again\n";
+	private static final String MESSAGE_ADD = "You have successfully added a new task.\n";							
+	private static final String MESSAGE_ADD_SUCCESS_5 = "Description: ";
+	private static final String MESSAGE_UPDATE = "You have updated task with ID %1$d\n";
+	private static final String MESSAGE_UPDATE_UNSUCCESSFUL = "You need to specify at least one parameter";
+	protected static final Ansi DELETED = ansi().fg(MAGENTA).a("(Deleted Task)\n").reset();
+	private static final String MESSAGE_INVALID_ID = "Your input task ID is not valid, please check your input and try again!\n";
+	private static final String MESSAGE_NULL_ERROR = "Your input command contains error, please check your input and try again!";
+	private static final String MESSAGE_MARK = "Successfully marked task %1$d as completed\n";
+	private static final String MESSAGE_MARK_SUCCESS = "Successfully marked task 4 as completed";
+	private static final String MESSAGE_MARK_SUCCESS_1 = "Successfully marked task 1 as completed";
+	public static final Ansi HELP_DEFAULT = ansi().fg(YELLOW).a("CEO Usage:\n").reset()
+			  								.bold().a("  add <Quick add string>\n" +
+			  								"      ([-S or --title <title>] [-D or -description <description>]\n" + 
+			  								"      [-L or -location <location>] [-R or -recurring <number h/d/w/m/y>]\n" +
+			  										"      [-T or -time {<blank>|<time>|<<time> to <time>>}])\n").reset()
+			  										.bg(BLUE).a("  +Add a new task. Enter \"help add\" for more\n\n").reset()
+			  										.bold().a("  list (<floating|deadline|periodic|all|trash>)\n").reset()
+			  										.bg(GREEN).a("  +List existing tasks. Enter \"help list\" for more\n\n").reset()
+			  										.bold().a("  show <task ID>\n").reset()
+			  										.bg(GREEN).a("  +Show detail of the task with specified task ID. Enter \"help show\" for more\n\n").reset()
+			  										.bold().a("  delete <task ID> (-p)\n").reset()
+			  										.bg(RED).a("  +Delete task with corresponding taskID. Enter \"help delete\" for more\n\n").reset()
+			  										.bold().a("  update <task ID> ([-S or -title <title>] [-C or -complete {true|false}]\n" +
+			  												"                   [-D or -description <description>]\n" +
+			  												"                   [-L or -location <location>]\n" +
+			  												"                   [-T or -time {<blank>|<time>|<<time> to <time>>}]\n" +
+			  												"                   [-R or -recurring <number h/d/w/m/y>])\n").reset()
+			  										.bg(BLUE).a("  +Update task with corresponding task ID. Enter \"help update\" for more\n\n").reset()
+			  										.bold().a("  undo/redo <number of steps>\n").reset()
+			  										.bg(BLUE).a("  +Undo/redo some steps. Enter \"help undo\" or \"help redo\" for more\n\n").reset()
+			  										.bold().a("  search (<keyword String>)\n" +
+			  												"         {([-K or -type <floating|deadline|periodic|all|trash>]\n" +
+			  												"         [-C or -complete {true|false}]\n" +
+			  												"         [-T or -time {<blank>|<time>|<<time> to <time>>}]}\n").reset()
+			  										.bg(GREEN).a("  +Search for tasks. Enter \"help search\" for more\n\n").reset()
+			  										.bold().a("  mark <task ID>\n").reset()
+			  										.bg(BLUE).a("  Mark a task as completed. Enter \"help mark\" for more\n\n").reset()
+			  										.bold().a("  sync (-disable)\n").reset()
+			  										.bg(BLUE).a("  +Manually sync your task with Google. In usual circumstances, CEO will\n" +
+			  										"   automatically sync with Google, this command is useful when you disabled\n" +
+			  										"   sync in initialization\n" +
+			  										"   Use sync -disable to disable syncing\n\n").reset()
+			  										.bold().a("  alert\n").reset()
+			  										.bg(BLUE).a("  +display approaching deadlines and start times\n\n").reset()
+			  										.bold().a("  help\n").reset()
+			  										.bg(BLUE).a("  +display this message\n").reset();
+	public static final Ansi HELP_ADD = ansi().a("Add usage:\n")
+										.bold().a("  add <Quick add string>\n" +
+												"      ([-S or --title <title>] [-D or -description <description>]\n" + 
+												"      [-L or -location <location>] [-R or -recurring <number h/d/w/m/y>]\n" +
+												"      [-T or -time {<blank>|<time>|<<time> to <time>>}])\n").reset()
+												.a("Options:\n")
+												.bg(CYAN).a("  <Quick add string>          Text before \"from\"/\"by\"/\"on\"/\"in\"/\"at\" is title.\n" +
+														"                              You can specify time after these keywords.\n" +
+														"                              Specify recurrence after keyword \"every\"\n" +
+														"  -title <taskTitle>          Optional if using quick add, title of the task\n" +
+														"  -description <description>  Optional, describe task details\n" +
+														"  -location <location>        Optional, describe task location\n" +
+														"                              Only available for periodic tasks\n" +
+														"  -time <blank>               default, no time info.\n" +
+														"                              This task is a floating task.\n" +
+														"        <time>                define a deadline for the task.\n" +
+														"                              This task is a deadline task\n" +
+														"        <<time> to <time>>    define time period for the task.\n" +
+														"                              This is a periodic task\n" +
+														"  -recurring <Interval><Frequency> Optional, define a recurrence period\n" +
+														"                       <Frequency> can be h/d/w/m/y, refers to:\n" +
+														"                       Every <Interval> (h)ours/(d)ays/(w)eek/(m)onth/(y)ear\n\n").reset()
+														.a("Example:\n")
+														.bg(YELLOW).a("  add Submit homework by tomorrow\n").reset()
+														.bg(BLUE).a("This will effectively adding a Deadline Task with title \"Submit homework\" with due time by tomorrow\n\n").reset()
+														.bg(YELLOW).a("  add -title Task Title -description Describe this task -location office\n" +
+																"      -time 2014/10/12 14:22 to 2014/10/13 14:22 -recurring 1w\n").reset()
+																.bg(BLUE).a("This will effectively adding a Periodic task with title \"Task Title\", with description \"Describe this task\", with location \"office\", with a time period from 2014/10/12 14:22 to 2014/10/13 14:22, and this task will recur every 1 week\n").reset();
+	public static final Ansi HELP_DELETE = ansi().a("Delete usage:\n")
+										   .bold().a("  delete <task ID> (-p)\n").reset()
+										   .a("Options:\n")
+										   .bg(CYAN).a("  <task ID>        Elementary, specify the task you want to move to trash\n" +
+												   "  -p               Optional, the task will be removed permanantly\n").reset()
+												   .bg(YELLOW).a("Example: delete 1\n").reset();
+											public static final Ansi HELP_UPDATE = ansi().a("Update usage:\n")
+											.bold().a("  update <task ID> ([-S or -title <title>] [-C or -complete {true|false}]\n" +
+											"                   [-D or -description <description>]\n" +
+											"                   [-L or -location <location>]\n" +
+											"                   [-T or -time {<blank>|<time>|<<time> to <time>>}]\n" +
+													"                   [-R or -recurring <number h/d/w/m/y>])\n").reset()
+													.a("Options:\n")
+													.bg(CYAN).a("  <Task ID>                   Elementary, specify the task ID of which\n" +
+															"                              the task require modification\n" +
+															"  -title <taskTitle>          Modify title of the task\n" +
+															"  -complete <true|false>      Indicate the task is complete or not\n" +
+															"                              Unavailable for periodic tasks\n" +
+															"  -description <description>  Modify task details\n" +
+															"  -location <location>        Modify task location\n" +
+															"                              only available for periodic tasks\n" +
+															"  -time <blank>               Convert this task to a floating task\n" +
+															"        <time>                Convert this task to a deadline task\n" +
+															"        <<time> to <time>>    Convert this task to a periodic task\n" +
+															"  -recurring <Interval><Frequency> Modify the recurrence period\n" +
+															"                       <Frequency> can be h/d/w/m/y, refers to:\n" +
+															"                       Every <Interval> (h)ours/(d)ays/(w)eek/(m)onth/(y)ear\n" +
+															"                       Use -recurring 0 to remove the recurrence\n\n").reset()
+															.a("Example:\n")
+															.bg(YELLOW).a("  update 1 -title Task Title -description Describe this task\n" +
+																	"           -time 2014/10/12 -complete true\n").reset()
+																	.bg(BLUE).a("This will effectively update the task with Task ID 1 to a Deadline task with title \"Task Title\", with description \"Describe this task\", with a deadline at 2014/10/12 and indicate the task is complete\n").reset();
+	public static final Ansi HELP_LIST = ansi().a("List usage:\n")
+										.bold().a("list (<<blank>|floating|deadline|periodic|all>)\n" +
+												"  <blank>              list only incomplete tasks\n" +
+												"  floating             list tasks with no dates set\n" +
+												"  deadline             list tasks that have a deadline\n" +
+												"  periodic             list tasks that is a timed event\n" +
+												"  all                  list all tasks\n" +
+												"  trash                list all tasks in trash bin\n").reset()
+												.bg(YELLOW).a("Example:\nlist deadline\n").reset();
+	public static final Ansi HELP_SHOW = ansi().bold().a("Show has no extra options\n" +
+										"Example:\nshow 1\n").reset();
+	public static final Ansi HELP_REDO = ansi().bold().a("Redo has no extra options\n" +
+										"Example:\nredo 1\n").reset();
+	public static final Ansi HELP_UNDO = ansi().bold().a("Undo has no extra options\n" +
+										"Example:\nundo 1\n").reset();
+	public static final Ansi HELP_SEARCH = ansi().a("Search usage:\n")
+											.bold().a("  search (<keyword String>)\n" +
+													"         {([-K or -type <floating|deadline|periodic|all|trash>]\n" +
+													"         [-C or -complete {true|false}]\n" +
+													"         [-T or -time {<blank>|<time>|<<time> to <time>>}]}\n").reset()
+													.a("Options:\n")
+													.bg(CYAN).a("  <Keyword>                   Search title, description and location\n" +
+															"                              for the specified keyword\n" +
+															"  <floating|deadline|         Specify the type of tasks to search\n" +
+															"  periodic|all|trash>         if not specified, search all tasks\n" +
+															"  -complete <true|false>      Specify the complete status you want to search\n" +
+															"  -time <blank>               Search only deadline and periodic tasks\n" +
+															"        <time>                Search deadline and periodic tasks that\n" +
+															"                              due time or start time is before given time\n" +
+															"        <<time> to <time>>    Search deadline and periodic tasks that \n" +
+															"                              due time or start time is within given period\n\n").reset()
+															.a("Example:\n")
+															.bg(YELLOW).a("  search example keyword -keyword all -complete true -time\n").reset()
+															.bg(BLUE).a("This will effectively return the completed Deadline tasks which title, description or location contains \"example keyword\". (when complete parameter is specified, it is implied that all Periodic Tasks will be excluded)\n").reset();
+	public static final Ansi HELP_MARK = ansi().bold().a("Mark has no extra options\n" +
+										"Example: mark 2\n").reset();
+
+	private static final String MESSAGE_REDO_SUCCESS = "Successfully redo 0 operations\n";
+	private static final String MESSAGE_REDO_SUCCESS_1 = "Successfully redo 1 operations\n";
+	private static final String MESSAGE_UNDO_SUCCESS = "Successfully undo 1 operations\n";
+	private static final String MESSAGE_SHOW_SUCCESS = "The details for Task 1:\n";
+	private static final String MESSAGE_SHOW_SUCCESS_1 = ansi().a(MESSAGE_SHOW_SUCCESS).fg(YELLOW).a("1. ").reset().bold().a("Play basketball \n").boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a('\t').a("Due At: ").bold().fg(GREEN).a("2014/12/15 07:00 PM").reset().a("\nDescription: \n").reset().toString();
+	private static final String MESSAGE_SHOW_SUCCESS_2 = ansi().a(MESSAGE_SHOW_SUCCESS).fg(YELLOW).a("1. ").reset().bold().a("boxing at NUS\n").boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a('\t').a("Due At: ").bold().fg(GREEN).a("2014/12/23 09:00 PM").reset().a("\nDescription: \n").reset().toString();
+	private static final String LESS_THAN_ONE_PARA = "You need to specify at least one parameter\n";
+	private static final String MESSAGE_LIST_EMPTY = "The task list is empty\n";
+	
+	@BeforeClass 
+	public static void initialise() throws HandledException, FatalException{
+		TaskList.getInstance(new Option(Option.Value.TEST)).emptyTestList();
+	}
+	
+	@Test
+	public void test14_InvalidCommand() throws HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		String invalidTest = test.testCommand("‐title submit ‐description IVLE ‐location NUS ‐time 2014/09/09 23:59 2014/09/08 00:00 to 2014/09/09 23:59");
+		assertEquals(invalidTest, ansi().bg(RED).a(MESSAGE_COMMAND_ERROR).reset().toString());
+	}	
+	
+	@Test(expected= NullPointerException.class)
+	public void test12_ExitCommand() throws NullPointerException, HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		assertNull(test.testCommand("exit"));
+	}
+		
+	@Test
+	public void test09_AddCommand() throws HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		String addTest = test.testCommand("add Submit homework on 21 December 2014 at 6pm");
+		String[] separatedTest = addTest.split("\n");
+		Ansi returnString = ansi().fg(GREEN).a(MESSAGE_ADD);
+		Ansi returnString1 = ansi().fg(YELLOW).a("2").a(". ").reset();
+		returnString1.bold().a("Submit homework ").a('\n').boldOff().reset();
+		returnString.a(returnString1);
+		String[] separated = returnString.toString().split("\n");
+		assertEquals(Array.get(separatedTest, 0), Array.get(separated, 0));
+		assertEquals(Array.get(separatedTest, 1), Array.get(separated, 1));
+		assertEquals(Array.get(separatedTest, 2), ansi().boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/21 06:00 PM").reset().toString());
+		assertEquals(Array.get(separatedTest, 3), MESSAGE_ADD_SUCCESS_5);
+		assertEquals(Array.get(separatedTest, 4), ansi().reset().toString());
+	}
+		
+	@Test
+	public void test05_UpdateCommand() throws HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		test.testCommand("add Submit test cases on 27 December 2014 at 7pm");
+		String updateTest = test.testCommand("Update 1 -title Submit nothing");
+	
+		Ansi returnString = ansi();
+		returnString.fg(GREEN).a(String.format(MESSAGE_UPDATE, 1)).reset();
+		Ansi returnString1 = ansi().fg(YELLOW).a("1").a(". ").reset();
+		returnString1.bold().a("Submit nothing").a('\n').boldOff().reset();
+		
+		returnString.a(returnString1);
+		returnString.a(ansi().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/27 07:00 PM").reset().toString());
+		returnString.a("\nDescription: \n").reset();
+		assertEquals(updateTest, returnString.toString());
+		
+		String invalidUpdateTest = test.testCommand("Update 23 invalid");
+		assertEquals(invalidUpdateTest, ansi().bg(RED).a(MESSAGE_UPDATE_UNSUCCESSFUL).a('\n').reset().toString());
+	}
+	
+	@Test
+	public void test02_SearchCommand() throws HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		String searchTest = test.testCommand("search periodic");
+		assertEquals(ansi().bold().fg(RED).a("The task list is empty\n").reset().toString(), searchTest);
+	}
+	
+	@Test
+	public void test10_DeleteCommand() throws HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		test.testCommand("add -title write test cases -description write test cases for CS2103 -location eclipse -time 2014/08/08/00:00 to 2014/09/09/23:59 -recurring 2d2");
+		String deleteTest = test.testCommand("delete 1");
+		assertEquals(deleteTest, ansi().fg(GREEN).a(String.format(MESSAGE_DELETE, 1)).reset().toString());
+		
+		String invalidDelete = test.testCommand("delete 23");
+		assertEquals(invalidDelete, ansi().bg(RED).a(MESSAGE_INVALID_ID).reset().toString());
+	}
+	
+	@Test
+	public void test11_EmptyCommand() throws HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		String emptyTest = test.testCommand("");
+		assertEquals(emptyTest, ansi().bg(RED).a(MESSAGE_COMMAND_ERROR).reset().toString());
+	}
+	
+	@Test
+	public void test17_NullCommand() throws HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		String nullTest = test.testCommand(null);
+		assertEquals(ansi().bg(RED).a(MESSAGE_NULL_ERROR).a('\n').reset().toString(), nullTest);
+	}
+	
+	@Test
+	public void test16_MarkCommand() throws HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		test.testCommand("add get rich on 5 June 2015 at 6pm");
+		String markTest = test.testCommand("mark 4");
+
+		String[] separatedTest = markTest.split("\n");
+		
+		Ansi returnString1 = ansi().fg(GREEN).a(String.format(MESSAGE_MARK, 4)).reset();
+		Ansi returnString= ansi().fg(YELLOW).a("4").a(". ").reset();
+		returnString1.a(returnString.bold().a("get rich "));
+		String[] result1 = returnString1.toString().split("\n");
+		assertEquals(Array.get(separatedTest, 0), ansi().fg(GREEN).a(MESSAGE_MARK_SUCCESS).toString());
+		assertEquals(Array.get(separatedTest, 1), Array.get(result1, 1));
+		assertEquals(Array.get(separatedTest, 2), ansi().boldOff().reset().a("Status: ").bold().fg(GREEN).a("Completed").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2015/06/05 06:00 PM").reset().toString());
+		assertEquals(Array.get(separatedTest, 3), ansi().a("Description: ").toString());
+		
+		String invalidMark = test.testCommand("mark 23");
+		assertEquals(invalidMark, ansi().bg(RED).a(MESSAGE_INVALID_ID).reset().toString());
+	}
+	
+	@Test 
+	public void test01_RedoCommand() throws HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		String redoTest = test.testCommand("redo 1");
+		assertEquals(redoTest, ansi().fg(GREEN).a(MESSAGE_REDO_SUCCESS).reset().toString());
+		
+	}
+	
+	@Test
+	public void test04_UndoCommand() throws HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		String undoTest = test.testCommand("undo 1");
+		assertEquals(undoTest, ansi().fg(GREEN).a(MESSAGE_UNDO_SUCCESS).reset().toString());
+	}
+	
+	@Test
+	public void test15_ListCommand() throws HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		String listTest = test.testCommand("list");
+		String[] separatedTest = listTest.split("\n");
+		Ansi returnString1 = ansi().fg(YELLOW).a("1").a(". ").reset();
+		returnString1.bold().a("Submit homework ").a('\n').boldOff().reset();
+		returnString1.a(ansi().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/21 06:00 PM").reset().toString());
+		String[] separated = returnString1.toString().split("\n");
+		assertEquals(Array.get(separatedTest, 0), Array.get(separated, 0));
+		assertEquals(Array.get(separatedTest, 1), Array.get(separated, 1));
+	}
+	
+	@Test
+	public void test03_ShowCommand() throws HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		String showTest1 = test.testCommand("show 10");
+		assertEquals(showTest1, ansi().bg(RED).a(MESSAGE_INVALID_ID).reset().toString());
+		
+		test.testCommand("add Play basketball on 15 December 2014 at 7pm");
+		String showTest2 = test.testCommand("show 1");
+		assertEquals(showTest2, MESSAGE_SHOW_SUCCESS_1);
+	}
+	
+	@Test
+	public void test13_HelpCommand() throws HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		String helpTest = test.testCommand("help");
+		assertEquals(helpTest, HELP_DEFAULT.toString());
+		
+		String helpAddTest = test.testCommand("help add");
+		assertEquals(helpAddTest, HELP_ADD.toString());
+		
+		String helpDeleteTest = test.testCommand("help delete");
+		assertEquals(helpDeleteTest, HELP_DELETE.toString());
+		
+		String helpUpdateTest = test.testCommand("help update");
+		assertEquals(helpUpdateTest, HELP_UPDATE.toString());
+		
+		String helpListTest = test.testCommand("help list");
+		assertEquals(helpListTest, HELP_LIST.toString());
+		
+		String helpShowTest = test.testCommand("help show");
+		assertEquals(helpShowTest, HELP_SHOW.toString());
+		
+		String helpRedoTest = test.testCommand("help redo");
+		assertEquals(helpRedoTest, HELP_REDO.toString());
+		
+		String helpUndoTest = test.testCommand("help undo");
+		assertEquals(helpUndoTest, HELP_UNDO.toString());
+		
+		String helpSearchTest = test.testCommand("help search");
+		assertEquals(helpSearchTest, HELP_SEARCH.toString());
+		
+		String helpMarkTest = test.testCommand("help mark");
+		assertEquals(helpMarkTest, HELP_MARK.toString());
+	}
+	
+	@Test
+	public void test06_multiCommand1() throws HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		TaskList testMulti = TaskList.getInstance();
+		testMulti.emptyTestList();
+		
+		String test1 = test.testCommand("add driving test on 16 December 2014 at 7pm");
+		String[] separatedTest1 = test1.split("\n");
+		Ansi returnString = ansi().fg(GREEN).a(MESSAGE_ADD);
+		Ansi returnString1 = ansi().fg(YELLOW).a("1").a(". ").reset();
+		returnString1.bold().a("driving test ").a('\n').boldOff().reset();
+		returnString.a(returnString1);
+		String[] separated1 = returnString.toString().split("\n");
+		assertEquals(Array.get(separatedTest1, 0), Array.get(separated1, 0));
+		assertEquals(Array.get(separatedTest1, 1), Array.get(separated1, 1));
+		assertEquals(Array.get(separatedTest1, 2), ansi().boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/16 07:00 PM").reset().toString());
+		assertEquals(Array.get(separatedTest1, 3), MESSAGE_ADD_SUCCESS_5);
+		assertEquals(Array.get(separatedTest1, 4), ansi().reset().toString());
+		
+		String test2 = test.testCommand("mark 1");
+		String[] separatedTest2 = test2.split("\n");
+		Ansi returnString2 = ansi().fg(GREEN).a(String.format(MESSAGE_MARK, 1)).reset();
+		Ansi returnString3= ansi().fg(YELLOW).a("1").a(". ").reset();
+		returnString2.a(returnString3.bold().a("driving test "));
+		String[] separated2 = returnString2.toString().split("\n");
+		assertEquals(Array.get(separatedTest2, 0), ansi().fg(GREEN).a(MESSAGE_MARK_SUCCESS_1).toString());
+		assertEquals(Array.get(separatedTest2, 1), Array.get(separated2, 1));
+		assertEquals(Array.get(separatedTest2, 2), ansi().boldOff().reset().a("Status: ").bold().fg(GREEN).a("Completed").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/16 07:00 PM").reset().toString());
+		assertEquals(Array.get(separatedTest2, 3), ansi().a("Description: ").toString());
+		
+		String test3 = test.testCommand("undo 1");
+		assertEquals(test3, ansi().fg(GREEN).a(MESSAGE_UNDO_SUCCESS).reset().toString());
+		
+		String test4 = test.testCommand("list");
+		String[] separatedTest3 = test4.split("\n");
+		assertEquals(Array.get(separatedTest3, 0), ansi().fg(YELLOW).a("1. ").reset().bold().a("driving test ").toString());
+		assertEquals(Array.get(separatedTest3, 1), ansi().boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/16 07:00 PM").reset().toString());
+		
+		String test5 = test.testCommand("redo 1");
+		assertEquals(test5, ansi().fg(GREEN).a(MESSAGE_REDO_SUCCESS_1).reset().toString());
+		
+		String test6 = test.testCommand("delete 2");
+		assertEquals(test6, ansi().bg(RED).a(MESSAGE_INVALID_ID).reset().toString());
+	}
+	
+	@Test
+	public void test07_multiCommand2() throws HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		TaskList testMulti = TaskList.getInstance();
+		testMulti.emptyTestList();
+		
+		String test1 = test.testCommand("add boxing at the gym on 23 December 2014 at 9pm");
+		String[] separatedTest1 = test1.split("\n");
+		Ansi returnString = ansi().fg(GREEN).a(MESSAGE_ADD);
+		Ansi returnString1 = ansi().fg(YELLOW).a("1").a(". ").reset();
+		returnString1.bold().a("boxing at the gym ").a('\n').boldOff().reset();
+		returnString.a(returnString1);
+		String[] separated1 = returnString.toString().split("\n");
+		assertEquals(Array.get(separatedTest1, 0), Array.get(separated1, 0));
+		assertEquals(Array.get(separatedTest1, 1), Array.get(separated1, 1));
+		assertEquals(Array.get(separatedTest1, 2), ansi().boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/23 09:00 PM").reset().toString());
+		assertEquals(Array.get(separatedTest1, 3), MESSAGE_ADD_SUCCESS_5);
+		assertEquals(Array.get(separatedTest1, 4), ansi().reset().toString());
+		
+		String test2 = test.testCommand("update -title boxing at NUS");
+		assertEquals(test2, ansi().bg(RED).a(LESS_THAN_ONE_PARA).reset().toString());
+		
+		String test3 = test.testCommand("update 1 -title boxing at NUS");
+		Ansi returnString2 = ansi();
+		returnString2.fg(GREEN).a(String.format(MESSAGE_UPDATE, 1)).reset();
+		Ansi returnString3 = ansi().fg(YELLOW).a("1").a(". ").reset();
+		returnString3.bold().a("boxing at NUS").a('\n').boldOff().reset();
+		
+		returnString2.a(returnString3);
+		returnString2.a(ansi().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/23 09:00 PM").reset().toString());
+		returnString2.a("\nDescription: \n").reset();
+		assertEquals(test3, returnString2.toString());
+		
+		String test4 = test.testCommand("undo 1");
+		assertEquals(test4, ansi().fg(GREEN).a(MESSAGE_UNDO_SUCCESS).reset().toString());
+	
+		String test5 = test.testCommand("redo 1");
+		assertEquals(test5, ansi().fg(GREEN).a(MESSAGE_REDO_SUCCESS_1).reset().toString());
+		
+		String test6 = test.testCommand("show 1");
+		assertEquals(test6, MESSAGE_SHOW_SUCCESS_2);
+	}
+	
+	@Test
+	public void test08_multiCommand3() throws HandledException, FatalException {
+		CommandLineUI test = CommandLineUI.getInstance(new Option(Option.Value.TEST));
+		TaskList testMulti = TaskList.getInstance();
+		testMulti.emptyTestList();
+		
+		String test1 = test.testCommand("add reformat laptop on 4 december 2014 at 1pm");
+		String[] separatedTest1 = test1.split("\n");
+		Ansi returnString = ansi().fg(GREEN).a(MESSAGE_ADD);
+		Ansi returnString1 = ansi().fg(YELLOW).a("1").a(". ").reset();
+		returnString1.bold().a("reformat laptop ").a('\n').boldOff().reset();
+		returnString.a(returnString1);
+		String[] separated1 = returnString.toString().split("\n");
+		assertEquals(Array.get(separatedTest1, 0), Array.get(separated1, 0));
+		assertEquals(Array.get(separatedTest1, 1), Array.get(separated1, 1));
+		assertEquals(Array.get(separatedTest1, 2), ansi().boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/04 01:00 PM").reset().toString());
+		assertEquals(Array.get(separatedTest1, 3), MESSAGE_ADD_SUCCESS_5);
+		assertEquals(Array.get(separatedTest1, 4), ansi().reset().toString());
+		
+		String test2 = test.testCommand("update 1 -complete true");
+		Ansi returnString2 = ansi();
+		returnString2.fg(GREEN).a(String.format(MESSAGE_UPDATE, 1)).reset();
+		Ansi returnString3 = ansi().fg(YELLOW).a("1").a(". ").reset();
+		returnString3.bold().a("reformat laptop ").a('\n').boldOff().reset();
+		
+		returnString2.a(returnString3);
+		returnString2.a(ansi().a("Status: ").bold().fg(GREEN).a("Completed").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/04 01:00 PM").reset().toString());
+		returnString2.a("\nDescription: \n").reset();
+		assertEquals(test2, returnString2.toString());
+		
+		String test3 = test.testCommand("undo 1");
+		assertEquals(test3, ansi().fg(GREEN).a(MESSAGE_UNDO_SUCCESS).reset().toString());
+		
+		String test4 = test.testCommand("list");
+		String[] separatedTest3 = test4.split("\n");
+		assertEquals(Array.get(separatedTest3, 0), ansi().fg(YELLOW).a("1. ").reset().bold().a("reformat laptop ").toString());
+		assertEquals(Array.get(separatedTest3, 1), ansi().boldOff().reset().a("Status: ").bold().fg(RED).a("Needs Action").reset().a("\t").a("Due At: ").bold().fg(GREEN).a("2014/12/04 01:00 PM").reset().toString());
+		
+		String test5 = test.testCommand("redo 1");
+		assertEquals(test5, ansi().fg(GREEN).a(MESSAGE_REDO_SUCCESS_1).reset().toString());
+		
+		String test6 = test.testCommand("list");
+		assertEquals(test6, ansi().bold().fg(RED).a(MESSAGE_LIST_EMPTY).reset().toString());
+	}
+}
+
+
+	// End of segment: CEO\src\cs2103\CommandLineUITest.java
+
+
+
+
+
+	/**
+	 * origin: CEO\src\cs2103\storage\TaskList.java
+	 */
+
+package cs2103.storage;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
+import cs2103.exception.FatalException;
+import cs2103.exception.HandledException;
+import cs2103.parameters.Option;
+import cs2103.task.DeadlineTask;
+import cs2103.task.FloatingTask;
+import cs2103.task.PeriodicTask;
+import cs2103.task.Task;
+import cs2103.util.CommonUtil;
+import cs2103.util.Logger;
+
+import java.util.Collections;
+
+/**
+ * Compiles the tasks into lists
+ */
+public class TaskList {
+	private static TaskList taskList;
+	private StorageInterface storage;
+	private final File dataFile;
+	private GoogleEngine google;
+	private ArrayList<Task> tasks;
+	private final Logger logger;
+	private static final String SYNCING = "Syncing with Google, please wait for a while\n";
+	private static final String COMMIT_ERROR = "Some error occurred when commit changes to Google";
+	private static final String SYNC_FROM_GOOGLE = "Downloaded %1$d tasks from Google\n";
+	private static final String SYNC_TO_GOOGLE = "Uploaded %1$d tasks to Google\n";
+	private static final String SYNC_FAIL = "Unable to sync your data with Google, Google Sync is disabled";
+	private static final String LOG_ADD = "Trying to insert a Task with UID %1$s into the list";
+	private static final String LOG_UPDATE = "Trying to update a Task with UID %1$s in the list";
+	private static final String LOG_REMOVE = "Tring to remove task with UID %1$s from the list";
+	private static final String LOG_INITIALIZE = "Initializing TaskList";
+	
+	private TaskList(Option option) throws FatalException, HandledException {
+		this.dataFile = new File("CEOStore.ics");
+		this.logger = Logger.getInstance();
+		this.logger.writeLog(LOG_INITIALIZE);
+		switch(option.getValue()) {
+		default:
+		case SYNC:
+		case DEFAULT:
+			try {
+				this.google = GoogleEngine.getInstance();
+			} catch (HandledException e) {
+				CommonUtil.printErrMsg(e.getErrorMsg());
+				this.google = null;
+			}
+		case NOSYNC:
+			this.storage = new StorageEngine(this.dataFile);
+			break;
+		case TEST:
+			this.storage = new StorageStub();
+			break;
+		}
+		this.tasks = this.storage.getTaskList();
+		this.syncWithGoogle();
+	}
+	
+	/**
+	 * Method returns different instances of the TaskList class
+	 * based on the Option arguments.
+	 * 
+	 * @param option
+	 * @return An instance of the TaskList class
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
+	public static TaskList getInstance(Option option) throws HandledException, FatalException {
+		if (taskList == null) {
+			assert(taskList == null);
+			taskList = new TaskList(option);
+		}
+		return taskList;
+	}
+	
+	/**
+	 * Method returns an instance of the TaskList class.
+	 * 
+	 * @return An instance of the TaskList class
+	 * @throws FatalException
+	 */
+	public static TaskList getInstance() throws FatalException {
+		if (taskList == null) {
+			throw new FatalException(FatalException.ExceptionType.NOT_INITIALIZED);
+		} else {
+			return taskList;
+		}
+	}
+	
+	/**
+	 * Method returns an ArrayList of periodic tasks.
+	 * 
+	 * @return an ArrayList of PeriodicTask objects
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
+	public ArrayList<PeriodicTask> getPeriodicList() throws HandledException, FatalException {
+		ArrayList<PeriodicTask> returnList = new ArrayList<PeriodicTask>();
+		for (Task task:this.getAllList()) {
+			if (task instanceof PeriodicTask) {
+				returnList.add((PeriodicTask) task);
+			}
+		}
+		Collections.sort(returnList, PeriodicTask.getComparator());
+		return returnList;
+	}
+	
+	/**
+	 * Method returns an ArrayList of Deadline tasks.
+	 * 
+	 * @return an ArrayList of DeadlineTask objects
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
+	public ArrayList<DeadlineTask> getDeadlineList() throws HandledException, FatalException {
+		ArrayList<DeadlineTask> returnList = new ArrayList<DeadlineTask>();
+		for (Task task:this.getAllList()) {
+			if (task instanceof DeadlineTask) {
+				returnList.add((DeadlineTask) task);
+			}
+		}
+		Collections.sort(returnList, DeadlineTask.getComparator());
+		return returnList;
+	}
+	
+	/**
+	 * Method returns an ArrayList of floating tasks.
+	 * 
+	 * @return an ArrayList of FloatingTask objects
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
+	public ArrayList<FloatingTask> getFloatingList() throws HandledException, FatalException {
+		ArrayList<FloatingTask> returnList = new ArrayList<FloatingTask>();
+		for (Task task:this.getAllList()) {
+			if (task instanceof FloatingTask) {
+				returnList.add((FloatingTask) task);
+			}
+		}
+		return returnList;
+	}
+	
+	/**
+	 * Method returns an ArrayList of deleted tasks.
+	 * 
+	 * @return an ArrayList of Task objects
+	 */
+	public ArrayList<Task> getTrashList() {
+		return this.filterList(this.tasks, true);
+	}
+	
+	/**
+	 * Method returns an ArrayList of default tasks.
+	 * 
+	 * @return an ArrayList of Task objects.
+	 * @throws HandledException
+	 */
+	public ArrayList<Task> getDefaultList() throws HandledException {
+		ArrayList<Task> returnList = new ArrayList<Task>();
+		for (Task task:this.getAllList()) {
+			if (task.getCompleted() == null) {
+				returnList.add(task);
+			}
+		}
+		return returnList;
+	}
+	
+	/**
+	 * Method returns an ArrayList of all task types.
+	 * 
+	 * @return an ArrayList of Task objects
+	 * @throws HandledException
+	 */
+	public ArrayList<Task> getAllList() throws HandledException {
+		return this.filterList(this.tasks, false);
+	}
+	
+	/**
+	 * Method returns a Task object based on the integer argument.
+	 * 
+	 * @param taskID
+	 * @return a Task object based on the taskID parameter
+	 * @throws HandledException
+	 */
+	public Task getTaskByID(int taskID) throws HandledException {
+		if (taskID > this.tasks.size() || taskID < 1) {
+			throw new HandledException(HandledException.ExceptionType.INVALID_TASKID);
+		} else {
+			return this.tasks.get(taskID - 1);
+		}
+	}
+	
+	/**
+	 * Method adds the Task argument to the storage component.
+	 * 
+	 * @param task
+	 * @return a Task object based on the Task argument
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
+	public Task addTask(Task task) throws HandledException, FatalException {
+		this.logger.writeLog(CommonUtil.formatLogString(LOG_ADD, task));
+		this.storage.updateTask(task);
+		this.tasks = this.storage.getTaskList();
+		Task returnTask = this.getTaskByTask(task);
+		if (this.google != null) {
+			Task added = this.commitAddToGoogle(task);
+			this.tasks = this.storage.getTaskList();
+			if (added != null) {
+				returnTask = this.getTaskByTask(added);
+			}
+		}
+		return returnTask;
+	}
+	
+	/**
+	 * Updates the Task object in the storage based on the Task argument.
+	 * 
+	 * @param task
+	 * @return a Task object based on the Task argument
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
+	public Task updateTask(Task task) throws HandledException, FatalException {
+		this.logger.writeLog(CommonUtil.formatLogString(LOG_UPDATE, task));
+		this.storage.updateTask(task);
+		this.tasks = this.storage.getTaskList();
+		Task returnTask = this.getTaskByTask(task);
+		if (this.google != null) {
+			Task updated = this.commitUpdateToGoogle(task);
+			this.tasks = this.storage.getTaskList();
+			if (updated != null) {
+				returnTask = this.getTaskByTask(updated);
+			}
+		}
+		return returnTask;
+	}
+	
+	/**
+	 * Deletes a Task object from storage based on the Task argument.
+	 * 
+	 * @param task
+	 * @throws HandledException
+	 * @throws FatalException
+	 */
+	public void deleteTask(Task task) throws HandledException, FatalException {
+		this.logger.writeLog(CommonUtil.formatLogString(LOG_REMOVE, task));
+		this.storage.deleteTask(task);
+		this.tasks = this.storage.getTaskList();
+		if (this.google != null) {
+			this.commitDeleteToGoogle(task);
+			this.tasks = this.storage.getTaskList();
+		}
+	}
+	
+	/**
+	 * Returns a true value if the system manages to sync with google,
+	 * false otherwise.
+	 * 
+	 * @return a boolean value based on whether the system is able to sync with google
+	 * @throws HandledException
+	 */
+	public boolean manualSync() throws HandledException {
+		if (this.google == null) {
+			this.google = GoogleEngine.getInstance();
+		}
+		return this.syncWithGoogle();
+	}
+	
+	/**
+	 * Disables the system's connection with google.
+	 */
+	public void disableSync() {
+		this.google = null;
+	}
+	
+	public void emptyTestList() throws FatalException, HandledException {
+		if (this.storage instanceof StorageStub) {
+			this.storage = new StorageStub();
+		}
+	}
+	
+	private void commitDeleteToGoogle(Task task) throws HandledException {
+		assert(this.google != null);
+		try {
+			if (this.google.needToSync(task)) {
+				this.syncWithGoogle();
+			} else {
+				this.google.deleteTask(task);
+				this.google.updateLastUpdated();
+			}
+		} catch (IOException e) {
+			this.logger.writeErrLog(COMMIT_ERROR, e);
+			CommonUtil.printErrMsg(COMMIT_ERROR);
+		}
+	}
+	
+	private Task commitUpdateToGoogle(Task task) throws HandledException, FatalException {
+		assert(this.google != null);
+		try {
+			if (this.google.needToSync(task)) {
+				this.syncWithGoogle();
+			} else {
+				return getCommitUpdateResult(task);
+			}
+		} catch (IOException e) {
+			this.logger.writeErrLog(COMMIT_ERROR, e);
+			CommonUtil.printErrMsg(COMMIT_ERROR);
+		}
+		return null;
+	}
+	
+	private Task getCommitUpdateResult(Task task) throws HandledException, FatalException, IOException {
+		assert(this.google != null);
+		if (task.isDeleted()) {
+			this.google.deleteTask(task);
+			return null;
+		} else {
+			Task updating = this.google.updateTask(task);
+			this.google.updateLastUpdated();
+			this.updateUidInList(task, updating);
+			return updating;
+		}
+	}
+
+	private Task commitAddToGoogle(Task task) throws HandledException, FatalException {
+		assert(this.google != null);
+		try {
+			if (this.google.needToSync(task)) {
+				this.syncWithGoogle();
+			} else {
+				return getCommitAddResult(task);
+			}
+		} catch (IOException e) {
+			this.logger.writeErrLog(COMMIT_ERROR, e);
+			CommonUtil.printErrMsg(COMMIT_ERROR);
+		}
+		return null;
+	}
+	
+	private Task getCommitAddResult(Task task) throws HandledException, FatalException, IOException {
+		assert(this.google != null);
+		Task returnTask = this.google.addTask(task);
+		this.updateUidInList(task, returnTask);
+		this.google.updateLastUpdated();
+		return returnTask;
+	}
+	
+	private boolean syncWithGoogle() {
+		if (this.google == null) return false;
+		CommonUtil.print(SYNCING);
+		this.logger.writeLog(SYNCING);
+		try {
+			ArrayList<Task> googleList = this.google.getTaskList();
+			String sync_from_google = String.format(SYNC_FROM_GOOGLE, syncFromGoogle(googleList));
+			CommonUtil.print(ansi().fg(YELLOW).a(sync_from_google).reset());
+			String sync_to_google = String.format(SYNC_TO_GOOGLE, syncToGoogle(googleList));
+			CommonUtil.print(ansi().fg(YELLOW).a(sync_to_google).reset());
+			this.tasks = this.storage.getTaskList();
+			this.google.updateLastUpdated();
+			return true;
+		} catch (IOException | FatalException | HandledException e) {
+			if (e instanceof IOException) {
+				this.logger.writeErrLog(COMMIT_ERROR, e);
+			}
+			CommonUtil.printErrMsg(SYNC_FAIL);
+			this.google = null;
+			return false;
+		}
+	}
+	
+	private int syncFromGoogle(ArrayList<Task> googleList) throws HandledException, FatalException {
+		assert(this.tasks != null);
+		int count = 0;
+		for (Task remoteTask:googleList) {
+			Task localTask = this.getTaskByTask(remoteTask, this.tasks);
+			if (localTask == null) {
+				assert(localTask == null);
+				if (!remoteTask.isDeleted()) {
+					this.storage.updateTask(remoteTask);
+					count++;
+				}
+			} else if (localTask.getLastModified().before(remoteTask.getLastModified())) {
+				remoteTask.updateCreated(localTask.getCreated());
+				this.storage.updateTask(remoteTask);
+				count++;
+			}
+		}
+		return count;
+	}
+	
+	private int syncToGoogle(ArrayList<Task> googleList) throws HandledException, FatalException{
+		assert(this.tasks != null);
+		int count = 0;
+		for (Task localTask:this.tasks) {
+			Task remoteTask = this.getTaskByTask(localTask, googleList);
+			Task updating = null;
+			if (remoteTask == null) {
+				assert(remoteTask == null);
+				updating = this.commitSyncToGoogle(localTask, true);
+				count++;
+			} else {
+				if (remoteTask.getLastModified().before(localTask.getLastModified())) {
+					updating = this.commitSyncToGoogle(localTask, false);
+					count++;
+				}
+			}
+			this.updateUidInList(localTask, updating);
+		}
+		return count;
+	}
+	
+	private Task commitSyncToGoogle(Task task, boolean newFlag) throws HandledException {
+		assert(this.google != null);
+		try {
+			if (newFlag) {
+				return this.google.addTask(task);
+			} else {
+				return this.google.updateTask(task);
+			}
+		} catch (IOException e) {
+			this.logger.writeErrLog(COMMIT_ERROR, e);
+			return null;
+		}
+	}
+	
+	private void updateUidInList(Task oldTask, Task newTask) throws HandledException, FatalException {
+		if (newTask == null) return;
+		if (oldTask.equals(newTask)) {
+			this.storage.updateTask(newTask);
+		} else {
+			this.storage.deleteTask(oldTask);
+			this.storage.updateTask(newTask);
+		}
+	}
+	
+	private ArrayList<Task> filterList(ArrayList<Task> taskList, boolean deleted) {
+		ArrayList<Task> returnList = new ArrayList<Task>();
+		for (Task task:taskList) {
+			if (task.isDeleted() == deleted) {
+				returnList.add(task);
+			}
+		}
+		return returnList;
+	}
+	
+	private Task getTaskByTask(Task task) {
+		assert(this.tasks != null);
+		return this.getTaskByTask(task, this.tasks);
+	}
+	
+	private Task getTaskByTask(Task task, ArrayList<Task> taskList) {
+		for (Task existingTask:taskList) {
+			if (existingTask.equals(task)) {
+				return existingTask;
+			}
+		}
+		return null;
+	}
+}
+
+	// End of segment: CEO\src\cs2103\storage\TaskList.java
+
+
+
+
+
+	/**
+	 * origin: CEO\src\cs2103\storage\TaskListTest.java
+	 */
+
+package cs2103.storage;
+
+import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import java.util.Date;
+
+import net.fortuna.ical4j.model.property.Status;
+
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
+import cs2103.exception.FatalException;
+import cs2103.exception.HandledException;
+import cs2103.parameters.Option;
+import cs2103.task.DeadlineTask;
+import cs2103.task.FloatingTask;
+import cs2103.task.PeriodicTask;
+import cs2103.task.Task;
+import cs2103.util.TestUtil;
+
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class TaskListTest {
+	@BeforeClass 
+	public static void initialise() throws HandledException, FatalException{
+		TaskList.getInstance(new Option(Option.Value.TEST)).emptyTestList();
+	}
+	
+	@Test
+	public void test10_GetPeriodicList() throws FatalException, HandledException {
+		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
+		Status  testStatus = new Status("testPeriodic");
+		
+		PeriodicTask testPeriodicTask = new PeriodicTask("testPeriodic", testStatus, new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis() + 864000L));
+		test.addTask(testPeriodicTask);
+		
+		ArrayList<PeriodicTask> returnTest = test.getPeriodicList();
+		assertEquals(returnTest.get(0).getStatus(), testStatus);
+	}
+
+	@Test
+	public void test04_GetDeadlineList() throws FatalException, HandledException {
+		TaskList testDead = TaskList.getInstance(new Option(Option.Value.TEST));
+		Status testStatus = new Status("testStatus");
+		
+		DeadlineTask testTask = new DeadlineTask("testDeadline", testStatus, new Date());
+		testDead.addTask(testTask);
+		ArrayList<DeadlineTask> returnTest = testDead.getDeadlineList();
+		assertTrue(TestUtil.compareTasks(returnTest.get(0), testTask));
+	}
+
+	@Test
+	public void test05_GetFloatingList() throws HandledException, FatalException {
+		TaskList testFloat = TaskList.getInstance(new Option(Option.Value.TEST));
+		Status testStatus = new Status("testFloat");
+		
+		FloatingTask testTask = new FloatingTask("testFloat", testStatus);
+		testFloat.addTask(testTask);
+		ArrayList<FloatingTask> returnTest = testFloat.getFloatingList();
+		
+		assertTrue(TestUtil.compareTasks(returnTest.get(3), testTask));
+	}
+	
+	@Test
+	public void test06_GetAllList() throws HandledException, FatalException {
+		TaskList testAll = TaskList.getInstance(new Option(Option.Value.TEST));
+		Status testStatus = new Status("testStatus");
+	
+		Task testAllTask = new FloatingTask("testAll", testStatus);
+		testAll.addTask(testAllTask);
+		
+		ArrayList<Task> test = testAll.getAllList();
+		assertTrue(TestUtil.compareTasks(test.get(5), testAllTask));
+	}
+	
+	@Test
+	public void test07_GetTaskByID() throws HandledException, FatalException {
+		TaskList testID = TaskList.getInstance(new Option(Option.Value.TEST));
+		Status testStatus = new Status("testID");
+		Date dueDate = new Date(System.currentTimeMillis() + 865000L);
+		
+		
+		DeadlineTask testIDTask = new DeadlineTask("testID", testStatus, dueDate);
+		testID.addTask(testIDTask);
+		assertTrue(TestUtil.compareTasks(testID.getTaskByID(8), testIDTask));
+	}
+	
+	@Test
+	public void test02_AddTask() throws HandledException, FatalException {
+		TaskList testAdd = TaskList.getInstance(new Option(Option.Value.TEST));
+		Status testStatus = new Status("testAdd");
+		
+		Task testAddTask = new FloatingTask("testAdd", testStatus);
+		testAdd.addTask(testAddTask);
+		ArrayList<Task> returnTest = testAdd.getAllList();
+		assertTrue(TestUtil.compareTasks(returnTest.get(0), testAddTask));
+	}
+	
+	
+	@Test
+	public void test03_UpdateTask() throws HandledException, FatalException {
+		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
+		Status testStatus = new Status("testUpdate");
+		
+		FloatingTask testTask = new FloatingTask("testUpdate", testStatus);
+		test.addTask(testTask);
+		ArrayList<FloatingTask> returnTest = test.getFloatingList();
+		assertTrue(TestUtil.compareTasks(returnTest.get(1), testTask));
+		
+		FloatingTask testTask1 = new FloatingTask("testUpdate2", testStatus);
+		test.updateTask(testTask1);
+		ArrayList<FloatingTask> returnTest1 = test.getFloatingList();
+		assertTrue(TestUtil.compareTasks(returnTest1.get(1), testTask1));
+	}
+
+	@Test
+	public void test08_DeleteTask() throws HandledException, FatalException {
+		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
+		Status testStatus = new Status("testDelete");
+		Date startDate = new Date(System.currentTimeMillis());
+		Date completeDate = new Date(System.currentTimeMillis() + 861000L);
+		
+		PeriodicTask testTask = new PeriodicTask("testDelete", testStatus, startDate,completeDate);
+		test.addTask(testTask);
+	
+		test.deleteTask(testTask);
+		ArrayList<PeriodicTask> returnTest1 = test.getPeriodicList();
+		assertTrue(returnTest1.isEmpty());
+	}
+	
+	@Test
+	public void test01_GetTrashList() throws HandledException, FatalException {
+		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
+		Status testStatus = new Status("testTrash");
+		
+		FloatingTask testTask = new FloatingTask("testTrash", testStatus);
+		test.addTask(testTask);
+		testTask.delete();
+		ArrayList<Task> testTrash = test.getTrashList();
+		assertEquals(testTrash.get(0).getStatus(), testTask.getStatus());
+	}
+	
+	@Test
+	public void test09_GetDefaultList() throws HandledException, FatalException {
+		TaskList test = TaskList.getInstance(new Option(Option.Value.TEST));
+		Status testStatus = new Status("testDefault");
+		
+		FloatingTask testingDefault = new FloatingTask("testFloating", testStatus);
+		test.addTask(testingDefault);
+		
+		ArrayList<Task> testDefault = test.getDefaultList();
+		assertTrue(TestUtil.compareTasks(testDefault.get(7), testingDefault));
+	}
+
+}
+
+
+	// End of segment: CEO\src\cs2103\storage\TaskListTest.java
+
+
+
+
+
+	/**
+	 * origin: CEO\src\cs2103\util\CommonUtil.java
+	 */
+
+package cs2103.util;
+
+import java.awt.Desktop;
+import java.awt.Desktop.Action;
+
+import org.fusesource.jansi.Ansi;
+import org.fusesource.jansi.AnsiConsole;
+
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
+import cs2103.exception.FatalException;
+import cs2103.exception.HandledException;
+import cs2103.task.Task;
+
+/**
+ * Carries out the basic utilities in CEO
+ */
+public class CommonUtil {
+	/**
+	 * Splits the first word from the rest of the string argument
+	 * and returns an array which contains this first word and
+	 * the rest of the string.
+	 * 
+	 * @param parameterString
+	 * @return an array which contains the split up String
+	 * @throws HandledException
+	 */
+	public static String[] splitFirstWord(String parameterString) throws HandledException {
+		checkNull(parameterString, HandledException.ExceptionType.INVALID_CMD);
+		assert(parameterString != null);
+		String[] result = new String[2];
+		int splitIndex = parameterString.indexOf(' ');
+		if (splitIndex == -1) {
+			result[0] = parameterString;
+			result[1] = null;
+		} else {
+			result[0] = parameterString.substring(0, splitIndex).trim();
+			result[1] = parameterString.substring(splitIndex).trim();
+		}
+		return result;
+	}
+	
+	/**
+	 * Parse an integer from the string argument and returns this integer.
+	 * 
+	 * @param parameter
+	 * @return the parsed integer from the String parameter
+	 * @throws HandledException
+	 */
+	public static int parseIntegerParameter(String parameter) throws HandledException {
+		checkNull(parameter, HandledException.ExceptionType.INVALID_PARA);
+		assert(parameter != null);
+		parameter = parameter.trim();
+		if (parameter.matches("[0-9]+")) {
+			return Integer.parseInt(parameter);
+		} else {
+			return -1;
+		}
+	}
+	
+	/**
+	 * Checks if the Object argument is a null object. Throws a 
+	 * HandledException if Object argument is null.
+	 *  
+	 * @param obj
+	 * @param expectedException
+	 * @throws HandledException
+	 */
+	public static void checkNull(Object obj, HandledException.ExceptionType expectedException) throws HandledException {
+		if (obj == null) throw new HandledException(expectedException);
+	}
+	
+	/**
+	 * Checks if the Object argument is a null object. Throws a 
+	 * FatalException if Object argument is a null object.
+	 * 
+	 * @param obj
+	 * @param expectedException
+	 * @throws FatalException
+	 */
+	public static void checkNull(Object obj, FatalException.ExceptionType expectedException) throws FatalException {
+		if (obj == null) throw new FatalException(expectedException);
+	}
+	
+	/**
+	 * Removes the dash character from the String argument and returns the
+	 * resultant String argument.
+	 * 
+	 * @param parameterString
+	 * @return parameterString with the front dash removed
+	 * @throws HandledException
+	 */
+	public static String removeDash(String parameterString) throws HandledException {
+		checkNull(parameterString, HandledException.ExceptionType.INVALID_PARA);
+		assert(parameterString != null);
+		if (parameterString.startsWith("-")) {
+			return parameterString.substring(1);
+		}else{
+			return parameterString;
+		}
+	}
+	
+	/**
+	 * Formats the String parameter with the Task parameter and returns
+	 * the formatted string.
+	 * 
+	 * @param format
+	 * @param task
+	 * @return a String containing the formatted log information
+	 */
+	public static String formatLogString(String format, Task task) {
+		assert(task != null);
+		return String.format(format, task.getTaskUID());
+	}
+	
+	/**
+	 * Prints the String argument in ANSI format if the String
+	 * argument is not a null object and is not an empty String.
+	 * 
+	 * @param feedback
+	 */
+	public static void print(String feedback) {
+		if (feedback != null && !feedback.isEmpty()) {
+			print(ansi().a(feedback));
+		}
+	}
+	
+	/**
+	 * Prints the Ansi argument if the Ansi argument is not a
+	 * null object.
+	 * 
+	 * @param feedback
+	 */
+	public static void print(Ansi feedback) {
+		if (feedback != null) {
+			AnsiConsole.out.print(feedback);
+		}
+	}
+	
+	/**
+	 * Prints the error message from the String argument if the String
+	 * argument is not a null object and is not an empty String.
+	 * 
+	 * @param errorMsg
+	 */
+	public static void printErrMsg(String errorMsg) {
+		if (errorMsg != null && !errorMsg.isEmpty()) {
+			print(ansi().bold().bg(RED).a(errorMsg).a('\n').reset());
+		}
+	}
+	
+	/**
+	 * Prints the String argument if it is not a null object
+	 * and if it is not an empty String.
+	 * 
+	 * @param prompt
+	 */
+	public static void printPrompt(String prompt) {
+		if (prompt != null && !prompt.isEmpty()) {
+			System.out.print(prompt);
+		}
+	}
+	
+	/**
+	 * Checks to see if the system supports google sync.
+	 * 
+	 * @return a true value if system supports google sync false otherwise
+	 */
+	public static boolean checkSyncSupport() {
+		try{
+			if (Desktop.isDesktopSupported()) {
+				Desktop desktop = Desktop.getDesktop();
+				if (desktop.isSupported(Action.BROWSE)) {
+					return true;
+				}
+			}
+			return false;
+		} catch (InternalError e) {
+			return checkSyncSupport();
+		}
+	}
+	
+	/**
+	 * This method clears the user display
+	 */
+	public static void clearConsole() {
+		try{
+			if (System.getProperty("os.name").contains("Windows")) {
+		        Console.clr();
+			} else {
+				AnsiConsole.out.println(ansi().eraseScreen().reset());
+			}
+		} catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
+			AnsiConsole.out.println(ansi().eraseScreen().reset());
+		}
+	}
+}
+
+	// End of segment: CEO\src\cs2103\util\CommonUtil.java
+
+
+
+
+
+	/**
+	 * origin: CEO\src\cs2103\util\CommonUtilTest.java
+	 */
+
+package cs2103.util;
+
+import static org.junit.Assert.*;
+
+import java.lang.reflect.Array;
+
+import net.fortuna.ical4j.model.property.Status;
+
+import org.junit.Test;
+
+import cs2103.exception.HandledException;
+import cs2103.task.FloatingTask;
+
+
+public class CommonUtilTest {
+	private static final String LOG_ADD = "Adding task with UID %1$s to Google";
+	private static final String LOG_UPDATE = "Updating task with UID %1$s to Google";
+	private static final String MESSAGE_ADD_SUCCESS = "Adding task with UID testFloat to Google";
+	private static final String MESSAGE_UPDATE_SUCCESS = "Updating task with UID testFloat to Google";
+	
+	@Test(expected = HandledException.class)
+	public void testSplitFirstWord() throws HandledException {
+		String[] testing = CommonUtil.splitFirstWord("testing split");
+		assertEquals(Array.get(testing, 0), "testing");
+		assertEquals(Array.get(testing, 1), "split");
+		
+		String[] testing1 = CommonUtil.splitFirstWord("");
+		assertEquals(Array.get(testing1, 0), "");
+		assertNull(Array.get(testing1, 1));
+
+		String[] testing2 = CommonUtil.splitFirstWord("123");
+		assertEquals(Array.get(testing2, 0), "123");
+		assertNull(Array.get(testing2, 1));
+		
+		CommonUtil.splitFirstWord(null);
+	}
+	
+	
+	@Test(expected = HandledException.class)
+	public void testParseIntegerParameter() throws HandledException {
+		int test = CommonUtil.parseIntegerParameter("1");
+		assertEquals(test, 1);
+		
+		int test1 = CommonUtil.parseIntegerParameter("0");
+		assertEquals(test1, 0);
+		
+		int test2 = CommonUtil.parseIntegerParameter("-2");
+		assertEquals(test2,-1);
+		
+		int test3 = CommonUtil.parseIntegerParameter("0.1");
+		assertEquals(test3, -1);
+		
+		int test4 = CommonUtil.parseIntegerParameter("-0.1");
+		assertEquals(test4, -1);
+		
+		
+		int test5 = CommonUtil.parseIntegerParameter("NOT AN INTEGER");
+		assertEquals(test5, -1);
+		
+		CommonUtil.parseIntegerParameter(null);
+	}
+	
+	@Test(expected = HandledException.class)
+	public void testRemoveDash() throws HandledException {
+		//test string with dash
+		String test = CommonUtil.removeDash("-testing");
+		assertEquals(test, "testing");
+		
+		//test string without dash
+		String test1 = CommonUtil.removeDash("testing");
+		assertEquals(test1, "testing");
+		
+		//test empty string
+		String test2 = CommonUtil.removeDash("");
+		assertEquals(test2, "");
+		
+		//test with dash only
+		String test3 = CommonUtil.removeDash("-");
+		assertEquals(test3, "");
+		
+		//test for null string
+		CommonUtil.removeDash(null);
+	}
+	
+	@Test
+	public void testFormatLogString() {
+		Status testLog = new Status("testFormatLogString");
+		FloatingTask testTask = new FloatingTask("testFloat", testLog);
+		
+		String test1 = CommonUtil.formatLogString(LOG_ADD, testTask);
+		assertEquals(test1, MESSAGE_ADD_SUCCESS);
+		
+		String test2 = CommonUtil.formatLogString(LOG_UPDATE, testTask);
+		assertEquals(test2, MESSAGE_UPDATE_SUCCESS);
+		
+		String testEmpty = CommonUtil.formatLogString("", testTask);
+		assertEquals(testEmpty, "");
+	}
+}
+
+	// End of segment: CEO\src\cs2103\util\CommonUtilTest.java
+
+
+
+
+
+	/**
+	 * origin: CEO\src\cs2103\util\TestUtil.java
+	 */
+
+package cs2103.util;
+
+import cs2103.task.*;
+
+/**
+ * Used for testing by comparing tasks
+ */
+public class TestUtil {
+	
+	/**
+	 * Compares the Task objects if they are similar, returns true, 
+	 * false otherwise.
+	 * 
+	 * @param task1
+	 * @param task2
+	 * @return a true value if Task arguments are similar, returns false otherwise
+	 */
+	public static boolean compareTasks(Task task1, Task task2) {
+		if (task1 == null || task2 == null) return false;
+		if (!task1.getTitle().equals(task2.getTitle())) return false;
+		if (!task1.getDescription().equals(task2.getDescription())) return false;
+		if (task1.getCreated().getTime() != task2.getCreated().getTime()) return false;
+		if (!task1.getStatus().equals(task2.getStatus())) return false;
+		if (task1.getLastModified().getTime() != task2.getLastModified().getTime()) return false;
+		if (task1 instanceof ToDoTask && task2 instanceof ToDoTask) {
+			return compareToDo((ToDoTask) task1, (ToDoTask) task2);
+		} else if (task1 instanceof EventTask && task2 instanceof EventTask) {
+			return compareEvent((EventTask) task1, (EventTask) task2);
+		} else {
+			return false;
+		}
+	}
+	
+	private static boolean compareToDo(ToDoTask task1, ToDoTask task2) {
+		if (task1 == null || task2 == null) return false;
+		if (task1.getCompleted() == null ^ task2.getCompleted() == null) return false;
+		if (task1.getCompleted() != null && task2.getCompleted() != null) {
+			if (task1.getCompleted().getTime() != task2.getCompleted().getTime()) return false;
+		}
+		if (task1 instanceof DeadlineTask ^ task2 instanceof DeadlineTask) return false;
+		if (task1 instanceof DeadlineTask && task2 instanceof DeadlineTask) {
+			if (((DeadlineTask) task1).getDueTime().getTime() != ((DeadlineTask) task2).getDueTime().getTime()) return false;
+		}
+		return true;
+	}
+	
+	private static boolean compareEvent(EventTask task1, EventTask task2) {
+		if (task1 == null || task2 == null) return false;
+		if (task1.getStartTime().getTime() != task2.getStartTime().getTime()) return false;
+		if (task1.getEndTime().getTime() != task2.getEndTime().getTime()) return false;
+		if (task1 instanceof PeriodicTask ^ task2 instanceof PeriodicTask) return false;
+		if (task1 instanceof PeriodicTask && task2 instanceof PeriodicTask) {
+			if (!((PeriodicTask) task1).getLocation().equals(((PeriodicTask) task2).getLocation())) return false;
+			if (((PeriodicTask) task1).getRecurrence() == null ^ ((PeriodicTask) task2).getRecurrence() == null) return false;
+			if (((PeriodicTask) task1).getRecurrence() != null && ((PeriodicTask) task2).getRecurrence() != null) {
+				if (!((PeriodicTask) task1).getRecurrence().toString().equals(((PeriodicTask) task2).getRecurrence().toString())) return false;
+			}
+		}
+		return true;
+	}
+}
+
+	// End of segment: CEO\src\cs2103\util\TestUtil.java
+
+
+
+
+

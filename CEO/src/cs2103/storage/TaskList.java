@@ -20,7 +20,6 @@ import cs2103.util.Logger;
 import java.util.Collections;
 
 /**
- * @author Zheng Han
  * Compiles the tasks into lists
  */
 public class TaskList {

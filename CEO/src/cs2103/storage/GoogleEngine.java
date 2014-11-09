@@ -26,7 +26,6 @@ import cs2103.util.CommonUtil;
 import cs2103.util.Logger;
 
 /**
- * @author Yuri
  * Read and write Task objects to Google Calendar and Google Tasks
  */
 public class GoogleEngine {

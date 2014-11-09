@@ -9,7 +9,6 @@ import java.io.PrintWriter;
 import java.util.Date;
 
 /**
- * @author Yuri
  * Log message to file
  */
 public class Logger {

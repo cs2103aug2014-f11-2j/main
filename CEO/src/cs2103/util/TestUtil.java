@@ -4,7 +4,6 @@ package cs2103.util;
 import cs2103.task.*;
 
 /**
- * @author Zheng Han
  * Used for testing by comparing tasks
  */
 public class TestUtil {

@@ -14,7 +14,6 @@ import cs2103.exception.HandledException;
 import cs2103.task.Task;
 
 /**
- * @author Zheng Han
  * Carries out the basic utilities in CEO
  */
 public class CommonUtil {

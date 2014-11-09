@@ -17,10 +17,6 @@ import cs2103.util.Logger;
 import static org.fusesource.jansi.Ansi.*;
 import static org.fusesource.jansi.Ansi.Color.*;
 
-/**
- * @author Zheng Han
- * Receives the commands from the user
- */
 public class CommandLineUI {
 	private static final String MESSAGE_WELCOME_FORMAT = "Welcome to the CEO. %1$s";
 	private static final String MESSAGE_SYNC_ENABLED = "Google Sync is enabled";

@@ -1,0 +1,2601 @@
+//@author: a0128478r
+
+
+
+	/**
+	 * origin: CEO\src\cs2103\task\DeadlineTask.java
+	 */
+
+package cs2103.task;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Locale;
+
+import org.fusesource.jansi.Ansi;
+
+import cs2103.exception.HandledException;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.component.VToDo;
+import net.fortuna.ical4j.model.property.Status;
+
+public class DeadlineTask extends ToDoTask {
+	private DateTime dueTime;
+	
+	public DeadlineTask(String taskUID, Status status, Date dueTime) throws HandledException {
+		super(taskUID, status);
+		this.updateDueTime(dueTime);
+	}
+	
+	/**
+	 * @return the due time as in RFC2445 iCalendar specification
+	 */
+	public DateTime getDueTime() {
+		return this.dueTime;
+	}
+	
+	private void updateDueTime(Date dueTime) throws HandledException {
+		if (dueTime == null) {
+			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
+		} else {
+			this.dueTime = new DateTime(dueTime);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#convert(java.util.Date[])
+	 */
+	@Override
+	protected Task convert(Date[] time) throws HandledException {
+		if (isInvalidTime(time)) {
+			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
+		} else if (isBothTimeNull(time)) {
+			return this.toFloating();
+		} else if (isFirstTimeNull(time)) {
+			return this.toDeadline(time[0]);
+		} else {
+			return this.toPeriodic(time[0], time[1]);
+		}
+	}
+
+	private boolean isInvalidTime(Date[] time) {
+		return time == null;
+	}
+	
+	private boolean isFirstTimeNull(Date[] time) {
+		return isSecondTimeNull(time);
+	}
+
+	private boolean isBothTimeNull(Date[] time) {
+		return time[0] == null && isFirstTimeNull(time);
+	}
+	
+	private ToDoTask toFloating() throws HandledException {
+		ToDoTask newTask = new FloatingTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION);
+		assert(newTask != null);
+		updateNewTask(newTask);
+		return newTask;
+	}
+
+	private ToDoTask toDeadline(Date dueTime) throws HandledException {
+		ToDoTask newTask = new DeadlineTask(this.getTaskUID(), this.getStatus(), dueTime);
+		assert(newTask != null);
+		updateNewTask(newTask);
+		return newTask;
+	}
+
+	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
+		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), Status.VEVENT_CONFIRMED, startTime, endTime);
+		assert(newTask != null);
+		updateNewTask(newTask);
+		return newTask;
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		try {
+			ToDoTask newTask = new DeadlineTask(this.getTaskUID(), this.getStatus(), this.getDueTime());
+			assert(newTask != null);
+			updateClone(newTask);
+			return newTask;
+		} catch (HandledException e) {
+			throw new CloneNotSupportedException();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#toSummary()
+	 */
+	@Override
+	public Ansi toSummary() {
+		Ansi returnString = this.addCommonString();
+		formatStatus(returnString);
+		formatDueTime(returnString);
+		return returnString.a('\n');
+	}
+
+	private void formatDueTime(Ansi returnString) {
+		returnString.a("\tDue At: ").a(this.dateToString(this.getDueTime()));
+	}
+	
+	/**
+	 * @return the comparator for sorting
+	 */
+	public static sortComparator getComparator() {
+		return new sortComparator();
+	}
+	
+	private static class sortComparator implements Comparator<DeadlineTask> {
+		@Override
+		public int compare(DeadlineTask o1, DeadlineTask o2) {
+			return o1.getDueTime().compareTo(o2.getDueTime());
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#checkPeriod(java.util.Date[])
+	 */
+	@Override
+	public boolean checkPeriod(Date[] time) {
+		if (isNullTimePeriod(time)) {
+			return true;
+		} else if (isSecondTimeNull(time)) {
+			return checkTimeBeforeDueTime(time);
+		} else {
+			return checkDueTimeBetweenTimes(time);
+		}
+	}
+
+	private boolean isNullTimePeriod(Date[] time) {
+		if (time == null) {
+			return true;
+		} else if (time[0] == null) {
+			return true;
+		}
+		return false;
+	}
+	
+	private boolean isSecondTimeNull(Date[] time) {
+		return time[1] == null;
+	}
+
+	/**
+	 * Check if dueTime is between time[0] and time[1]
+	 */
+	private boolean checkDueTimeBetweenTimes(Date[] time) {
+		return this.getDueTime().after(time[0]) && this.getDueTime().before(time[1]);
+	}
+
+	/**
+	 * Check if dueTime is before time
+	 */
+	private boolean checkTimeBeforeDueTime(Date[] time) {
+		return this.getDueTime().before(time[0]);
+	}
+
+	/* (non-Javadoc)
+	 * @see cs2103.task.ToDoTask#toVToDo()
+	 */
+	@Override
+	protected VToDo toVToDo() {
+		VToDo vToDo = new VToDo(this.getCreated(), this.getDueTime(), this.getTitle());
+		this.addVToDoProperty(vToDo);
+		return vToDo;
+	}
+	
+	/* (non-Javadoc)
+	 * @see cs2103.task.ToDoTask#toGTask()
+	 */
+	@Override
+	public com.google.api.services.tasks.model.Task toGTask() {
+		com.google.api.services.tasks.model.Task gTask = new com.google.api.services.tasks.model.Task();
+		this.addGTaskProperty(gTask);
+		gTask.setDue(new com.google.api.client.util.DateTime(this.getDueTime().getTime()));
+		gTask.setNotes(this.formatGTaskDescription());
+		return gTask;
+	}
+	
+	private String formatGTaskDescription() {
+		StringBuffer sb = new StringBuffer();
+		sb.append(this.getDescription());
+		sb.append("\n<Due At: ");
+		DateFormat format = new SimpleDateFormat("hh:mm a", Locale.US);
+		sb.append(format.format(this.getDueTime()));
+		sb.append(">");
+		return sb.toString();
+	}
+}
+
+	// End of segment: CEO\src\cs2103\task\DeadlineTask.java
+
+
+
+
+
+	/**
+	 * origin: CEO\src\cs2103\task\DeadlineTaskTest.java
+	 */
+
+package cs2103.task;
+
+import org.fusesource.jansi.Ansi;
+
+import static org.fusesource.jansi.Ansi.ansi;
+import static org.fusesource.jansi.Ansi.Color.GREEN;
+import static org.fusesource.jansi.Ansi.Color.RED;
+import static org.fusesource.jansi.Ansi.Color.YELLOW;
+import static org.junit.Assert.*;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.property.Status;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import cs2103.exception.HandledException;
+import cs2103.util.TestUtil;
+
+public class DeadlineTaskTest extends ToDoTaskTest{
+	static DeadlineTask dlt;
+	String taskUID = null;
+	Date created = null; 
+	Status status = null;
+	String title = "Testing";
+	String description = "Description";
+	String location = "Location";
+	Recur recurrence = null;
+	Date complete = null;
+	DateTime dueTime = new DateTime(1);
+	
+	protected ToDoTask getConcrete(){
+		return dlt;
+	}
+
+	@Before
+	public void setUp() throws Exception {
+		dlt = new DeadlineTask(this.taskUID, this.status, this.dueTime);
+		dlt.updateTitle(this.title);
+		dlt.updateDescription(this.description);
+		dlt.updateLocation(this.location);
+		dlt.updateRecurrence(this.recurrence);
+		dlt.updateLastModified(null);
+	}
+	
+	/**
+	 * Three different cases to test DeadlineTask constructor
+	 */
+	@Test 
+	public void testDeadlineTaskConstructor() throws HandledException{
+		testDeadlineTaskConstructionOne();
+		testDeadlineTaskConstructionTwo();
+	}
+		
+	/**
+	 * Case 1: Invalid date
+	 */
+	public void testDeadlineTaskConstructionOne() throws HandledException {
+		exception.expect(HandledException.class);
+		dlt = new DeadlineTask(this.taskUID, this.status, null);
+	}
+	
+	/**
+	 * Case 2: Successful Construction 
+	 */
+	public void testDeadlineTaskConstructionTwo() throws HandledException {
+		dlt = new DeadlineTask(this.taskUID, this.status, null);
+		assertTrue(true);
+	}
+
+	@Test
+	public void testUpdateAndGetDueTime() throws HandledException{
+		DateTime newDate = new DateTime(1);
+		assertTrue(dlt.getDueTime().compareTo(newDate) == 0);
+	}
+
+	/**
+	 * Check if DeadlineTask should be alerted to user
+	 */
+	@Test
+	public void testCheckPeriod() {
+		DateTime[] time = new DateTime[2];
+		assertEquals(dlt.checkPeriod(time), true);
+		
+		time[0] = new DateTime(1);
+		assertEquals(dlt.checkPeriod(time), false);
+		
+		time[0] = null;
+		time[1] = new DateTime(2);
+		assertEquals(dlt.checkPeriod(time), true);
+	}
+
+	@Test
+	public void testConvert() throws HandledException {
+		testConvertException();
+		testConvertToFloating();
+		testConvertToDeadline();
+		testConvertToPeriodic();
+	}
+	
+	private void testConvertException() throws HandledException {
+		exception.expect(HandledException.class);
+		DateTime[] time = null;
+		dlt.convert(time);	
+	}
+	
+	private void testConvertToFloating() throws HandledException {
+		DateTime[] time = generateTimeForConvert("f");
+		Task taskTest = dlt.convert(time);
+		assertTrue(taskTest instanceof FloatingTask);
+		
+		Task taskExpected = new FloatingTask(dlt.getTaskUID(), Status.VTODO_NEEDS_ACTION);
+		updateTaskExpected(taskExpected);
+		assertTrue(TestUtil.compareTasks(taskTest, taskExpected));
+	}
+
+	private void testConvertToDeadline() throws HandledException {	
+		DateTime[] time = generateTimeForConvert("d");
+		Task taskTest = dlt.convert(time);
+		assertTrue(taskTest instanceof DeadlineTask);
+		
+		ToDoTask taskExpected = new DeadlineTask(dlt.getTaskUID(), dlt.getStatus(), time[0]);
+		updateTaskExpected(taskExpected);
+		assertTrue(TestUtil.compareTasks(taskTest, taskExpected));
+	}
+	
+	private void testConvertToPeriodic() throws HandledException {
+		DateTime[] time = generateTimeForConvert("p");
+		Task taskTest = dlt.convert(time);
+		assertTrue(taskTest instanceof PeriodicTask);
+		
+		PeriodicTask taskExpected = new PeriodicTask(dlt.getTaskUID(), Status.VEVENT_CONFIRMED, time[0], time[1]);
+		updateTaskExpected(taskExpected);
+		assertTrue(TestUtil.compareTasks(taskTest, taskExpected));
+	}
+	
+	@Test
+	public void testClone() throws CloneNotSupportedException {
+		ToDoTask task = (ToDoTask) dlt.clone();
+		assertTrue(TestUtil.compareTasks(task, dlt));
+	}
+	
+	@Test
+	public void testToSummary() {
+		Ansi expected = generateSummaryExpected();
+		Ansi test = generateSummaryTest();
+		assertEquals(expected.toString(), test.toString());
+	}
+
+	private Ansi generateSummaryTest() {
+		return dlt.toSummary();
+	}
+
+	private Ansi generateSummaryExpected() {
+		Ansi expected = ansi().fg(YELLOW).a(dlt.getTaskID()).a(". ").reset();
+		expected.bold().a(dlt.getTitle()).a('\n').boldOff().reset();
+		expected.a("Status: ").a(generateStatusExpected(dlt.getCompleted()));
+		expected.a("\tDue At: ").a(generateDateStringExpected(dlt.getDueTime())).a('\n');
+		return expected;
+	}
+	
+	private Ansi generateDateStringExpected(Date date) {
+		Ansi returnString = ansi().bold();
+		DateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm a", Locale.US);	
+		returnString.fg(GREEN).a(format.format(date)).reset();
+		return returnString;
+	}
+	
+	private Ansi generateStatusExpected(DateTime completed) {
+		Ansi returnString = ansi();
+		returnString.bold().fg(RED).a("Needs Action").reset();
+		return returnString;
+	}
+}
+	// End of segment: CEO\src\cs2103\task\DeadlineTaskTest.java
+
+
+
+
+
+	/**
+	 * origin: CEO\src\cs2103\task\EventTask.java
+	 */
+
+package cs2103.task;
+
+import java.util.Date;
+
+import com.google.api.client.util.Data;
+
+import cs2103.exception.HandledException;
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.TimeZone;
+import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.Status;
+
+/**
+ *  Contains inherited methods from Task
+ *  Extends to concrete Task class PeriodicTask
+ */
+public abstract class EventTask extends Task {
+	private DateTime startTime;
+	private DateTime endTime;
+	
+	private static final long YEAR_IN_MILLIS = 31556952000L;
+
+	public EventTask(String taskUID, Status status, Date startTime, Date endTime) throws HandledException {
+		super(taskUID);
+		this.updateTime(startTime, endTime);
+		this.updateStatus(status);
+	}
+	
+	/**
+	 * @return the start time as in RFC2445 iCalendar specification
+	 */
+	public DateTime getStartTime() {
+		return this.startTime;
+	}
+	
+	/**
+	 * @return the end time as in RFC2445 iCalendar specification
+	 */
+	public DateTime getEndTime() {
+		return this.endTime;
+	}
+	
+	protected void updateTime(Date startTime, Date endTime) throws HandledException {
+		checkInvalidTimes(startTime, endTime);
+		this.startTime = new DateTime(startTime);
+		if (isAntique(startTime, endTime)) {
+			this.endTime = new DateTime(startTime.getTime() + YEAR_IN_MILLIS);
+		} else {
+			this.endTime = new DateTime(endTime);
+		}
+		
+	}
+
+	/**
+	 * Checks if time specified is below the range allowed for DateTime class
+	 */
+	private boolean isAntique(Date startTime, Date endTime) {
+		return endTime.getTime() - startTime.getTime() > YEAR_IN_MILLIS;
+	}
+
+	private void checkInvalidTimes(Date startTime, Date endTime) throws HandledException {
+		if (checkTimeNull(startTime, endTime)) {
+			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
+		} else if (startTime.after(endTime)) {
+			throw new HandledException(HandledException.ExceptionType.END_BEFORE_START);
+		}
+	}
+
+	private boolean checkTimeNull(Date startTime, Date endTime) {
+		return startTime == null || endTime == null;
+	}
+	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#getCompleted()
+	 */
+	@Override
+	public DateTime getCompleted() {
+		if (checkEndBeforeNow()){
+			return this.getEndTime();
+		} else {
+			return null;
+		}
+	}
+
+	private boolean checkEndBeforeNow() {
+		return this.getEndTime().before(new DateTime());
+	}
+	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#updateCompleted(java.util.Date)
+	 */
+	@Override
+	public void updateCompleted(Date complete) {
+		return;
+	}
+	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#updateStatus(net.fortuna.ical4j.model.property.Status)
+	 */
+	@Override
+	protected void updateStatus(Status status) {
+		if (status == null) {
+			this.status = Status.VEVENT_CONFIRMED;
+		} else {
+			this.status = status;
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#isDeleted()
+	 */
+	@Override
+	public boolean isDeleted() {
+		return this.getStatus().equals(Status.VEVENT_CANCELLED);
+	}
+
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#delete()
+	 */
+	@Override
+	public void delete() {
+		this.updateStatus(Status.VEVENT_CANCELLED);
+	}
+
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#restore()
+	 */
+	@Override
+	public void restore() {
+		this.updateStatus(Status.VEVENT_CONFIRMED);
+	}
+	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#toComponent()
+	 */
+	@Override
+	public Component toComponent() {
+		return this.toVEvent();
+	}
+	
+	protected void addGEventProperty(com.google.api.services.calendar.model.Event gEvent) {
+		assert(gEvent != null);
+		gEvent.setSummary(this.getTitle());
+		gEvent.setDescription(this.getDescription());
+		gEvent.setCreated(new com.google.api.client.util.DateTime(this.getCreated().getTime()));
+		gEvent.setStatus("confirmed");
+		gEvent.setStart(dateTimeToEventDateTime(this.getStartTime()));
+		gEvent.setEnd(dateTimeToEventDateTime(this.getEndTime()));
+	}
+	
+	private static com.google.api.services.calendar.model.EventDateTime dateTimeToEventDateTime(DateTime time) {
+		com.google.api.services.calendar.model.EventDateTime eventDateTime = new com.google.api.services.calendar.model.EventDateTime();
+		eventDateTime.setTimeZone(TimeZone.getDefault().getID());
+		eventDateTime.setDate(Data.NULL_DATE_TIME);
+		eventDateTime.setDateTime(new com.google.api.client.util.DateTime(time.getTime()));
+		return eventDateTime;
+	}
+	
+	/**
+	 * @return generate a VEvent object for iCal4j
+	 */
+	protected abstract VEvent toVEvent();
+	/**
+	 * @return generate a Google Calendar event which is needed for Google Sync
+	 */
+	public abstract com.google.api.services.calendar.model.Event toGEvent();
+}
+
+	// End of segment: CEO\src\cs2103\task\EventTask.java
+
+
+
+
+
+	/**
+	 * origin: CEO\src\cs2103\task\EventTaskTest.java
+	 */
+
+package cs2103.task;
+
+import static org.fusesource.jansi.Ansi.ansi;
+import static org.fusesource.jansi.Ansi.Color.*;
+import static org.junit.Assert.*;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.property.Status;
+
+import org.fusesource.jansi.Ansi;
+import org.junit.Test;
+
+import cs2103.exception.HandledException;
+
+/**
+ * Containing tests for the inherited methods in concrete Task class PeriodicTask
+ */
+public abstract class EventTaskTest extends TaskTest{
+
+	@Test
+	public void testGetCompleted() throws HandledException{
+		EventTask task = (EventTask) getConcrete();
+		DateTime testStartDate = new DateTime(0);
+		DateTime testEndDate = new DateTime(1);
+		task.updateTime(testStartDate, testEndDate);
+		assertEquals(testEndDate, task.getCompleted());
+	}
+	
+	@Test
+	public void testUpdateAndGetStatus() {
+		EventTask task = (EventTask) getConcrete();
+		testUpdateAndGetStatusNull(task);
+		testUpdateAndGetStatusCompleted(task);
+	}
+
+	private void testUpdateAndGetStatusCompleted(EventTask task) {
+		Status testStatus = Status.VTODO_COMPLETED;
+		task.updateStatus(testStatus);
+		assertEquals(testStatus, task.getStatus());
+	}
+
+	private void testUpdateAndGetStatusNull(EventTask task) {
+		task.updateStatus(null);
+		assertEquals(Status.VEVENT_CONFIRMED, task.getStatus());
+	}
+	
+	@Test
+	public void testRestore() {
+		EventTask task = (EventTask) getConcrete();
+		task.restore();
+		assertEquals(Status.VEVENT_CONFIRMED, task.getStatus());
+		assertTrue(new DateTime().equals(task.getLastModified()));	
+	}
+
+	@Test
+	public void testDateToString(){
+		EventTask task = (EventTask) getConcrete();
+		DateTime testDate = new DateTime(0);
+		Ansi test = generateDateToStringTest(task, testDate);
+		Ansi expected = generateDateToStringExpected(testDate);
+		assertEquals(expected.toString(), test.toString());
+	}
+
+	private Ansi generateDateToStringTest(EventTask task, DateTime testDate) {
+		Ansi test = task.dateToString(testDate);
+		return test;
+	}
+
+	private Ansi generateDateToStringExpected(DateTime testDate) {
+		DateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm a", Locale.US);
+		Ansi expected = ansi().bold().fg(GREEN).a(format.format(testDate)).reset();
+		return expected;
+	}
+
+	/**
+	 * Three different cases to test UpdateTime, getStartTime, and getEndTime methods
+	 */
+	@Test
+	public void testUpdateAndGetStartAndEndTime() throws HandledException {
+		testUpdateAndGetStartAndEndTimeOne();
+		testUpdateAndGetStartAndEndTimeTwo();
+		testUpdateAndGetStartAndEndTimeThree();
+	}
+	
+	/**
+	 * Case 1: Invalid input, throwing error
+	 */
+	private void testUpdateAndGetStartAndEndTimeOne() throws HandledException {
+		EventTask task = (EventTask) getConcrete();
+		exception.expect(HandledException.class);
+		DateTime date1 = null;
+		DateTime date2 = null;
+		task.updateTime(date1, date2);
+	}
+
+	/**
+	 * Case 2: Start time after end time, throwing error
+	 */
+	private void testUpdateAndGetStartAndEndTimeTwo() throws HandledException {
+		EventTask task = (EventTask) getConcrete();
+		exception.expect(HandledException.class);
+		Date date1 = new DateTime(2);
+		Date date2 = new DateTime(1);
+		task.updateTime(date1, date2);
+	}
+	
+	/**
+	 * Case 3: Successful Update 
+	 */
+	private void testUpdateAndGetStartAndEndTimeThree() throws HandledException {
+		EventTask task = (EventTask) getConcrete();
+		DateTime date1 = new DateTime(1);
+		DateTime date2 = new DateTime(2);
+		task.updateTime(date1, date2);
+		assertEquals(task.getStartTime(), date1);
+		assertEquals(task.getEndTime(), date2);
+	}
+}
+	// End of segment: CEO\src\cs2103\task\EventTaskTest.java
+
+
+
+
+
+	/**
+	 * origin: CEO\src\cs2103\task\FloatingTask.java
+	 */
+
+package cs2103.task;
+
+import java.util.Date;
+
+import org.fusesource.jansi.Ansi;
+
+import cs2103.exception.HandledException;
+import net.fortuna.ical4j.model.component.VToDo;
+import net.fortuna.ical4j.model.property.Status;
+
+public class FloatingTask extends ToDoTask {
+	public FloatingTask(String taskUID, Status status) {
+		super(taskUID, status);
+	}
+	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#convert(java.util.Date[])
+	 */
+	@Override
+	protected Task convert(Date[] time) throws HandledException {
+		if (isInvalidTime(time)) {
+			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
+		} else if (isBothTimeNull(time)) {
+			return this.toFloating();
+		} else if (isFirstTimeNull(time)) {
+			return this.toDeadline(time[0]);
+		} else {
+			return this.toPeriodic(time[0], time[1]);
+		}
+	}
+
+	private boolean isInvalidTime(Date[] time) {
+		return time == null;
+	}
+	
+	private boolean isFirstTimeNull(Date[] time) {
+		return time[1] == null;
+	}
+
+	private boolean isBothTimeNull(Date[] time) {
+		return time[0] == null && isFirstTimeNull(time);
+	}
+	
+	private ToDoTask toFloating() throws HandledException {
+		ToDoTask newTask = new FloatingTask(this.getTaskUID(), this.getStatus());
+		assert(newTask != null);
+		updateNewTask(newTask);
+		return newTask;
+	}
+
+	private ToDoTask toDeadline(Date dueTime) throws HandledException {
+		ToDoTask newTask = new DeadlineTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION, dueTime);
+		assert(newTask != null);
+		updateNewTask(newTask);
+		return newTask;
+	}
+
+	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
+		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), Status.VEVENT_CONFIRMED, startTime, endTime);
+		assert(newTask != null);
+		updateNewTask(newTask);
+		return newTask;
+	}
+
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#clone()
+	 */
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		ToDoTask newTask = new FloatingTask(this.getTaskUID(), this.getStatus());
+		assert(newTask != null);
+		updateClone(newTask);
+		return newTask;
+	}
+
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#toSummary()
+	 */
+	@Override
+	public Ansi toSummary() {
+		Ansi returnString = this.addCommonString();
+		this.formatStatus(returnString);
+		return returnString.a('\n');
+	}
+
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#checkPeriod(java.util.Date[])
+	 */
+	@Override
+	public boolean checkPeriod(Date[] time) {
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see cs2103.task.ToDoTask#toVToDo()
+	 */
+	@Override
+	protected VToDo toVToDo() {
+		VToDo vToDo = new VToDo(this.getCreated(), this.getTitle());
+		this.addVToDoProperty(vToDo);
+		return vToDo;
+	}
+	
+	/* (non-Javadoc)
+	 * @see cs2103.task.ToDoTask#toGTask()
+	 */
+	@Override
+	public com.google.api.services.tasks.model.Task toGTask() {
+		com.google.api.services.tasks.model.Task gTask = new com.google.api.services.tasks.model.Task();
+		this.addGTaskProperty(gTask);
+		gTask.setNotes(this.getDescription());
+		return gTask;
+	}
+}
+
+	// End of segment: CEO\src\cs2103\task\FloatingTask.java
+
+
+
+
+
+	/**
+	 * origin: CEO\src\cs2103\task\FloatingTaskTest.java
+	 */
+
+package cs2103.task;
+
+import static org.fusesource.jansi.Ansi.ansi;
+import static org.fusesource.jansi.Ansi.Color.MAGENTA;
+import static org.fusesource.jansi.Ansi.Color.YELLOW;
+import static org.junit.Assert.*;
+
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.property.Status;
+
+import org.fusesource.jansi.Ansi;
+import org.junit.Before;
+import org.junit.Test;
+
+import cs2103.exception.HandledException;
+import cs2103.util.TestUtil;
+
+public class FloatingTaskTest extends ToDoTaskTest {
+	static ToDoTask ft;
+	private final String taskUID = null;
+	Status status = null;
+	String title = "Testing";
+	String description = "Description";
+	String location = "Location";
+	Recur recurrence = null;
+
+	protected ToDoTask getConcrete(){
+		return ft;
+	}
+	
+	@Before
+	public void setUp() throws Exception {
+		ft = new FloatingTask(this.taskUID, this.status);
+		updateNewFloatingTask();
+	}
+
+	private void updateNewFloatingTask() {
+		ft.updateTitle(this.title);
+		ft.updateDescription(this.description);
+		ft.updateLocation(this.location);
+		ft.updateRecurrence(this.recurrence);
+		ft.updateLastModified(null);
+	}
+	
+	@Test
+	public void testDeadlineTaskConstructor(){
+		ft = new FloatingTask(null, null);
+		assertTrue(true);
+	}
+	
+	@Test
+	public void testConvert() throws HandledException {
+		testConvertException();
+		testConvertToFloating();
+		testConvertToDeadline();
+		testConvertToPeriodic();
+	}
+	
+	private void testConvertException() throws HandledException {
+		exception.expect(HandledException.class);
+		DateTime[] time = null;
+		ft.convert(time);	
+	}
+
+	private void testConvertToFloating() throws HandledException {
+		DateTime[] time = generateTimeForConvert("f");
+		Task ft2 = ft.convert(time);
+		assertTrue(ft2 instanceof FloatingTask);
+		
+		ToDoTask taskExpected = new FloatingTask(ft.getTaskUID(), ft.getStatus());
+		updateTaskExpected(taskExpected);
+		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
+	}
+
+	private void testConvertToDeadline() throws HandledException {	
+		DateTime[] time = generateTimeForConvert("d");
+		Task ft2 = ft.convert(time);
+		assertTrue(ft2 instanceof DeadlineTask);
+		
+		ToDoTask taskExpected = new DeadlineTask(ft.getTaskUID(), Status.VTODO_NEEDS_ACTION, time[0]);
+		updateTaskExpected(taskExpected);
+		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
+	}
+	
+	private void testConvertToPeriodic() throws HandledException {
+		DateTime[] time = generateTimeForConvert("p");
+		Task ft2 = ft.convert(time);
+		assertTrue(ft2 instanceof PeriodicTask);
+		
+		PeriodicTask taskExpected = new PeriodicTask(ft.getTaskUID(), Status.VEVENT_CONFIRMED, time[0], time[1]);
+		updateTaskExpected(taskExpected);
+		assertTrue(TestUtil.compareTasks(ft2, taskExpected));
+	}
+
+	@Test
+	public void testClone() throws CloneNotSupportedException {
+		ToDoTask task = (ToDoTask) ft.clone();
+		assertTrue(TestUtil.compareTasks(task,ft));
+	}
+
+	@Test
+	public void testToSummary() {
+		testToSummaryUndeleted();
+		testToSummaryDeleted();
+	}
+
+	private void testToSummaryDeleted() {
+		Ansi expected = generateSummaryExpectedDeleted();
+		Ansi test = generateSummaryTestDeleted();
+		assertEquals(expected.toString(), test.toString());
+	}
+
+	private void testToSummaryUndeleted() {
+		Ansi expected = generateSummaryExpected();
+		Ansi test = generateSummaryTest();
+		assertEquals(expected.toString(), test.toString());
+	}
+
+	private Ansi generateSummaryTestDeleted() {
+		Ansi test;
+		ft.delete();
+		test = generateSummaryTest();
+		return test;
+	}
+
+	private Ansi generateSummaryTest() {
+		return ft.toSummary();
+	}
+
+	private Ansi generateSummaryExpectedDeleted() {
+		Ansi expected;
+		Ansi deletedTest = ansi().fg(MAGENTA).a("(Deleted Task)\n").reset();
+		expected = ansi().fg(YELLOW).a(ft.getTaskID()).a(". ").reset();
+		expected.bold().a(ft.getTitle()).a('\n').boldOff().reset().a(deletedTest);
+		expected.a("Status: ").a(ToDoTask.completedToString(ft.getCompleted())).a('\n');
+		return expected;
+	}
+
+	private Ansi generateSummaryExpected() {
+		Ansi expected = ansi().fg(YELLOW).a(ft.getTaskID()).a(". ").reset();
+		expected.bold().a(ft.getTitle()).a('\n').boldOff().reset();
+		expected.a("Status: ").a(ToDoTask.completedToString(ft.getCompleted())).a('\n');
+		return expected;
+	}
+}
+	// End of segment: CEO\src\cs2103\task\FloatingTaskTest.java
+
+
+
+
+
+	/**
+	 * origin: CEO\src\cs2103\task\PeriodicTask.java
+	 */
+
+package cs2103.task;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.fusesource.jansi.Ansi;
+
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
+import cs2103.exception.HandledException;
+import cs2103.util.CommonUtil;
+import cs2103.util.Logger;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.Location;
+import net.fortuna.ical4j.model.property.RRule;
+import net.fortuna.ical4j.model.property.Status;
+
+public class PeriodicTask extends EventTask {
+	private String location;
+	private Recur recurrence;
+
+	private static final String STRING_LOCATION = "Location: ";
+	private static final String STRING_RECUR = "Recurrence: ";
+	private static final String LOG_UPDATEFROMRECUR = "Updating Periodic Task with UID %1$s from Recurrence";
+	
+	public PeriodicTask(String taskUID, Status status, Date startTime, Date endTime) throws HandledException {
+		super(taskUID, status, startTime, endTime);
+	}
+	
+	/**
+	 * @return the location String
+	 */
+	public String getLocation() {
+		return this.location;
+	}
+	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#updateLocation(java.lang.String)
+	 */
+	public void updateLocation(String location) {
+		if (location == null) {
+			this.location = "";
+		} else {
+			this.location = location;
+		}
+	}
+
+	/**
+	 * @return the Recurrence object
+	 */
+	public Recur getRecurrence() {
+		return this.recurrence;
+	}
+	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#updateRecurrence(net.fortuna.ical4j.model.Recur)
+	 */
+	public void updateRecurrence(Recur recurrence) {
+		this.recurrence = recurrence;
+	}
+	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#convert(java.util.Date[])
+	 */
+	@Override
+	protected Task convert(Date[] time) throws HandledException {
+		if (isInvalidTime(time)) {
+			throw new HandledException(HandledException.ExceptionType.INVALID_TIME);
+		} else if (isBothTimeNull(time)) {
+			return this.toFloating();
+		} else if (isFirstTimeNull(time)) {
+			return this.toDeadline(time[0]);
+		} else {
+			return this.toPeriodic(time[0], time[1]);
+		}
+	}
+
+	private boolean isInvalidTime(Date[] time) {
+		return time == null;
+	}
+
+	private boolean isFirstTimeNull(Date[] time) {
+		return time[1] == null;
+	}
+
+	private boolean isBothTimeNull(Date[] time) {
+		return time[0] == null && isFirstTimeNull(time);
+	}
+	
+	private ToDoTask toFloating() throws HandledException {
+		ToDoTask newTask = new FloatingTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION);
+		assert(newTask != null);
+		updateNewTask(newTask);
+		return newTask;
+	}
+
+	private ToDoTask toDeadline(Date dueTime) throws HandledException {
+		ToDoTask newTask = new DeadlineTask(this.getTaskUID(), Status.VTODO_NEEDS_ACTION, dueTime);
+		assert(newTask != null);
+		updateNewTask(newTask);
+		return newTask;
+	}
+
+	private PeriodicTask toPeriodic(Date startTime, Date endTime) throws HandledException {
+		PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getStatus(), startTime, endTime);
+		assert(newTask != null);
+		updateNewTask(newTask);
+		return newTask;
+	}
+	
+	private void updateNewTask(Task newTask) {
+		newTask.updateLocation(this.getLocation());
+		newTask.updateRecurrence(this.getRecurrence());
+		newTask.updateTitle(this.getTitle());
+		newTask.updateCreated(this.getCreated());
+		newTask.updateDescription(this.getDescription());
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		try {
+			PeriodicTask newTask = new PeriodicTask(this.getTaskUID(), this.getStatus(), this.getStartTime(), this.getEndTime());
+			assert(newTask != null);
+			updateClone(newTask);
+			return newTask;
+		} catch (HandledException e) {
+			throw new CloneNotSupportedException();
+		}
+	}
+
+	private void updateClone(PeriodicTask newTask) {
+		updateNewTask(newTask);
+		newTask.updateLastModified(null);
+	}
+
+	@Override
+	public Ansi toSummary() {
+		Ansi returnString = this.addCommonString();
+		formatStartEndTime(returnString);
+		if (hasRecurrence()) {
+			formatRecurrence(returnString);
+		}
+		return returnString;
+	}
+
+	private boolean hasRecurrence() {
+		return this.getRecurrence() != null;
+	}
+
+	private void formatStartEndTime(Ansi returnString) {
+		returnString.a("From: ");
+		returnString.a(this.dateToString(this.getStartTime()));
+		returnString.a(" to ");
+		returnString.a(this.dateToString(this.getEndTime())).reset();
+		returnString.a('\n');
+	}
+
+	private Ansi formatRecurrence(Ansi returnString) {
+		return returnString.a(recurToString(this.getRecurrence())).a('\n');
+	}
+
+	@Override
+	public Ansi toDetail() {
+		Ansi returnString = this.toSummary();
+		formatLocation(returnString);
+		formatDescription(returnString);
+		return returnString;
+	}
+
+	private void formatLocation(Ansi returnString) {
+		returnString.a(STRING_LOCATION);
+		returnString.fg(CYAN).a(this.getLocation()).a("\n").reset();
+	}
+	
+	private void formatDescription(Ansi returnString) {
+		returnString.a(STRING_DESCRIPTION).a(this.getDescription()).reset().a('\n');
+	}
+	
+	private static Ansi recurToString(Recur recur) {
+		Ansi returnString = ansi().a(STRING_RECUR);
+		returnString.fg(YELLOW).a(recur.getInterval()).a(' ');
+		returnString.a(recur.getFrequency()).reset();
+		return returnString;
+	}
+	
+	private static List<String> recurToGoogle(Recur recur) {
+		if (recur == null) {
+			return null;
+		} else {
+			return generateRecurrenceList(recur);
+		}
+	}
+
+	private static List<String> generateRecurrenceList(Recur recur) {
+		List<String> recurrenceList = new ArrayList<String>();
+		StringBuffer sb = new StringBuffer();
+		sb.append("RRULE:").append(recur.toString());
+		recurrenceList.add(sb.toString());
+		return recurrenceList;
+	}
+
+	@Override
+	public VEvent toVEvent() {
+		VEvent vEvent = new VEvent(this.getStartTime(), this.getEndTime(),this.getTitle());
+		this.addCommonProperty(vEvent);
+		if (hasRecurrence()) {
+			vEvent.getProperties().add(new RRule(this.getRecurrence()));
+		}
+		vEvent.getProperties().add(this.getStatus());
+		vEvent.getProperties().add(new Location(this.getLocation()));
+		return vEvent;
+	}
+	
+	public com.google.api.services.calendar.model.Event toGEvent() {
+		com.google.api.services.calendar.model.Event gEvent = new com.google.api.services.calendar.model.Event();
+		this.addGEventProperty(gEvent);
+		gEvent.setLocation(this.getLocation());
+		List<String> recurrenceList = recurToGoogle(this.getRecurrence());
+		if (recurrenceList != null) gEvent.setRecurrence(recurrenceList);
+		return gEvent;
+	}
+	
+	/**
+	 * @return the comparator for sorting
+	 */
+	public static sortComparator getComparator() {
+		return new sortComparator();
+	}
+
+	/**
+	 * Special class to compare Periodic Tasks
+	 */
+	private static class sortComparator implements Comparator<PeriodicTask> {
+		@Override
+		public int compare(PeriodicTask o1, PeriodicTask o2) {
+			return o1.getStartTime().compareTo(o2.getStartTime());
+		}
+	}
+
+	@Override
+	public boolean checkPeriod(Date[] time) {
+		if (isNullTimePeriod(time)) {
+			return true;
+		} else if (isFirstTimeNull(time)) {
+			return checkTimeAfterStartTime(time[0]);
+		} else {
+			return checkStartTimeBetweenTimes(time);
+		}
+	}
+	
+	private boolean isNullTimePeriod(Date[] time) {
+		if (time == null) {
+			return true;
+		} else if (time[0] == null) {
+			return true;
+		} 
+		return false;
+	}
+
+	/**
+	 * Check if startTime is between time[0] and time[1]
+	 */
+	private boolean checkStartTimeBetweenTimes(Date[] time) {
+		return this.getStartTime().after(time[0]) && this.getStartTime().before(time[1]);
+	}
+
+	/**
+	 * Check if startTime is before time
+	 */
+	private boolean checkTimeAfterStartTime(Date time) {
+		return this.getStartTime().before(time);
+	}
+	
+	@Override
+	public boolean matches(String keyword) {
+		if (isEmptyKeyword(keyword)){
+			return true;
+		} else {
+			return containsKeywordInTask(keyword);
+		}
+	}
+
+	private boolean isEmptyKeyword(String keyword) {
+		return keyword == null || keyword.isEmpty();
+	}
+
+	private boolean containsKeywordInTask(String keyword) {
+		if (containsKeywordInTitle(keyword)) {
+			return true;
+		} else if (containsKeywordInDescription(keyword)) {
+			return true;
+		} else if (containsKeywordInLocation(keyword)) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean containsKeywordInLocation(String keyword) {
+		return StringUtils.containsIgnoreCase(this.getLocation(), keyword);
+	}
+
+	private boolean containsKeywordInDescription(String keyword) {
+		return StringUtils.containsIgnoreCase(this.getDescription(), keyword);
+	}
+
+	private boolean containsKeywordInTitle(String keyword) {
+		return StringUtils.containsIgnoreCase(this.getTitle(), keyword);
+	}
+	
+	/**
+	 * Updates new Times for task based on recurrence
+	 */
+	public PeriodicTask updateTimeFromRecur() throws HandledException {
+		DateTime now = new DateTime();
+		if (hasRecurrenceAndFrequency() && endTimeBeforeNow(now)) {
+			Date startTime = calculateStartTimeFromRecur(now);
+			if (startTime == null) {
+				return null;
+			} else {
+				Date endTime = calculateEndTimeFromRecur(startTime);
+				assert(endTime != null);
+				Logger.getInstance().writeLog(CommonUtil.formatLogString(LOG_UPDATEFROMRECUR, this));
+				this.updateTime(startTime, endTime);
+				this.updateLastModified(null);
+				return this;
+			}
+		} else {
+			return null;
+		}
+	}
+
+	private net.fortuna.ical4j.model.Date calculateStartTimeFromRecur(DateTime now) {
+		assert(now != null);
+		return this.getRecurrence().getNextDate(this.getStartTime(), now);
+	}
+
+	private Date calculateEndTimeFromRecur(Date startTime) {
+		assert(startTime != null);
+		return new Date(this.getEndTime().getTime() - this.getStartTime().getTime() + startTime.getTime());
+	}
+
+	private boolean endTimeBeforeNow(DateTime now) {
+		assert(now != null);
+		return this.getEndTime().before(now);
+	}
+
+	private boolean hasRecurrenceAndFrequency() {
+		return hasRecurrence() && this.getRecurrence().getFrequency() != null;
+	}
+}
+	// End of segment: CEO\src\cs2103\task\PeriodicTask.java
+
+
+
+
+
+	/**
+	 * origin: CEO\src\cs2103\task\PeriodicTaskTest.java
+	 */
+
+package cs2103.task;
+
+import static org.fusesource.jansi.Ansi.ansi;
+
+import static org.fusesource.jansi.Ansi.Color.CYAN;
+import static org.fusesource.jansi.Ansi.Color.GREEN;
+import static org.fusesource.jansi.Ansi.Color.YELLOW;
+import static org.junit.Assert.*;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.property.Status;
+
+import org.fusesource.jansi.Ansi;
+import org.junit.Before;
+import org.junit.Test;
+
+import cs2103.exception.HandledException;
+import cs2103.util.TestUtil;
+
+public class PeriodicTaskTest extends EventTaskTest{
+	static PeriodicTask pt;
+	String taskUID = null;
+	Date created = null; 
+	String title = "Testing";
+	String location = "Location";
+	String description = "Description";
+	Status status = null;
+	Date startTime = new DateTime(1000);
+	Date endTime = new DateTime(1001);
+	Recur recurrence = new Recur();
+
+	protected PeriodicTask getConcrete() {
+		return pt;
+	}
+	
+	@Before
+	public void setUp() throws Exception {
+		pt = new PeriodicTask(this.taskUID, this.status, this.startTime, this.endTime);
+		updateNewPeriodicTask();
+	}
+
+	private void updateNewPeriodicTask() {
+		pt.updateTitle(this.title);
+		pt.updateDescription(this.description);
+		pt.updateLocation(this.location);
+		pt.updateLastModified(null);
+		pt.updateRecurrence(this.recurrence);
+	}
+
+	/**
+	 * Three different cases to test PeriodicTask constructor
+	 */
+	@Test 
+	public void testPeriodicTaskConstructor() throws HandledException{
+		testPeriodicTaskConstructionOne();
+		testPeriodicTaskConstructionTwo();
+		testPeriodicTaskConstructionThree();
+	}
+		
+	/**
+	 * Case 1: Invalid input times
+	 */
+	public void testPeriodicTaskConstructionOne() throws HandledException {
+		exception.expect(HandledException.class);
+		pt = new PeriodicTask(this.taskUID, this.status, null, null);
+	}
+	
+	/**
+	 * Case 2: Invalid input times
+	 */
+	public void testPeriodicTaskConstructionTwo() throws HandledException {
+		exception.expect(HandledException.class);
+		DateTime newStartTime = new DateTime(1);
+		DateTime newEndTime = new DateTime(0);
+		pt = new PeriodicTask(this.taskUID, this.status, newStartTime, newEndTime);
+	}
+
+	/**
+	 * Case 3: Successful Creation
+	 */
+	public void testPeriodicTaskConstructionThree() throws HandledException {
+		pt = new PeriodicTask(this.taskUID, this.status, this.startTime, this.endTime);
+		assertTrue(true);
+	}
+	
+	@Test
+	public void testUpdateAndGetLocation() {
+		String location = "Test Location";
+		pt.updateLocation(location);
+		assertEquals(location, pt.getLocation());
+	}
+
+	@Test
+	public void testUpdateAndGetRecurrence() {
+		Recur recur = new Recur();
+		pt.updateRecurrence(recur);
+		assertEquals(recur, pt.getRecurrence());
+	}
+
+	@Test
+	public void testClone() throws CloneNotSupportedException {
+		PeriodicTask task = (PeriodicTask) pt.clone();
+		assertTrue(TestUtil.compareTasks(task, pt));
+		
+	}
+
+	/**
+	 * Check if Periodic Task should be alerted to user
+	 */
+	@Test
+	public void testCheckPeriod() {
+		Date[] time = new Date[2];
+		assertEquals(pt.checkPeriod(time), true);
+		
+		time[0] = new DateTime(1);
+		assertEquals(pt.checkPeriod(time), false);
+		
+		time[0] = null;
+		time[1] = new DateTime(2);
+		assertEquals(pt.checkPeriod(time), true);
+	}
+	
+	/**
+	 * Matches returns true if the input string is included, regardless
+	 * 				of case, in the title, description, and location fields 
+	 */
+	@Test
+	public void testMatches() {
+		String keyword = null;
+		assertEquals(pt.matches(keyword), true);
+		
+		keyword = "";
+		assertEquals(pt.matches(keyword), true);
+		
+		keyword = "Testing";
+		assertEquals(pt.matches(keyword), true);
+		
+		keyword = "Codin";
+		assertEquals(pt.matches(keyword), false);
+		
+		pt.updateDescription("Coding");
+		assertEquals(pt.matches(keyword), true);
+		
+		keyword = "New Location";
+		assertEquals(pt.matches(keyword), false);
+		
+		pt.updateLocation("New LOcation");
+		assertEquals(pt.matches(keyword), true);
+	}
+	
+	@Test
+	public void testConvert() throws HandledException {
+		testConvertException();
+		testConvertToFloating();
+		testConvertToDeadline();
+		testConvertToPeriodic();
+	}
+	
+	private void testConvertException() throws HandledException {
+		exception.expect(HandledException.class);
+		DateTime[] time = null;
+		pt.convert(time);	
+	}
+	
+	private void testConvertToFloating() throws HandledException {
+		DateTime[] time = generateTimeForConvert("f");
+		Task taskTest = pt.convert(time);
+		assertTrue(taskTest instanceof FloatingTask);
+		
+		Task taskExpected = new FloatingTask(pt.getTaskUID(), Status.VTODO_NEEDS_ACTION);
+		updateTaskExpected(taskExpected);
+		assertTrue(TestUtil.compareTasks(taskTest, taskExpected));
+	}
+
+	private void testConvertToDeadline() throws HandledException {	
+		DateTime[] time = generateTimeForConvert("d");
+		Task taskTest = pt.convert(time);
+		assertTrue(taskTest instanceof DeadlineTask);
+		
+		ToDoTask taskExpected = new DeadlineTask(pt.getTaskUID(), Status.VTODO_NEEDS_ACTION, time[0]);
+		updateTaskExpected(taskExpected);
+		assertTrue(TestUtil.compareTasks(taskTest, taskExpected));
+	}
+	
+	private void testConvertToPeriodic() throws HandledException {
+		DateTime[] time = generateTimeForConvert("p");
+		Task taskTest = pt.convert(time);
+		assertTrue(taskTest instanceof PeriodicTask);
+		
+		PeriodicTask taskExpected = new PeriodicTask(pt.getTaskUID(), pt.getStatus(), time[0], time[1]);
+		updateTaskExpectedPeriodic(taskExpected);
+		assertTrue(TestUtil.compareTasks(taskTest, taskExpected));
+	}
+
+	private void updateTaskExpectedPeriodic(PeriodicTask taskExpected) {
+		updateTaskExpected(taskExpected);
+		taskExpected.updateLocation(pt.getLocation());
+		taskExpected.updateRecurrence(pt.getRecurrence());
+	}
+
+	@Test
+	public void testToSummary() {
+		testToSummaryWithRecurrence();
+		testToSummaryWithoutRecurrence();
+	}
+
+	private void testToSummaryWithoutRecurrence() {
+		Ansi expected = generateSummaryExpectedNullRecurrence();
+		Ansi test = generateSummaryTestNullRecurrence();
+		assertEquals(expected.toString(), test.toString());
+	}
+
+	private void testToSummaryWithRecurrence() {
+		Ansi expected = generateSummaryExpected();
+		Ansi test = generateSummaryTest();
+		assertEquals(expected.toString(), test.toString());
+	}
+
+	private Ansi generateSummaryTest() {
+		Ansi test = pt.toSummary();
+		return test;
+	}
+
+	private Ansi generateSummaryTestNullRecurrence() {
+		Ansi test;
+		pt.updateRecurrence(null);
+		test = pt.toSummary();
+		return test;
+	}
+
+	private Ansi generateSummaryExpectedNullRecurrence() {
+		Ansi expected;
+		expected = ansi().fg(YELLOW).a(pt.getTaskID()).a(". ").reset();
+		expected.bold().a(pt.getTitle()).a('\n').boldOff().reset();
+		expected.a("From: ").a(generateDateStringExpected(pt.getStartTime())).a(" to ");
+		expected.a(generateDateStringExpected(pt.getEndTime())).reset();
+		expected.a('\n');
+		return expected;
+	}
+
+	private Ansi generateSummaryExpected() {
+		Ansi expected = ansi().fg(YELLOW).a(pt.getTaskID()).a(". ").reset();
+		expected.bold().a(pt.getTitle()).a('\n').boldOff().reset();
+		expected.a("From: ").a(generateDateStringExpected(pt.getStartTime())).a(" to ");
+		expected.a(generateDateStringExpected(pt.getEndTime())).reset();
+		expected.a('\n').a(generateRecurExpected(pt.getRecurrence())).a('\n');
+		return expected;
+	}
+	
+	private Ansi generateRecurExpected(Recur recur) {
+		Ansi returnString = ansi().a("Recurrence: ");
+		returnString.fg(YELLOW).a(recur.getInterval()).a(' ');
+		returnString.a(recur.getFrequency()).reset();
+		return returnString;
+	}
+	
+	private Ansi generateDateStringExpected(Date date) {
+		Ansi returnString = ansi().bold();
+		DateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm a", Locale.US);	
+		returnString.fg(GREEN).a(format.format(date)).reset();
+		return returnString;
+	}
+
+	@Test
+	public void testToDetail() {
+		Ansi expected = generateDetailExpected();
+		Ansi test = generateDetailTest();
+		assertEquals(expected.toString(), test.toString());
+	}
+
+	private Ansi generateDetailTest() {
+		return pt.toDetail();
+	}
+
+	private Ansi generateDetailExpected() {
+		Ansi expected = generateSummaryTest();
+		expected.a("Location: ");
+		expected.fg(CYAN).a(pt.getLocation()).a("\n").reset();
+		expected.a("Description: ").a(pt.getDescription()).reset().a('\n');
+		return expected;
+	}
+	
+	/**
+	 * Two different test cases to see if a task can correctly update based on its recurrence
+	 */
+	@Test
+	public void testUpdateTimeFromRecur() throws HandledException {
+		testUpdateTimeFromRecurOne();
+		testUpdateTimeFromRecurTwo();
+	}
+	
+	/**
+	 * Recurrence is non null
+	 */
+	private void testUpdateTimeFromRecurOne() throws HandledException {
+		PeriodicTask pt2 = pt.updateTimeFromRecur();
+		assertTrue(pt2 == null);
+		recurrence.setFrequency(Recur.HOURLY);
+		pt.updateRecurrence(recurrence);
+		pt2 = pt.updateTimeFromRecur();
+		assertTrue(TestUtil.compareTasks(pt, pt2));
+	}
+		
+	/**
+	 * Recurrence is null
+	 */
+	private void testUpdateTimeFromRecurTwo() throws HandledException {
+		pt.updateRecurrence(null);
+		PeriodicTask pt2 = pt.updateTimeFromRecur();
+		assertTrue(pt2 == null);
+	}
+}
+	// End of segment: CEO\src\cs2103\task\PeriodicTaskTest.java
+
+
+
+
+
+	/**
+	 * origin: CEO\src\cs2103\task\Task.java
+	 */
+
+package cs2103.task; 
+
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import org.fusesource.jansi.Ansi;
+
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
+import cs2103.exception.HandledException;
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.property.Created;
+import net.fortuna.ical4j.model.property.Description;
+import net.fortuna.ical4j.model.property.LastModified;
+import net.fortuna.ical4j.model.property.Status;
+import net.fortuna.ical4j.model.property.Uid;
+
+/**
+ * Containing methods for the inherited methods in 
+ * 				concrete Task classes: DeadlineTask, FloatingTask, and PeriodicTask
+ */
+
+public abstract class Task implements Comparable<Task>, Cloneable{;
+	private int taskID;
+	private final String taskUID;
+	private String title;
+	private String description;
+	private DateTime created;
+	private DateTime lastModified;
+	protected Status status;
+	protected static final String STRING_DESCRIPTION = "Description: ";
+	protected static final long DAY_IN_MILLIS = 86400000L;
+	protected static final Ansi DELETED = ansi().fg(MAGENTA).a("(Deleted Task)\n").reset();
+	
+	public Task(String taskUID) {
+		if (taskUID == null){
+			this.taskUID = this.generateUid();
+		} else {
+			this.taskUID = taskUID;
+		}
+		this.updateCreated(null);
+	}
+	
+	/**
+	 * Generated a String taskUID, unique to each Task created
+	 */
+	private String generateUid(){
+		SecureRandom random = new SecureRandom();
+		return new BigInteger(130, random).toString(32);
+	}
+	
+	/**
+	 * @return the temporary Task ID
+	 */
+	public int getTaskID(){
+		return this.taskID;
+	}
+	
+	/**
+	 * @return the unique identifying String of the task object
+	 */
+	public String getTaskUID(){
+		return this.taskUID;
+	}
+	
+	/**
+	 * @return the Title of the Task
+	 */
+	public String getTitle(){
+		if (this.title == null){
+			this.title = "";
+		}
+		return this.title;
+	}
+	
+	/**
+	 * @return the Description of the Task
+	 */
+	public String getDescription(){
+		if (this.description == null){
+			this.description = "";
+		}
+		return this.description;
+	}
+	
+	/**
+	 * @return the created time of the Task
+	 */
+	public DateTime getCreated(){
+		return this.created;
+	}
+	
+	/**
+	 * @return the last modified time of the Task
+	 */
+	public DateTime getLastModified(){
+		if (this.lastModified == null){
+			this.updateLastModified(null);
+		}
+		return this.lastModified;
+	}
+	
+	/**
+	 * @param a temporary task id
+	 */
+	public void updateTaskID(int id){
+		this.taskID = id;
+	}
+	
+	/**
+	 * @param title
+	 */
+	public void updateTitle(String title) {
+		this.title = title;
+	}
+	
+	/**
+	 * @param description
+	 */
+	public void updateDescription(String description){
+		this.description = description;
+	}
+	
+	/**
+	 * @param the last modified time
+	 */
+	public void updateLastModified(Date date){
+		if (date == null){
+			this.lastModified = new DateTime();
+		} else {
+			this.lastModified = new DateTime(date);
+		}
+	}
+	
+	/**
+	 * @param the created time
+	 */
+	public void updateCreated(Date date){
+		if (date == null){
+			this.created = new DateTime();
+		} else {
+			this.created = new DateTime(date);
+		}
+	}
+	
+	@Override
+	public int compareTo(Task o) {
+		return this.getCreated().compareTo(o.getCreated());
+	}
+	
+	/**
+	 * Adds property to component necessary for Google Sync
+	 */
+	protected void addCommonProperty(Component component){
+		component.getProperties().add(new Uid(this.getTaskUID()));
+		component.getProperties().add(new Created(this.getCreated()));
+		component.getProperties().add(new LastModified(addLastModified()));
+		component.getProperties().add(new Description(this.getDescription()));
+	}
+
+	private DateTime addLastModified() {
+		if (this.getLastModified() == null) {
+			return new DateTime();
+		} else {
+			return this.getLastModified();
+		}
+	}
+	
+	/**
+	 * Generates the output format used by toSummary and toDetail for all Tasks 
+	 */
+	protected Ansi addCommonString(){
+		Ansi returnString = ansi().fg(YELLOW).a(this.getTaskID()).a(". ").reset();
+		returnString.bold().a(this.getTitle()).a('\n').boldOff().reset();
+		if (this.isDeleted()) returnString.a(DELETED);
+		return returnString;
+	}
+	
+	@Override
+	public boolean equals(Object o){
+		if (o == null) return false;
+		if (o instanceof Task){
+			return this.getTaskUID().equals(((Task) o).getTaskUID());
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * @param a Date array contains time information
+	 * @return Updated task
+	 * @throws HandledException
+	 */
+	public Task updateNewTask(Date[] time) throws HandledException{
+		Task returnTask = this.convert(time);
+		assert(returnTask != null);
+		returnTask.updateLastModified(null);
+		return returnTask;
+	}
+	
+	/**
+	 * @param time completed
+	 */
+	public abstract void updateCompleted(Date complete);
+	/**
+	 * @param location
+	 */
+	public abstract void updateLocation(String location);
+	/**
+	 * @param recurrence
+	 */
+	public abstract void updateRecurrence(Recur recurrence);
+	/**
+	 * @param status as in RFC 2445 iCalendar specification
+	 */
+	protected abstract void updateStatus(Status status);
+	/**
+	 * @return return whether this task is deleted
+	 */
+	public abstract boolean isDeleted();
+	/**
+	 * Indicate this Task is deleted
+	 */
+	public abstract void delete();
+	/**
+	 * Revives a task from delete
+	 */
+	public abstract void restore();
+	/**
+	 * Used to change one type of task to another type
+	 * Called from an Update of the task
+	 */
+	protected abstract Task convert(Date[] time) throws HandledException;
+	@Override
+	public abstract Object clone() throws CloneNotSupportedException;
+	/**
+	 * @return Summary Ansi String to be printed
+	 */
+	public abstract Ansi toSummary();
+	/**
+	 * @return Detail Ansi String to be printed
+	 */
+	public abstract Ansi toDetail();
+	/**
+	 * @return convert to iCal4j component object to store
+	 */
+	public abstract Component toComponent();
+	/**
+	 * @return return the time the task is completed
+	 */
+	public abstract DateTime getCompleted();
+	/**
+	 * @param a Date array specify the time period for checking
+	 * @return if this task is within the period
+	 */
+	public abstract boolean checkPeriod(Date[] time);
+	/**
+	 * Checks if keyword is contained anywhere within the task
+	 */
+	public abstract boolean matches(String keyword);
+	
+	/**
+	 * @return status as in RFC 2445 iCalendar specification
+	 */
+	public Status getStatus(){
+		return this.status;
+	}
+
+	protected Ansi dateToString(Date date){
+		Ansi returnString = ansi().bold();
+		DateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm a", Locale.US);
+		if (this.checkAlert()){
+			returnString.fg(RED);
+		} else {
+			returnString.fg(GREEN);
+		}
+		returnString.a(format.format(date)).reset();
+		return returnString;
+	}
+	
+	/**
+	 * To check whether a Task is in the time frame eligible to be alerted to the user
+	 */
+	public boolean checkAlert() {
+		Date[] time = new Date[2];
+		time[0] = new Date();
+		time[1] = new Date(time[0].getTime() + DAY_IN_MILLIS);
+		return this.checkPeriod(time);
+	}
+}
+
+	// End of segment: CEO\src\cs2103\task\Task.java
+
+
+
+
+
+	/**
+	 * origin: CEO\src\cs2103\task\TaskTest.java
+	 */
+
+package cs2103.task;
+
+import static org.junit.Assert.*;
+
+import java.util.Date;
+
+import net.fortuna.ical4j.model.DateTime;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import cs2103.exception.HandledException;
+
+/**
+ * Containing tests for the inherited methods in 
+ * 				concrete Task classes: DeadlineTask, FloatingTask, and PeriodicTask
+ */
+
+public abstract class TaskTest {
+	private static final String testDescription = "New Description";
+	private static final String testTitle = "New Title";
+	private static final int testTaskID = 1;
+	
+	/**
+	 * Called in the beginning of every JUnit test that is inherited from 
+	 * 							an Abstract JUnit Test class
+	 * Obtains a concrete object to run JUnit test
+	 */
+	protected abstract Task getConcrete();
+	
+	@Rule
+	public ExpectedException exception = ExpectedException.none();
+
+	@Test
+	public void testCheckAlert(){
+		Task task = getConcrete();
+		assertFalse(task.checkAlert());
+	}
+		
+	@Test
+	public void testUpdateAndGetLastModified() {
+		Task task = getConcrete();
+		assertTrue(task.getLastModified().equals(new DateTime(new Date())));
+		
+		Date testDate= new DateTime(1000);
+		task.updateLastModified(testDate);
+		assertTrue(task.getLastModified().equals(testDate));
+	}
+	
+	@Test
+	public void testUpdateAndGetTaskID() {
+		Task task = getConcrete();
+		task.updateTaskID(testTaskID);
+		assertEquals(task.getTaskID(),testTaskID);
+	}
+	
+	@Test
+	public void testUpdateAndGetDescription() {
+		Task task = getConcrete();
+		task.updateDescription(testDescription);
+		assertEquals(testDescription,task.getDescription());
+	}
+	
+	@Test
+	public void testUpdateAndGetTitle() throws HandledException {
+			Task task = getConcrete();
+			String newTitle = testTitle;
+			task.updateTitle(newTitle);
+			assertEquals(testTitle,task.getTitle());
+	}
+	
+	@Test
+	public void testUpdateAndGetCreated() {
+		Task task = getConcrete();
+		testUpdateAndGetCreatedNull(task);
+		testUpdateAndGetCreatedNonNull(task);
+	}
+
+	private void testUpdateAndGetCreatedNonNull(Task task) {
+		DateTime testDate = new DateTime(1);
+		task.updateCreated(testDate);
+		assertTrue(testDate.equals(task.getCreated()));
+	}
+
+	private void testUpdateAndGetCreatedNull(Task task) {
+		task.updateCreated(null);
+		assertTrue(new DateTime().equals(task.getCreated()));
+	}
+
+	@Test
+	public void testEquals() throws CloneNotSupportedException, HandledException{
+		Task task = getConcrete();
+		testEqualsNull(task);
+		testEqualsNonTask(task);
+		testEqualsTasks(task);
+	}
+	
+	/**
+	 * Variable dummyTask is a task (never used in other test cases) used as 
+	 * 				comparison to test method Equals
+	 */
+	private void testEqualsTasks(Task task) throws CloneNotSupportedException {
+		Task dummyTask = generateDummyTask();
+		assertFalse(task.equals(dummyTask));
+		assertTrue(task.equals(task.clone()));
+	}
+
+	private void testEqualsNonTask(Task task) {
+		Object o;
+		o = (String) "Testing";
+		assertEquals(false, task.equals(o));
+	}
+
+	private void testEqualsNull(Task task) {
+		Object o = null;
+		assertEquals(false, task.equals(o));
+	}
+
+	private Task generateDummyTask() {
+		Task dummyTask = new FloatingTask(null, null);
+		return dummyTask;
+	}
+	
+	@Test
+	public void testDeleteAndIsDelete() {
+		Task task = getConcrete();
+		assertEquals(false, task.isDeleted());
+		task.delete();
+		assertEquals(true, task.isDeleted());
+	}
+	
+	@Test
+	public void testCompareTo() throws CloneNotSupportedException{
+		Task task = getConcrete();
+		assertEquals(0, compareToTask(task));
+	}
+
+	private int compareToTask(Task task) throws CloneNotSupportedException {
+		return task.compareTo((Task) task.clone());
+	}
+	
+	@Test
+	public void testDeleteAndIsDeleted(){
+		Task task = (Task) getConcrete();
+		task.delete();
+		assertTrue(task.isDeleted());
+	}
+	
+	protected DateTime[] generateTimeForConvert(String type) {
+		DateTime[] time = new DateTime[2];
+		if (type.equals("f")) {
+			generateFloatingTaskTime(time);
+		} else if (type.equals("d")) {
+			generateDeadlineTaskTime(time);
+		} else if (type.equals("p")) {
+			generatePeriodicTaskTime(time);
+		}
+		return time;
+	}
+
+	private void generatePeriodicTaskTime(DateTime[] time) {
+		time[0] = new DateTime(1);
+		time[1]= new DateTime(2);
+	}
+
+	private void generateDeadlineTaskTime(DateTime[] time) {
+		time[0] = new DateTime(1);
+		time[1] = null;
+	}
+
+	private void generateFloatingTaskTime(DateTime[] time) {
+		time[0] = null;
+		time[1] = null;
+	}
+	
+	protected void updateTaskExpected(Task taskExpected) {
+		taskExpected.updateTitle(taskExpected.getTitle());
+		taskExpected.updateDescription(taskExpected.getDescription());
+		taskExpected.updateLastModified(taskExpected.getLastModified());
+		taskExpected.updateCompleted(taskExpected.getCompleted());
+	}
+}
+	// End of segment: CEO\src\cs2103\task\TaskTest.java
+
+
+
+
+
+	/**
+	 * origin: CEO\src\cs2103\task\ToDoTask.java
+	 */
+
+package cs2103.task;
+
+import java.util.Date;
+
+import org.apache.commons.lang.StringUtils;
+import org.fusesource.jansi.Ansi;
+
+import com.google.api.client.util.Data;
+
+import static org.fusesource.jansi.Ansi.*;
+import static org.fusesource.jansi.Ansi.Color.*;
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.component.VToDo;
+import net.fortuna.ical4j.model.property.Completed;
+import net.fortuna.ical4j.model.property.Status;
+
+/**
+ *  Contains inherited methods from Task
+ *  Extends to concrete Task class FloatingTask and DeadlineTask
+ */
+public abstract class ToDoTask extends Task {
+	private DateTime completed;
+	
+	public ToDoTask(String taskUID, Status status) {
+		super(taskUID);
+		this.updateStatus(status);
+	}
+	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#getCompleted()
+	 */
+	@Override
+	public DateTime getCompleted() {
+		return this.completed;
+	}
+	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#updateCompleted(java.util.Date)
+	 */
+	@Override
+	public void updateCompleted(Date completed) {
+		if (completed == null) {
+			this.completed = null;
+		} else {
+			this.completed = new DateTime(completed);
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#updateStatus(net.fortuna.ical4j.model.property.Status)
+	 */
+	@Override
+	protected void updateStatus(Status status) {
+		if (status == null) {
+			this.status = Status.VTODO_NEEDS_ACTION;
+		} else {
+			this.status = status;
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#updateLocation(java.lang.String)
+	 */
+	@Override
+	public void updateLocation(String location) {
+		return;
+	}
+
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#updateRecurrence(net.fortuna.ical4j.model.Recur)
+	 */
+	@Override
+	public void updateRecurrence(Recur recurrence) {
+		return;
+	}
+	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#isDeleted()
+	 */
+	@Override
+	public boolean isDeleted() {
+		return this.getStatus().equals(Status.VTODO_CANCELLED);
+	}
+
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#delete()
+	 */
+	@Override
+	public void delete() {
+		this.updateStatus(Status.VTODO_CANCELLED);
+	}
+
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#restore()
+	 */
+	@Override
+	public void restore() {
+		if (this.getCompleted() == null){
+			this.updateStatus(Status.VTODO_NEEDS_ACTION);
+		} else {
+			this.updateStatus(Status.VTODO_COMPLETED);
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#toComponent()
+	 */
+	@Override
+	public Component toComponent() {
+		return this.toVToDo();
+	}
+	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#toDetail()
+	 */
+	@Override
+	public Ansi toDetail() {
+		Ansi returnString = this.toSummary();
+		formatDescription(returnString);
+		return returnString;
+	}
+
+	private void formatDescription(Ansi returnString) {
+		returnString.a(STRING_DESCRIPTION).a(this.getDescription()).a('\n').reset();
+	}
+	
+	protected void addVToDoProperty(VToDo vToDo) {
+		assert(vToDo != null);
+		this.addCommonProperty(vToDo);
+		if (this.isDeleted()) {
+			vToDo.getProperties().add(Status.VTODO_CANCELLED);
+		} else if (this.getCompleted() == null) {
+			vToDo.getProperties().add(Status.VTODO_NEEDS_ACTION);
+		} else {
+			vToDo.getProperties().add(Status.VTODO_COMPLETED);
+			vToDo.getProperties().add(new Completed(this.getCompleted()));
+		}
+	}
+	
+	protected void addGTaskProperty(com.google.api.services.tasks.model.Task gTask) {
+		assert(gTask != null);
+		gTask.setTitle(this.getTitle());
+		if (this.getCompleted() == null) {
+			gTask.setCompleted(Data.NULL_DATE_TIME);
+			gTask.setStatus("needsAction");
+		} else {
+			gTask.setCompleted(new com.google.api.client.util.DateTime(this.getCompleted().getTime()));
+			gTask.setStatus("completed");
+		}
+	}
+	
+	protected static Ansi completedToString(DateTime completed) {
+		Ansi returnString = ansi();
+		formatCompleted(completed, returnString);
+		return returnString.reset();
+	}
+
+	private static void formatCompleted(DateTime completed, Ansi returnString) {
+		if (completed == null) {
+			formatCompletedNeedsAction(returnString);
+		} else {
+			formatCompletedIsCompleted(returnString);
+		}
+	}
+
+	private static Ansi formatCompletedIsCompleted(Ansi returnString) {
+		return returnString.bold().fg(GREEN).a("Completed");
+	}
+
+	private static Ansi formatCompletedNeedsAction(Ansi returnString) {
+		return returnString.bold().fg(RED).a("Needs Action");
+	}
+	
+	/* (non-Javadoc)
+	 * @see cs2103.task.Task#matches(java.lang.String)
+	 */
+	@Override
+	public boolean matches(String keyword) {
+		if (isEmptyKeyword(keyword)) {
+			return true;
+		} else {
+			return containsKeywordInTask(keyword);
+		}
+	}
+
+	private boolean containsKeywordInTask(String keyword) {
+		return containsKeywordInTitle(keyword) || containsKeywordInDescription(keyword);
+	}
+
+	private boolean containsKeywordInDescription(String keyword) {
+		return StringUtils.containsIgnoreCase(this.getDescription(), keyword);
+	}
+
+	private boolean containsKeywordInTitle(String keyword) {
+		return StringUtils.containsIgnoreCase(this.getTitle(), keyword);
+	}
+	
+	private boolean isEmptyKeyword(String keyword) {
+		return keyword == null || keyword.isEmpty();
+	}
+	
+	/**
+	 * @return a Google Task object which is needed for Google Sync
+	 */
+	public abstract com.google.api.services.tasks.model.Task toGTask();
+	protected abstract VToDo toVToDo();
+
+	protected void updateNewTask(Task newTask) {
+		newTask.updateTitle(this.getTitle());
+		newTask.updateCreated(this.getCreated());
+		newTask.updateDescription(this.getDescription());
+		newTask.updateCompleted(this.getCompleted());
+	}
+
+	protected void updateClone(ToDoTask newTask) {
+		updateNewTask(newTask);
+		newTask.updateLastModified(null);
+	}
+
+	protected void formatStatus(Ansi returnString) {
+		returnString.a("Status: ").a(completedToString(this.getCompleted()));
+	}
+}
+
+	// End of segment: CEO\src\cs2103\task\ToDoTask.java
+
+
+
+
+
+	/**
+	 * origin: CEO\src\cs2103\task\ToDoTaskTest.java
+	 */
+
+package cs2103.task;
+
+import static org.fusesource.jansi.Ansi.Color.GREEN;
+import static org.fusesource.jansi.Ansi.Color.RED;
+import static org.junit.Assert.*;
+
+import org.fusesource.jansi.Ansi;
+
+import static org.fusesource.jansi.Ansi.*;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.property.Status;
+
+import org.junit.Test;
+
+/**
+ *	Containing tests for the inherited methods in 
+ * 				concrete Task classes: DeadlineTask and FloatingTask
+ */
+public abstract class ToDoTaskTest extends TaskTest{
+
+	@Test
+	public void testUpdateAndGetCompleted(){
+		ToDoTask task = (ToDoTask) getConcrete();
+		testUpdateAndGetCompletedNull(task);
+		testUpdateAndGetCompletedWithTime(task);
+	}
+
+	private void testUpdateAndGetCompletedWithTime(ToDoTask task) {
+		DateTime testDate = new DateTime();
+		task.updateCompleted(testDate);
+		assertTrue(testDate.equals(task.getCompleted()));
+	}
+
+	private void testUpdateAndGetCompletedNull(ToDoTask task) {
+		task.updateCompleted(null);
+		assertEquals(null, task.getCompleted());
+	}
+	
+	@Test
+	public void testUpdateAndGetStatus(){
+		ToDoTask task = (ToDoTask) getConcrete();
+		task.updateStatus(null);
+		assertEquals(Status.VTODO_NEEDS_ACTION, task.getStatus());
+		
+		Status testStatus = Status.VTODO_COMPLETED;
+		task.updateStatus(testStatus);
+		assertEquals(testStatus, task.getStatus());
+	}
+	
+	@Test
+	public void testRestore(){
+		ToDoTask task = (ToDoTask) getConcrete();
+		testRestoreUncompletedTask(task);
+		testRestoreCompletedTask(task);
+	}
+
+	private void testRestoreCompletedTask(ToDoTask task) {
+		DateTime testDate = new DateTime();
+		task.updateCompleted(testDate);
+		task.restore();
+		assertEquals(Status.VTODO_COMPLETED, task.getStatus());
+		assertEquals(new DateTime(), task.getLastModified());
+	}
+
+	private void testRestoreUncompletedTask(ToDoTask task) {
+		task.updateCompleted(null);
+		task.restore();
+		assertEquals(Status.VTODO_NEEDS_ACTION, task.getStatus());
+	}
+	
+	@Test
+	public void testCompletedToString(){
+		testCompletedToStringWithoutDate();
+		testCompletedToStringWithDate();
+	}
+
+	private void testCompletedToStringWithDate() {
+		DateTime testDate = new DateTime();
+		Ansi test = ToDoTask.completedToString(testDate);
+		Ansi expected = generateCompletedToStringCompleted(); 
+		assertTrue(test.toString().equals(expected.toString()));
+	}
+
+	private void testCompletedToStringWithoutDate() {
+		Ansi test = ToDoTask.completedToString(null);
+		Ansi expected = generateCompletedToStringNeedsAction();
+		assertTrue(test.toString().equals(expected.toString()));
+	}
+
+	private Ansi generateCompletedToStringCompleted() {
+		Ansi expected;
+		expected = ansi().bold().fg(GREEN).a("Completed").reset();
+		return expected;
+	}
+
+	private Ansi generateCompletedToStringNeedsAction() {
+		Ansi expected = ansi().bold().fg(RED).a("Needs Action").reset();
+		return expected;
+	}
+	
+	/**
+	 * Matches returns true if the input string is included, regardless
+	 * 				of case, in the title or description fields 
+	 */
+	@Test
+	public void testMatches(){
+		ToDoTask task = (ToDoTask) getConcrete();
+		testMatchesHelper(task);
+	}
+
+	private void testMatchesHelper(ToDoTask task) {
+		testMatchesEmptySearch(task);
+		testMatchesTitle(task);
+		testMatchesFail(task);
+		testMatchesDescription(task);
+	}
+
+	private void testMatchesEmptySearch(ToDoTask task) {
+		String testKeyword = null;
+		assertTrue(task.matches(testKeyword));
+		
+		testKeyword = "";
+		assertTrue(task.matches(testKeyword));
+	}
+
+	private void testMatchesFail(ToDoTask task) {
+		String testKeyword;
+		testKeyword = "Testing";
+		assertTrue(!(task.matches(testKeyword)));
+	}
+
+	private void testMatchesTitle(ToDoTask task) {
+		String testKeyword;
+		testKeyword = "teSt";
+		task.updateTitle("Test Title");
+		assertTrue(task.matches(testKeyword));
+	}
+
+	private void testMatchesDescription(ToDoTask task) {
+		String testKeyword;
+		testKeyword = "DescRiption";
+		task.updateDescription("Test Description");
+		assertTrue(task.matches(testKeyword));
+	}	
+	
+	@Test 
+	public void testToDetail(){
+		ToDoTask task = (ToDoTask) getConcrete();
+		Ansi expected = generateDetailExpected(task);
+		Ansi test = generateDetailTest(task);
+		assertEquals(expected.toString(), test.toString());
+	}
+
+	private Ansi generateDetailTest(ToDoTask task) {
+		return task.toDetail();
+	}
+
+	private Ansi generateDetailExpected(ToDoTask task) {
+		Ansi expected = task.toSummary();
+		expected.a("Description: ").a(task.getDescription()).a('\n').reset();
+		return expected;
+	}
+}
+	// End of segment: CEO\src\cs2103\task\ToDoTaskTest.java
+
+
+
+
+

@@ -2,7 +2,6 @@
 package cs2103.util;
 
 /**
- * @author Yuri
  * Clear console on Windows
  */
 public class Console {

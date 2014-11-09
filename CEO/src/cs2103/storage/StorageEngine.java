@@ -44,7 +44,6 @@ import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.util.CompatibilityHints;
 
 /**
- * @author Yuri
  * This class implements StorageInterface
  * Using iCal4j to read and store iCalendar file complying RFC 2445 iCalendar specification
  */

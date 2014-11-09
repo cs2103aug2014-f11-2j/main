@@ -7,7 +7,6 @@ import java.util.Collections;
 import cs2103.task.Task;
 
 /**
- * @author Yuri
  * This class is used for testing purpose, it will not write the task list into file system
  */
 public class StorageStub implements StorageInterface {
