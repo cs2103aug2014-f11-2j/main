@@ -75,7 +75,6 @@ public class TaskList {
 	 */
 	public static TaskList getInstance(Option option) throws HandledException, FatalException {
 		if (taskList == null) {
-			assert(taskList == null);
 			taskList = new TaskList(option);
 		}
 		return taskList;
@@ -383,7 +382,6 @@ public class TaskList {
 		for (Task remoteTask:googleList) {
 			Task localTask = this.getTaskByTask(remoteTask, this.tasks);
 			if (localTask == null) {
-				assert(localTask == null);
 				if (!remoteTask.isDeleted()) {
 					this.storage.updateTask(remoteTask);
 					count++;
@@ -404,7 +402,6 @@ public class TaskList {
 			Task remoteTask = this.getTaskByTask(localTask, googleList);
 			Task updating = null;
 			if (remoteTask == null) {
-				assert(remoteTask == null);
 				updating = this.commitSyncToGoogle(localTask, true);
 				count++;
 			} else {
